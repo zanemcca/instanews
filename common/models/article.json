@@ -8,12 +8,31 @@
       "type": "geopoint",
       "required": true
     },
+    "isPrivate": {
+      "type": "boolean",
+      "required": true
+    },
+    "date": {
+      "type": "date"
+    },
     "votes": {
       "type": "votes"
     }
   },
   "validations": [],
-  "relations": {},
+  "relations": {
+    "subarticles": {
+      "type": "hasMany",
+      "model": "subarticle",
+      "foreignKey": "subarticleId"
+    },
+    "journalists": {
+      "type": "hasMany",
+      "model": "journalist",
+      "foreignKey": "journalistId",
+      "through": "subarticle"
+    }
+  },
   "acls": [],
   "methods": []
 }

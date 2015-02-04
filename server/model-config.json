@@ -35,7 +35,7 @@
     "public": true
   },
   "votes": {
-    "dataSource": null,
+    "dataSource": "db",
     "public": true
   },
   "journalist": {

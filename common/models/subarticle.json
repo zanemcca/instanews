@@ -23,10 +23,24 @@
     },
     "votes": {
       "type": "votes"
+    },
+    "date": {
+      "type": "date"
     }
   },
   "validations": [],
-  "relations": {},
+  "relations": {
+    "parent": {
+      "type": "belongsTo",
+      "model": "article",
+      "foreignKey": "parentId"
+    },
+    "author": {
+      "type": "belongsTo",
+      "model": "journalist",
+      "foreignKey": "authorId"
+    }
+  },
   "acls": [],
   "methods": []
 }

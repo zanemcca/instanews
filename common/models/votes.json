@@ -12,6 +12,9 @@
     },
     "rate": {
       "type": "number"
+    },
+    "lastUpdated": {
+      "type": "date"
     }
   },
   "validations": [],
