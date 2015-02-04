@@ -2,5 +2,19 @@
   "db": {
     "name": "db",
     "connector": "memory"
+  },
+  "Articles": {
+    "host": "localhost",
+    "port": 27017,
+    "database": "articles",
+    "name": "Articles",
+    "connector": "mongodb"
+  },
+  "Users": {
+    "host": "localhost",
+    "port": 27017,
+    "database": "users",
+    "name": "Users",
+    "connector": "mongodb"
   }
 }

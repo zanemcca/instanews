@@ -1,0 +1,32 @@
+{
+  "name": "subarticle",
+  "base": "PersistedModel",
+  "strict": false,
+  "idInjection": false,
+  "properties": {
+    "title": {
+      "type": "string",
+      "required": true
+    },
+    "text": {
+      "type": "string"
+    },
+    "videos": {
+      "type": [
+        "string"
+      ]
+    },
+    "photos": {
+      "type": [
+        "string"
+      ]
+    },
+    "votes": {
+      "type": "votes"
+    }
+  },
+  "validations": [],
+  "relations": {},
+  "acls": [],
+  "methods": []
+}

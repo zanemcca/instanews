@@ -1,0 +1,19 @@
+{
+  "name": "article",
+  "base": "PersistedModel",
+  "strict": false,
+  "idInjection": false,
+  "properties": {
+    "location": {
+      "type": "geopoint",
+      "required": true
+    },
+    "votes": {
+      "type": "votes"
+    }
+  },
+  "validations": [],
+  "relations": {},
+  "acls": [],
+  "methods": []
+}

@@ -1,0 +1,21 @@
+{
+  "name": "votes",
+  "base": "PersistedModel",
+  "strict": false,
+  "idInjection": false,
+  "properties": {
+    "up": {
+      "type": "number"
+    },
+    "down": {
+      "type": "number"
+    },
+    "rate": {
+      "type": "number"
+    }
+  },
+  "validations": [],
+  "relations": {},
+  "acls": [],
+  "methods": []
+}

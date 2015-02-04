@@ -25,5 +25,21 @@
   "Role": {
     "dataSource": "db",
     "public": false
+  },
+  "subarticle": {
+    "dataSource": "Articles",
+    "public": true
+  },
+  "article": {
+    "dataSource": "Articles",
+    "public": true
+  },
+  "votes": {
+    "dataSource": null,
+    "public": true
+  },
+  "journalist": {
+    "dataSource": "Users",
+    "public": true
   }
 }
