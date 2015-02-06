@@ -12,6 +12,12 @@
     },
     "votes": {
       "type": "votes"
+    },
+    "journalistId": {
+      "type": "number",
+      "id": true,
+      "required": true,
+      "index": true
     }
   },
   "validations": [],
@@ -19,7 +25,7 @@
     "articles": {
       "type": "hasMany",
       "model": "subarticle",
-      "foreignKey": "articleId"
+      "foreignKey": "journalistId"
     }
   },
   "acls": [],

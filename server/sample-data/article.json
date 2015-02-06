@@ -1,0 +1,17 @@
+[
+   {
+      "articleId": 1,
+      "isPrivate": false,
+      "date": "2015-02-06T12:48:43.511Z",
+      "location": {
+         "lat": 37.7884036,
+         "lng": -122.4208504
+      },
+      "votes" : {
+         "up": 0,
+         "down": 0,
+         "rate": 0,
+         "lastUpdated" : "2015-02-06T12:48:43.511Z"
+      }
+   }
+]

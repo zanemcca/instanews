@@ -4,10 +4,6 @@
   "strict": false,
   "idInjection": false,
   "properties": {
-    "location": {
-      "type": "geopoint",
-      "required": true
-    },
     "isPrivate": {
       "type": "boolean",
       "required": true
@@ -17,6 +13,17 @@
     },
     "votes": {
       "type": "votes"
+    },
+    "articleId": {
+      "type": "number",
+      "id": true,
+      "required": true,
+      "index": true
+    },
+    "location": {
+      "type": "geopoint",
+      "required": true,
+      "index": true
     }
   },
   "validations": [],
@@ -24,12 +31,12 @@
     "subarticles": {
       "type": "hasMany",
       "model": "subarticle",
-      "foreignKey": "subarticleId"
+      "foreignKey": "parentId"
     },
     "journalists": {
       "type": "hasMany",
       "model": "journalist",
-      "foreignKey": "journalistId",
+      "foreignKey": "parentId",
       "through": "subarticle"
     }
   },

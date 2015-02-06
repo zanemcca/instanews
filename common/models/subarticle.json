@@ -26,6 +26,12 @@
     },
     "date": {
       "type": "date"
+    },
+    "subarticleId": {
+      "type": "number",
+      "id": true,
+      "required": true,
+      "index": true
     }
   },
   "validations": [],
@@ -35,10 +41,10 @@
       "model": "article",
       "foreignKey": "parentId"
     },
-    "author": {
+    "journalist": {
       "type": "belongsTo",
       "model": "journalist",
-      "foreignKey": "authorId"
+      "foreignKey": "journalistId"
     }
   },
   "acls": [],
