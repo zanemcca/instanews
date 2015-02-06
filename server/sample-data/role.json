@@ -1,0 +1,11 @@
+[
+   {
+      "name": "admin",
+      "principals": [
+         {
+            "principalId": 1,
+            "principalType": "Journalist"
+         }
+      ]
+   }
+]

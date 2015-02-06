@@ -3,11 +3,14 @@ var async = require('async');
 var journalists = require('./journalist.json');
 var articles = require('./article.json');
 var subarticles = require('./subarticle.json');
+var roles = require('./role.json');
 
 module.exports = function (app, cb) {
    var Articles = app.models.Article;
    var Subarticles = app.models.Subarticle;
    var Journalists = app.models.Journalist;
+   var Role = app.models.Role;
+   var RoleMapping = app.models.RoleMapping;
 
    var ArticlesDB = app.datasources.Articles;
    var UserDB = app.datasources.Users;
@@ -43,4 +46,27 @@ module.exports = function (app, cb) {
             cb(err);
       }
    );
+
+   Role.create({
+      name: 'admin'
+   }, function(err, role) {
+      if (err) {
+         cb(err);
+         return;
+      }
+
+      console.log('Created role:', role);
+
+      //make zane an admin
+      role.principals.create({
+         principalType: RoleMapping.USER,
+         principalId: 1
+      }, function(err,principal) {
+         if (err) {
+            cb(err);
+            return;
+         }
+         console.log('Created principal - '+ principal + ' for admin');
+      });
+   });
 };
