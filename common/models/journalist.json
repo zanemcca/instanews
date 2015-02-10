@@ -55,6 +55,13 @@
       "principalId": "$everyone",
       "permission": "ALLOW",
       "property": "__get__articles"
+    },
+    {
+      "accessType": "EXECUTE",
+      "principalType": "ROLE",
+      "principalId": "$everyone",
+      "permission": "DENY",
+      "property": "find"
     }
   ],
   "methods": []
