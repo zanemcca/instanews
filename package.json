@@ -4,7 +4,7 @@
   "main": "server/server.js",
   "scripts": {
     "pretest": "jshint .",
-    "test": "mocha --reporter nyan"
+    "test": "mocha"
   },
   "dependencies": {
     "async": "^0.9.0",

@@ -20,11 +20,11 @@
   },
   "RoleMapping": {
     "dataSource": "db",
-    "public": false
+    "public": "false"
   },
   "Role": {
     "dataSource": "db",
-    "public": false
+    "public": "false"
   },
   "subarticle": {
     "dataSource": "Articles",
@@ -36,7 +36,7 @@
   },
   "votes": {
     "dataSource": null,
-    "public": true
+    "public": false
   },
   "journalist": {
     "dataSource": "Users",

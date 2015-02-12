@@ -3,10 +3,15 @@
 
 var should = require('chai').should(),
     supertest = require('supertest'),
-    api = supertest('http://localhost:3000');
+    app = require('../server/server'),
+    api = supertest(app),
+    assert = require('assert');
 
 var importer = require('./sample-data/import');
-var app = require('../server/server');
+
+var journalists = require('./sample-data/journalist.json');
+var Role = app.models.Role;
+var RoleMapping = app.models.RoleMapping;
 
 // Test to see that anyone can get articles
 describe('REST', function() {
@@ -115,6 +120,7 @@ describe('REST', function() {
       });
 
       //Test votes
+      /*
       describe('Votes', function() {
          it('A guest should NOT be able to get a votes', function(done) {
             api.get('/api/votes/1')
@@ -135,7 +141,46 @@ describe('REST', function() {
             api.delete('/api/votes/1')
             .expect(401,done);
          });
+      });
+      */
+   });
 
+   describe('Admin', function() {
+
+      user = journalists[0];
+      var credentials = { email: user.email, password: user.password };
+      var token;
+
+      before( function(done) {
+         //console.log('Admin is: '+ user.firstName + ' @ id :' + user.journalistId);
+
+         api.post('/api/journalists/login')
+         .send(credentials)
+         .expect(200)
+         .end(function(err, res) {
+            if (err) return done(err);
+
+            token = res.body;
+            assert(token.userId === user.journalistId);
+            //console.log('Token : ' + token.id);
+            done();
+         });
+      });
+
+      describe('Articles', function() {
+         it('Admin should be able to get all articles', function(done) {
+            api.get('/api/articles')
+            .set('Authorization', token.id)
+            .expect(200,done);
+         });
+      });
+
+      describe('Subarticles', function() {
+         it('Admin should be able to get all subarticles', function(done) {
+            api.get('/api/subarticles')
+            .set('Authorization', token.id)
+            .expect(200,done);
+         });
       });
    });
 });

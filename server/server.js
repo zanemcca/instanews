@@ -19,3 +19,6 @@ app.start = function() {
 if (require.main === module) {
   app.start();
 }
+
+//export the app for testing
+exports = module.exports = app;
