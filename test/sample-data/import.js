@@ -3,7 +3,7 @@ var async = require('async');
 var journalists = require('./journalist.json');
 var articles = require('./article.json');
 var subarticles = require('./subarticle.json');
-var roles = require('./role.json');
+//var roles = require('./role.json');
 
 module.exports = function (app, cb) {
 
@@ -17,15 +17,6 @@ module.exports = function (app, cb) {
    var ArticlesDB = app.datasources.Articles;
    var UserDB = app.datasources.Users;
    var db = app.datasources.db;
-
-   function errCB(err, res) {
-      if(err) {
-         console.log('Error - ',err);
-      }
-      else {
-         console.log('Successful');
-      }
-   }
 
    // This function imports all members of the data array into the given Model
    function importData(Model, data, callb) {
@@ -78,23 +69,29 @@ module.exports = function (app, cb) {
       });
    }
 
+   function updateDB(callback) {
+      ArticlesDB.autoupdate(
+            UserDB.autoupdate(
+               db.autoupdate( function(err, res) {
+                  if (err) console.log('db Error');
+                  callback(err, res);
+               })));
+   }
+
    console.log('Starting the import of sample data');
+
    async.series([
       importData.bind(null,Journalists, journalists),
       importData.bind(null,Articles, articles),
       importData.bind(null,Subarticles, subarticles),
       createAdmin.bind(null),
-      function(callback) {
-         ArticlesDB.autoupdate(
-               UserDB.autoupdate(
-                  db.autoupdate( function(err, res) {
-                     if (err) console.log('db Error');
-                     callback(err, res);
-                  })));
-      },
+      updateDB.bind(null)
    ], function(err,res) {
-         errCB(err);
-         console.log('Completed the sample data importing');
+         if (err) {
+            console.log('\nFailed to import the data!\n', err);
+         }
+         else console.log('Completed the sample data importing');
+
          cb(err);
    });
 };
