@@ -36,15 +36,15 @@
   },
   "validations": [],
   "relations": {
-    "parent": {
-      "type": "belongsTo",
-      "model": "article",
-      "foreignKey": "parentId"
-    },
     "journalist": {
       "type": "belongsTo",
       "model": "journalist",
       "foreignKey": "journalistId"
+    },
+    "parent": {
+      "type": "belongsTo",
+      "model": "article",
+      "foreignKey": "parentId"
     }
   },
   "acls": [
@@ -116,6 +116,19 @@
       "principalId": "$authenticated",
       "permission": "ALLOW",
       "property": "find"
+    },
+    {
+      "accessType": "EXECUTE",
+      "principalType": "ROLE",
+      "principalId": "$owner",
+      "permission": "ALLOW",
+      "property": "deleteById"
+    },
+    {
+      "principalType": "ROLE",
+      "principalId": "$owner",
+      "permission": "ALLOW",
+      "property": "updateAttributes"
     },
     {
       "accessType": "EXECUTE",

@@ -2,6 +2,7 @@
 var common = require('../common');
 var api = common.api;
 var assert = common.assert;
+var dump = common.dump;
 
 var journalists = require('../sample-data/journalist.json');
 
@@ -70,7 +71,11 @@ describe('Articles', function() {
          api.post('/api/articles')
          .send(article)
          .set('Authorization', token.id)
-         .expect(200,done);
+         .expect(200)
+         .end( function(err, res) {
+            dump(err, res);
+            done(err,res);
+         });
       });
 
       article.location.lat = 40.7884036;
@@ -92,11 +97,13 @@ describe('Articles', function() {
       });
       */
 
+      /*
       it('Admin should be allowed to delete an article', function(done) {
          api.delete('/api/articles/100')
          .set('Authorization', token.id)
          .expect(204, done);
       });
+      */
    });
 
 });
@@ -117,20 +124,24 @@ describe('Subarticles', function() {
    });
 
    describe('Modify', function() {
-      var subarticle ={
-          "title": "Sweet blazing glory",
-          "text": "Holy crap look at that!",
-          "votes": {
-               "up": 3,
-               "down": 50,
-               "rate": -6,
-               "lastUpdated": "2015-02-06T12:48:43.511Z"
-          },
-          "date": "2015-02-06T12:48:43.511Z",
-          "subarticleId": 100,
-          "parentId": 1,
-          "journalistId": 1
-      };
+      var subarticle;
+      before( function(done) {
+         subarticle ={
+             "title": "Sweet blazing glory",
+             "text": "Holy crap look at that!",
+             "votes": {
+                  "up": 3,
+                  "down": 50,
+                  "rate": -6,
+                  "lastUpdated": "2015-02-06T12:48:43.511Z"
+             },
+             "date": "2015-02-06T12:48:43.511Z",
+             "subarticleId": 100,
+             "parentId": 1,
+             "journalistId": 1
+         };
+         done();
+      });
 
       it('Admin should be allowed to create a subarticle', function(done) {
          api.post('/api/subarticles')
@@ -139,7 +150,6 @@ describe('Subarticles', function() {
          .expect(200,done);
       });
 
-      subarticle.title = "Big ole fire";
       it('Admin should be allowed to put a subarticle', function(done) {
          api.put('/api/subarticles')
          .send(subarticle)

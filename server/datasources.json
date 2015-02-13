@@ -8,7 +8,8 @@
     "port": 27017,
     "database": "articles",
     "name": "Articles",
-    "connector": "mongodb"
+    "connector": "mongodb",
+    "debug": true
   },
   "Users": {
     "host": "localhost",

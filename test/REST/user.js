@@ -67,21 +67,25 @@ describe('Articles', function() {
 
    describe('Modify', function(done) {
 
-      var article =  {
-         "isPrivate": false,
-         "date": "2015-02-10T12:48:43.511Z",
-         "votes": {
-            "up": 50,
-            "down": 10,
-            "rate": 5,
-            "lastUpdated": "2015-02-10T12:48:43.511Z",
-         },
-         "articleId": 100,
-         "location":{
-            "lat": 38.7884036,
-            "lng": -124.4208504
-         }
-      };
+      var article;
+      before( function(done) {
+         article =  {
+            "isPrivate": false,
+            "date": "2015-02-10T12:48:43.511Z",
+            "votes": {
+               "up": 50,
+               "down": 10,
+               "rate": 5,
+               "lastUpdated": "2015-02-10T12:48:43.511Z",
+            },
+            "articleId": 200,
+            "location":{
+               "lat": 38.7884036,
+               "lng": -124.4208504
+            }
+         };
+         done();
+      });
 
       it('User should be allowed to create an article', function(done) {
          api.post('/api/articles')
@@ -94,13 +98,11 @@ describe('Articles', function() {
          });
       });
 
-      article.location.lat = 40.7884036;
-
-      it('User should be allowed to put an article', function(done) {
+      it('User should NOT be allowed to put an article', function(done) {
          api.put('/api/articles')
          .send(article)
          .set('Authorization', token.id)
-         .expect(200)
+         .expect(401)
          .end( function(err, res) {
             dump(err, res);
             done(err,res);
@@ -117,10 +119,10 @@ describe('Articles', function() {
       });
       */
 
-      it('User should be allowed to delete an article', function(done) {
-         api.delete('/api/articles/100')
+      it('User should NOT be allowed to delete an article', function(done) {
+         api.delete('/api/articles/'+ article.articleId)
          .set('Authorization', token.id)
-         .expect(204)
+         .expect(401)
          .end( function(err, res) {
             dump(err, res);
             done(err,res);
@@ -154,20 +156,24 @@ describe('Subarticles', function() {
    });
 
    describe('Modify', function() {
-      var subarticle ={
-          "title": "FIRRRREEE",
-          "text": "It's hot!",
-          "votes": {
+      var subarticle;
+      before( function(done) {
+         subarticle = {
+            "title": "Fire!!!!!",
+            "text" : "There is a blaze!",
+            "subarticleId": 200,
+            "journalistId": user.journalistId,
+            "parentId": 1,
+            "date": "2015-02-08T12:48:43.511Z",
+            "votes" : {
                "up": 5,
                "down": 50,
                "rate": -6,
-               "lastUpdated": "2015-02-06T12:48:43.511Z"
-          },
-          "date": "2015-02-07777777T12:48:43.511Z",
-          "subarticleId": 200,
-          "parentId": 1,
-          "journalistId": user.journalistId
-      };
+               "lastUpdated" : "2015-02-08T12:48:43.511Z"
+            }
+         };
+         done();
+      });
 
       it('User should be allowed to create their own subarticle', function(done) {
          api.post('/api/subarticles')
@@ -180,10 +186,8 @@ describe('Subarticles', function() {
          });
       });
 
-      subarticle.title = "Big ole fire";
-
       it('User should be allowed to update their subarticle', function(done) {
-         api.put('/api/subarticles')
+         api.put('/api/subarticles/'+ subarticle.subarticleId)
          .send(subarticle)
          .set('Authorization', token.id)
          .expect(200)
@@ -192,15 +196,6 @@ describe('Subarticles', function() {
             done(err,res);
          });
       });
-
-      /*
-      it('User should be allowed to update a subarticle', function(done) {
-         api.post('/api/subarticles/update')
-         .send(subarticle)
-         .set('Authorization', token.id)
-         .expect(200,done);
-      });
-      */
 
       it('User should be allowed to delete their own subarticle', function(done) {
          api.delete('/api/subarticles/'+ subarticle.subarticleId)
@@ -213,17 +208,19 @@ describe('Subarticles', function() {
       });
 
       /*
-      subarticle.journalistId = 1;
       it('User should NOT be allowed to create a subarticle for someone else', function(done) {
          api.post('/api/subarticles')
          .send(subarticle)
          .set('Authorization', token.id)
          .expect(401,done);
       });
-      subarticle.journalistId = user.journlistId;
       */
-      subarticle.subarticleId = 1;
+
       it('User should NOT be allowed to update someone elses subarticle', function(done) {
+         var subArt = subarticle;
+         subArt.journalistId = 1;
+         subArt.subarticleId = 1;
+
          api.put('/api/subarticles')
          .send(subarticle)
          .set('Authorization', token.id)
@@ -277,5 +274,4 @@ describe('Journalists', function() {
          done(err,res);
       });
    });
-
 });

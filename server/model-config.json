@@ -8,7 +8,8 @@
     ]
   },
   "User": {
-    "dataSource": "db"
+    "dataSource": "db",
+    "public": false
   },
   "AccessToken": {
     "dataSource": "db",
@@ -20,11 +21,11 @@
   },
   "RoleMapping": {
     "dataSource": "db",
-    "public": "false"
+    "public": false
   },
   "Role": {
     "dataSource": "db",
-    "public": "false"
+    "public": false
   },
   "subarticle": {
     "dataSource": "Articles",
