@@ -5,11 +5,11 @@ var should = require('chai').should(),
     api = supertest(app),
     assert = require('assert');
 
-var importTest = function (name, path) {
+function importTest(name, path) {
    describe(name, function () {
       require(path);
    });
-};
+}
 
 exports.assert = assert;
 exports.app = app;

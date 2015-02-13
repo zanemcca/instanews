@@ -5,7 +5,7 @@ var assert = common.assert;
 
 var journalists = require('../sample-data/journalist.json');
 
-var user = journalists[0];
+var user = journalists[1];
 var credentials = { email: user.email, password: user.password };
 var token;
 
@@ -24,25 +24,25 @@ before( function(done) {
 });
 
 describe('Articles', function() {
-   it('Admin should be able to get an article', function(done) {
+   it('User should be able to get an article', function(done) {
       api.get('/api/articles/1')
       .set('Authorization', token.id)
       .expect(200,done);
    });
 
-   it('Admin should be able to get all articles', function(done) {
+   it('User should be able to get all articles', function(done) {
       api.get('/api/articles')
       .set('Authorization', token.id)
       .expect(200,done);
    });
 
-   it('Admin should be allowed to get all subarticles of an article', function(done) {
+   it('User should be allowed to get all subarticles of an article', function(done) {
       api.get('/api/articles/1/subarticles')
       .set('Authorization', token.id)
       .expect(200,done);
    });
 
-   it('Admin should be allowed to get all journalists associated with an article', function(done) {
+   it('User should be allowed to get all journalists associated with an article', function(done) {
       api.get('/api/articles/1/journalists')
       .set('Authorization', token.id)
       .expect(200,done);
@@ -66,7 +66,7 @@ describe('Articles', function() {
          }
       };
 
-      it('Admin should be allowed to create an article', function(done) {
+      it('User should be allowed to create an article', function(done) {
          api.post('/api/articles')
          .send(article)
          .set('Authorization', token.id)
@@ -75,7 +75,7 @@ describe('Articles', function() {
 
       article.location.lat = 40.7884036;
 
-      it('Admin should be allowed to put an article', function(done) {
+      it('User should be allowed to put an article', function(done) {
          api.put('/api/articles')
          .send(article)
          .set('Authorization', token.id)
@@ -84,7 +84,7 @@ describe('Articles', function() {
 
       /*
       article.location.lng = -50.4208504;
-      it('Admin should be allowed to update an article', function(done) {
+      it('User should be allowed to update an article', function(done) {
          api.post('/api/articles/update')
          .send(article)
          .set('Authorization', token.id)
@@ -92,7 +92,7 @@ describe('Articles', function() {
       });
       */
 
-      it('Admin should be allowed to delete an article', function(done) {
+      it('User should be allowed to delete an article', function(done) {
          api.delete('/api/articles/100')
          .set('Authorization', token.id)
          .expect(204, done);
@@ -104,13 +104,13 @@ describe('Articles', function() {
 //Test access to subarticles
 describe('Subarticles', function() {
 
-   it('Admin should be able to get a subarticle', function(done) {
+   it('User should be able to get a subarticle', function(done) {
       api.get('/api/subarticles/1')
       .set('Authorization', token.id)
       .expect(200,done);
    });
 
-   it('Admin should be able to get all subarticles', function(done) {
+   it('User should be able to get all subarticles', function(done) {
       api.get('/api/subarticles')
       .set('Authorization', token.id)
       .expect(200,done);
@@ -118,8 +118,8 @@ describe('Subarticles', function() {
 
    describe('Modify', function() {
       var subarticle ={
-          "title": "Sweet blazing glory",
-          "text": "Holy crap look at that!",
+          "title": "FIRRRREEE",
+          "text": "It's hot!",
           "votes": {
                "up": 3,
                "down": 50,
@@ -127,12 +127,12 @@ describe('Subarticles', function() {
                "lastUpdated": "2015-02-06T12:48:43.511Z"
           },
           "date": "2015-02-06T12:48:43.511Z",
-          "subarticleId": 100,
+          "subarticleId": 200,
           "parentId": 1,
-          "journalistId": 1
+          "journalistId": user.journalistId
       };
 
-      it('Admin should be allowed to create a subarticle', function(done) {
+      it('User should be allowed to create their own subarticle', function(done) {
          api.post('/api/subarticles')
          .send(subarticle)
          .set('Authorization', token.id)
@@ -140,7 +140,8 @@ describe('Subarticles', function() {
       });
 
       subarticle.title = "Big ole fire";
-      it('Admin should be allowed to put a subarticle', function(done) {
+
+      it('User should be allowed to update their subarticle', function(done) {
          api.put('/api/subarticles')
          .send(subarticle)
          .set('Authorization', token.id)
@@ -148,7 +149,7 @@ describe('Subarticles', function() {
       });
 
       /*
-      it('Admin should be allowed to update a subarticle', function(done) {
+      it('User should be allowed to update a subarticle', function(done) {
          api.post('/api/subarticles/update')
          .send(subarticle)
          .set('Authorization', token.id)
@@ -156,32 +157,56 @@ describe('Subarticles', function() {
       });
       */
 
-      it('Admin should be allowed to delete a subarticle', function(done) {
+      it('User should be allowed to delete their own subarticle', function(done) {
          api.delete('/api/subarticles/'+ subarticle.subarticleId)
          .set('Authorization', token.id)
          .expect(204, done);
+      });
+
+      /*
+      subarticle.journalistId = 1;
+      it('User should NOT be allowed to create a subarticle for someone else', function(done) {
+         api.post('/api/subarticles')
+         .send(subarticle)
+         .set('Authorization', token.id)
+         .expect(401,done);
+      });
+      subarticle.journalistId = user.journlistId;
+      */
+      subarticle.subarticleId = 1;
+      it('User should NOT be allowed to update someone elses subarticle', function(done) {
+         api.put('/api/subarticles')
+         .send(subarticle)
+         .set('Authorization', token.id)
+         .expect(401,done);
+      });
+
+      it('User should NOT be allowed to delete someone elses subarticle', function(done) {
+         api.delete('/api/subarticles/'+ subarticle.subarticleId)
+         .set('Authorization', token.id)
+         .expect(401, done);
       });
    });
 });
 
 //Test access to journalists
 describe('Journalists', function() {
-   it('Admin should be able to get a journalist', function(done) {
+   it('User should be able to get a journalist', function(done) {
       api.get('/api/journalists/1')
       .set('Authorization', token.id)
       .expect(200,done);
    });
 
-   it('Admin should be able to get all articles of a journalist', function(done) {
+   it('User should be able to get all articles of a journalist', function(done) {
       api.get('/api/journalists/1/articles')
       .set('Authorization', token.id)
       .expect(200,done);
    });
 
-   it('Admin should be able to get all journalists', function(done) {
+   it('User should NOT be able to get all journalists', function(done) {
       api.get('/api/journalists')
       .set('Authorization', token.id)
-      .expect(200,done);
+      .expect(401 ,done);
    });
 
 });

@@ -24,23 +24,25 @@ describe('Articles', function() {
       .expect(200,done);
    });
 
-   it('A guest should NOT be allowed to create an article', function(done) {
-      api.post('/api/articles')
-      .expect(401,done);
-   });
+   describe('Modify', function() {
+      it('A guest should NOT be allowed to create an article', function(done) {
+         api.post('/api/articles')
+         .expect(401,done);
+      });
 
-   it('A guest should NOT be allowed to put an article', function(done) {
-      api.put('/api/articles/1')
-      .expect(401,done);
-   });
+      it('A guest should NOT be allowed to put an article', function(done) {
+         api.put('/api/articles/1')
+         .expect(401,done);
+      });
 
-   it('A guest should NOT be allowed to update an article', function(done) {
-      api.post('/api/articles/update')
-      .expect(401,done);
-   });
-   it('A guest should NOT be allowed to delete an article', function(done) {
-      api.delete('/api/articles/1')
-      .expect(401,done);
+      it('A guest should NOT be allowed to update an article', function(done) {
+         api.post('/api/articles/update')
+         .expect(401,done);
+      });
+      it('A guest should NOT be allowed to delete an article', function(done) {
+         api.delete('/api/articles/1')
+         .expect(401,done);
+      });
    });
 });
 
@@ -57,24 +59,26 @@ describe('Subarticles', function() {
       .expect(401,done);
    });
 
-   it('A guest should NOT be allowed to create a subarticle', function(done) {
-      api.post('/api/subarticles')
-      .expect(401,done);
-   });
+   describe('Modify', function() {
+      it('A guest should NOT be allowed to create a subarticle', function(done) {
+         api.post('/api/subarticles')
+         .expect(401,done);
+      });
 
-   it('A guest should NOT be allowed to put a subarticle', function(done) {
-      api.put('/api/subarticles/1')
-      .expect(401,done);
-   });
+      it('A guest should NOT be allowed to put a subarticle', function(done) {
+         api.put('/api/subarticles/1')
+         .expect(401,done);
+      });
 
-   it('A guest should NOT be allowed to update a subarticle', function(done) {
-      api.post('/api/subarticles/update')
-      .expect(401,done);
-   });
+      it('A guest should NOT be allowed to update a subarticle', function(done) {
+         api.post('/api/subarticles/update')
+         .expect(401,done);
+      });
 
-   it('A guest should NOT be allowed to delete a subarticle', function(done) {
-      api.delete('/api/subarticles/1')
-      .expect(401,done);
+      it('A guest should NOT be allowed to delete a subarticle', function(done) {
+         api.delete('/api/subarticles/1')
+         .expect(401,done);
+      });
    });
 });
 

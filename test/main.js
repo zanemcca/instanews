@@ -18,6 +18,7 @@ describe('Top', function() {
    describe('REST', function() {
       importTest("Guest",'./REST/guest');
       importTest("Admin",'./REST/admin');
+      importTest("User",'./REST/user');
    });
 
 });
