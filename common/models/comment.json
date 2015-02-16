@@ -1,0 +1,32 @@
+{
+  "name": "comment",
+  "base": "PersistedModel",
+  "idInjection": true,
+  "properties": {
+    "content": {
+      "type": "string",
+      "required": true
+    },
+    "date": {
+      "type": "date",
+      "required": true
+    },
+    "votes": {
+      "type": "votes"
+    }
+  },
+  "validations": [],
+  "relations": {
+      "commentable": {
+         "type": "belongsTo",
+         "polymorphic": true
+      },
+      "comments": {
+         "type": "hasMany",
+         "model": "Comment",
+         "polymorphic": "commentable"
+      }
+  },
+  "acls": [],
+  "methods": []
+}

@@ -1,6 +1,6 @@
 {
   "name": "votes",
-  "base": "PersistedModel",
+  "base": "Model",
   "strict": false,
   "idInjection": false,
   "properties": {

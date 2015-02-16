@@ -42,5 +42,9 @@
   "journalist": {
     "dataSource": "Users",
     "public": true
+  },
+  "comment": {
+    "dataSource": "Articles",
+    "public": true
   }
 }

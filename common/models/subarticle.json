@@ -45,6 +45,11 @@
       "type": "belongsTo",
       "model": "article",
       "foreignKey": "parentId"
+    },
+    "comments": {
+       "type": "hasMany",
+       "model": "comment",
+       "polymorphic": "commentable"
     }
   },
   "acls": [
