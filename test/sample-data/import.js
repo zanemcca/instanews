@@ -1,6 +1,7 @@
 var async = require('async');
 
 var journalists = require('./journalist.json');
+var comments = require('./comment.json');
 var articles = require('./article.json');
 var subarticles = require('./subarticle.json');
 //var roles = require('./role.json');
@@ -10,6 +11,7 @@ module.exports = function (app, cb) {
    var Articles = app.models.Article;
    var Subarticles = app.models.Subarticle;
    var Journalists = app.models.Journalist;
+   var Comments    = app.models.Comment;
    var Roles =       app.models.Role;
    var RoleMapping = app.models.RoleMapping;
    var AccessToken = app.models.AccessToken;
@@ -84,6 +86,7 @@ module.exports = function (app, cb) {
       importData.bind(null,Journalists, journalists),
       importData.bind(null,Articles, articles),
       importData.bind(null,Subarticles, subarticles),
+      importData.bind(null,Comments, comments),
       createAdmin.bind(null),
       updateDB.bind(null)
    ], function(err,res) {

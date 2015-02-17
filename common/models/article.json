@@ -40,9 +40,9 @@
       "through": "subarticle"
     },
     "comments": {
-       "type": "hasMany",
-       "model": "comment",
-       "polymorphic": "commentable"
+      "type": "hasMany",
+      "model": "comment",
+      "polymorphic": "commentable"
     }
   },
   "acls": [
@@ -121,6 +121,20 @@
       "principalId": "$owner",
       "permission": "ALLOW",
       "property": "deleteById"
+    },
+    {
+      "accessType": "EXECUTE",
+      "principalType": "ROLE",
+      "principalId": "$everyone",
+      "permission": "ALLOW",
+      "property": "__get__comments"
+    },
+    {
+      "accessType": "EXECUTE",
+      "principalType": "ROLE",
+      "principalId": "$authenticated",
+      "permission": "ALLOW",
+      "property": "__create__comments"
     }
   ],
   "methods": []

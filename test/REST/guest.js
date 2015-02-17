@@ -1,6 +1,7 @@
 
 var common = require('../common');
 var api = common.api;
+var dump = common.dump;
 
 //Test access to the articles
 describe('Articles', function() {
@@ -58,6 +59,16 @@ describe('Subarticles', function() {
       api.get('/api/subarticles')
       .expect(401,done);
    });
+
+   it('A guest should be able to get all comments on a subarticles', function(done) {
+      api.get('/api/subarticles/1/comments')
+      .expect(200)
+      .end( function(err, res) {
+         dump(err, res);
+         done(err,res);
+      });
+   });
+
 
    describe('Modify', function() {
       it('A guest should NOT be allowed to create a subarticle', function(done) {
@@ -125,3 +136,48 @@ describe('Votes', function() {
    });
 });
 */
+
+describe('Comments', function() {
+
+   var comment = {};
+
+   it('A guest should NOT be able to create a comment directly', function(done) {
+      api.post('/api/comments')
+      .send(comment)
+      .expect(401)
+      .end( function(err, res) {
+         dump(err, res);
+         done(err,res);
+      });
+   });
+
+   it('A guest should NOT be able to comment on a comment', function(done) {
+      api.post('/api/comments/1/comments')
+      .send(comment)
+      .expect(401)
+      .end( function(err, res) {
+         dump(err, res);
+         done(err,res);
+      });
+   });
+
+   it('A guest should NOT be able to update a comment', function(done) {
+      api.put('/api/comments/1')
+      .send(comment)
+      .expect(401)
+      .end( function(err, res) {
+         dump(err, res);
+         done(err,res);
+      });
+   });
+
+   it('A guest should NOT be able to delete a comment', function(done) {
+      api.delete('/api/comments/1')
+      .expect(401)
+      .end( function(err, res) {
+         dump(err, res);
+         done(err,res);
+      });
+   });
+
+});

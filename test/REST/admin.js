@@ -123,6 +123,16 @@ describe('Subarticles', function() {
       .expect(200,done);
    });
 
+   it('Admin should be able to get all comments on a subarticles', function(done) {
+      api.get('/api/subarticles/1/comments')
+      .set('Authorization', token.id)
+      .expect(200)
+      .end( function(err, res) {
+         dump(err, res);
+         done(err,res);
+      });
+   });
+
    describe('Modify', function() {
       var subarticle;
       before( function(done) {
@@ -192,6 +202,72 @@ describe('Journalists', function() {
       api.get('/api/journalists')
       .set('Authorization', token.id)
       .expect(200,done);
+   });
+
+});
+
+describe('Comments', function() {
+
+   var comment;
+   before( function(done) {
+      comment = {
+        "content": "Nuts!",
+        "date": "2015-02-06T12:48:43.511Z",
+        "votes": {
+          "up": 2,
+          "down": 1,
+          "rate": 1,
+          "lastUpdated": "2015-02-06T12:48:43.511Z"
+        },
+        "commentId": 100,
+        "journalistId": 2,
+        "commentableId": 1,
+        "commentableType": "comment"
+      };
+      done();
+   });
+
+   it('Admin should NOT be able to create a comment directly', function(done) {
+      api.post('/api/comments')
+      .set('Authorization', token.id)
+      .send(comment)
+      .expect(401)
+      .end( function(err, res) {
+         dump(err, res);
+         done(err,res);
+      });
+   });
+
+   it('Admin should be able to comment on a comment', function(done) {
+      api.post('/api/comments/'+ comment.commentableId + '/comments')
+      .set('Authorization', token.id)
+      .send(comment)
+      .expect(200)
+      .end( function(err, res) {
+         dump(err, res);
+         done(err,res);
+      });
+   });
+
+   it('Admin should NOT be able to update a comment', function(done) {
+      api.put('/api/comments/'+comment.commentId)
+      .set('Authorization', token.id)
+      .send(comment)
+      .expect(401)
+      .end( function(err, res) {
+         dump(err, res);
+         done(err,res);
+      });
+   });
+
+   it('Admin should be able to delete a comment', function(done) {
+      api.delete('/api/comments/'+comment.commentId)
+      .set('Authorization', token.id)
+      .expect(204)
+      .end( function(err, res) {
+         dump(err, res);
+         done(err,res);
+      });
    });
 
 });

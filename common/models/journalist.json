@@ -26,6 +26,11 @@
       "type": "hasMany",
       "model": "subarticle",
       "foreignKey": "journalistId"
+    },
+    "comments": {
+      "type": "hasMany",
+      "model": "comment",
+      "foreignKey": "journalistId"
     }
   },
   "acls": [
