@@ -2,3 +2,4 @@ node_modules/
 .strong-pm/
 *npm-debug.log
 strongloop.json
+client/vendor/

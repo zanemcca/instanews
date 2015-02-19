@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+   <head>
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1">
+      <title>Instanews</title>
+
+      <!-- Include bootstrap -->
+      <link href="vendor/bootstrap/dist/css/bootstrap.css" rel="stylesheet">
+
+   </head>
+
+   <body ng-app="app">
+      <div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+         <div class="container">
+            <div class="navbar-header">
+               <a class="navbar-brand" href="#">Instanews</a>
+            </div>
+         </div>
+      </div>
+
+      <div class="container">
+         <div ui-view></div>
+      </div>
+
+      <script src="vendor/jquery/dist/jquery.js"></script>
+      <script src="vendor/bootstrap/dist/js/bootstrap.js"></script>
+      <script src="vendor/angular/angular.js"></script>
+      <script src="vendor/angular-resource/angular-resource.js"></script>
+      <script src="vendor/angular-ui-router/release/angular-ui-router.js"></script>
+      <script src="js/lb-services.js"></script>
+
+   </body>
+</html>
