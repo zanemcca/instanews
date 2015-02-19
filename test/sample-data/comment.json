@@ -2,7 +2,7 @@
    {
      "content": "That is crazy man!",
      "date": "2015-02-06T12:48:43.511Z",
-     "votes": {
+     "_votes": {
        "up": 2,
        "down": 1,
        "rate": 1,

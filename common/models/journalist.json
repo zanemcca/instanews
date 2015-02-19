@@ -10,9 +10,6 @@
     "lastName": {
       "type": "string"
     },
-    "votes": {
-      "type": "votes"
-    },
     "journalistId": {
       "type": "number",
       "id": true,
@@ -27,10 +24,9 @@
       "model": "subarticle",
       "foreignKey": "journalistId"
     },
-    "comments": {
-      "type": "hasMany",
-      "model": "comment",
-      "foreignKey": "journalistId"
+    "votes": {
+      "type": "embedsOne",
+      "model": "votes"
     }
   },
   "acls": [

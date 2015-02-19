@@ -15,10 +15,10 @@ describe('Top', function() {
       importer(app, done);
    });
 
-   describe('REST', function() {
-      importTest("Admin",'./REST/admin');
-      importTest("Guest",'./REST/guest');
-      importTest("User",'./REST/user');
+   describe('Permissions', function() {
+      importTest("Admin",'./permissions/admin');
+      importTest("Guest",'./permissions/guest');
+      importTest("User",'./permissions/user');
    });
 
 });

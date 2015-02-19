@@ -25,6 +25,27 @@ before( function(done) {
 });
 
 describe('Articles', function() {
+
+   it('User should be able to upvote an article', function(done) {
+      api.post('/api/articles/1/upvote')
+      .set('Authorization', token.id)
+      .expect(200)
+      .end( function(err, res) {
+         dump(err, res);
+         done(err, res);
+      });
+   });
+
+   it('User should be able to downvote an article', function(done) {
+      api.post('/api/articles/1/downvote')
+      .set('Authorization', token.id)
+      .expect(200)
+      .end( function(err, res) {
+         dump(err, res);
+         done(err, res);
+      });
+   });
+
    it('User should be able to get an article', function(done) {
       api.get('/api/articles/1')
       .set('Authorization', token.id)
@@ -34,6 +55,7 @@ describe('Articles', function() {
          done(err, res);
       });
    });
+
 
    it('User should be able to get all articles', function(done) {
       api.get('/api/articles')
@@ -202,10 +224,31 @@ describe('Subarticles', function() {
       });
    });
 
-   it('User should be able to get all subarticles', function(done) {
-      api.get('/api/subarticles')
+   it('User should be able to upvote a subarticle', function(done) {
+      api.post('/api/subarticles/1/upvote')
       .set('Authorization', token.id)
       .expect(200)
+      .end( function(err, res) {
+         dump(err, res);
+         done(err, res);
+      });
+   });
+
+   it('User should be able to downvote a subarticle', function(done) {
+      api.post('/api/subarticles/1/downvote')
+      .set('Authorization', token.id)
+      .expect(200)
+      .end( function(err, res) {
+         dump(err, res);
+         done(err, res);
+      });
+   });
+
+
+   it('User should NOT be able to get all subarticles', function(done) {
+      api.get('/api/subarticles')
+      .set('Authorization', token.id)
+      .expect(404)
       .end( function(err, res) {
          dump(err, res);
          done(err,res);
@@ -417,10 +460,30 @@ describe('Comments', function() {
       api.post('/api/comments')
       .set('Authorization', token.id)
       .send(comment)
-      .expect(401)
+      .expect(404)
       .end( function(err, res) {
          dump(err, res);
          done(err,res);
+      });
+   });
+
+   it('User should be able to upvote an comment', function(done) {
+      api.post('/api/comments/1/upvote')
+      .set('Authorization', token.id)
+      .expect(200)
+      .end( function(err, res) {
+         dump(err, res);
+         done(err, res);
+      });
+   });
+
+   it('User should be able to downvote an comment', function(done) {
+      api.post('/api/comments/1/downvote')
+      .set('Authorization', token.id)
+      .expect(200)
+      .end( function(err, res) {
+         dump(err, res);
+         done(err, res);
       });
    });
 

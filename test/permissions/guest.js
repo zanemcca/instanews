@@ -10,6 +10,24 @@ describe('Articles', function() {
       .expect(200,done);
    });
 
+   it('A guest should NOT be able to upvote an article', function(done) {
+      api.post('/api/articles/1/upvote')
+      .expect(401)
+      .end( function(err, res) {
+         dump(err, res);
+         done(err, res);
+      });
+   });
+
+   it('A guest should NOT be able to downvote an article', function(done) {
+      api.post('/api/articles/1/downvote')
+      .expect(401)
+      .end( function(err, res) {
+         dump(err, res);
+         done(err, res);
+      });
+   });
+
    it('A guest should be able to get all articles', function(done) {
       api.get('/api/articles')
       .expect(200,done);
@@ -37,7 +55,7 @@ describe('Articles', function() {
       });
 
       it('A guest should NOT be allowed to update an article', function(done) {
-         api.post('/api/articles/update')
+         api.put('/api/articles')
          .expect(401,done);
       });
       it('A guest should NOT be allowed to delete an article', function(done) {
@@ -50,6 +68,24 @@ describe('Articles', function() {
 //Test access to subarticles
 describe('Subarticles', function() {
 
+   it('A guest should NOT be able to upvote a subarticle', function(done) {
+      api.post('/api/subarticles/1/upvote')
+      .expect(401)
+      .end( function(err, res) {
+         dump(err, res);
+         done(err, res);
+      });
+   });
+
+   it('A guest should NOT be able to downvote a subarticle', function(done) {
+      api.post('/api/subarticles/1/downvote')
+      .expect(401)
+      .end( function(err, res) {
+         dump(err, res);
+         done(err, res);
+      });
+   });
+
    it('A guest should NOT be able to get a subarticle', function(done) {
       api.get('/api/subarticles/1')
       .expect(401,done);
@@ -57,7 +93,7 @@ describe('Subarticles', function() {
 
    it('A guest should NOT be able to get all subarticles', function(done) {
       api.get('/api/subarticles')
-      .expect(401,done);
+      .expect(404,done);
    });
 
    it('A guest should be able to get all comments on a subarticles', function(done) {
@@ -83,7 +119,7 @@ describe('Subarticles', function() {
 
       it('A guest should NOT be allowed to update a subarticle', function(done) {
          api.post('/api/subarticles/update')
-         .expect(401,done);
+         .expect(404,done);
       });
 
       it('A guest should NOT be allowed to delete a subarticle', function(done) {
@@ -144,10 +180,28 @@ describe('Comments', function() {
    it('A guest should NOT be able to create a comment directly', function(done) {
       api.post('/api/comments')
       .send(comment)
-      .expect(401)
+      .expect(404)
       .end( function(err, res) {
          dump(err, res);
          done(err,res);
+      });
+   });
+
+   it('A guest should NOT be able to upvote an comment', function(done) {
+      api.post('/api/comments/1/upvote')
+      .expect(401)
+      .end( function(err, res) {
+         dump(err, res);
+         done(err, res);
+      });
+   });
+
+   it('A guest should NOT be able to downvote an comment', function(done) {
+      api.post('/api/comments/1/downvote')
+      .expect(401)
+      .end( function(err, res) {
+         dump(err, res);
+         done(err, res);
       });
    });
 

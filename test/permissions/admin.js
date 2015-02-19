@@ -120,7 +120,7 @@ describe('Subarticles', function() {
    it('Admin should be able to get all subarticles', function(done) {
       api.get('/api/subarticles')
       .set('Authorization', token.id)
-      .expect(200,done);
+      .expect(404,done);
    });
 
    it('Admin should be able to get all comments on a subarticles', function(done) {
@@ -231,7 +231,7 @@ describe('Comments', function() {
       api.post('/api/comments')
       .set('Authorization', token.id)
       .send(comment)
-      .expect(401)
+      .expect(404)
       .end( function(err, res) {
          dump(err, res);
          done(err,res);

@@ -11,9 +11,6 @@
     "date": {
       "type": "date"
     },
-    "votes": {
-      "type": "votes"
-    },
     "articleId": {
       "type": "number",
       "id": true,
@@ -32,6 +29,10 @@
       "type": "hasMany",
       "model": "subarticle",
       "foreignKey": "parentId"
+    },
+    "votes": {
+      "type": "embedsOne",
+      "model": "votes"
     },
     "journalists": {
       "type": "hasMany",
@@ -135,6 +136,20 @@
       "principalId": "$authenticated",
       "permission": "ALLOW",
       "property": "__create__comments"
+    },
+    {
+      "accessType": "EXECUTE",
+      "principalType": "ROLE",
+      "principalId": "$authenticated",
+      "permission": "ALLOW",
+      "property": "downvote"
+    },
+    {
+      "accessType": "EXECUTE",
+      "principalType": "ROLE",
+      "principalId": "$authenticated",
+      "permission": "ALLOW",
+      "property": "upvote"
     }
   ],
   "methods": []

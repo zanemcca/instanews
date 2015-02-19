@@ -6,7 +6,7 @@
       "journalistId": 1,
       "parentId": 1,
       "date": "2015-02-06T12:48:43.511Z",
-      "votes" : {
+      "_votes" : {
          "up": 0,
          "down": 0,
          "rate": 0,
@@ -19,7 +19,7 @@
       "journalistId": 2,
       "parentId": 1,
       "date": "2015-02-06T02:48:43.511Z",
-      "votes" : {
+      "_votes" : {
          "up": 0,
          "down": 0,
          "rate": 0,
@@ -36,7 +36,7 @@
       "journalistId": 3,
       "parentId": 1,
       "date": "2015-02-06T03:48:43.511Z",
-      "votes" : {
+      "_votes" : {
          "up": 0,
          "down": 0,
          "rate": 0,

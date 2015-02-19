@@ -21,9 +21,6 @@
         "string"
       ]
     },
-    "votes": {
-      "type": "votes"
-    },
     "date": {
       "type": "date"
     },
@@ -36,6 +33,10 @@
   },
   "validations": [],
   "relations": {
+    "votes": {
+      "type": "embedsOne",
+      "model": "votes"
+    },
     "journalist": {
       "type": "belongsTo",
       "model": "journalist",
@@ -152,9 +153,23 @@
     {
       "accessType": "EXECUTE",
       "principalType": "ROLE",
-      "principalId": "$authenticated",
+      "principalId": "$everyone",
       "permission": "ALLOW",
       "property": "__create__comments"
+    },
+    {
+      "accessType": "EXECUTE",
+      "principalType": "ROLE",
+      "principalId": "$authenticated",
+      "permission": "ALLOW",
+      "property": "downvote"
+    },
+    {
+      "accessType": "EXECUTE",
+      "principalType": "ROLE",
+      "principalId": "$authenticated",
+      "permission": "ALLOW",
+      "property": "upvote"
     }
   ],
   "methods": []
