@@ -1,6 +1,14 @@
 body {
-   padding-top:50px
+   background: grey;
+   padding-top:60px
 }
-.glyphicon-remove:hover {
+.glyphicon-chevron-up:hover {
    cursor:pointer
+}
+.glyphicon-chevron-down:hover {
+   cursor:pointer
+}
+.list-group-item {
+   background: grey;
+   border: grey;
 }

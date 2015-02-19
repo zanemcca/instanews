@@ -54,7 +54,7 @@ describe('Articles', function() {
       var article =  {
          "isPrivate": false,
          "date": "2015-02-10T12:48:43.511Z",
-         "votes": {
+         "_votes": {
             "up": 50,
             "down": 10,
             "rate": 5,
@@ -97,13 +97,11 @@ describe('Articles', function() {
       });
       */
 
-      /*
       it('Admin should be allowed to delete an article', function(done) {
          api.delete('/api/articles/100')
          .set('Authorization', token.id)
          .expect(204, done);
       });
-      */
    });
 
 });
@@ -139,7 +137,7 @@ describe('Subarticles', function() {
          subarticle ={
              "title": "Sweet blazing glory",
              "text": "Holy crap look at that!",
-             "votes": {
+             "_votes": {
                   "up": 3,
                   "down": 50,
                   "rate": -6,
@@ -213,7 +211,7 @@ describe('Comments', function() {
       comment = {
         "content": "Nuts!",
         "date": "2015-02-06T12:48:43.511Z",
-        "votes": {
+        "_votes": {
           "up": 2,
           "down": 1,
           "rate": 1,

@@ -12,7 +12,12 @@ angular
       url: '',
       templateUrl: 'views/feed.html',
       controller: 'FeedCtrl'
+   })
+   .state('article', {
+      url: '/articles/{id}',
+      templateUrl: 'views/article.html',
+      controller: 'ArticleCtrl'
    });
 
-   $urlRouterProvider.otherwise('feed');
+   $urlRouterProvider.otherwise('');
 }]);

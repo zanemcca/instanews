@@ -105,9 +105,9 @@ describe('Articles', function() {
          article =  {
             "isPrivate": false,
             "date": "2015-02-10T12:48:43.511Z",
-            "votes": {
+            "_votes": {
                "up": 50,
-               "down": 10,
+               "down": 5,
                "rate": 5,
                "lastUpdated": "2015-02-10T12:48:43.511Z",
             },
@@ -120,7 +120,7 @@ describe('Articles', function() {
          comment = {
            "content": "Nuts!",
            "date": "2015-02-06T12:48:43.511Z",
-           "votes": {
+           "_votes": {
              "up": 2,
              "down": 1,
              "rate": 1,
@@ -277,7 +277,7 @@ describe('Subarticles', function() {
             "journalistId": user.journalistId,
             "parentId": 1,
             "date": "2015-02-08T12:48:43.511Z",
-            "votes" : {
+            "_votes" : {
                "up": 5,
                "down": 50,
                "rate": -6,
@@ -287,7 +287,7 @@ describe('Subarticles', function() {
          comment = {
            "content": "Nuts!",
            "date": "2015-02-06T12:48:43.511Z",
-           "votes": {
+           "_votes": {
              "up": 2,
              "down": 1,
              "rate": 1,
@@ -442,7 +442,7 @@ describe('Comments', function() {
       comment = {
         "content": "Nuts!",
         "date": "2015-02-06T12:48:43.511Z",
-        "votes": {
+        "_votes": {
           "up": 2,
           "down": 1,
           "rate": 1,

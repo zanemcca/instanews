@@ -1,7 +1,21 @@
 <!DOCTYPE html>
 
-<h1>Local</h1>
-<hr>
-<div class="list-group">
-   <a class="list-group-item" ng-repeat="article in articles">{{article}}&nbsp;></a>
+<div class="list-group" >
+   <div class="list-group-item" ng-repeat="article in articles | orderBy: '-(_votes.up - _votes.down)'">
+      <!-- Up and downvote buttons -->
+      <span class="glyphicon glyphicon-chevron-up"
+         ng-click="upvote(article)"></span>
+      {{article._votes.up}}
+      <span class="glyphicon glyphicon-chevron-down"
+         ng-click="downvote(article)"></span>
+      {{article._votes.down}}
+
+      <span style="font-size:20px; margin-left:10px;">
+         {{article.articleId}}
+         <span style="font-size:20px;"
+            class="pull-right">
+            <a href="#/articles/{{article.articleId}}" class="glyphicon glyphicon-chevron-right"></a>
+         </span>
+      </span>
+   </div>
 </div>

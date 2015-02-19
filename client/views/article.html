@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<div class="list-group">
+   <li class="list-group-item" ng-repeat="article in subarticles | orderBy: '-(_votes.up - _votes.down)'">
+      <div>
+         <!-- Up and downvote buttons -->
+         <h4 class="list-group-item-heading">{{article.title}}</h4>
+
+         <span class="glyphicon glyphicon-chevron-up"
+            style="color:green"
+            ng-click="upvote(article)"></span>
+         {{article._votes.up}}
+         <span class="glyphicon glyphicon-chevron-down"
+            style="color:red"
+            ng-click="downvote(article)"></span>
+         {{article._votes.down}}
+
+         <span style="font-size:10px;"
+            class="pull-right">
+            <a href="#/journalists/{{article.journalistId}}" style="color: black;">- {{article.journalistId}}</a>
+         </span>
+         <hr>
+      </div>
+      <div>
+         <span ng-show="article.text">
+            {{article.text}}
+            <hr>
+         </span>
+      </div>
+      <div>
+         <span ng-show="article.photos">
+            <div class="list-group">
+               <div class="list-group-item" ng-repeat="photo in article.photos">
+                  <div class="thumbnail">
+                     <img src="{{photo}}">
+               </div>
+            </div>
+            <hr>
+         </span>
+      </div>
+      <div>
+         <span ng-show="article.videos">
+            <div class="list-group">
+               <div class="list-group-item" ng-repeat="video in article.videos">
+                  {{video}}
+               </div>
+            </div>
+         </span>
+      </div>
+   </li>
+</div>
