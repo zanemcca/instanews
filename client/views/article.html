@@ -4,20 +4,11 @@
       <span ng-show="article.text">
          {{article.text}}
       </span>
-      <span ng-show="article.photos">
-         <div class="list-group">
-            <div class="list-group-item" ng-repeat="photo in article.photos">
-               <div class="thumbnail">
-                  <img src="{{photo}}">
-               </div>
-            </div>
-         </div>
-      </span>
-      <span ng-show="article.videos">
-         <div class="list-group">
-            <div class="list-group-item" ng-repeat="video in article.videos">
-               {{video}}
-            </div>
+      <span ng-show="article._file">
+         <div class="media">
+            <a href="/api/storages/{{article.parentId}}/download/{{article._file.name}}">
+               {{article._file.name}}
+            </a>
          </div>
       </span>
       <div>

@@ -46,5 +46,13 @@
   "comment": {
     "dataSource": "Articles",
     "public": true
+  },
+  "storage": {
+    "dataSource": "Storage",
+    "public": true
+  },
+  "file": {
+    "dataSource": "Articles",
+    "public": true
   }
 }

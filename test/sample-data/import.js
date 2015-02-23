@@ -20,6 +20,12 @@ module.exports = function (app, cb) {
    var UserDB = app.datasources.Users;
    var db = app.datasources.db;
 
+   /*
+   var st = app.datasources.photos;
+   var container = st.createModel('container');
+   app.model(container);
+   */
+
    // This function imports all members of the data array into the given Model
    function importData(Model, data, callb) {
 

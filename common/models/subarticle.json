@@ -4,22 +4,8 @@
   "strict": false,
   "idInjection": false,
   "properties": {
-    "title": {
-      "type": "string",
-      "required": true
-    },
     "text": {
       "type": "string"
-    },
-    "videos": {
-      "type": [
-        "string"
-      ]
-    },
-    "photos": {
-      "type": [
-        "string"
-      ]
     },
     "date": {
       "type": "date"
@@ -33,6 +19,10 @@
   },
   "validations": [],
   "relations": {
+    "file": {
+      "type": "embedsOne",
+      "model": "file"
+    },
     "votes": {
       "type": "embedsOne",
       "model": "votes"

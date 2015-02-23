@@ -1,6 +1,5 @@
 [
    {
-      "title": "Fire at Poley Mountain",
       "text" : "There is a large blaze at Poley Mountain in the Sussex area. Residence of near by homes have been evacutated as a precaution.",
       "subarticleId": 1,
       "journalistId": 1,
@@ -14,7 +13,6 @@
       }
    },
    {
-      "title": "Poley is burning",
       "subarticleId": 2,
       "journalistId": 2,
       "parentId": 1,
@@ -25,13 +23,14 @@
          "rate": 0,
          "lastUpdated" : "2015-02-06T02:48:43.511Z"
       },
-      "videos": [
-         "https://www.youtube.com/watch?v=P2eqNB6zy9k",
-         "https://www.youtube.com/watch?v=ZWSMoE3A5DI"
-      ]
+      "_file": {
+         "type": "video",
+         "size": 5000,
+         "name": "ECSE 414 - SPDY Project.mp4",
+         "caption": "Crazy video!!"
+      }
    },
    {
-      "title": "O no Poley is on fire!",
       "subarticleId": 3,
       "journalistId": 3,
       "parentId": 1,
@@ -42,8 +41,11 @@
          "rate": 0,
          "lastUpdated" : "2015-02-06T03:48:43.511Z"
       },
-      "photos" : [
-         "./imgs/123456.jpg"
-      ]
+      "_file": {
+         "type": "image",
+         "size": 2000,
+         "name": "123456.jpg",
+         "caption": "Nuts photo!!"
+      }
    }
 ]
