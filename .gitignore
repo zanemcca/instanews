@@ -3,3 +3,4 @@ node_modules/
 *npm-debug.log
 strongloop.json
 client/thirdParty/
+client/platforms/
