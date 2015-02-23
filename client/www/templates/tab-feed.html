@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+
+<ion-view view-title="Feed">
+   <ion-content>
+      <ion-list>
+         <ion-item ng-repeat="article in articles | orderBy: '-(_votes.up - _votes.down)'" type="item-text-wrap" href="#/tab/articles/{{article.articleId}}">
+            <!-- Up and downvote buttons -->
+            <ion-option-button class="icon ion-chevron-up"
+               ng-click="upvote(article)">
+                {{article._votes.up}}
+            </ion-option-button>
+
+            <ion-option-button class="icon ion-chevron-down"
+               ng-click="downvote(article)">
+                {{article._votes.down}}
+            </ion-option-button>
+
+            <span style="font-size:20px; margin-left:10px;">
+               {{article.articleId}}
+            </span>
+
+         </ion-item>
+      </ion-list>
+   </ion-content>
+</ion-view>

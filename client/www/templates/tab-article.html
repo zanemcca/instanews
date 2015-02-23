@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<ion-view view-title="Article">
+   <ion-content>
+      <ion-list>
+         <ion-item ng-repeat="article in subarticles | orderBy: '-(_votes.up - _votes.down)'" type="item-text-wrap">
+            <!-- Up and downvote buttons -->
+            <ion-option-button class="icon ion-chevron-up"
+               ng-click="upvote(article)">
+                {{article._votes.up}}
+            </ion-option-button>
+
+            <ion-option-button class="icon ion-chevron-down"
+               ng-click="downvote(article)">
+                {{article._votes.down}}
+            </ion-option-button>
+
+            <span ng-show="article.text">
+               <p>
+                  {{article.text}}
+               </p>
+            </span>
+            <span ng-show="article._file.type === 'video'">
+               <video controls="controls">
+                  <!--source ng-src="/api/storages/{{article.parentId}}/download/{{article._file.name}}" type="video/mp4"-->
+                  <source ng-src="/api/storages/1/download/ECSE 414 - SPDY Project.mp4" type="video/mp4">
+               </video>
+            </span>
+            <span ng-show="article._file.type === 'image'">
+               <img src="/api/storages/{{article.parentId}}/download/{{article._file.name}}">
+            </span>
+            <footer class="item-icon-right">
+               <p>
+                  <a href="#/journalists/{{article.journalistId}}" class="icon item-icon-right" style="font-size: 10px; color: black;">- {{article.journalistId}}</a>
+               </p>
+            </footer>
+         </ion-item>
+      </ion-list>
+   </ion-content>
+</ion-view>
