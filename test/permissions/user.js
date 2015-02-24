@@ -103,6 +103,7 @@ describe('Articles', function() {
       var comment;
       before( function(done) {
          article =  {
+            "title": "Boring article",
             "isPrivate": false,
             "date": "2015-02-10T12:48:43.511Z",
             "_votes": {
@@ -271,7 +272,6 @@ describe('Subarticles', function() {
       var comment;
       before( function(done) {
          subarticle = {
-            "title": "Fire!!!!!",
             "text" : "There is a blaze!",
             "subarticleId": 200,
             "journalistId": user.journalistId,

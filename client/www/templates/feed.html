@@ -3,7 +3,7 @@
 <ion-view view-title="Feed">
    <ion-content>
       <ion-list>
-         <ion-item ng-repeat="article in articles | orderBy: '-(_votes.up - _votes.down)'" type="item-text-wrap" href="#/tab/articles/{{article.articleId}}">
+         <ion-item class="card" ng-repeat="article in articles | orderBy: '-(_votes.up - _votes.down)'" type="item-text-wrap" href="#/tab/articles/{{article.articleId}}">
             <!-- Up and downvote buttons -->
             <ion-option-button class="icon ion-chevron-up"
                ng-click="upvote(article)">
@@ -16,7 +16,7 @@
             </ion-option-button>
 
             <span style="font-size:20px; margin-left:10px;">
-               {{article.articleId}}
+               {{article.title}}
             </span>
 
          </ion-item>

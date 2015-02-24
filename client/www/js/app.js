@@ -23,7 +23,10 @@ angular.module('instanews', ['ionic','instanews.article','instanews.feed','insta
   });
 })
 
-.config(function($stateProvider, $urlRouterProvider) {
+.config(function($stateProvider, $urlRouterProvider, $ionicConfigProvider) {
+
+   $ionicConfigProvider.tabs.position("bottom"); //Places them at the bottom for all OS
+   //$ionicConfigProvider.tabs.style("standard"); //Makes them all look the same across all OS
 
   // Ionic uses AngularUI Router which uses the concept of states
   // Learn more here: https://github.com/angular-ui/ui-router
@@ -44,7 +47,7 @@ angular.module('instanews', ['ionic','instanews.article','instanews.feed','insta
       url: '/feed',
       views: {
          'tab-feed': {
-            templateUrl: 'templates/tab-feed.html',
+            templateUrl: 'templates/feed.html',
             controller: 'FeedCtrl'
          }
       }
@@ -53,8 +56,8 @@ angular.module('instanews', ['ionic','instanews.article','instanews.feed','insta
    .state('tab.article', {
       url: '/articles/{id}',
       views: {
-         'tab-article': {
-            templateUrl: 'templates/tab-article.html',
+         'tab-feed': {
+            templateUrl: 'templates/article.html',
             controller: 'ArticleCtrl'
          }
       }
