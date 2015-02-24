@@ -7,8 +7,9 @@ var cb = function(err, res) {
 };
 
 angular
-.module('starter')
+.module('instanews.feed', ['ionic', 'ngResource'])
 .controller('FeedCtrl', ['$scope', '$state', 'Article', function($scope, $state, Article) {
+   //$scope.articles = $resource('/api/articles');
    $scope.articles = [];
 
    function getArticles() {

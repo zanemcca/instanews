@@ -1,7 +1,15 @@
 
-angular
-.module('starter')
-.controller('ArticleCtrl', ['$scope', '$stateParams', 'Article','Subarticle', function($scope, $stateParams, Article, Subarticle) {
+var app = angular.module('instanews.article', ['ionic', 'ngResource']);
+
+
+app.controller('ArticleCtrl', [
+      '$scope',
+      '$stateParams',
+      'Article',
+      'Subarticle',
+      'Storage',
+      function($scope, $stateParams, Article, Subarticle, Storage) {
+
    $scope.subarticles = [];
 
    function getSubarticles() {
@@ -22,3 +30,4 @@ angular
       Subarticle.prototype$downvote({id: subarticle.subarticleId});
    }
 }]);
+
