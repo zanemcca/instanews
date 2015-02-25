@@ -2,7 +2,7 @@
    {
       "text" : "There is a large blaze at Poley Mountain in the Sussex area. Residence of near by homes have been evacutated as a precaution.",
       "subarticleId": 1,
-      "journalistId": 1,
+      "username": "zane",
       "parentId": 1,
       "date": "2015-02-06T12:48:43.511Z",
       "_votes" : {
@@ -14,7 +14,7 @@
    },
    {
       "subarticleId": 2,
-      "journalistId": 2,
+      "username": "bob",
       "parentId": 1,
       "date": "2015-02-06T02:48:43.511Z",
       "_votes" : {
@@ -31,8 +31,21 @@
       }
    },
    {
+      "text": "A subarticle for an article",
+      "subarticleId": 4,
+      "username": "bob",
+      "parentId": 200,
+      "date": "2015-02-06T02:48:43.511Z",
+      "_votes" : {
+         "up": 0,
+         "down": 0,
+         "rate": 0,
+         "lastUpdated" : "2015-02-06T02:48:43.511Z"
+      }
+   },
+   {
       "subarticleId": 3,
-      "journalistId": 3,
+      "username" : "jane",
       "parentId": 1,
       "date": "2015-02-06T03:48:43.511Z",
       "_votes" : {

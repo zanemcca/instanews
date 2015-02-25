@@ -2,7 +2,6 @@
    {
       "firstName": "Zane",
       "lastName": "McCaig",
-      "journalistId": 1,
       "email": "zanemccaig@gmail.com",
       "username": "zane",
       "password": "password"
@@ -10,7 +9,6 @@
    {
       "firstName": "Bob",
       "lastName": "Smith",
-      "journalistId": 2,
       "email": "bob@smith.com",
       "username": "bob",
       "password": "password"
@@ -18,7 +16,6 @@
    {
       "firstName": "Jane",
       "lastName": "Henderson",
-      "journalistId": 3,
       "email": "jane@henderson.com",
       "username": "jane",
       "password": "password"

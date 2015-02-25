@@ -132,12 +132,12 @@ describe('Subarticles', function() {
 //Test access to journalists
 describe('Journalists', function() {
    it('A guest should be able to get a journalist', function(done) {
-      api.get('/api/journalists/1')
+      api.get('/api/journalists/zane')
       .expect(200,done);
    });
 
    it('A guest should be able to get all articles of a journalist', function(done) {
-      api.get('/api/journalists/1/articles')
+      api.get('/api/journalists/zane/articles')
       .expect(200,done);
    });
 

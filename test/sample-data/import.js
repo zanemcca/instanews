@@ -64,7 +64,7 @@ module.exports = function (app, cb) {
 
                   role.principals.create({
                      principalType: RoleMapping.USER,
-                     principalId: journalists[0].journalistId
+                     principalId: journalists[0].username
                   }, function(err, principal) {
                      if (err) return callback(err);
 

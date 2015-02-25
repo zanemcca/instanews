@@ -10,11 +10,11 @@
     "lastName": {
       "type": "string"
     },
-    "journalistId": {
-      "type": "number",
-      "id": true,
-      "required": true,
-      "index": true
+    "username": {
+       "type": "string",
+       "required": true,
+       "id": true,
+       "index": true
     }
   },
   "validations": [],

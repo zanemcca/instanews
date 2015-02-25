@@ -19,7 +19,7 @@ before( function(done) {
       if (err) return done(err);
 
       token = res.body;
-      assert(token.userId === user.journalistId);
+      assert(token.userId === user.username);
       done();
    });
 });
@@ -128,7 +128,7 @@ describe('Articles', function() {
              "lastUpdated": "2015-02-06T12:48:43.511Z"
            },
            "commentId": 201,
-           "journalistId": user.journalistId,
+           "username" : user.username,
            "commentableId": article.articleId,
            "commentableType": "article"
          };
@@ -274,7 +274,7 @@ describe('Subarticles', function() {
          subarticle = {
             "text" : "There is a blaze!",
             "subarticleId": 200,
-            "journalistId": user.journalistId,
+            "username": user.username,
             "parentId": 1,
             "date": "2015-02-08T12:48:43.511Z",
             "_votes" : {
@@ -294,7 +294,7 @@ describe('Subarticles', function() {
              "lastUpdated": "2015-02-06T12:48:43.511Z"
            },
            "commentId": 200,
-           "journalistId": user.journalistId,
+           "username": user.username,
            "commentableId": subarticle.subarticleId,
            "commentableType": "subarticle"
          };
@@ -377,7 +377,7 @@ describe('Subarticles', function() {
 
       it('User should NOT be allowed to update someone elses subarticle', function(done) {
          var subArt = subarticle;
-         subArt.journalistId = 1;
+         subArt.username = 1;
          subArt.subarticleId = 1;
 
          api.put('/api/subarticles')
@@ -405,7 +405,7 @@ describe('Subarticles', function() {
    //Test access to journalists
 describe('Journalists', function() {
    it('User should be able to get a journalist', function(done) {
-      api.get('/api/journalists/1')
+      api.get('/api/journalists/zane')
       .set('Authorization', token.id)
       .expect(200)
       .end( function(err, res) {
@@ -415,7 +415,7 @@ describe('Journalists', function() {
    });
 
    it('User should be able to get all articles of a journalist', function(done) {
-      api.get('/api/journalists/1/articles')
+      api.get('/api/journalists/zane/articles')
       .set('Authorization', token.id)
       .expect(200)
       .end( function(err, res) {
@@ -449,7 +449,7 @@ describe('Comments', function() {
           "lastUpdated": "2015-02-06T12:48:43.511Z"
         },
         "commentId": 300,
-        "journalistId": user.journalistId,
+        "username": user.username,
         "commentableId": 1,
         "commentableType": "comment"
       };

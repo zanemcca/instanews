@@ -1,10 +1,9 @@
 <!DOCTYPE html>
 <ion-view view-title="Article">
    <ion-content>
-      <div class="list">
-         <div class="item card"  collection-repeat="subarticle in subarticles | orderBy: '-(_votes.up - _votes.down)'" collection-item-width="'100%'" collection-item-height="'100%'">
+      <ion-list>
+         <ion-item class="item card"  collection-repeat="subarticle in subarticles | orderBy: '-(_votes.up - _votes.down)'" collection-item-width="'100%'" collection-item-height="'100%'">
             <!-- Up and downvote buttons -->
-            <!--
             <ion-option-button class="icon ion-chevron-up"
                ng-click="upvote(subarticle)">
                 {{subarticle._votes.up}}
@@ -14,19 +13,27 @@
                ng-click="downvote(subarticle)">
                 {{subarticle._votes.down}}
             </ion-option-button>
--->
-            <div class="item-body">
+
+            <div class="item item-body">
                <span ng-show="subarticle.text">
-                  <p>
-                     {{subarticle.text}}
-                  </p>
+                  <p>{{subarticle.text}}</p>
                </span>
                <file-item ng-if="subarticle._file"></file-item>
             </div>
-            <div class="item item-divider item-icon-right">
-               <a href="#/journalists/{{subarticle.journalistId}}" class="icon item-icon-right" style="font-size: 10px; color: black;">- {{subarticle.journalistId}}</a>
+            <div class="item">
+               <div class="item-icon-right">
+                  <a href="#/journalists/{{subarticle.username}}" class="icon" style="font-size: 12px;">- {{subarticle.username}}</a>
+               </div>
+               <div class="icon ion-chevron-down button-positive"></div>
             </div>
-         </div>
-      </div>
+            <!--
+            <div class="item">
+               <div class="card" ng-repeat"comment in subarticle.comments | orderBy: '-(_votes.up - _votes.down)'">
+                  {{comment.content}}
+               </div>
+            </div>
+            -->
+         </ion-item>
+      </ion-list>
    </ion-content>
 </ion-view>

@@ -13,11 +13,11 @@ app.directive('fileItem', function ($compile) {
 
       switch(subarticle._file.type) {
          case 'image':
-            template = '<div class="item-image"><img src='+ getSrc(subarticle) + '></div>';
+            template = '<div class="item item-image"><img src='+ getSrc(subarticle) + '></div>';
             break;
          case 'video':
-            template = '<div class="file-video"><video src='+ getSrc(subarticle) +
-                        ' controls="controls"></video></div>';
+            template = '<div class="item file-video"><video height="300px" controls="controls"><source src='
+                        + getSrc(subarticle) +'></video></div>';
             break;
       }
       return template;

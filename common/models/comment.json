@@ -36,7 +36,7 @@
     "journalist": {
       "type": "belongsTo",
       "model": "journalist",
-      "foreignKey": "journalistId"
+      "foreignKey": "username"
     }
   },
   "acls": [

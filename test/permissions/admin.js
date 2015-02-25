@@ -19,7 +19,8 @@ before( function(done) {
       if (err) return done(err);
 
       token = res.body;
-      assert(token.userId === user.journalistId);
+      console.log(token.userId+ '\t' + user.username);
+      assert(token.userId === user.username);
       done();
    });
 });
@@ -146,7 +147,7 @@ describe('Subarticles', function() {
              "date": "2015-02-06T12:48:43.511Z",
              "subarticleId": 100,
              "parentId": 1,
-             "journalistId": 1
+             "username": "zane"
          };
          done();
       });
@@ -185,13 +186,13 @@ describe('Subarticles', function() {
 //Test access to journalists
 describe('Journalists', function() {
    it('Admin should be able to get a journalist', function(done) {
-      api.get('/api/journalists/1')
+      api.get('/api/journalists/zane')
       .set('Authorization', token.id)
       .expect(200,done);
    });
 
    it('Admin should be able to get all articles of a journalist', function(done) {
-      api.get('/api/journalists/1/articles')
+      api.get('/api/journalists/zane/articles')
       .set('Authorization', token.id)
       .expect(200,done);
    });
@@ -218,7 +219,7 @@ describe('Comments', function() {
           "lastUpdated": "2015-02-06T12:48:43.511Z"
         },
         "commentId": 100,
-        "journalistId": 2,
+        "username" : "bob",
         "commentableId": 1,
         "commentableType": "comment"
       };

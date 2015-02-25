@@ -30,7 +30,7 @@
     "journalist": {
       "type": "belongsTo",
       "model": "journalist",
-      "foreignKey": "journalistId"
+      "foreignKey": "username"
     },
     "parent": {
       "type": "belongsTo",
