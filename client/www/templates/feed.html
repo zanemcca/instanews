@@ -1,24 +1,46 @@
 <!DOCTYPE html>
-
 <ion-view view-title="Feed">
    <ion-content>
       <ion-list>
-         <ion-item class="card" ng-repeat="article in articles | orderBy: '-(_votes.up - _votes.down)'" type="item-text-wrap" href="#/tab/articles/{{article.articleId}}">
-            <!-- Up and downvote buttons -->
-            <ion-option-button class="icon ion-chevron-up"
-               ng-click="upvote(article)">
-                {{article._votes.up}}
-            </ion-option-button>
+         <ion-item style="border: transparent"
+            collection-repeat="article in articles | orderBy: '-(_votes.up - _votes.down)'"
+            collection-item-width="'720px'"
+            collection-item-height="'200px'">
 
-            <ion-option-button class="icon ion-chevron-down"
-               ng-click="downvote(article)">
-                {{article._votes.down}}
-            </ion-option-button>
+            <div class="">
+               <div class="item item-divider">
+                  <button class="button button-clear button-small">
+                     @
+                  </button>
+               </div>
 
-            <div class="item">
-               <h2>{{article.title}}</h2>
+               <div class="item item-body" style="width: 720px;">
+                  <a class="button button-clear button-full" href="#/tab/articles/{{article.articleId}}">
+                     {{article.title}}
+                  </a>
+               </div>
+
+               <div class="item item-divider">
+                  <div class="item-icon-right">
+                     <button class="item button button-small button-clear icon ion-chevron-right"></button>
+                  </div>
+                  <button class="item button button-clear button-balanced button-small ion-chevron-up"
+                     ng-click="upvote(article, $index)">
+                      {{article._votes.up}}
+                   </button>
+                  <button class="item button button-clear button-assertive button-small ion-chevron-down"
+                    ng-click="downvote(article, $index)">
+                     {{article._votes.down}}
+                  </button>
+               </div>
+               <!--
+               <div class="item">
+                  <div class="card" ng-repeat"comment in subarticle.comments | orderBy: '-(_votes.up - _votes.down)'">
+                     {{comment.content}}
+                  </div>
+               </div>
+               -->
             </div>
-
          </ion-item>
       </ion-list>
    </ion-content>

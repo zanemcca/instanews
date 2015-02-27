@@ -22,11 +22,25 @@ angular
 
    getArticles();
 
-   $scope.upvote = function(article) {
-      Article.prototype$upvote({id: article.articleId});
+   $scope.upvote = function(article, $index) {
+      Article.prototype$upvote({id: article.articleId}, function (res) {
+         for(i = 0; i < $scope.articles.length; i++) {
+            if($scope.articles[i].articleId === article.articleId) {
+               $scope.articles[i]._votes = res.article._votes;
+               return;
+            }
+         }
+      });
    }
 
-   $scope.downvote = function(article) {
-      Article.prototype$downvote({id: article.articleId});
+   $scope.downvote = function(article, $index) {
+      Article.prototype$downvote({id: article.articleId}, function (res) {
+         for(i = 0; i < $scope.articles.length; i++) {
+            if($scope.articles[i].articleId === article.articleId) {
+               $scope.articles[i]._votes = res.article._votes;
+               return;
+            }
+         }
+      });
    }
 }]);

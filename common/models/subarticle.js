@@ -26,7 +26,7 @@ module.exports = function(Subarticle) {
    Subarticle.remoteMethod( 'upvote', {
       isStatic: false,
       http: { path: '/upvote',  verb: 'post'},
-      returns: { arg: 'status', type: 'string'}
+      returns: { arg: 'subarticle', type: 'string'}
    });
 
    //Downvote function
@@ -37,6 +37,6 @@ module.exports = function(Subarticle) {
    Subarticle.remoteMethod( 'downvote', {
       isStatic: false,
       http: { path: '/downvote',  verb: 'post'},
-      returns: { arg: 'status', type: 'string'}
+      returns: { arg: 'subarticle', type: 'string'}
    });
 };

@@ -37,7 +37,7 @@ module.exports = function(Article) {
    Article.remoteMethod( 'upvote', {
       isStatic: false,
       http: { path: '/upvote',  verb: 'post'},
-      returns: { arg: 'status', type: 'string'}
+      returns: { arg: 'article', type: 'string'}
    });
 
    //Downvote function
@@ -48,6 +48,6 @@ module.exports = function(Article) {
    Article.remoteMethod( 'downvote', {
       isStatic: false,
       http: { path: '/downvote',  verb: 'post'},
-      returns: { arg: 'status', type: 'string'}
+      returns: { arg: 'article', type: 'string'}
    });
 };

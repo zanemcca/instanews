@@ -7,8 +7,7 @@ app.controller('ArticleCtrl', [
       '$stateParams',
       'Article',
       'Subarticle',
-      'Storage',
-      function($scope, $stateParams, Article, Subarticle, Storage) {
+      function($scope, $stateParams, Article, Subarticle) {
 
    $scope.subarticles = [];
 
@@ -22,12 +21,48 @@ app.controller('ArticleCtrl', [
 
    getSubarticles();
 
-   $scope.upvote = function(subarticle) {
-      Subarticle.prototype$upvote({id: subarticle.subarticleId});
+   $scope.getSubarticleHeight = function(subarticle) {
+      var height;
+      if (subarticle._file) {
+         //Video and image size
+         if (subarticle._file.type === 'video') {
+            height = 360;
+            //console.log('Video: '+ height);
+         }
+         else if (subarticle._file.type === 'image') {
+            height = 480;
+            //console.log('Image: '+ height);
+         }
+      }
+      else {
+         //Size of text
+         height = 50;
+         //console.log('Text: '+ height);
+      }
+      return height;
    }
 
-   $scope.downvote = function(subarticle) {
-      Subarticle.prototype$downvote({id: subarticle.subarticleId});
+
+   $scope.upvote = function(subarticle, $index) {
+      Subarticle.prototype$upvote({id: subarticle.subarticleId}, function (res) {
+         for(i = 0; i < $scope.subarticles.length; i++) {
+            if($scope.subarticles[i].subarticleId === subarticle.subarticleId) {
+               $scope.subarticles[i]._votes = res.subarticle._votes;
+               return;
+            }
+         }
+      });
+   }
+
+   $scope.downvote = function(subarticle, $index) {
+      Subarticle.prototype$downvote({id: subarticle.subarticleId}, function (res) {
+         for(i = 0; i < $scope.subarticles.length; i++) {
+            if($scope.subarticles[i].subarticleId === subarticle.subarticleId) {
+               $scope.subarticles[i]._votes = res.subarticle._votes;
+               return;
+            }
+         }
+      });
    }
 }]);
 
