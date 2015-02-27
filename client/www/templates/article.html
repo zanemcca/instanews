@@ -1,6 +1,16 @@
 <!DOCTYPE html>
 <ion-view view-title="Article">
    <ion-content>
+      <ion-item data-tap-disabled="true">
+         <video id="video_test" class="video-js vjs-default-skin vjs-big-play-centered vjs-paused vjs-controls-enabled vjs-user-active" controls width="100%" data-setup='{}'>
+            <source src="http://video.ch9.ms/ch9/7066/1fbfb520-2165-4a16-9d54-84583b377066/WindowsAzureMediaServicesNETSDK_mid.mp4" type="video/mp4" data-quality="Medium" onerror="ch9.functions.html5Presenter.fallback(this);">
+            <source src="http://d1s3yn3kxq96sy.cloudfront.net/bigbuckbunny/index.m3u8">
+            <source src="http://vjs.zencdn.net/v/oceans.mp4" type="video/mp4">
+            <source src="http://vjs.zencdn.net/v/oceans.webm" type="video/webm">
+            <source src="http://192.168.100.10:3000/api/storages/1/download/dscovr_launches_aboard_spacex_falcon_9.mp4" type="video/mp4">
+         </video>
+      </ion-item>
+      <!--
       <ion-list>
          <ion-item style="border: transparent"
             collection-repeat="subarticle in subarticles | orderBy: '-(_votes.up - _votes.down)'"
@@ -34,6 +44,7 @@
                      {{subarticle._votes.down}}
                   </button>
                </div>
+               -->
                <!--
                <div class="item">
                   <div class="card" ng-repeat"comment in subarticle.comments | orderBy: '-(_votes.up - _votes.down)'">
@@ -41,8 +52,10 @@
                   </div>
                </div>
                -->
+               <!--
             </div>
          </ion-item>
       </ion-list>
+      -->
    </ion-content>
 </ion-view>
