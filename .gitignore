@@ -4,3 +4,4 @@ node_modules/
 strongloop.json
 client/thirdParty/
 client/platforms/
+client/plugins/
