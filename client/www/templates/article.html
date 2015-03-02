@@ -1,61 +1,56 @@
 <!DOCTYPE html>
 <ion-view view-title="Article">
    <ion-content>
-      <ion-item data-tap-disabled="true">
-         <video id="video_test" class="video-js vjs-default-skin vjs-big-play-centered vjs-paused vjs-controls-enabled vjs-user-active" controls width="100%" data-setup='{}'>
-            <source src="http://video.ch9.ms/ch9/7066/1fbfb520-2165-4a16-9d54-84583b377066/WindowsAzureMediaServicesNETSDK_mid.mp4" type="video/mp4" data-quality="Medium" onerror="ch9.functions.html5Presenter.fallback(this);">
-            <source src="http://d1s3yn3kxq96sy.cloudfront.net/bigbuckbunny/index.m3u8">
-            <source src="http://vjs.zencdn.net/v/oceans.mp4" type="video/mp4">
-            <source src="http://vjs.zencdn.net/v/oceans.webm" type="video/webm">
-            <source src="http://192.168.100.10:3000/api/storages/1/download/dscovr_launches_aboard_spacex_falcon_9.mp4" type="video/mp4">
-         </video>
-      </ion-item>
-      <!--
-      <ion-list>
-         <ion-item style="border: transparent"
+      <ul class="list">
+         <!--ion-item ng-repeat="subarticle in subarticles | orderBy: '-(_votes.up - _votes.down)'"-->
+         <li class="item" style="border: transparent"
             collection-repeat="subarticle in subarticles | orderBy: '-(_votes.up - _votes.down)'"
             collection-item-width="'720px'"
             collection-item-height="getSubarticleHeight(subarticle)+ 170">
+            <div class="item item-divider">
+               <a class="button button-clear button-small" href="#/journalists/{{subarticle.username}}">
+                  @{{subarticle.username}}
+               </a>
+            </div>
 
-            <div class="">
-               <div class="item item-divider">
-                  <a class="button button-clear button-small" href="#/journalists/{{subarticle.username}}">
-                     @{{subarticle.username}}
-                  </a>
+            <div class="item item-body">
+               <div ng-show="subarticle.text">
+                  <p>{{subarticle.text}}</p>
                </div>
+               <file-item ng-if="subarticle._file"></file-item>
+            </div>
 
-               <div class="item item-body" style="width: 720px;">
-                  <div ng-show="subarticle.text">
-                     <p>{{subarticle.text}}</p>
-                  </div>
-                  <file-item ng-if="subarticle._file"></file-item>
-               </div>
-
-               <div class="item item-divider">
-                  <div class="item-icon-right">
-                     <button class="item button button-clear icon ion-chevron-right"></button>
-                  </div>
-                  <button class="item button button-clear button-balanced ion-chevron-up"
-                     ng-click="upvote(subarticle, $index)">
-                      {{subarticle._votes.up}}
-                   </button>
-                  <button class="item button button-clear button-assertive ion-chevron-down"
-                    ng-click="downvote(subarticle, $index)">
-                     {{subarticle._votes.down}}
+            <div class="item item-divider">
+               <div class="item-icon-right">
+                  <button class="item button button-clear icon ion-chevron-right"
+                     ng-click="toggleComments(subarticle)">
                   </button>
                </div>
-               -->
-               <!--
-               <div class="item">
-                  <div class="card" ng-repeat"comment in subarticle.comments | orderBy: '-(_votes.up - _votes.down)'">
-                     {{comment.content}}
-                  </div>
+               <button class="item button button-clear button-balanced ion-chevron-up"
+                  ng-click="upvote(subarticle, $index)">
+                   {{subarticle._votes.up}}
+                </button>
+               <button class="item button button-clear button-assertive ion-chevron-down"
+                 ng-click="downvote(subarticle, $index)">
+                  {{subarticle._votes.down}}
+               </button>
+
+               <div ng-show="subarticle.showComments">
+                  <ion-scroll data-tap-disabled="false">
+                     <ul class="list">
+                        <li
+                        ng-repeat="comment in subarticle.comments | orderBy: '-(_votes.up - _votes.down)'">
+                           <a class="item item-avatar"  href="#/tab/journalists/{{comment.username}}">
+                              <img class="_s0 fbxWelcomeBoxImg _rw img" src="https://fbcdn-profile-a.akamaihd.net/hprofile-ak-xpa1/v/t1.0-1/c12.0.50.50/p57x57/64117_10151470410352484_1225492414_n.jpg?oh=6d2398a1b1371fb2d88cfa815b6c4e74&amp;oe=5592BA68&amp;__gda__=1433839573_e0b4f4b7b5512c1db9fb1a5f0ddc5978">
+                              <h2>{{comment.username}}</h2>
+                              <p>{{comment.content}}<p>
+                           </a>
+                        </li>
+                     </ul>
+                  </ion-scroll>
                </div>
-               -->
-               <!--
             </div>
-         </ion-item>
-      </ion-list>
-      -->
+         </li>
+      </ul>
    </ion-content>
 </ion-view>

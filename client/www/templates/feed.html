@@ -4,8 +4,8 @@
       <ion-list>
          <ion-item style="border: transparent"
             collection-repeat="article in articles | orderBy: '-(_votes.up - _votes.down)'"
-            collection-item-width="'720px'"
-            collection-item-height="'200px'">
+            collection-item-width="'100%'"
+            collection-item-height="'250px'">
 
             <div class="">
                <div class="item item-divider">
@@ -14,7 +14,7 @@
                   </button>
                </div>
 
-               <div class="item item-body" style="width: 720px;">
+               <div class="item item-body">
                   <a class="button button-clear button-full" href="#/tab/articles/{{article.articleId}}">
                      {{article.title}}
                   </a>

@@ -16,6 +16,7 @@ app.controller('ArticleCtrl', [
       .$promise
       .then( function (res) {
          $scope.subarticles = res;
+         console.log(res);
       });
    }
 
@@ -59,6 +60,22 @@ app.controller('ArticleCtrl', [
          for(i = 0; i < $scope.subarticles.length; i++) {
             if($scope.subarticles[i].subarticleId === subarticle.subarticleId) {
                $scope.subarticles[i]._votes = res.subarticle._votes;
+               return;
+            }
+         }
+      });
+   }
+
+   $scope.toggleComments = function(subarticle) {
+      console.log(subarticle);
+      Subarticle.prototype$__get__comments({id: subarticle.subarticleId})
+      .$promise
+      .then( function (res) {
+         for(i = 0; i < $scope.subarticles.length; i++) {
+            if($scope.subarticles[i].subarticleId === subarticle.subarticleId) {
+               $scope.subarticles[i].comments = [];
+               $scope.subarticles[i].comments = res;
+               $scope.subarticles[i].showComments = !$scope.subarticles[i].showComments;
                return;
             }
          }
