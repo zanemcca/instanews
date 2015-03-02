@@ -10,6 +10,49 @@
      },
      "commentId": 1,
      "commentableId": 1,
-     "commentableType": "subarticle"
+     "commentableType": "subarticle",
+     "username" : "zane"
+   },
+   {
+     "content": "Crazy stuffffff!",
+     "date": "2015-02-06T12:48:43.511Z",
+     "_votes": {
+       "up": 2,
+       "down": 2,
+       "rate": 1,
+       "lastUpdated": "2015-02-06T12:48:43.511Z"
+     },
+     "commentId": 2,
+     "commentableId": 1,
+     "commentableType": "subarticle",
+     "username" : "zane"
+   },
+   {
+     "content": "a bunch of words",
+     "date": "2015-02-06T12:48:43.511Z",
+     "_votes": {
+       "up": 5,
+       "down": 1,
+       "rate": 1,
+       "lastUpdated": "2015-02-06T12:48:43.511Z"
+     },
+     "commentId": 3,
+     "commentableId": 1,
+     "commentableType": "subarticle",
+     "username" : "jane"
+   },
+   {
+     "content": "blah blah",
+     "date": "2015-02-06T12:48:43.511Z",
+     "_votes": {
+       "up": 2,
+       "down": 3,
+       "rate": 1,
+       "lastUpdated": "2015-02-06T12:48:43.511Z"
+     },
+     "commentId": 4,
+     "commentableId": 1,
+     "commentableType": "subarticle",
+     "username" : "bob"
    }
 ]
