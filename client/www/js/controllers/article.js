@@ -7,7 +7,8 @@ app.controller('ArticleCtrl', [
       '$stateParams',
       'Article',
       'Subarticle',
-      function($scope, $stateParams, Article, Subarticle) {
+      'Comment',
+      function($scope, $stateParams, Article, Subarticle, Comment) {
 
    $scope.subarticles = [];
 
@@ -16,7 +17,6 @@ app.controller('ArticleCtrl', [
       .$promise
       .then( function (res) {
          $scope.subarticles = res;
-         console.log(res);
       });
    }
 
@@ -43,43 +43,87 @@ app.controller('ArticleCtrl', [
       return height;
    }
 
+   var newId = function() {
+      var ret = Math.floor(Math.random()*Math.pow(2,32));
+      return ret;
+   }
+
+   var updateSubarticle = function (subarticle) {
+      $scope.subarticles.splice($scope.subarticles.indexOf(subarticle),1,subarticle);
+   }
+
+   $scope.createComment = function( subarticle, content) {
+      Subarticle.prototype$__create__comments({
+         id: subarticle.subarticleId,
+         content: content,
+         username: "bob",
+         date:  Date.now(),
+         commentableId: subarticle.subarticleId,
+         commentableType: "subarticle",
+         commentId: newId(),
+         _votes: {
+            up: 0,
+            down: 0,
+            lastUpdated: Date.now()
+         }
+      })
+      .$promise
+      .then( function(res, err) {
+         subarticle.comments.push(res);
+         updateSubarticle(subarticle);
+      });
+   }
+
+   $scope.upvoteComment = function(comment, subarticle) {
+      Comment.prototype$upvote({id: comment.commentId})
+      .$promise
+      .then ( function (res) {
+         subarticle.comments.splice(subarticle.comments.indexOf(comment),1,res.comment);
+         updateSubarticle(subarticle);
+      });
+   }
+
+   $scope.downvoteComment = function(comment, subarticle) {
+      Comment.prototype$downvote({id: comment.commentId})
+      .$promise
+      .then ( function (res) {
+         subarticle.comments.splice(subarticle.comments.indexOf(comment),1,res.comment);
+         updateSubarticle(subarticle);
+      });
+   }
 
    $scope.upvote = function(subarticle, $index) {
-      Subarticle.prototype$upvote({id: subarticle.subarticleId}, function (res) {
-         for(i = 0; i < $scope.subarticles.length; i++) {
-            if($scope.subarticles[i].subarticleId === subarticle.subarticleId) {
-               $scope.subarticles[i]._votes = res.subarticle._votes;
-               return;
-            }
-         }
+      Subarticle.prototype$upvote({id: subarticle.subarticleId})
+      .$promise
+      .then( function (res) {
+         subarticle._votes = res.subarticle._votes;
+         updateSubarticle(subarticle);
       });
    }
 
    $scope.downvote = function(subarticle, $index) {
-      Subarticle.prototype$downvote({id: subarticle.subarticleId}, function (res) {
-         for(i = 0; i < $scope.subarticles.length; i++) {
-            if($scope.subarticles[i].subarticleId === subarticle.subarticleId) {
-               $scope.subarticles[i]._votes = res.subarticle._votes;
-               return;
-            }
-         }
+      Subarticle.prototype$downvote({id: subarticle.subarticleId})
+      .$promise
+      .then( function (res) {
+         subarticle._votes = res.subarticle._votes;
+         updateSubarticle(subarticle);
       });
    }
 
    $scope.toggleComments = function(subarticle) {
-      console.log(subarticle);
-      Subarticle.prototype$__get__comments({id: subarticle.subarticleId})
-      .$promise
-      .then( function (res) {
-         for(i = 0; i < $scope.subarticles.length; i++) {
-            if($scope.subarticles[i].subarticleId === subarticle.subarticleId) {
-               $scope.subarticles[i].comments = [];
-               $scope.subarticles[i].comments = res;
-               $scope.subarticles[i].showComments = !$scope.subarticles[i].showComments;
-               return;
-            }
-         }
-      });
+      if(!subarticle.showComments) {
+         Subarticle.prototype$__get__comments({id: subarticle.subarticleId})
+         .$promise
+         .then( function (res) {
+            subarticle.comments = res;
+            subarticle.showComments = true;
+            updateSubarticle(subarticle);
+         });
+      }
+      else {
+         subarticle.showComments = false;
+         updateSubarticle(subarticle);
+      }
    }
 }]);
 

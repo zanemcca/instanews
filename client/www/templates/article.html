@@ -2,14 +2,16 @@
 <ion-view view-title="Article">
    <ion-content>
       <ul class="list">
-         <!--ion-item ng-repeat="subarticle in subarticles | orderBy: '-(_votes.up - _votes.down)'"-->
-         <li class="item" style="border: transparent"
+         <ion-item class="card no-padding" ng-repeat="subarticle in subarticles | orderBy: '-(_votes.up - _votes.down)'">
+         <!--
+         <li style="border: transparent"
             collection-repeat="subarticle in subarticles | orderBy: '-(_votes.up - _votes.down)'"
-            collection-item-width="'720px'"
+            collection-item-width="'100%'"
             collection-item-height="getSubarticleHeight(subarticle)+ 170">
+            -->
             <div class="item item-divider">
                <a class="button button-clear button-small" href="#/journalists/{{subarticle.username}}">
-                  @{{subarticle.username}}
+                  {{subarticle.username}}
                </a>
             </div>
 
@@ -22,32 +24,55 @@
 
             <div class="item item-divider">
                <div class="item-icon-right">
-                  <button class="item button button-clear icon ion-chevron-right"
+                  <button class="item button button-clear icon button-small" ng-class="{'ion-arrow-right-b': !subarticle.showComments, 'ion-arrow-down-b': subarticle.showComments}"
                      ng-click="toggleComments(subarticle)">
                   </button>
                </div>
-               <button class="item button button-clear button-balanced ion-chevron-up"
+               <button class="item button button-clear button-small button-balanced ion-chevron-up"
                   ng-click="upvote(subarticle, $index)">
                    {{subarticle._votes.up}}
                 </button>
-               <button class="item button button-clear button-assertive ion-chevron-down"
+               <button class="item button button-clear button-small button-assertive ion-chevron-down"
                  ng-click="downvote(subarticle, $index)">
                   {{subarticle._votes.down}}
                </button>
 
-               <div ng-show="subarticle.showComments">
-                  <ion-scroll data-tap-disabled="false">
-                     <ul class="list">
-                        <li
-                        ng-repeat="comment in subarticle.comments | orderBy: '-(_votes.up - _votes.down)'">
-                           <a class="item item-avatar"  href="#/tab/journalists/{{comment.username}}">
-                              <img class="_s0 fbxWelcomeBoxImg _rw img" src="https://fbcdn-profile-a.akamaihd.net/hprofile-ak-xpa1/v/t1.0-1/c12.0.50.50/p57x57/64117_10151470410352484_1225492414_n.jpg?oh=6d2398a1b1371fb2d88cfa815b6c4e74&amp;oe=5592BA68&amp;__gda__=1433839573_e0b4f4b7b5512c1db9fb1a5f0ddc5978">
-                              <h2>{{comment.username}}</h2>
-                              <p>{{comment.content}}<p>
+               <div ng-if="subarticle.showComments">
+                  <ul class="listi">
+                     <li class="item no-padding"
+                     ng-repeat="comment in subarticle.comments | orderBy: '-(_votes.up - _votes.down)'">
+                        <div class="item item-avatar item-text-wrap" style="padding-bottom: 0px; border-bottom-color: transparent">
+                           <img src="https://fbcdn-profile-a.akamaihd.net/hprofile-ak-xpa1/v/t1.0-1/c12.0.50.50/p57x57/64117_10151470410352484_1225492414_n.jpg?oh=6d2398a1b1371fb2d88cfa815b6c4e74&amp;oe=5592BA68&amp;__gda__=1433839573_e0b4f4b7b5512c1db9fb1a5f0ddc5978" >
+                           <a class="button button-clear button-small"  href="#/tab/journalists/{{comment.username}}" >
+                              {{comment.username}}
                            </a>
-                        </li>
-                     </ul>
-                  </ion-scroll>
+                           <p>{{comment.content}}</p>
+                           <div class="item" style="padding-top: 0px; padding-left: 0px; border-color: transparent">
+                              <button class="button button-clear button-small button-balanced ion-chevron-up"
+                                 ng-click="upvoteComment(comment, subarticle)">
+                                  {{comment._votes.up}}
+                               </button>
+                              <button class="button button-clear button-small button-assertive ion-chevron-down"
+                                ng-click="downvoteComment(comment, subarticle)">
+                                 {{comment._votes.down}}
+                              </button>
+                              <div class="item-icon-right">
+                                 <button class="icon button button-clear button-small" ng-class="{'ion-arrow-right-b': !comment.showComments, 'ion-arrow-down-b': comment.showComments}"
+                                    ng-click="toggleComments(comment)">
+                                 </button>
+                              </div>
+                           </div>
+                        </div>
+                     </li>
+                  </ul>
+                  <form ng-submit="createComment(subarticle, content)">
+                     <div class="list">
+                        <label class="item item-input">
+                           <textarea type="text" ng-model="content" placeholder="Comment"></textarea>
+                           <button type="submit" class="button button-clear icon ion-forward"></button>
+                        </label>
+                     </div>
+                  </form>
                </div>
             </div>
          </li>

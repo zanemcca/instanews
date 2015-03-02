@@ -27,7 +27,7 @@ module.exports = function(Comment) {
    Comment.remoteMethod( 'upvote', {
       isStatic: false,
       http: { path: '/upvote',  verb: 'post'},
-      returns: { arg: 'status', type: 'string'}
+      returns: { arg: 'comment', type: 'string'}
    });
 
    //Downvote function
@@ -38,6 +38,6 @@ module.exports = function(Comment) {
    Comment.remoteMethod( 'downvote', {
       isStatic: false,
       http: { path: '/downvote',  verb: 'post'},
-      returns: { arg: 'status', type: 'string'}
+      returns: { arg: 'comment', type: 'string'}
    });
 };
