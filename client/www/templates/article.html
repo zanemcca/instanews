@@ -9,11 +9,10 @@
             collection-item-width="'100%'"
             collection-item-height="getSubarticleHeight(subarticle)+ 170">
             -->
-            <div class="item item-divider">
-               <a class="button button-clear button-small" href="#/journalists/{{subarticle.username}}">
-                  {{subarticle.username}}
-               </a>
-            </div>
+            <a class="item item-divider item-avatar" style="height: 65px" href="#/journalists/{{subarticle.username}}">
+               <img src="https://fbcdn-profile-a.akamaihd.net/hprofile-ak-xpa1/v/t1.0-1/c12.0.50.50/p57x57/64117_10151470410352484_1225492414_n.jpg?oh=6d2398a1b1371fb2d88cfa815b6c4e74&amp;oe=5592BA68&amp;__gda__=1433839573_e0b4f4b7b5512c1db9fb1a5f0ddc5978" >
+               {{subarticle.username}}
+            </a>
 
             <div class="item item-body">
                <div ng-show="subarticle.text">
@@ -38,7 +37,7 @@
                </button>
 
                <div ng-if="subarticle.showComments">
-                  <ul class="listi">
+                  <ul class="list">
                      <li class="item no-padding"
                      ng-repeat="comment in subarticle.comments | orderBy: '-(_votes.up - _votes.down)'">
                         <div class="item item-avatar item-text-wrap" style="padding-bottom: 0px; border-bottom-color: transparent">
@@ -66,12 +65,10 @@
                      </li>
                   </ul>
                   <form ng-submit="createComment(subarticle, content)">
-                     <div class="list">
-                        <label class="item item-input">
-                           <textarea type="text" ng-model="content" placeholder="Comment"></textarea>
-                           <button type="submit" class="button button-clear icon ion-forward"></button>
-                        </label>
-                     </div>
+                     <label class="item item-divider item-input no-padding">
+                        <textarea type="text" ng-model="content" placeholder="Comment" required></textarea>
+                        <button type="submit" class="button button-clear icon ion-forward"></button>
+                     </label>
                   </form>
                </div>
             </div>
