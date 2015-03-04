@@ -13,7 +13,7 @@ app.controller('ArticleCtrl', [
    $scope.subarticles = [];
 
    function getSubarticles() {
-      Article.prototype$__get__subarticles({id: $stateParams.id})
+      Article.subarticles({id: $stateParams.id})
       .$promise
       .then( function (res) {
          $scope.subarticles = res;
@@ -52,8 +52,9 @@ app.controller('ArticleCtrl', [
       $scope.subarticles.splice($scope.subarticles.indexOf(subarticle),1,subarticle);
    }
 
+   //TODO Move the filing in to the server and only transmit the content
    $scope.createComment = function( subarticle, content) {
-      Subarticle.prototype$__create__comments({
+      Subarticle.comments.create({
          id: subarticle.subarticleId,
          content: content,
          username: "bob",
@@ -70,7 +71,6 @@ app.controller('ArticleCtrl', [
       .$promise
       .then( function(res, err) {
          subarticle.comments.push(res);
-         updateSubarticle(subarticle);
       });
    }
 
@@ -78,8 +78,7 @@ app.controller('ArticleCtrl', [
       Comment.prototype$upvote({id: comment.commentId})
       .$promise
       .then ( function (res) {
-         subarticle.comments.splice(subarticle.comments.indexOf(comment),1,res.comment);
-         updateSubarticle(subarticle);
+         comment._votes = res.comment._votes;
       });
    }
 
@@ -87,8 +86,7 @@ app.controller('ArticleCtrl', [
       Comment.prototype$downvote({id: comment.commentId})
       .$promise
       .then ( function (res) {
-         subarticle.comments.splice(subarticle.comments.indexOf(comment),1,res.comment);
-         updateSubarticle(subarticle);
+         comment._votes = res.comment._votes;
       });
    }
 
@@ -97,7 +95,6 @@ app.controller('ArticleCtrl', [
       .$promise
       .then( function (res) {
          subarticle._votes = res.subarticle._votes;
-         updateSubarticle(subarticle);
       });
    }
 
@@ -106,23 +103,20 @@ app.controller('ArticleCtrl', [
       .$promise
       .then( function (res) {
          subarticle._votes = res.subarticle._votes;
-         updateSubarticle(subarticle);
       });
    }
 
    $scope.toggleComments = function(subarticle) {
       if(!subarticle.showComments) {
-         Subarticle.prototype$__get__comments({id: subarticle.subarticleId})
+         Subarticle.comments({id: subarticle.subarticleId})
          .$promise
          .then( function (res) {
             subarticle.comments = res;
             subarticle.showComments = true;
-            updateSubarticle(subarticle);
          });
       }
       else {
          subarticle.showComments = false;
-         updateSubarticle(subarticle);
       }
    }
 }]);

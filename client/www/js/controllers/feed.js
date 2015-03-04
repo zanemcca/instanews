@@ -8,39 +8,21 @@ var cb = function(err, res) {
 
 angular
 .module('instanews.feed', ['ionic', 'ngResource'])
-.controller('FeedCtrl', ['$scope', '$state', 'Article', function($scope, $state, Article) {
-   //$scope.articles = $resource('/api/articles');
-   $scope.articles = [];
+.controller('FeedCtrl', ['$scope', '$state', 'Article','Common',  function($scope, $state, Article, Common) {
 
-   function getArticles() {
-      Article.find()
-      .$promise
-      .then( function (res) {
-         $scope.articles = res;
-      });
-   }
-
-   getArticles();
+   $scope.articles = Common.getArticles();
 
    $scope.upvote = function(article, $index) {
       Article.prototype$upvote({id: article.articleId}, function (res) {
-         for(i = 0; i < $scope.articles.length; i++) {
-            if($scope.articles[i].articleId === article.articleId) {
-               $scope.articles[i]._votes = res.article._votes;
-               return;
-            }
-         }
+         article._votes = res.article._votes;
+         Common.updateArticle(article);
       });
    }
 
    $scope.downvote = function(article, $index) {
       Article.prototype$downvote({id: article.articleId}, function (res) {
-         for(i = 0; i < $scope.articles.length; i++) {
-            if($scope.articles[i].articleId === article.articleId) {
-               $scope.articles[i]._votes = res.article._votes;
-               return;
-            }
-         }
+         article._votes = res.article._votes;
+         Common.updateArticle(article);
       });
    }
 }]);

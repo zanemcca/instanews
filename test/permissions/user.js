@@ -114,8 +114,8 @@ describe('Articles', function() {
             },
             "articleId": 200,
             "location":{
-               "lat": 38.7884036,
-               "lng": -124.4208504
+               "lat": 45.61950,
+               "lng": -65.45772
             }
          };
          comment = {
