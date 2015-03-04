@@ -8,7 +8,8 @@ app.controller('ArticleCtrl', [
       'Article',
       'Subarticle',
       'Comment',
-      function($scope, $stateParams, Article, Subarticle, Comment) {
+      'Common',
+      function($scope, $stateParams, Article, Subarticle, Comment, Common) {
 
    $scope.subarticles = [];
 
@@ -43,81 +44,28 @@ app.controller('ArticleCtrl', [
       return height;
    }
 
-   var newId = function() {
-      var ret = Math.floor(Math.random()*Math.pow(2,32));
-      return ret;
-   }
-
-   var updateSubarticle = function (subarticle) {
-      $scope.subarticles.splice($scope.subarticles.indexOf(subarticle),1,subarticle);
-   }
-
-   //TODO Move the filing in to the server and only transmit the content
    $scope.createComment = function( subarticle, content) {
-      Subarticle.comments.create({
-         id: subarticle.subarticleId,
-         content: content,
-         username: "bob",
-         date:  Date.now(),
-         commentableId: subarticle.subarticleId,
-         commentableType: "subarticle",
-         commentId: newId(),
-         _votes: {
-            up: 0,
-            down: 0,
-            lastUpdated: Date.now()
-         }
-      })
-      .$promise
-      .then( function(res, err) {
-         subarticle.comments.push(res);
-      });
+      Common.createComment(Subarticle, subarticle,'subarticle', content);
    }
 
-   $scope.upvoteComment = function(comment, subarticle) {
-      Comment.prototype$upvote({id: comment.commentId})
-      .$promise
-      .then ( function (res) {
-         comment._votes = res.comment._votes;
-      });
+   $scope.upvoteComment = function(comment) {
+      Common.upvote(Comment, comment);
    }
 
-   $scope.downvoteComment = function(comment, subarticle) {
-      Comment.prototype$downvote({id: comment.commentId})
-      .$promise
-      .then ( function (res) {
-         comment._votes = res.comment._votes;
-      });
+   $scope.downvoteComment = function(comment) {
+      Common.downvote(Comment, comment);
    }
 
-   $scope.upvote = function(subarticle, $index) {
-      Subarticle.prototype$upvote({id: subarticle.subarticleId})
-      .$promise
-      .then( function (res) {
-         subarticle._votes = res.subarticle._votes;
-      });
+   $scope.upvote = function(subarticle) {
+      Common.upvote(Subarticle,subarticle);
    }
 
-   $scope.downvote = function(subarticle, $index) {
-      Subarticle.prototype$downvote({id: subarticle.subarticleId})
-      .$promise
-      .then( function (res) {
-         subarticle._votes = res.subarticle._votes;
-      });
+   $scope.downvote = function(subarticle) {
+      Common.downvote(Subarticle,subarticle);
    }
 
    $scope.toggleComments = function(subarticle) {
-      if(!subarticle.showComments) {
-         Subarticle.comments({id: subarticle.subarticleId})
-         .$promise
-         .then( function (res) {
-            subarticle.comments = res;
-            subarticle.showComments = true;
-         });
-      }
-      else {
-         subarticle.showComments = false;
-      }
+      Common.toggleComments(Subarticle,subarticle);
    }
 }]);
 

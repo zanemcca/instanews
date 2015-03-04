@@ -61,7 +61,7 @@ describe('Articles', function() {
             "rate": 5,
             "lastUpdated": "2015-02-10T12:48:43.511Z",
          },
-         "articleId": 100,
+         "myId": 100,
          "location":{
             "lat": 38.7884036,
             "lng": -124.4208504
@@ -145,7 +145,7 @@ describe('Subarticles', function() {
                   "lastUpdated": "2015-02-06T12:48:43.511Z"
              },
              "date": "2015-02-06T12:48:43.511Z",
-             "subarticleId": 100,
+             "myId": 100,
              "parentId": 1,
              "username": "zane"
          };
@@ -176,7 +176,7 @@ describe('Subarticles', function() {
       */
 
       it('Admin should be allowed to delete a subarticle', function(done) {
-         api.delete('/api/subarticles/'+ subarticle.subarticleId)
+         api.delete('/api/subarticles/'+ subarticle.id)
          .set('Authorization', token.id)
          .expect(204, done);
       });
@@ -218,7 +218,7 @@ describe('Comments', function() {
           "rate": 1,
           "lastUpdated": "2015-02-06T12:48:43.511Z"
         },
-        "commentId": 100,
+        "myId": 100,
         "username" : "bob",
         "commentableId": 1,
         "commentableType": "comment"
@@ -249,7 +249,7 @@ describe('Comments', function() {
    });
 
    it('Admin should NOT be able to update a comment', function(done) {
-      api.put('/api/comments/'+comment.commentId)
+      api.put('/api/comments/'+comment.myId)
       .set('Authorization', token.id)
       .send(comment)
       .expect(401)
@@ -260,7 +260,7 @@ describe('Comments', function() {
    });
 
    it('Admin should be able to delete a comment', function(done) {
-      api.delete('/api/comments/'+comment.commentId)
+      api.delete('/api/comments/'+comment.myId)
       .set('Authorization', token.id)
       .expect(204)
       .end( function(err, res) {

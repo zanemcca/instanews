@@ -8,14 +8,14 @@
       "required": true
     },
     "date": {
-      "type": "date",
-      "required": true
+      "type": "date"
     },
-    "commentId": {
+    "myId": {
       "type": "number",
       "id": true,
       "required": true,
       "index": true
+
     }
   },
   "validations": [],

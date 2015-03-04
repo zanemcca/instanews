@@ -27,7 +27,7 @@ module.exports = function(Comment) {
    Comment.remoteMethod( 'upvote', {
       isStatic: false,
       http: { path: '/upvote',  verb: 'post'},
-      returns: { arg: 'comment', type: 'string'}
+      returns: { arg: 'instance', type: 'string'}
    });
 
    //Downvote function
@@ -38,6 +38,26 @@ module.exports = function(Comment) {
    Comment.remoteMethod( 'downvote', {
       isStatic: false,
       http: { path: '/downvote',  verb: 'post'},
-      returns: { arg: 'comment', type: 'string'}
+      returns: { arg: 'instance', type: 'string'}
    });
+
+   Comment.beforeValidate = function(next) {
+
+      if (!this.myId) {
+         this.myId = Math.floor(Math.random()*Math.pow(2,32));
+      }
+
+      if (!this.username) this.username = 'bob';
+
+      this.date =  Date.now();
+
+      if (!this._votes) {
+         this._votes = {
+               up: 0,
+               down: 0,
+               lastUpdated: Date.now()
+         };
+      }
+      next();
+   };
 };

@@ -10,7 +10,7 @@
     "date": {
       "type": "date"
     },
-    "subarticleId": {
+    "myId": {
       "type": "number",
       "id": true,
       "required": true,

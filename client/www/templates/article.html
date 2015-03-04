@@ -2,7 +2,7 @@
 <ion-view view-title="Article">
    <ion-content>
       <ul class="list">
-         <ion-item class="card no-padding" ng-repeat="subarticle in subarticles | orderBy: '-(_votes.up - _votes.down)'">
+         <ion-item class="no-padding" ng-repeat="subarticle in subarticles | orderBy: '-(_votes.up - _votes.down)'">
          <!--
          <li style="border: transparent"
             collection-repeat="subarticle in subarticles | orderBy: '-(_votes.up - _votes.down)'"
@@ -28,11 +28,11 @@
                   </button>
                </div>
                <button class="item button button-clear button-small button-balanced ion-chevron-up"
-                  ng-click="upvote(subarticle, $index)">
+                  ng-click="upvote(subarticle)">
                    {{subarticle._votes.up}}
                 </button>
                <button class="item button button-clear button-small button-assertive ion-chevron-down"
-                 ng-click="downvote(subarticle, $index)">
+                 ng-click="downvote(subarticle)">
                   {{subarticle._votes.down}}
                </button>
 

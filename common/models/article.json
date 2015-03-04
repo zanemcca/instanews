@@ -11,7 +11,7 @@
     "date": {
       "type": "date"
     },
-    "articleId": {
+    "myId": {
       "type": "number",
       "id": true,
       "required": true,
@@ -133,7 +133,7 @@
     {
       "accessType": "EXECUTE",
       "principalType": "ROLE",
-      "principalId": "$authenticated",
+      "principalId": "$everyone",
       "permission": "ALLOW",
       "property": "__create__comments"
     },
