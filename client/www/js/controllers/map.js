@@ -2,18 +2,32 @@ var app = angular.module('instanews.map', ['ionic', 'ngResource']);
 
 app.controller('MapCtrl', ['$scope', '$ionicLoading','$compile','Common', function($scope, $ionicLoading, $compile, Common) {
 
-   $scope.articles = Common.getArticles();
+   $scope.articles = Common.articles;
 
    var map;
 
+   $scope.$watch('articles', function (newValue, oldValue) {
+      if (newValue !== oldValue) getMarkers();
+   }, true);
+
    function getMarkers() {
+      var tempMarker = {
+         map: map,
+         animation: google.maps.Animation.DROP,
+         icon: {
+            size: new google.maps.Size(120, 120),
+            origin: new google.maps.Point(0, 0),
+            anchor: new google.maps.Point(0, 20),
+            scaledSize: new google.maps.Size(30,30)
+         }
+      }
+
       for(i = 0; i < $scope.articles.length; i++) {
-         var marker = new google.maps.Marker({
-            position: new google.maps.LatLng($scope.articles[i].location.lat, $scope.articles[i].location.lng),
-            map: map,
-            title: $scope.articles[i].title,
-            animation: google.maps.Animation.DROP
-         });
+         tempMarker.position = new google.maps.LatLng($scope.articles[i].location.lat, $scope.articles[i].location.lng);
+         tempMarker.title = $scope.articles[i].title;
+         tempMarker.icon.url = 'img/ionic.png';
+
+         var marker = new google.maps.Marker(tempMarker);
       }
    }
 
@@ -56,12 +70,12 @@ app.controller('MapCtrl', ['$scope', '$ionicLoading','$compile','Common', functi
     }
 
     ionic.DomUtil.ready( function() {
-       console.log("Fire it up!");
-       document.addEventListener("deviceready", initializeMap, false);
-
-       google.maps.event.addDomListener(window, 'load', initializeMap);
-
-       console.log("=====================");
+       if (navigator.userAgent.match(/(iPhone|iPod|Android|BlackBerry)/)) {
+          document.addEventListener("deviceready", initializeMap, false);
+       } else {
+          initializeMap();
+       }
+       console.log(navigator.userAgent);
     });
 
     /*

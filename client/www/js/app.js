@@ -7,11 +7,11 @@
 // 'starter.controllers' is found in controllers.js
 angular.module('instanews', [
       'ionic',
+      'instanews.common',
       'instanews.article',
       'instanews.feed',
       'instanews.file',
       'instanews.map',
-      'instanews.common',
       'lbServices',
       'ui.router'])
 

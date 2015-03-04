@@ -5,6 +5,7 @@ app.service('Common', ['Article', function(Article){
 
    var articles = Article.find();
 
+   /*
    return {
       getArticles: function () {
          return articles;
@@ -12,5 +13,9 @@ app.service('Common', ['Article', function(Article){
       updateArticle: function (article) {
          articles.splice(articles.indexOf(article),1,article);
       }
+   };
+   */
+   return {
+      articles: articles
    };
 }]);
