@@ -176,7 +176,7 @@ describe('Subarticles', function() {
       */
 
       it('Admin should be allowed to delete a subarticle', function(done) {
-         api.delete('/api/subarticles/'+ subarticle.id)
+         api.delete('/api/subarticles/'+ subarticle.myId)
          .set('Authorization', token.id)
          .expect(204, done);
       });
