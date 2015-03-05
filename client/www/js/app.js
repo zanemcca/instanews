@@ -12,6 +12,7 @@ angular.module('instanews', [
       'instanews.feed',
       'instanews.file',
       'instanews.map',
+      'instanews.camera',
       'lbServices',
       'ui.router'])
 
@@ -33,6 +34,7 @@ angular.module('instanews', [
 
    //$ionicConfigProvider.tabs.position("bottom"); //Places them at the bottom for all OS
    //$ionicConfigProvider.tabs.style("standard"); //Makes them all look the same across all OS
+   $ionicConfigProvider.backButton.previousTitleText(false).text('');
 
   // Ionic uses AngularUI Router which uses the concept of states
   // Learn more here: https://github.com/angular-ui/ui-router

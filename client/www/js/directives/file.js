@@ -5,7 +5,12 @@ var urlBase = "http://192.168.100.10:3000/api";
 app.directive('fileItem', function ($compile) {
 
    var getSrc = function (subarticle) {
-      return '"' + urlBase + '/storages/' + subarticle.parentId + '/download/' + subarticle._file.name + '"';
+      if (subarticle._file.name.indexOf('file:///') > -1) {
+         return subarticle._file.name;
+      }
+      else {
+         return '"' + urlBase + '/storages/' + subarticle.parentId + '/download/' + subarticle._file.name + '"';
+      }
    }
 
    var getWidth = function (file) {
