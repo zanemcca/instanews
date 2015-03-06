@@ -10,51 +10,62 @@
       <ion-refresher pulling-text="Fresh Stuff" on-refresh="onRefresh()">
       </ion-refresher>
       <ul class="list">
-         <ion-item class="no-padding" ng-repeat="subarticle in subarticles | orderBy: '-(_votes.up - _votes.down)'">
+         <ion-item class="no-padding card" ng-repeat="subarticle in subarticles | orderBy: '-(_votes.up - _votes.down)'">
          <!--
          <li style="border: transparent"
             collection-repeat="subarticle in subarticles | orderBy: '-(_votes.up - _votes.down)'"
             collection-item-width="'100%'"
             collection-item-height="getSubarticleHeight(subarticle)+ 170">
             -->
-            <a class="item item-divider item-avatar" style="height: 65px" href="#/journalists/{{subarticle.username}}">
+            <div class="item item-avatar item-text-wrap" style="min-height:65px" >
                <img src="img/ionic.png">
-               {{subarticle.username}}
-            </a>
-
-            <div class="item item-body no-padding">
-               <div ng-show="subarticle.text" class="item">
-                  <p>{{subarticle.text}}</p>
+               <a class="button button-clear no-padding button-small" href="#/journalists/{{subarticle.username}}">
+                  {{subarticle.username}}
+               </a>
+               <p>{{subarticle.text}}</p>
+               <div class="item no-padding" style="border: transparent">
+                  <button class="item button button-clear button-small button-balanced ion-chevron-up"
+                     ng-click="upvote(subarticle)">
+                      {{subarticle._votes.up}}
+                   </button>
+                  <button class="item button button-clear button-small button-assertive ion-chevron-down"
+                    ng-click="downvote(subarticle)">
+                     {{subarticle._votes.down}}
+                  </button>
+                  <div ng-if="!subarticle._file">
+                     <div class="item-icon-right">
+                        <button class="item button button-clear icon button-small" ng-class="{'ion-arrow-right-b': !subarticle.showComments, 'ion-arrow-down-b': subarticle.showComments}"
+                           ng-click="toggleComments(subarticle)">
+                        </button>
+                     </div>
+                  </div>
                </div>
-               <file-item ng-if="subarticle._file"></file-item>
             </div>
 
-            <div class="item item-divider">
-               <div class="item-icon-right">
-                  <button class="item button button-clear icon button-small" ng-class="{'ion-arrow-right-b': !subarticle.showComments, 'ion-arrow-down-b': subarticle.showComments}"
-                     ng-click="toggleComments(subarticle)">
-                  </button>
+            <div class="item item-body no-padding" ng-if="subarticle._file">
+               <file-item ></file-item>
+            </div>
+
+            <div class="item " ng-if="subarticle.showComments || subarticle._file" >
+               <div ng-if="subarticle._file">
+                  <div class="item-icon-right">
+                     <button class="item button button-clear icon button-small" ng-class="{'ion-arrow-right-b': !subarticle.showComments, 'ion-arrow-down-b': subarticle.showComments}"
+                        ng-click="toggleComments(subarticle)">
+                     </button>
+                  </div>
                </div>
-               <button class="item button button-clear button-small button-balanced ion-chevron-up"
-                  ng-click="upvote(subarticle)">
-                   {{subarticle._votes.up}}
-                </button>
-               <button class="item button button-clear button-small button-assertive ion-chevron-down"
-                 ng-click="downvote(subarticle)">
-                  {{subarticle._votes.down}}
-               </button>
 
                <div ng-if="subarticle.showComments">
                   <ul class="list">
                      <li class="item no-padding"
                      ng-repeat="comment in subarticle.comments | orderBy: '-(_votes.up - _votes.down)'">
-                        <div class="item item-avatar item-text-wrap" style="padding-bottom: 0px; border-bottom-color: transparent">
+                        <div class="item item-avatar item-text-wrap item-divider" style="padding-bottom: 0px; border-bottom-color: transparent">
                            <img src="img/ionic.png">
                            <a class="button button-clear button-small"  href="#/tab/journalists/{{comment.username}}" >
                               {{comment.username}}
                            </a>
                            <p>{{comment.content}}</p>
-                           <div class="item" style="padding-top: 0px; padding-left: 0px; border-color: transparent">
+                           <div class="item item-divider" style="padding-top: 0px; padding-left: 0px; border-color: transparent">
                               <button class="button button-clear button-small button-balanced ion-chevron-up"
                                  ng-click="upvoteComment(comment, subarticle)">
                                   {{comment._votes.up}}
@@ -72,7 +83,7 @@
                         </div>
                      </li>
                   </ul>
-                  <form name="form" class="item item-divider no-padding" style="border-color: transparent">
+                  <form name="form" class="item no-padding" style="border-color: transparent">
                      <div style="padding-right:60px">
                         <textarea type="text" ng-model="content" placeholder="Comment" required></textarea>
                      </div>
