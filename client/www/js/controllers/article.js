@@ -16,15 +16,22 @@ app.controller('ArticleCtrl', [
    $scope.subarticles = [];
    $scope.article = Common.getArticle($stateParams.id);
 
-   function getSubarticles() {
+   getSubarticles = function(cb) {
       Article.subarticles({id: $stateParams.id})
       .$promise
       .then( function (res) {
          $scope.subarticles = res;
-      });
+         if (cb) cb();
+      })
    }
 
    getSubarticles();
+
+   $scope.onRefresh = function () {
+      getSubarticles( function () {
+         $scope.$broadcast('scroll.refreshComplete');
+      });
+   }
 
    $scope.getSubarticleHeight = function(subarticle) {
       var height;
@@ -54,12 +61,12 @@ app.controller('ArticleCtrl', [
          myId: Math.floor(Math.random()*Math.pow(2,32)),
          parentId: $stateParams.id,
          _votes: {
-            up: 25,
-            down: 0,
+            up: Math.floor(Math.random()*100),
+            down: Math.floor(Math.random()*50),
             lastUpdated: Date.now()
          },
          username: 'bob',
-         text: "A new article"
+         text: 'Key: ' +  Math.random().toString()
       })
       .$promise.then( function(res) {
          $scope.subarticles.push(res);

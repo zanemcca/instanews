@@ -7,6 +7,8 @@ app.controller('MapCtrl', ['$scope', '$ionicLoading','$compile','Common', functi
 
    var map, myCircle;
    var markers = [];
+   var northPole = new google.maps.LatLng(90.0000, 0.0000);
+   var southPole = new google.maps.LatLng(-90.0000, 0.0000);
 
    $scope.$watch('articles', function (newValue, oldValue) {
       if (newValue !== oldValue) getMarkers();
@@ -67,6 +69,15 @@ app.controller('MapCtrl', ['$scope', '$ionicLoading','$compile','Common', functi
             fillColor: 'blue',
          });
       }
+      //Update the map to contain the circle
+      var bounds = myCircle.getBounds();
+      map.fitBounds(bounds);
+      //If the bounds contain either the north or south pole then
+      // move to the equator for the center of the map
+      if ( bounds.contains(northPole) || bounds.contains(southPole)) {
+         var equator = new google.maps.LatLng(0.0000, $scope.mPos.lng);
+         map.setCenter(equator);
+      }
    }
 
 
@@ -108,10 +119,12 @@ app.controller('MapCtrl', ['$scope', '$ionicLoading','$compile','Common', functi
 
 
       navigator.geolocation.getCurrentPosition( function(position) {
-         //$scope.mPos.lat = position.coords.latitude;
-         //$scope.mPos.lng = position.coords.longitude;
+         $scope.mPos.lat = position.coords.latitude;
+         $scope.mPos.lng = position.coords.longitude;
+         /*
          $scope.mPos.lat = 43.7000;
          $scope.mPos.lng = -79.4000;
+         */
          $scope.mPos.accuracy = position.coords.accuracy;
          $scope.mPos.radSlider = 0;
          mPosition = new google.maps.LatLng($scope.mPos.lat,$scope.mPos.lng);

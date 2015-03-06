@@ -7,6 +7,8 @@
       <button class="button button-clear icon ion-plus-round" ng-click="postText()"></button>
    </ion-nav-buttons>
    <ion-content>
+      <ion-refresher pulling-text="Fresh Stuff" on-refresh="onRefresh()">
+      </ion-refresher>
       <ul class="list">
          <ion-item class="no-padding" ng-repeat="subarticle in subarticles | orderBy: '-(_votes.up - _votes.down)'">
          <!--
@@ -20,8 +22,8 @@
                {{subarticle.username}}
             </a>
 
-            <div class="item item-body">
-               <div ng-show="subarticle.text">
+            <div class="item item-body no-padding">
+               <div ng-show="subarticle.text" class="item">
                   <p>{{subarticle.text}}</p>
                </div>
                <file-item ng-if="subarticle._file"></file-item>

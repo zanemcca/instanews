@@ -5,6 +5,13 @@ app.service('Common', ['$rootScope','$filter','Article', function($rootScope, $f
 
    var articles = Article.find();
 
+   var onRefresh = function () {
+      Article.find( function (res) {
+         article = res;
+         $rootScope.$broadcast('scroll.refreshComplete');
+      });
+   }
+
    var mPosition = {
       lat: 45.61545,
       lng: -66.45270,
@@ -130,6 +137,7 @@ app.service('Common', ['$rootScope','$filter','Article', function($rootScope, $f
    return {
       articles: articles,
       getArticle: getArticle,
+      onRefresh: onRefresh,
       mPosition: mPosition,
       withinRange: withinRange,
       createComment: createComment,

@@ -3,7 +3,7 @@ var app = angular.module('instanews.feed', ['ionic', 'ngResource']);
 app.controller('FeedCtrl', ['$scope', 'Article', 'Common', 'Comment', function($scope, Article, Common, Comment) {
 
    $scope.articles = Common.articles;
-
+   $scope.onRefresh = Common.onRefresh;
 
    $scope.createComment = function( article, content) {
       Common.createComment(Article, article,'article', content);

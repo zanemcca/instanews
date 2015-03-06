@@ -36,8 +36,8 @@ app.directive('fileItem', function ($compile) {
                         + '</video></div>';
 */
             template = '<div data-tap-disabled="true">'
-               +'<video id="video_test" class="video-js vjs-default-skin vjs-big-play-centered vjs-paused vjs-controls-enabled vjs-user-active" controls data-setup={}>'
-                  +'<source src="http://video.ch9.ms/ch9/7066/1fbfb520-2165-4a16-9d54-84583b377066/WindowsAzureMediaServicesNETSDK_mid.mp4" type="video/mp4" data-quality="Medium" onerror="ch9.functions.html5Presenter.fallback(this);">'
+               +'<video id="video_test" width="100%" class="video-js vjs-default-skin vjs-big-play-centered vjs-paused vjs-controls-enabled vjs-user-active" controls data-setup={}>'
+                  +'<source src="http://video.ch9.ms/ch9/7066/1fbfb520-2165-4a16-9d54-84583b377066/WindowsAzureMediaServicesNETSDK_mid.mp4" type="video/mp4" onerror="ch9.functions.html5Presenter.fallback(this);">'
                   +'<source src="http://d1s3yn3kxq96sy.cloudfront.net/bigbuckbunny/index.m3u8">'
                   +'<source src="http://vjs.zencdn.net/v/oceans.mp4" type="video/mp4">'
                   +'<source src="http://vjs.zencdn.net/v/oceans.webm" type="video/webm">'

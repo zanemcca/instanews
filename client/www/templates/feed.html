@@ -8,6 +8,8 @@
       <button class="button button-clear icon ion-plus-round" ng-click="postText()"></button>
    </ion-nav-buttons>
    <ion-content>
+      <ion-refresher pulling-text="Fresh Stuff" on-refresh="onRefresh()">
+      </ion-refresher>
       <ul class="list">
          <ion-item class="no-padding" ng-repeat="article in articles | orderBy: '-(_votes.up - _votes.down)'">
          <!--
