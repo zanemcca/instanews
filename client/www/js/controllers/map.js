@@ -3,39 +3,122 @@ var app = angular.module('instanews.map', ['ionic', 'ngResource']);
 app.controller('MapCtrl', ['$scope', '$ionicLoading','$compile','Common', function($scope, $ionicLoading, $compile, Common) {
 
    $scope.articles = Common.articles;
+   $scope.mPos = Common.mPosition;
 
-   var map;
+   var map, myCircle;
+   var markers = [];
 
    $scope.$watch('articles', function (newValue, oldValue) {
       if (newValue !== oldValue) getMarkers();
    }, true);
 
+   $scope.$watch('mPos.radius', function (newValue, oldValue) {
+      if (newValue !== oldValue) {
+         updateMyCircle();
+         updateMarkers();
+      }
+   }, true);
+
+   function updateMarkers() {
+      angular.forEach( markers, function (marker) {
+         if (!Common.withinRange({lat: marker.position.k, lng: marker.position.D})) {
+            marker.setVisible(false);
+         }
+         else marker.setVisible(true);
+      });
+   }
+
    function getMarkers() {
       var tempMarker = {
          map: map,
-         animation: google.maps.Animation.DROP,
+         animation: google.maps.Animation.DROP//,
+         /*
          icon: {
             size: new google.maps.Size(120, 120),
             origin: new google.maps.Point(0, 0),
             anchor: new google.maps.Point(0, 20),
             scaledSize: new google.maps.Size(30,30)
          }
+         */
       }
 
       for(i = 0; i < $scope.articles.length; i++) {
          tempMarker.position = new google.maps.LatLng($scope.articles[i].location.lat, $scope.articles[i].location.lng);
          tempMarker.title = $scope.articles[i].title;
-         tempMarker.icon.url = 'img/ionic.png';
+//         tempMarker.icon.url = 'img/ionic.png';
 
-         var marker = new google.maps.Marker(tempMarker);
+         if ( Common.withinRange($scope.articles[i].location)) {
+            tempMarker.visible = false;
+         }
+         markers.push(new google.maps.Marker(tempMarker));
       }
    }
 
-    var initializeMap = function() {
-       var mLat = 45.61545;
-       var mLng = -65.45270;
+   function updateMyCircle() {
+      if ($scope.mPos.radius < $scope.mPos.accuracy) {
+         myCircle.setOptions({
+            radius: $scope.mPos.accuracy,
+            fillColor: 'red'
+         });
+      }
+      else {
+         myCircle.setOptions({
+            radius: $scope.mPos.radius,
+            fillColor: 'blue',
+         });
+      }
+   }
 
-       console.log("Fired up 1!");
+
+   function drawMyCircle() {
+      var options = {
+         strokeColor: 'blue',
+         strokeOpacity: 0.3,
+         strokeWeight: 0,
+         fillColor: 'blue',
+         fillOpacity: 0.1,
+         map: map,
+         center: new google.maps.LatLng($scope.mPos.lat,$scope.mPos.lng)
+      };
+      if ($scope.mPos.radius < $scope.mPos.accuracy) options.radius = $scope.mPos.accuracy;
+      else options.radius = $scope.mPos.radius;
+
+      myCircle = new google.maps.Circle(options);
+   }
+
+   var error = function(err) {
+      console.log(err);
+   }
+
+    var initializeMap = function() {
+
+      //TODO correlate3 zoom with radius
+      var zoom = 8;
+
+      var mPosition = new google.maps.LatLng($scope.mPos.lat,$scope.mPos.lng);
+
+      var mapOptions = {
+         center: mPosition,
+         zoom: zoom,
+         mapTypeId: google.maps.MapTypeId.ROADMAP
+      };
+
+      // Load the map
+      map = new google.maps.Map(document.getElementById("map"), mapOptions);
+
+
+      navigator.geolocation.getCurrentPosition( function(position) {
+         //$scope.mPos.lat = position.coords.latitude;
+         //$scope.mPos.lng = position.coords.longitude;
+         $scope.mPos.lat = 43.7000;
+         $scope.mPos.lng = -79.4000;
+         $scope.mPos.accuracy = position.coords.accuracy;
+         $scope.mPos.radSlider = 0;
+         mPosition = new google.maps.LatLng($scope.mPos.lat,$scope.mPos.lng);
+         map.setCenter(mPosition);
+         drawMyCircle();
+         getMarkers();
+      }, error, {enableHighAccuracy: true});
        /*
       //Cordova Google Map native plugin
 
@@ -45,15 +128,7 @@ app.controller('MapCtrl', ['$scope', '$ionicLoading','$compile','Common', functi
 
       //Google maps implementation
 
-      var myLatlng = new google.maps.LatLng(mLat,mLng);
-
-      var mapOptions = {
-         center: myLatlng,
-         zoom: 11,
-         mapTypeId: google.maps.MapTypeId.ROADMAP
-      };
-
-      map = new google.maps.Map(document.getElementById("map"), mapOptions);
+//      var myLatlng = new google.maps.LatLng(mLat,mLng);
 
        /*
       //Bing maps implementation
@@ -66,7 +141,6 @@ app.controller('MapCtrl', ['$scope', '$ionicLoading','$compile','Common', functi
        var map = new Microsoft.Maps.Map(document.getElementById("map"), mapOptions);
        */
 
-      getMarkers();
     }
 
     ionic.DomUtil.ready( function() {

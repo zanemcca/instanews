@@ -14,6 +14,7 @@ app.controller('ArticleCtrl', [
       function($scope, $stateParams, Article, Subarticle, Comment, Common, Camera, Storage) {
 
    $scope.subarticles = [];
+   $scope.article = Common.getArticle($stateParams.id);
 
    function getSubarticles() {
       Article.subarticles({id: $stateParams.id})

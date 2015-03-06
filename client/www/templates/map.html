@@ -1,6 +1,11 @@
 <!DOCTYPE html>
-<ion-view view-title="Map">
-   <ion-content>
-      <div style="width:100%; height: 500px" id="map"></div>
+<ion-view view-title="Map" hide-nav-bar="true">
+   <ion-content scroll="false">
+      <div class="item item-dark range range-calm">
+         <i class="icon ion-location"></i>
+         <input type="range" name="radius" min="0" max="100" value="mPos.radSlider" ng-model="mPos.radSlider">
+         <i class="icon ion-earth"></i>
+      </div>
+      <div style="width:100%; height:100%" id="map"></div>
    </ion-content>
 </ion-view>
