@@ -1,0 +1,18 @@
+
+<!DOCTYPE html>
+<ion-popover-view style="width: 52px; height: 188px">
+   <div class="list" ng-click="postPopover.hide()">
+      <div class="item no-padding item-dark">
+         <button class="button button-clear icon ion-camera button-light" ng-click="postPhoto()"></button>
+      </div>
+      <div class="item no-padding item-dark">
+         <button class="button button-clear icon ion-compose button-light" ng-click="postTextModal.show()"></button>
+      </div>
+      <div class="item no-padding item-dark">
+         <button class="button button-clear icon ion-videocamera button-light" ng-click="postVideo()"></button>
+      </div>
+      <div class="item no-padding item-dark">
+         <button class="button button-clear icon ion-mic-a button-light" ng-click="postAudio()"></button>
+      </div>
+   </div>
+</ion-popover-view>

@@ -5,18 +5,33 @@ var app = angular.module('instanews.article', ['ionic', 'ngResource']);
 app.controller('ArticleCtrl', [
       '$scope',
       '$stateParams',
+      '$ionicPopover',
+      '$ionicModal',
       'Article',
       'Subarticle',
       'Comment',
       'Common',
       'Camera',
       'Storage',
-      function($scope, $stateParams, Article, Subarticle, Comment, Common, Camera, Storage) {
+      function($scope,
+         $stateParams,
+         $ionicPopover,
+         $ionicModal,
+         Article,
+         Subarticle,
+         Comment,
+         Common,
+         Camera,
+         Storage) {
 
    $scope.subarticles = [];
    $scope.article = Common.getArticle($stateParams.id);
+   $scope.data = {
+      newText: ''
+   };
 
    getSubarticles = function(cb) {
+      //TODO apply filters before hand
       Article.subarticles({id: $stateParams.id})
       .$promise
       .then( function (res) {
@@ -27,11 +42,28 @@ app.controller('ArticleCtrl', [
 
    getSubarticles();
 
+   $scope.loadMore = function () {
+      $scope.$broadcast('scroll.infiniteScrollComplete');
+   }
+
    $scope.onRefresh = function () {
       getSubarticles( function () {
          $scope.$broadcast('scroll.refreshComplete');
       });
    }
+
+   $ionicModal.fromTemplateUrl('templates/postTextModal.html', {
+      scope: $scope,
+      animation: 'slide-in-up'
+   }).then( function (modal) {
+      $scope.postTextModal = modal;
+   });
+
+   $ionicPopover.fromTemplateUrl('templates/postPopover.html', {
+      scope: $scope,
+   }).then (function (popover) {
+      $scope.postPopover = popover;
+   });
 
    $scope.getSubarticleHeight = function(subarticle) {
       var height;
@@ -54,6 +86,12 @@ app.controller('ArticleCtrl', [
       return height;
    }
 
+   //TODO move post creation to a service
+   $scope.trashText = function() {
+      $scope.data.newText = '';
+      $scope.postTextModal.hide();
+   };
+
    $scope.postText = function() {
       Article.subarticles.create({
          id: $stateParams.id,
@@ -66,17 +104,15 @@ app.controller('ArticleCtrl', [
             lastUpdated: Date.now()
          },
          username: 'bob',
-         text: 'Key: ' +  Math.random().toString()
+         text: $scope.data.newText
       })
       .$promise.then( function(res) {
          $scope.subarticles.push(res);
       });
+      $scope.trashText();
    };
 
-
-
    $scope.postPhoto = function() {
-
       Camera.getPicture()
       .then( function(imageURI) {
          console.log(imageURI);
@@ -102,8 +138,8 @@ app.controller('ArticleCtrl', [
       });
    };
 
-   $scope.createComment = function( subarticle, content) {
-      Common.createComment(Subarticle, subarticle,'subarticle', content);
+   $scope.createComment = function( subarticle, newComment) {
+      Common.createComment(Subarticle, subarticle,'subarticle', newComment);
    };
 
    $scope.upvoteComment = function(comment) {

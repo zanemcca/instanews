@@ -1,10 +1,7 @@
 <!DOCTYPE html>
 <ion-view view-title="{{article.title}}" style="background-color: #C0C0C0">
-   <ion-nav-buttons side="primary">
-      <button class="button button-clear icon ion-camera" ng-click="postPhoto()"></button>
-   </ion-nav-buttons>
    <ion-nav-buttons side="secondary">
-      <button class="button button-clear icon ion-plus-round" ng-click="postText()"></button>
+      <button class="button button-clear icon ion-plus-round" ng-click="postPopover.show($event)"></button>
    </ion-nav-buttons>
    <ion-content>
       <ion-refresher pulling-text="Fresh Stuff" on-refresh="onRefresh()">
@@ -23,12 +20,14 @@
                   {{subarticle.username}}
                </a>
                <p>{{subarticle.text}}</p>
+
+               <!--TODO Turn the vote and comment box into a  generic directive -->
                <div class="item no-padding" style="border: transparent">
-                  <button class="item button button-clear button-small button-balanced ion-chevron-up"
+                  <button class="item button button-clear button-small button-balanced ion-arrow-up-b"
                      ng-click="upvote(subarticle)">
                       {{subarticle._votes.up}}
                    </button>
-                  <button class="item button button-clear button-small button-assertive ion-chevron-down"
+                  <button class="item button button-clear button-small button-assertive ion-arrow-down-b"
                     ng-click="downvote(subarticle)">
                      {{subarticle._votes.down}}
                   </button>
@@ -55,6 +54,7 @@
                   </div>
                </div>
 
+               <!-- TODO turn  the comments box into a more generic directive -->
                <div ng-if="subarticle.showComments">
                   <ul class="list">
                      <li class="item no-padding"
@@ -85,11 +85,11 @@
                   </ul>
                   <form name="form" class="item no-padding" style="border-color: transparent">
                      <div style="padding-right:60px">
-                        <textarea type="text" ng-model="content" placeholder="Comment" required></textarea>
+                        <textarea type="text" ng-model="newComment" placeholder="Comment" required></textarea>
                      </div>
                      <div class="item-icon-right">
                         <button type="reset" class="button button-clear icon ion-forward"
-                           ng-click="createComment(subarticle, content)">
+                           ng-click="createComment(subarticle, newComment)" ng-disabled="!newComment">
                         </button>
                      </div>
                   </form>
@@ -97,5 +97,9 @@
             </div>
          </li>
       </ul>
+      <ion-infinite-scroll
+         on-infinite="loadMore()"
+         distance="1%">
+      </ion-infinite-scroll>
    </ion-content>
 </ion-view>

@@ -22,7 +22,7 @@ app.service('Common', ['$rootScope','$filter','Article', function($rootScope, $f
 
    var RadiusMax = Math.PI*6371000; //Half the earths circumference
    var RadiusMin = 500; //Minimum radius in meters
-   var maxSlider = 100; //Slider range from 0 to 100
+   var maxSlider = 500; //Slider range from 0 to 100
    var scale = maxSlider / Math.log(RadiusMax - RadiusMin + 1);
 
    mPosition.radSlider = radToSlide(mPosition.radius);
@@ -137,6 +137,7 @@ app.service('Common', ['$rootScope','$filter','Article', function($rootScope, $f
    return {
       articles: articles,
       getArticle: getArticle,
+      radToSlide: radToSlide,
       onRefresh: onRefresh,
       mPosition: mPosition,
       withinRange: withinRange,

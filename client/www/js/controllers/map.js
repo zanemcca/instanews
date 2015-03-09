@@ -31,6 +31,12 @@ app.controller('MapCtrl', ['$scope', '$ionicLoading','$compile','Common', functi
    }
 
    function getMarkers() {
+      //TODO only update the changed ones not all
+      angular.forEach( markers, function( marker) {
+         marker.setMap(null);
+      });
+      markers.length = 0;
+
       var tempMarker = {
          map: map,
          animation: google.maps.Animation.DROP//,
@@ -95,6 +101,9 @@ app.controller('MapCtrl', ['$scope', '$ionicLoading','$compile','Common', functi
       else options.radius = $scope.mPos.radius;
 
       myCircle = new google.maps.Circle(options);
+      map.fitBounds(myCircle.getBounds());
+      console.log(options.radius);
+      $scope.mPos.radSlider = Common.radToSlide(options.radius);
    }
 
    var error = function(err) {
@@ -103,7 +112,6 @@ app.controller('MapCtrl', ['$scope', '$ionicLoading','$compile','Common', functi
 
     var initializeMap = function() {
 
-      //TODO correlate3 zoom with radius
       var zoom = 8;
 
       var mPosition = new google.maps.LatLng($scope.mPos.lat,$scope.mPos.lng);
@@ -126,7 +134,6 @@ app.controller('MapCtrl', ['$scope', '$ionicLoading','$compile','Common', functi
          $scope.mPos.lng = -79.4000;
          */
          $scope.mPos.accuracy = position.coords.accuracy;
-         $scope.mPos.radSlider = 0;
          mPosition = new google.maps.LatLng($scope.mPos.lat,$scope.mPos.lng);
          map.setCenter(mPosition);
          drawMyCircle();
