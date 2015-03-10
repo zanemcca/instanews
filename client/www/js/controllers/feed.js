@@ -1,31 +1,82 @@
 var app = angular.module('instanews.feed', ['ionic', 'ngResource']);
 
-app.controller('FeedCtrl', ['$scope', 'Article', 'Common', 'Comment', function($scope, Article, Common, Comment) {
+app.controller('FeedCtrl', [
+      '$scope',
+      '$ionicModal',
+      'Article',
+      'Common',
+      'Comment',
+      function($scope,
+         $ionicModal,
+         Article,
+         Common,
+         Comment) {
 
    $scope.articles = Common.articles;
-   $scope.onRefresh = Common.onRefresh;
 
-   $scope.createComment = function( article, content) {
-      Common.createComment(Article, article,'article', content);
+   $scope.onRefresh = function () {
+      Article.find( function (res) {
+         $scope.articles = res;
+         $scope.$broadcast('scroll.refreshComplete');
+      });
    };
 
-   $scope.upvoteComment = function(comment) {
-      Common.upvote(Comment, comment);
+   $scope.newArticle = {
+      title: '',
+      posSearch: '',
+      posName: ''
    };
 
-   $scope.downvoteComment = function(comment) {
-      Common.downvote(Comment, comment);
+   $ionicModal.fromTemplateUrl('templates/postArticleModal.html', {
+      scope: $scope,
+      animation: 'slide-in-up'
+   }).then( function (modal) {
+      $scope.postArticleModal = modal;
+   });
+
+   $scope.trashArticle = function() {
+      $scope.newArticle.title = '';
+      $scope.postArticleModal.hide();
    };
 
-   $scope.upvote = function(article) {
-      Common.upvote(Article,article);
+   $scope.useMyLocation = function() {
+      //TODO Change this to lookup the name of the user location
+      $scope.newArticle.posName = 'My Location';
    };
 
-   $scope.downvote = function(article) {
-      Common.downvote(Article,article);
+   $scope.postArticle = function() {
+      if ( $scope.newArticle.posSearch ) {
+         //TODO Lookup the lat-lng
+         $scope.newArticle.posName = 'My Location';
+         loc = {
+            lat: Common.mPosition.lat,
+            lng: Common.mPosition.lng
+         }
+      }
+      else {
+         $scope.newArticle.posName = 'My Location';
+         loc = {
+            lat: Common.mPosition.lat,
+            lng: Common.mPosition.lng
+         }
+      }
+      Article.create({
+         date: Date.now(),
+         isPrivate: false,
+         myId: Math.floor(Math.random()*Math.pow(2,32)),
+         location: loc,
+         _votes: {
+            up: Math.floor(Math.random()*100),
+            down: Math.floor(Math.random()*50),
+            lastUpdated: Date.now()
+         },
+         username: 'bob',
+         title: $scope.newArticle.title
+      })
+      .$promise.then( function(res) {
+         $scope.articles.push(res);
+      });
+      $scope.trashArticle();
    };
 
-   $scope.toggleComments = function(article) {
-      Common.toggleComments(Article,article);
-   };
 }]);

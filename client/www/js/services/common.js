@@ -11,13 +11,6 @@ app.service('Common', [
    //Initialize and refresh
    var articles = Article.find();
 
-   var onRefresh = function () {
-      Article.find( function (res) {
-         articles = res;
-         $rootScope.$broadcast('scroll.refreshComplete');
-      });
-   };
-
    var mPosition = {
       lat: 45.61545,
       lng: -66.45270,
@@ -179,7 +172,6 @@ app.service('Common', [
       articles: articles,
       getArticle: getArticle,
       radToSlide: radToSlide,
-      onRefresh: onRefresh,
       mPosition: mPosition,
       withinRange: withinRange,
       createComment: createComment,

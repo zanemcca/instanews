@@ -91,7 +91,7 @@ app.controller('ArticleCtrl', [
 
    //TODO move post creation to a service
    $scope.trashText = function() {
-      $scope.data.newText = '';
+      $scope.data.newtext = '';
       $scope.postTextModal.hide();
    };
 
@@ -107,7 +107,7 @@ app.controller('ArticleCtrl', [
             lastUpdated: Date.now()
          },
          username: 'bob',
-         text: $scope.data.newText
+         text: $scope.data.text
       })
       .$promise.then( function(res) {
          $scope.subarticles.push(res);
@@ -141,28 +141,5 @@ app.controller('ArticleCtrl', [
       });
    };
 
-   $scope.createComment = function( subarticle, newComment) {
-      Common.createComment(Subarticle, subarticle,'subarticle', newComment);
-   };
-
-   $scope.upvoteComment = function(comment) {
-      Common.upvote(Comment, comment);
-   };
-
-   $scope.downvoteComment = function(comment) {
-      Common.downvote(Comment, comment);
-   };
-
-   $scope.upvote = function(subarticle) {
-      Common.upvote(Subarticle,subarticle);
-   };
-
-   $scope.downvote = function(subarticle) {
-      Common.downvote(Subarticle,subarticle);
-   };
-
-   $scope.toggleComments = function(subarticle) {
-      Common.toggleComments(Subarticle,subarticle);
-   };
 }]);
 
