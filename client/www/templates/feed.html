@@ -1,95 +1,40 @@
-
 <!DOCTYPE html>
-<ion-view view-title="Instanews">
-   <ion-nav-buttons side="primary">
-      <button class="button button-clear icon ion-camera" ng-click="postPhoto()"></button>
-   </ion-nav-buttons>
+<ion-view view-title="Instanews" style="background-color: #C0C0C0">
    <ion-nav-buttons side="secondary">
-      <button class="button button-clear icon ion-plus-round" ng-click="postText()"></button>
+      <button class="button button-clear icon ion-plus-round"
+         ng-click="postPopover.show($event)">
+      </button>
    </ion-nav-buttons>
    <ion-content>
       <ion-refresher pulling-text="Fresh Stuff" on-refresh="onRefresh()">
       </ion-refresher>
       <ul class="list">
-         <ion-item class="no-padding" ng-repeat="article in articles | orderBy: '-(_votes.up - _votes.down)'">
-         <!--
-         <ion-item style="border: transparent"
-            collection-repeat="article in articles | orderBy: '-(_votes.up - _votes.down)'"
-            collection-item-width="'100%'"
-            collection-item-height="'250px'">
-            -->
-            <a class="item item-divider item-avatar" style="height: 65px" href="#/journalists/{{article.username}}">
+         <ion-item class="no-padding card" ng-repeat="article in articles | orderBy: '-(_votes.up - _votes.down)'">
+            <div class="item item-avatar item-text-wrap" style="min-height:65px" >
                <img src="img/ionic.png">
-               {{article.username}}
-            </a>
+               <a class="button button-clear no-padding button-small"
+                  href="#/journalists/{{article.username}}">
+                  {{article.username}}
+               </a>
 
-            <div class="item item-body">
-               <a class="button button-clear button-full" href="#/tab/articles/{{article.myId}}">
+               <a class="button button-clear button-full"
+                  style="margin: 0px;"
+                  href="#/tab/articles/{{article.myId}}">
                   {{article.title}}
                </a>
+
+               <votes class="item no-padding"
+                  style="border: transparent"
+                  voteable="article">
+               </votes>
             </div>
 
-            <div class="item item-divider">
-               <div class="item-icon-right">
-                  <button class="item button button-clear icon button-small"
-                     ng-class="{'ion-arrow-right-b': !article.showComments, 'ion-arrow-down-b': article.showComments}"
-                     ng-click="toggleComments(article)">
-                  </button>
-               </div>
-               <button class="item button button-clear button-small button-balanced ion-chevron-up"
-                  ng-click="upvote(article)">
-                   {{article._votes.up}}
-                </button>
-               <button class="item button button-clear button-small button-assertive ion-chevron-down"
-                 ng-click="downvote(article)">
-                  {{article._votes.down}}
-               </button>
-
-               <div ng-if="article.showComments">
-                  <ul class="list">
-                     <li class="item no-padding"
-                     ng-repeat="comment in article.comments | orderBy: '-(_votes.up - _votes.down)'">
-                        <div class="item item-avatar item-text-wrap" style="padding-bottom: 0px; border-bottom-color: transparent">
-                           <img src="img/ionic.png">
-                           <a class="button button-clear button-small"  href="#/tab/journalists/{{comment.username}}" >
-                              {{comment.username}}
-                           </a>
-                           <p>{{comment.content}}</p>
-                           <div class="item" style="padding-top: 0px; padding-left: 0px; border-color: transparent">
-                              <button class="button button-clear button-small button-balanced ion-chevron-up"
-                                 ng-click="upvoteComment(comment, article)">
-                                  {{comment._votes.up}}
-                               </button>
-                              <button class="button button-clear button-small button-assertive ion-chevron-down"
-                                ng-click="downvoteComment(comment, article)">
-                                 {{comment._votes.down}}
-                              </button>
-                              <div class="item-icon-right">
-                                 <button class="icon button button-clear button-small"
-                                    ng-class="{'ion-arrow-right-b': !comment.showComments, 'ion-arrow-down-b': comment.showComments}"
-                                    ng-click="toggleComments(comment)">
-                                 </button>
-                              </div>
-                           </div>
-                        </div>
-                     </li>
-                  </ul>
-                  <form name="form" class="item item-divider no-padding" style="border-color: transparent">
-                     <div style="padding-right:60px">
-                        <textarea type="text" ng-model="content" placeholder="Comment" required></textarea>
-                     </div>
-                     <div class="item-icon-right">
-                        <button type="reset" class="button button-clear icon ion-forward"
-                           ng-click="createComment(article, content)">
-                        </button>
-                     </div>
-                  </form>
-               </div>
-            </div>
-
-         </ion-item>
-      </ion-list>
+            <comments owner="article"></comments>
+         </li>
+      </ul>
+      <ion-infinite-scroll
+         on-infinite="loadMore()"
+         distance="1%">
+      </ion-infinite-scroll>
    </ion-content>
 </ion-view>
-
-

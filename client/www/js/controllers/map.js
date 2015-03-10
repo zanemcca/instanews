@@ -48,7 +48,7 @@ app.controller('MapCtrl', ['$scope', '$ionicLoading','$compile','Common', functi
             scaledSize: new google.maps.Size(30,30)
          }
          */
-      }
+      };
 
       for(i = 0; i < $scope.articles.length; i++) {
          tempMarker.position = new google.maps.LatLng($scope.articles[i].location.lat, $scope.articles[i].location.lng);
@@ -108,7 +108,7 @@ app.controller('MapCtrl', ['$scope', '$ionicLoading','$compile','Common', functi
 
    var error = function(err) {
       console.log(err);
-   }
+   };
 
     var initializeMap = function() {
 
@@ -161,7 +161,7 @@ app.controller('MapCtrl', ['$scope', '$ionicLoading','$compile','Common', functi
        var map = new Microsoft.Maps.Map(document.getElementById("map"), mapOptions);
        */
 
-    }
+    };
 
     ionic.DomUtil.ready( function() {
        if (navigator.userAgent.match(/(iPhone|iPod|Android|BlackBerry)/)) {

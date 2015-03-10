@@ -1,100 +1,35 @@
 <!DOCTYPE html>
 <ion-view view-title="{{article.title}}" style="background-color: #C0C0C0">
    <ion-nav-buttons side="secondary">
-      <button class="button button-clear icon ion-plus-round" ng-click="postPopover.show($event)"></button>
+      <button class="button button-clear icon ion-plus-round"
+         ng-click="postPopover.show($event)">
+      </button>
    </ion-nav-buttons>
    <ion-content>
       <ion-refresher pulling-text="Fresh Stuff" on-refresh="onRefresh()">
       </ion-refresher>
       <ul class="list">
          <ion-item class="no-padding card" ng-repeat="subarticle in subarticles | orderBy: '-(_votes.up - _votes.down)'">
-         <!--
-         <li style="border: transparent"
-            collection-repeat="subarticle in subarticles | orderBy: '-(_votes.up - _votes.down)'"
-            collection-item-width="'100%'"
-            collection-item-height="getSubarticleHeight(subarticle)+ 170">
-            -->
             <div class="item item-avatar item-text-wrap" style="min-height:65px" >
                <img src="img/ionic.png">
-               <a class="button button-clear no-padding button-small" href="#/journalists/{{subarticle.username}}">
+               <a class="button button-clear no-padding button-small"
+                  href="#/journalists/{{subarticle.username}}">
                   {{subarticle.username}}
                </a>
                <p>{{subarticle.text}}</p>
 
-               <!--TODO Turn the vote and comment box into a  generic directive -->
-               <div class="item no-padding" style="border: transparent">
-                  <button class="item button button-clear button-small button-balanced ion-arrow-up-b"
-                     ng-click="upvote(subarticle)">
-                      {{subarticle._votes.up}}
-                   </button>
-                  <button class="item button button-clear button-small button-assertive ion-arrow-down-b"
-                    ng-click="downvote(subarticle)">
-                     {{subarticle._votes.down}}
-                  </button>
-                  <div ng-if="!subarticle._file">
-                     <div class="item-icon-right">
-                        <button class="item button button-clear icon button-small" ng-class="{'ion-arrow-right-b': !subarticle.showComments, 'ion-arrow-down-b': subarticle.showComments}"
-                           ng-click="toggleComments(subarticle)">
-                        </button>
-                     </div>
-                  </div>
-               </div>
+               <votes class="item no-padding"
+                  style="border: transparent"
+                  voteable="subarticle">
+               </votes>
             </div>
 
             <div class="item item-body no-padding" ng-if="subarticle._file">
-               <file-item ></file-item>
+               <file-item></file-item>
             </div>
 
-            <div class="item " ng-if="subarticle.showComments || subarticle._file" >
-               <div ng-if="subarticle._file">
-                  <div class="item-icon-right">
-                     <button class="item button button-clear icon button-small" ng-class="{'ion-arrow-right-b': !subarticle.showComments, 'ion-arrow-down-b': subarticle.showComments}"
-                        ng-click="toggleComments(subarticle)">
-                     </button>
-                  </div>
-               </div>
+            <comments owner="subarticle"></comments>
 
-               <!-- TODO turn  the comments box into a more generic directive -->
-               <div ng-if="subarticle.showComments">
-                  <ul class="list">
-                     <li class="item no-padding"
-                     ng-repeat="comment in subarticle.comments | orderBy: '-(_votes.up - _votes.down)'">
-                        <div class="item item-avatar item-text-wrap item-divider" style="padding-bottom: 0px; border-bottom-color: transparent">
-                           <img src="img/ionic.png">
-                           <a class="button button-clear button-small"  href="#/tab/journalists/{{comment.username}}" >
-                              {{comment.username}}
-                           </a>
-                           <p>{{comment.content}}</p>
-                           <div class="item item-divider" style="padding-top: 0px; padding-left: 0px; border-color: transparent">
-                              <button class="button button-clear button-small button-balanced ion-chevron-up"
-                                 ng-click="upvoteComment(comment, subarticle)">
-                                  {{comment._votes.up}}
-                               </button>
-                              <button class="button button-clear button-small button-assertive ion-chevron-down"
-                                ng-click="downvoteComment(comment, subarticle)">
-                                 {{comment._votes.down}}
-                              </button>
-                              <div class="item-icon-right">
-                                 <button class="icon button button-clear button-small" ng-class="{'ion-arrow-right-b': !comment.showComments, 'ion-arrow-down-b': comment.showComments}"
-                                    ng-click="toggleComments(comment)">
-                                 </button>
-                              </div>
-                           </div>
-                        </div>
-                     </li>
-                  </ul>
-                  <form name="form" class="item no-padding" style="border-color: transparent">
-                     <div style="padding-right:60px">
-                        <textarea type="text" ng-model="newComment" placeholder="Comment" required></textarea>
-                     </div>
-                     <div class="item-icon-right">
-                        <button type="reset" class="button button-clear icon ion-forward"
-                           ng-click="createComment(subarticle, newComment)" ng-disabled="!newComment">
-                        </button>
-                     </div>
-                  </form>
-               </div>
-            </div>
          </li>
       </ul>
       <ion-infinite-scroll

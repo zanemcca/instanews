@@ -1,6 +1,4 @@
-
 var app = angular.module('instanews.article', ['ionic', 'ngResource']);
-
 
 app.controller('ArticleCtrl', [
       '$scope',
@@ -24,33 +22,38 @@ app.controller('ArticleCtrl', [
          Camera,
          Storage) {
 
+   //Add the Models to the scope
+   $scope.Subarticle = Subarticle;
+
+   //Scope variables
    $scope.subarticles = [];
    $scope.article = Common.getArticle($stateParams.id);
+   //Form entry structure
    $scope.data = {
       newText: ''
    };
 
-   getSubarticles = function(cb) {
+   var getSubarticles = function(cb) {
       //TODO apply filters before hand
       Article.subarticles({id: $stateParams.id})
       .$promise
       .then( function (res) {
          $scope.subarticles = res;
          if (cb) cb();
-      })
-   }
+      });
+   };
 
    getSubarticles();
 
    $scope.loadMore = function () {
       $scope.$broadcast('scroll.infiniteScrollComplete');
-   }
+   };
 
    $scope.onRefresh = function () {
       getSubarticles( function () {
          $scope.$broadcast('scroll.refreshComplete');
       });
-   }
+   };
 
    $ionicModal.fromTemplateUrl('templates/postTextModal.html', {
       scope: $scope,
@@ -84,7 +87,7 @@ app.controller('ArticleCtrl', [
          //console.log('Text: '+ height);
       }
       return height;
-   }
+   };
 
    //TODO move post creation to a service
    $scope.trashText = function() {

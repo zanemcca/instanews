@@ -11,6 +11,8 @@ angular.module('instanews', [
       'instanews.article',
       'instanews.feed',
       'instanews.file',
+      'instanews.votes',
+      'instanews.comments',
       'instanews.map',
       'instanews.camera',
       'lbServices',

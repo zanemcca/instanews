@@ -17,5 +17,5 @@ app.factory('Camera', ['$q', function($q) {
 
       return q.promise;
     }
-  }
+  };
 }]);

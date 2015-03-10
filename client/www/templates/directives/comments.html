@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<div class="item " ng-if="owner.showComments || owner._file" >
+   <div ng-if="owner._file">
+      <div class="item-icon-right">
+         <button class="item button button-clear icon button-small"
+            ng-class="{'ion-arrow-right-b': !owner.showComments, 'ion-arrow-down-b': owner.showComments}"
+            ng-click="Common.toggleComments(owner)">
+         </button>
+      </div>
+   </div>
+
+   <div ng-if="owner.showComments">
+      <ul class="list">
+         <li class="item no-padding"
+         ng-repeat="comment in owner.comments | orderBy: '-(_votes.up - _votes.down)'">
+            <div class="item item-avatar item-text-wrap item-divider"
+               style="padding-bottom: 0px; border-bottom-color: transparent">
+               <img src="img/ionic.png">
+               <a class="button button-clear button-small"
+                  href="#/tab/journalists/{{comment.username}}" >
+                  {{comment.username}}
+               </a>
+               <p>{{comment.content}}</p>
+
+               <votes class="item item-divider no-padding"
+                  style="border: transparent"
+                  voteable="comment">
+               </votes>
+            </div>
+         </li>
+      </ul>
+      <form name="form" class="item no-padding" style="border-color: transparent">
+         <div style="padding-right:60px">
+            <textarea type="text" ng-model="newComment" placeholder="Comment" required></textarea>
+         </div>
+         <div class="item-icon-right">
+            <button type="reset" class="button button-clear icon ion-forward"
+               ng-click="Common.createComment(owner, newComment)" ng-disabled="!newComment">
+            </button>
+         </div>
+      </form>
+   </div>
+</div>
