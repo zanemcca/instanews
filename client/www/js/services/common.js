@@ -11,6 +11,8 @@ app.service('Common', [
    //Initialize and refresh
    var articles = Article.find();
 
+   var user = {};
+
    var mPosition = {
       lat: 45.61545,
       lng: -66.45270,
@@ -170,6 +172,7 @@ app.service('Common', [
 
    return {
       articles: articles,
+      user: user,
       getArticle: getArticle,
       radToSlide: radToSlide,
       mPosition: mPosition,

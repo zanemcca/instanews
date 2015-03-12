@@ -8,8 +8,20 @@
    margin: 0px !important;
 }
 
+.box-invalid {
+   box-shadow: inset 1px 1px 3px #FF0000, inset -1px -1px 3px #FF0000;
+}
+
+.box-valid {
+   box-shadow: inset 1px 1px 3px #00FF00, inset -1px -1px 3px #00FF00;
+}
+
 .video-container {
    width: 80% !important;
    max-width: 640px;
    overflow: hidden;
+}
+
+.scroll {
+   height: 100%;
 }

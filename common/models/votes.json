@@ -13,6 +13,9 @@
     "rate": {
       "type": "number"
     },
+    "ranking": {
+      "type": "number"
+    },
     "lastUpdated": {
       "type": "date"
     }

@@ -13,6 +13,7 @@ app.controller('FeedCtrl', [
          Comment) {
 
    $scope.articles = Common.articles;
+   $scope.user = Common.user.user;
 
    $scope.onRefresh = function () {
       Article.find( function (res) {
@@ -70,7 +71,7 @@ app.controller('FeedCtrl', [
             down: Math.floor(Math.random()*50),
             lastUpdated: Date.now()
          },
-         username: 'bob',
+         username: $scope.user.username,
          title: $scope.newArticle.title
       })
       .$promise.then( function(res) {

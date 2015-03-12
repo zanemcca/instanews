@@ -9,6 +9,7 @@
          "up": 0,
          "down": 0,
          "rate": 0,
+         "rating": 0,
          "lastUpdated" : "2015-02-06T12:48:43.511Z"
       }
    },
@@ -21,6 +22,7 @@
          "up": 0,
          "down": 0,
          "rate": 0,
+         "rating": 0,
          "lastUpdated" : "2015-02-06T02:48:43.511Z"
       },
       "_file": {
@@ -40,6 +42,7 @@
          "up": 0,
          "down": 0,
          "rate": 0,
+         "rating": 0,
          "lastUpdated" : "2015-02-06T02:48:43.511Z"
       }
    },
@@ -52,6 +55,7 @@
          "up": 0,
          "down": 0,
          "rate": 0,
+         "rating": 0,
          "lastUpdated" : "2015-02-06T03:48:43.511Z"
       },
       "_file": {

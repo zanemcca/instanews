@@ -24,21 +24,31 @@ app.controller('ArticleCtrl', [
 
    //Add the Models to the scope
    $scope.Subarticle = Subarticle;
+   $scope.user = Common.user.user;
+   $scope.itemsAvailable = true;
 
    //Scope variables
    $scope.subarticles = [];
    $scope.article = Common.getArticle($stateParams.id);
    //Form entry structure
    $scope.data = {
-      newText: ''
+      text: ''
    };
 
+   var filter = {
+      limit: 2,
+      skip: 0,
+      order: '_votes.rating DESC'
+   }
+
    var getSubarticles = function(cb) {
-      //TODO apply filters before hand
-      Article.subarticles({id: $stateParams.id})
+
+      filter.skip = 0
+      Article.subarticles({id: $stateParams.id, filter: filter})
       .$promise
       .then( function (res) {
          $scope.subarticles = res;
+         $scope.itemsAvailable = true;
          if (cb) cb();
       });
    };
@@ -46,6 +56,36 @@ app.controller('ArticleCtrl', [
    getSubarticles();
 
    $scope.loadMore = function () {
+      filter.skip += filter.limit;
+      //TODO dynamic filter limit based on users speed
+
+      var subarticlesCount;
+
+      Article.subarticles.count({id : $stateParams.id})
+      .$promise
+      .then( function (res) {
+         var count = res.count;
+
+         if (count <= filter.skip + filter.limit ) {
+            console.log('No more items');
+            $scope.itemsAvailable = false;
+         }
+
+         Article.subarticles({
+            id: $stateParams.id,
+            filter: filter
+         })
+         .$promise
+         .then( function (res) {
+            //POSSIBLY DANGEROUS - NOT SURE ABOUT ORDERING WITH FOREACH
+            //TODO Clean this up so that we are not getting duplicates
+            //    from the server due to reordering
+            angular.forEach(res, function(item) {
+               $scope.subarticles.push(item);
+            });
+         });
+      });
+
       $scope.$broadcast('scroll.infiniteScrollComplete');
    };
 
@@ -68,30 +108,9 @@ app.controller('ArticleCtrl', [
       $scope.postPopover = popover;
    });
 
-   $scope.getSubarticleHeight = function(subarticle) {
-      var height;
-      if (subarticle._file) {
-         //Video and image size
-         if (subarticle._file.type === 'video') {
-            height = 360;
-            //console.log('Video: '+ height);
-         }
-         else if (subarticle._file.type === 'image') {
-            height = 480;
-            //console.log('Image: '+ height);
-         }
-      }
-      else {
-         //Size of text
-         height = 50;
-         //console.log('Text: '+ height);
-      }
-      return height;
-   };
-
    //TODO move post creation to a service
    $scope.trashText = function() {
-      $scope.data.newtext = '';
+      $scope.data.text = '';
       $scope.postTextModal.hide();
    };
 
@@ -106,7 +125,7 @@ app.controller('ArticleCtrl', [
             down: Math.floor(Math.random()*50),
             lastUpdated: Date.now()
          },
-         username: 'bob',
+         username: $scope.user.username,
          text: $scope.data.text
       })
       .$promise.then( function(res) {
@@ -128,10 +147,16 @@ app.controller('ArticleCtrl', [
             _votes: {
                up: 0,
                down: 0,
+               rating: 0,
                lastUpdated: Date.now()
             },
-            username: 'bob',
-            text: imageURI
+            username: $scope.user.username,
+            _file: {
+               type: 'image',
+               name: imageURI,
+               size: 5000,
+               caption: 'Look at that'
+            }
          })
          .$promise.then( function(res) {
             $scope.subarticles.push(res);

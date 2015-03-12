@@ -12,6 +12,7 @@ angular.module('instanews', [
       'instanews.feed',
       'instanews.file',
       'instanews.votes',
+      'instanews.login',
       'instanews.comments',
       'instanews.map',
       'instanews.camera',
@@ -43,6 +44,12 @@ angular.module('instanews', [
   // Set up the various states which the app can be in.
   // Each state's controller can be found in controllers.js
   $stateProvider
+
+   .state('login', {
+      url:'/login',
+      templateUrl: "templates/login.html",
+      controller: "LoginCtrl"
+   })
 
   // setup an abstract state for the tabs directive
     .state('tab', {
@@ -84,6 +91,11 @@ angular.module('instanews', [
    });
 
   // if none of the above states are matched, use this as the fallback
-  $urlRouterProvider.otherwise('/tab/feed');
+  if ( true ) {
+     $urlRouterProvider.otherwise('/login');
+  }
+  else {
+     $urlRouterProvider.otherwise('/tab/feed');
+  }
 
 });

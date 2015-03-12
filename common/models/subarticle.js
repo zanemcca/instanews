@@ -39,4 +39,10 @@ module.exports = function(Subarticle) {
       http: { path: '/downvote',  verb: 'post'},
       returns: { arg: 'instance', type: 'string'}
    });
+
+   Subarticle.beforeValidate = function (next) {
+      //TODO Pre validation of subarticle server side
+      this._votes.rating = this._votes.up - this._votes.down;
+      next();
+   };
 };
