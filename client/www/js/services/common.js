@@ -170,6 +170,7 @@ app.service('Common', [
       }
    };
 
+
    return {
       articles: articles,
       user: user,

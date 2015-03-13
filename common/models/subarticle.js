@@ -20,6 +20,7 @@ module.exports = function(Subarticle) {
 
    //Upvote function
    Subarticle.prototype.upvote = function( cb) {
+      this.date = Date.now();
       common.upvote(this,cb);
    };
 
@@ -31,6 +32,7 @@ module.exports = function(Subarticle) {
 
    //Downvote function
    Subarticle.prototype.downvote = function( cb) {
+      this.date = Date.now();
       common.downvote(this,cb);
    };
 
@@ -43,6 +45,7 @@ module.exports = function(Subarticle) {
    Subarticle.beforeValidate = function (next) {
       //TODO Pre validation of subarticle server side
       this._votes.rating = this._votes.up - this._votes.down;
+      this.date = Date.now();
       next();
    };
 };

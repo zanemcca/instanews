@@ -5,6 +5,7 @@ app.controller('ArticleCtrl', [
       '$stateParams',
       '$ionicPopover',
       '$ionicModal',
+      '$filter',
       'Article',
       'Subarticle',
       'Comment',
@@ -15,6 +16,7 @@ app.controller('ArticleCtrl', [
          $stateParams,
          $ionicPopover,
          $ionicModal,
+         $filter,
          Article,
          Subarticle,
          Comment,
@@ -35,15 +37,24 @@ app.controller('ArticleCtrl', [
       text: ''
    };
 
+   var lastUpdate = new Date(1975,1);
+
+   var loadLimit = 1;
+
    var filter = {
-      limit: 2,
+      limit: loadLimit,
       skip: 0,
-      order: '_votes.rating DESC'
+      order: '_votes.rating DESC',
+      where: {
+         date: {gt: lastUpdate}
+      }
    }
 
    var getSubarticles = function(cb) {
 
-      filter.skip = 0
+      filter.skip = 0;
+      lastUpdate = new Date(1975,1);
+      filter.where.date.gt = lastUpdate;
       Article.subarticles({id: $stateParams.id, filter: filter})
       .$promise
       .then( function (res) {
@@ -55,21 +66,18 @@ app.controller('ArticleCtrl', [
 
    getSubarticles();
 
+   //TODO Only load modified or new subarticles
+   //    not all of them. I think server side session
+   //    management is the key
    $scope.loadMore = function () {
-      filter.skip += filter.limit;
-      //TODO dynamic filter limit based on users speed
+      filter.limit = $scope.subarticles.length + loadLimit;
+      //TODO Dynamic loadLimit based on scroll speed & ping time
 
-      var subarticlesCount;
-
-      Article.subarticles.count({id : $stateParams.id})
+      Article.subarticles.count({id: $stateParams.id})
       .$promise
-      .then( function (res) {
-         var count = res.count;
+      .then ( function (res) {
 
-         if (count <= filter.skip + filter.limit ) {
-            console.log('No more items');
-            $scope.itemsAvailable = false;
-         }
+         var count = res.count;
 
          Article.subarticles({
             id: $stateParams.id,
@@ -77,12 +85,47 @@ app.controller('ArticleCtrl', [
          })
          .$promise
          .then( function (res) {
-            //POSSIBLY DANGEROUS - NOT SURE ABOUT ORDERING WITH FOREACH
-            //TODO Clean this up so that we are not getting duplicates
-            //    from the server due to reordering
-            angular.forEach(res, function(item) {
-               $scope.subarticles.push(item);
-            });
+            if (res.length === count) {
+               console.log('No more items');
+               $scope.itemsAvailable = false;
+            }
+            for(var j = 0; j < res.length; j++) {
+               item = res[j];
+               var update = false;
+               for(var i = 0; i < $scope.subarticles.length; i++ ) {
+                  var sub = $scope.subarticles[i];
+                  if( sub.myId === item.myId) {
+                     update = true;
+                     if ( Date.parse(sub.date) < Date.parse(item.date)) {
+                        //Only update the votes for now so that media doesn't
+                        //have to reload
+                        sub._votes = item._votes;
+                        sub.date = item.date;
+
+                        console.log('Updated: ' + item.text);
+                        console.log('@ ' + item.date);
+                        if ( item._file) {
+                           console.log(item._file.name);
+                        }
+                     }
+                     break;
+                  }
+               }
+               if(!update) {
+                  $scope.subarticles.push(item);
+               }
+
+               /*
+               //Set our last update as the latest updated article we recieve back
+               //This makes sure there is no possibility of forming gaps .
+               var tempDate = Date.parse(item._votes.lastUpdated);
+               if ( lastUpdate < tempDate) {
+                  console.log('lastUpdate: ' + lastUpdate + '\tRemote: ' + tempDate);
+                  lastUpdate = tempDate;
+                 // filter.where.date.gt = lastUpdate;
+               }
+               */
+            }
          });
       });
 
