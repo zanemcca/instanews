@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <ion-view view-title="Map" hide-nav-bar="true">
    <ion-content scroll="false">
-      <div class="item item-dark range range-calm">
+      <div class="item item-dark range" ng-class="{'range-assertive' : mPos.limit , 'range-calm' : !mPos.limit}">
          <i class="icon ion-location"></i>
          <input type="range" name="radius" min="0" max="500" ng-model="mPos.radSlider">
          <i class="icon ion-earth"></i>

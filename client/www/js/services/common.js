@@ -35,15 +35,15 @@ app.service('Common', [
       if (newValue !== oldValue) {
          var radius = slideToRad(newValue);
 
-         if (radius < mPosition.accuracy) {
+         if (radius <= mPosition.accuracy) {
             mPosition.radSlider = radToSlide(mPosition.accuracy);
-            //TODO Use this limit instead of checking everywhere
             mPosition.limit = true;
          }
          else {
-            mPosition.radius = radius;
             mPosition.limit = false;
          }
+
+         mPosition.radius = radius;
       }
    }, true);
 

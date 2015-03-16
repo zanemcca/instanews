@@ -1,19 +1,44 @@
 var app = angular.module('instanews.map', ['ionic', 'ngResource']);
 
-app.controller('MapCtrl', ['$scope', '$ionicLoading','$compile','Common', function($scope, $ionicLoading, $compile, Common) {
+app.controller('MapCtrl', [
+      '$scope',
+      '$ionicLoading',
+      '$compile',
+      'Common',
+      function($scope,
+         $ionicLoading,
+         $compile,
+         Common) {
 
    $scope.articles = Common.articles;
    $scope.mPos = Common.mPosition;
 
    var map, myCircle;
+   var posWatch;
    var markers = [];
+
    var northPole = new google.maps.LatLng(90.0000, 0.0000);
    var southPole = new google.maps.LatLng(-90.0000, 0.0000);
 
+   //Reload the markers when we recieve new articles
    $scope.$watch('articles', function (newValue, oldValue) {
       if (newValue !== oldValue) getMarkers();
    }, true);
 
+   //Watch our accuracy so that we always know if we hit our limit
+   $scope.$watch('mPos.accuracy', function(newValue, oldValue) {
+      if (newValue !== oldValue) {
+         if (newValue >= $scope.mPos.radius) {
+            $scope.mPos.limit = true;
+            $scope.mPos.radius =  newValue;
+         }
+         else {
+            $scope.mPos.limit = false;
+         }
+      }
+   });
+
+   //Update our circle and markers when the radius changes
    $scope.$watch('mPos.radius', function (newValue, oldValue) {
       if (newValue !== oldValue) {
          updateMyCircle();
@@ -21,7 +46,11 @@ app.controller('MapCtrl', ['$scope', '$ionicLoading','$compile','Common', functi
       }
    }, true);
 
+   //Update the markers on the map
    function updateMarkers() {
+      if( markers.length === 0) {
+         getMarkers();
+      }
       angular.forEach( markers, function (marker) {
          if (!Common.withinRange({lat: marker.position.k, lng: marker.position.D})) {
             marker.setVisible(false);
@@ -30,12 +59,13 @@ app.controller('MapCtrl', ['$scope', '$ionicLoading','$compile','Common', functi
       });
    }
 
+   //Get the markers initially
    function getMarkers() {
       //TODO only update the changed ones not all
-      angular.forEach( markers, function( marker) {
-         marker.setMap(null);
-      });
-      markers.length = 0;
+      for( var i = 0 ; i < markers.length ; i++) {
+         markers[i].setMap(null);
+      }
+      markers = [];
 
       var tempMarker = {
          map: map,
@@ -50,31 +80,25 @@ app.controller('MapCtrl', ['$scope', '$ionicLoading','$compile','Common', functi
          */
       };
 
-      for(i = 0; i < $scope.articles.length; i++) {
+      for( var i = 0; i < $scope.articles.length; i++) {
          tempMarker.position = new google.maps.LatLng($scope.articles[i].location.lat, $scope.articles[i].location.lng);
          tempMarker.title = $scope.articles[i].title;
 //         tempMarker.icon.url = 'img/ionic.png';
 
-         if ( Common.withinRange($scope.articles[i].location)) {
+         if (!Common.withinRange($scope.articles[i].location)) {
             tempMarker.visible = false;
          }
          markers.push(new google.maps.Marker(tempMarker));
       }
    }
 
+   //Update my circle
    function updateMyCircle() {
-      if ($scope.mPos.radius < $scope.mPos.accuracy) {
-         myCircle.setOptions({
-            radius: $scope.mPos.accuracy,
-            fillColor: 'red'
-         });
+      if( !myCircle) {
+         drawMyCircle();
       }
-      else {
-         myCircle.setOptions({
-            radius: $scope.mPos.radius,
-            fillColor: 'blue',
-         });
-      }
+
+      myCircle.setRadius($scope.mPos.radius);
       //Update the map to contain the circle
       var bounds = myCircle.getBounds();
       map.fitBounds(bounds);
@@ -86,7 +110,7 @@ app.controller('MapCtrl', ['$scope', '$ionicLoading','$compile','Common', functi
       }
    }
 
-
+   //Draw my circle initially
    function drawMyCircle() {
       var options = {
          strokeColor: 'blue',
@@ -97,8 +121,7 @@ app.controller('MapCtrl', ['$scope', '$ionicLoading','$compile','Common', functi
          map: map,
          center: new google.maps.LatLng($scope.mPos.lat,$scope.mPos.lng)
       };
-      if ($scope.mPos.radius < $scope.mPos.accuracy) options.radius = $scope.mPos.accuracy;
-      else options.radius = $scope.mPos.radius;
+      options.radius = $scope.mPos.radius;
 
       myCircle = new google.maps.Circle(options);
       map.fitBounds(myCircle.getBounds());
@@ -106,81 +129,53 @@ app.controller('MapCtrl', ['$scope', '$ionicLoading','$compile','Common', functi
       $scope.mPos.radSlider = Common.radToSlide(options.radius);
    }
 
+   //Update our position
+   function updatePosition(position) {
+      $scope.mPos.lat = position.coords.latitude;
+      $scope.mPos.lng = position.coords.longitude;
+      $scope.mPos.accuracy = position.coords.accuracy;
+
+      updateMyCircle();
+      updateMarkers();
+   }
+
+   //Error callback
    var error = function(err) {
       console.log(err);
    };
 
+   //Initialize the map
     var initializeMap = function() {
-
-      var zoom = 8;
-
       var mPosition = new google.maps.LatLng($scope.mPos.lat,$scope.mPos.lng);
 
       var mapOptions = {
          center: mPosition,
-         zoom: zoom,
+         zoom: 8,
          mapTypeId: google.maps.MapTypeId.ROADMAP
       };
 
       // Load the map
       map = new google.maps.Map(document.getElementById("map"), mapOptions);
 
+      posWatch = navigator.geolocation.watchPosition( updatePosition, error, {enableHighAccuracy: true});
 
-      navigator.geolocation.getCurrentPosition( function(position) {
-         $scope.mPos.lat = position.coords.latitude;
-         $scope.mPos.lng = position.coords.longitude;
-         /*
-         $scope.mPos.lat = 43.7000;
-         $scope.mPos.lng = -79.4000;
-         */
-         $scope.mPos.accuracy = position.coords.accuracy;
-         mPosition = new google.maps.LatLng($scope.mPos.lat,$scope.mPos.lng);
-         map.setCenter(mPosition);
-         drawMyCircle();
-         getMarkers();
-      }, error, {enableHighAccuracy: true});
-       /*
-      //Cordova Google Map native plugin
-
-      var div = document.getElementById("map_canvas");
-      map = plugin.google.maps.Map.getMap(div);
-      */
-
-      //Google maps implementation
-
-//      var myLatlng = new google.maps.LatLng(mLat,mLng);
-
-       /*
-      //Bing maps implementation
-       var mapOptions = {
-           credentials: "Ao1m9sBT9kMrHEzRKteLvqHeNBvSGA8LNXusHmwiL9Rz7Eck1bKU7OQ3WHh8fESs",
-           mapTypeId: Microsoft.Maps.MapTypeId.road,
-           center: new Microsoft.Maps.Location(mLat,mLng),
-           zoom: 11
-       };
-       var map = new Microsoft.Maps.Map(document.getElementById("map"), mapOptions);
-       */
+      //Refresh the map everytime we enter the view
+      $scope.$on('$ionicView.enter', function() {
+         google.maps.event.trigger(map, 'resize');
+      });
 
     };
 
+
+    //Wait for the device to be ready and then load the map
+    //TODO Re initialize the map
     ionic.DomUtil.ready( function() {
-       if (navigator.userAgent.match(/(iPhone|iPod|Android|BlackBerry)/)) {
+       if (navigator.userAgent.match(/(iPhone|iPod|Android|BlackBerry)/)) { //Mobile map load
           document.addEventListener("deviceready", initializeMap, false);
-       } else {
+       } else { //Web version
           initializeMap();
        }
-       console.log(navigator.userAgent);
     });
 
-    /*
-    ionic.DomUtil.ready( function() {
-       console.log("Running Dom Util")
-       document.addEventListener("deviceready", function() {
-         var div = document.getElementById("map_canvas");
-         map = plugin.google.maps.Map.getMap(div);
-          console.log("Running event listener")
-       }, false);
-    });
-    */
 }]);
 
