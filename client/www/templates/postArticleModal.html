@@ -6,24 +6,27 @@
       <button class="button button-clear icon ion-forward" ng-click="postArticle()"
          ng-disabled="!newArticle.title"></button>
    </ion-header-bar>
-   <ion-content scroll=false>
+   <ion-content >
       <div class="list">
          <label class="item item-input">
             <input type="text" placeholder="Title" ng-model="newArticle.title" required>
          </label>
          <div class="item item-input item-stacked-label">
             <span class="input-label">
-               <div ng-if="!newArticle.posName">
+               <div ng-if="!newArticle.place.name">
                   Location
                </div>
-               <div ng-if="newArticle.posName">
+               <div ng-if="newArticle.place.name">
                   {{newArticle.posName}}
                </div>
             </span>
             <div class="item item-icon-right no-padding" style="border:0px;">
-               <div  style="width:60%">
-                  <input type="search" placeholder="Search"
-                     ng-model="newArticle.posSearch">
+               <div data-tap-disabled="true" style="width:60%">
+                  <input type="text" ng-autocomplete placeholder="Search" ng-model="newArticle.search">
+                     <!--
+                  <input id="placeSearch" type="text" placeholder="Search"
+                     googleplace="">
+                  -->
                </div>
                <div class="icon">
                   <button class="button button-clear ion-location"
@@ -36,9 +39,11 @@
       </div>
    </ion-content>
    <ion-footer-bar class="bar-dark">
+      <div class="row">
          <button class="button button-clear icon ion-camera"></button>
          <button class="button button-clear icon ion-compose"></button>
          <button class="button button-clear icon ion-videocamera"></button>
          <button class="button button-clear icon ion-mic-b"></button>
+      </div>
    </ion-footer-bar>
 </ion-modal-view>

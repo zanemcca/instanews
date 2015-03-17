@@ -25,3 +25,9 @@
 .scroll {
    height: 100%;
 }
+
+.pac-container {
+   /* This only fixes autocomplete on browsers not mobile */
+   pointer-events: visibleStroke !important;
+}
+

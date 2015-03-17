@@ -1,4 +1,4 @@
-var app = angular.module('instanews.feed', ['ionic', 'ngResource']);
+var app = angular.module('instanews.feed', ['ionic', 'ngResource','ngAutocomplete']);
 
 app.controller('FeedCtrl', [
       '$scope',
@@ -24,8 +24,7 @@ app.controller('FeedCtrl', [
 
    $scope.newArticle = {
       title: '',
-      posSearch: '',
-      posName: ''
+      search: ''
    };
 
    $ionicModal.fromTemplateUrl('templates/postArticleModal.html', {
@@ -35,6 +34,20 @@ app.controller('FeedCtrl', [
       $scope.postArticleModal = modal;
    });
 
+   var autocomplete;
+   $scope.$on('modal.shown', function(modal) {
+      //TODO Add data-tap-disabled='true' to pac-container class. I think that should
+      //solve the long press required on the google maps autocomplete
+
+      /*
+      // My implementation of the autocomplete
+      autocomplete = new google.maps.places.Autocomplete(document.getElementById('placeSearch'));
+      google.maps.event.addListener(autocomplete, 'place_changed', function() {
+         $scope.newArticle.place = autocomplete.getPlace();
+      });
+      */
+   });
+
    $scope.trashArticle = function() {
       $scope.newArticle.title = '';
       $scope.postArticleModal.hide();
@@ -42,20 +55,23 @@ app.controller('FeedCtrl', [
 
    $scope.useMyLocation = function() {
       //TODO Change this to lookup the name of the user location
-      $scope.newArticle.posName = 'My Location';
+      $scope.newArticle.search = 'My Location';
    };
 
+
+
    $scope.postArticle = function() {
-      if ( $scope.newArticle.posSearch ) {
+      if ( $scope.newArticle.search ) {
          //TODO Lookup the lat-lng
-         $scope.newArticle.posName = 'My Location';
+         $scope.newArticle.search = 'My Location';
          loc = {
             lat: Common.mPosition.lat,
             lng: Common.mPosition.lng
          }
       }
       else {
-         $scope.newArticle.posName = 'My Location';
+         $scope.newArticle.search = 'My Location';
+         loc = $scope.newArticle.place.
          loc = {
             lat: Common.mPosition.lat,
             lng: Common.mPosition.lng
