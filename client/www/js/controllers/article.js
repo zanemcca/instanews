@@ -39,22 +39,22 @@ app.controller('ArticleCtrl', [
 
    var lastUpdate = new Date(1975,1);
 
-   var loadLimit = 1;
+   var loadLimit = 10;
 
    var filter = {
       limit: loadLimit,
       skip: 0,
-      order: '_votes.rating DESC',
+      order: 'rating DESC'/*,
       where: {
          date: {gt: lastUpdate}
-      }
+      }*/
    }
 
    var getSubarticles = function(cb) {
 
       filter.skip = 0;
-      lastUpdate = new Date(1975,1);
-      filter.where.date.gt = lastUpdate;
+ //     lastUpdate = new Date(1975,1);
+ //     filter.where.date.gt = lastUpdate;
       Article.subarticles({id: $stateParams.id, filter: filter})
       .$promise
       .then( function (res) {

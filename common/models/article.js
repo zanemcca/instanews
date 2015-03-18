@@ -5,6 +5,8 @@ var app =
 
 module.exports = function(Article) {
 
+   common.initVotes(Article);
+
    var staticDisable = [
       'exists',
       'updateAll'
@@ -19,35 +21,21 @@ module.exports = function(Article) {
       '__link__journalists',
       '__destroyById__journalists',
       '__delete__journalists',
-      '__delete__subarticles',
-      '__destroy__votes',
-      '__update__votes',
-      '__create__votes'
+      '__delete__subarticles'
    ];
 
    common.disableRemotes(Article,staticDisable,true);
    common.disableRemotes(Article,nonStaticDisable,false);
 
+   /*
+   Article.afterRemote('find', function(ctx, articles, next) {
 
-   //Upvote function
-   Article.prototype.upvote = function( cb) {
-      common.upvote(this,cb);
-   };
-
-   Article.remoteMethod( 'upvote', {
-      isStatic: false,
-      http: { path: '/upvote',  verb: 'post'},
-      returns: { arg: 'instance', type: 'string'}
+      for(var i = 0; i < articles.length; i++) {
+         articles[i].__count__upVotes(function (res) {
+            console.log('upVotes ', res);
+         });
+      }
+      next();
    });
-
-   //Downvote function
-   Article.prototype.downvote = function( cb) {
-      common.downvote(this,cb);
-   };
-
-   Article.remoteMethod( 'downvote', {
-      isStatic: false,
-      http: { path: '/downvote',  verb: 'post'},
-      returns: { arg: 'instance', type: 'string'}
-   });
+   */
 };

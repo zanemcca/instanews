@@ -1,5 +1,5 @@
 
-exports.disableRemotes = function(Model,list,isStatic) {
+ var disableRemotes = function(Model,list,isStatic) {
    /*
    if (isStatic) {
       console.log('\nDisabling staic remote methods on ' + Model.modelName);
@@ -15,6 +15,7 @@ exports.disableRemotes = function(Model,list,isStatic) {
    }
 };
 
+/*
 exports.upvote = function(Model,cb) {
    Model._votes.up++;
    var currentTime = Date.now();
@@ -36,3 +37,22 @@ exports.downvote = function(Model,cb) {
    Model._votes.rating = Model._votes.up - Model._votes.down;
    Model.save(cb);
 };
+*/
+
+var initVotes = function(Model) {
+   var staticDisable = [
+   ];
+
+   var nonStaticDisable = [
+      '__updateById__upVotes',
+      '__delete__upVotes',
+      '__delete__downVotes',
+      '__updateById__downVotes'
+   ];
+
+   disableRemotes(Model,staticDisable,true);
+   disableRemotes(Model,nonStaticDisable,false);
+};
+
+exports.initVotes = initVotes;
+exports.disableRemotes = disableRemotes;

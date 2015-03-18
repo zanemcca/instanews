@@ -83,42 +83,62 @@ app.service('Common', [
       }
    };
 
-   //Instance methods **TODO get rid of copy and make this work
-   //                   -> No documentation for instance remoteMethods for loopback
    var upvote = function (instance) {
-      //For some reason the instance call replaces
-      //the calling instance with the return value
-      //so make a copy of the instance for now
+      //Since comments are nested the constructor actually belongs
+      //to the parent model so we have to specifically check for it
       if ( instance.commentableId ) {
-         Comment.prototype$upvote({id: instance.myId})
+         Comment.prototype$__create__upVotes({
+            id: instance.myId,
+            votableId: instance.myId,
+            votableType: "comment"
+         })
          .$promise
          .then( function(res) {
-            instance._votes = res.instance._votes;
+            instance.upVoteCount = res.upVoteCount;
+            instance.rating = res.rating;
+            console.log('Upvote ', res);
          });
       }
       else {
-         var copy = angular.copy(instance);
-         copy.$prototype$upvote({id: instance.myId})
-         .then( function (res) {
-            instance._votes = res.instance._votes;
+         instance.constructor.prototype$__create__upVotes({
+            id: instance.myId,
+            votableId: instance.myId,
+            votableType: instance.constructor.modelName.toLowerCase()
+         })
+         .$promise
+         .then( function(res) {
+            instance.upVoteCount = res.upVoteCount;
+            instance.rating = res.rating;
+            console.log('Upvote ', res);
          });
       }
    };
 
    var downvote = function (instance) {
-      // ^^^ DITTO
       if ( instance.commentableId ) {
-         Comment.prototype$downvote({id: instance.myId})
+         Comment.prototype$__create__downVotes({
+            id: instance.myId,
+            votableId: instance.myId,
+            votableType: "comment"
+         })
          .$promise
          .then( function(res) {
-            instance._votes = res.instance._votes;
+            instance.downVoteCount = res.downVoteCount;
+            instance.rating = res.rating;
+            console.log('Down ', res);
          });
       }
       else {
-         var copy = angular.copy(instance);
-         copy.$prototype$downvote({id: instance.myId})
-         .then( function (res) {
-            instance._votes = res.instance._votes;
+         instance.constructor.prototype$__create__downVotes({
+            id: instance.myId,
+            votableId: instance.myId,
+            votableType: instance.constructor.modelName.toLowerCase()
+         })
+         .$promise
+         .then( function(res) {
+            instance.downVoteCount = res.downVoteCount;
+            instance.rating = res.rating;
+            console.log('Down ', res);
          });
       }
    };

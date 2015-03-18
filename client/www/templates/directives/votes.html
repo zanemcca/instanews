@@ -1,11 +1,12 @@
 <!DOCTYPE html>
+<!--TODO spell votable correctly -->
 <button class="item button button-clear button-small button-balanced ion-arrow-up-b"
    ng-click="Common.upvote(voteable)">
-    {{voteable._votes.up}}
+    {{voteable.upVoteCount}}
  </button>
 <button class="item button button-clear button-small button-assertive ion-arrow-down-b"
   ng-click="Common.downvote(voteable)">
-   {{voteable._votes.down}}
+   {{voteable.downVoteCount}}
 </button>
 <div ng-if="!voteable._file">
    <div class="item-icon-right">

@@ -10,7 +10,7 @@
       </ion-refresher>
       <ul class="list">
          <ion-item class="no-padding card"
-         ng-repeat="subarticle in subarticles | orderBy: '-(_votes.rating)'">
+         ng-repeat="subarticle in subarticles | orderBy: '-(rating)'">
             <div class="item item-avatar item-text-wrap" style="min-height:65px" >
                <img src="img/ionic.png">
                <a class="button button-clear no-padding button-small"
@@ -25,7 +25,7 @@
                </votes>
             </div>
 
-            <div class="item item-body no-padding" ng-if="subarticle._file">
+            <div class="item item-body" ng-if="subarticle._file">
                <file-item></file-item>
             </div>
 

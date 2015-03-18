@@ -1,21 +1,13 @@
+var common = require('./common');
+
 module.exports = function(Votes) {
+   common.initVotes(Votes);
 
-   //Upvoting function
-   Votes.upvote = function(cb) {
-      console.log('Made it into Votes.upvote');
-      Votes.up++;
-      var currentTime = Date.now();
-      //Update the instantaneous rate
-      Votes.rate = 1/(currentTime - Votes.lastUpdated);
-      Votes.lastUpdated = currentTime;
-      console.log('Made it through Votes.upvote');
-      cb();
-   };
-
-   /*
-   Votes.remoteMethod( 'upvote', {
-      http: { path: '/upvote', verb: 'post' },
-      returns: { arg: 'status', type: 'string'}
+   Votes.observe('before save', function(ctx, next) {
+      if ( ctx.instance) {
+         ctx.instance.rating = ctx.instance.upVoteCount -
+                              ctx.instance.downVoteCount;
+      }
+      next();
    });
-   */
 };

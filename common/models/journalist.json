@@ -11,10 +11,10 @@
       "type": "string"
     },
     "username": {
-       "type": "string",
-       "required": true,
-       "id": true,
-       "index": true
+      "type": "string",
+      "id": true,
+      "required": true,
+      "index": true
     }
   },
   "validations": [],
@@ -27,6 +27,14 @@
     "votes": {
       "type": "embedsOne",
       "model": "votes"
+    },
+    "upVotes": {
+      "type": "hasMany",
+      "model": "upVote"
+    },
+    "downVotes": {
+      "type": "hasMany",
+      "model": "downVote"
     }
   },
   "acls": [
@@ -63,6 +71,27 @@
       "principalId": "$everyone",
       "permission": "DENY",
       "property": "find"
+    },
+    {
+      "accessType": "EXECUTE",
+      "principalType": "ROLE",
+      "principalId": "$everyone",
+      "permission": "ALLOW",
+      "property": "__get__downVotes"
+    },
+    {
+      "accessType": "EXECUTE",
+      "principalType": "ROLE",
+      "principalId": "$everyone",
+      "permission": "ALLOW",
+      "property": "__get__upVotes"
+    },
+    {
+      "accessType": "EXECUTE",
+      "principalType": "ROLE",
+      "principalId": "$owner",
+      "permission": "ALLOW",
+      "property": "__link__upVotes"
     },
     {
       "accessType": "EXECUTE",

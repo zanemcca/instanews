@@ -36,7 +36,7 @@
     "public": true
   },
   "votes": {
-    "dataSource": "Articles",
+    "dataSource": null,
     "public": false
   },
   "journalist": {
@@ -53,6 +53,18 @@
   },
   "file": {
     "dataSource": "Articles",
+    "public": false
+  },
+  "upVote": {
+    "dataSource": "Articles",
     "public": true
+  },
+  "downVote": {
+    "dataSource": "Articles",
+    "public": true
+  },
+  "vote": {
+    "dataSource": null,
+    "public": false
   }
 }

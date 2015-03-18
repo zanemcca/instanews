@@ -27,7 +27,7 @@ before( function(done) {
 describe('Articles', function() {
 
    it('User should be able to upvote an article', function(done) {
-      api.post('/api/articles/1/upvote')
+      api.post('/api/articles/1/upVotes')
       .set('Authorization', token.id)
       .expect(200)
       .end( function(err, res) {
@@ -37,7 +37,7 @@ describe('Articles', function() {
    });
 
    it('User should be able to downvote an article', function(done) {
-      api.post('/api/articles/1/downvote')
+      api.post('/api/articles/1/downVotes')
       .set('Authorization', token.id)
       .expect(200)
       .end( function(err, res) {
@@ -107,9 +107,9 @@ describe('Articles', function() {
             "isPrivate": false,
             "date": "2015-02-10T12:48:43.511Z",
             "_votes": {
-               "up": 50,
-               "down": 5,
                "rate": 5,
+                "rating": 0,
+                "myId": 200,
                "lastUpdated": "2015-02-10T12:48:43.511Z",
             },
             "myId": 200,
@@ -122,9 +122,9 @@ describe('Articles', function() {
            "content": "Nuts!",
            "date": "2015-02-06T12:48:43.511Z",
            "_votes": {
-             "up": 2,
-             "down": 1,
              "rate": 1,
+             "rating": 0,
+             "myId": 201,
              "lastUpdated": "2015-02-06T12:48:43.511Z"
            },
            "myId": 201,
@@ -226,7 +226,7 @@ describe('Subarticles', function() {
    });
 
    it('User should be able to upvote a subarticle', function(done) {
-      api.post('/api/subarticles/1/upvote')
+      api.post('/api/subarticles/1/upVotes')
       .set('Authorization', token.id)
       .expect(200)
       .end( function(err, res) {
@@ -236,7 +236,7 @@ describe('Subarticles', function() {
    });
 
    it('User should be able to downvote a subarticle', function(done) {
-      api.post('/api/subarticles/1/downvote')
+      api.post('/api/subarticles/1/downVotes')
       .set('Authorization', token.id)
       .expect(200)
       .end( function(err, res) {
@@ -278,9 +278,9 @@ describe('Subarticles', function() {
             "parentId": 1,
             "date": "2015-02-08T12:48:43.511Z",
             "_votes" : {
-               "up": 5,
-               "down": 50,
                "rate": -6,
+                "rating": 0,
+                "myId": 302,
                "lastUpdated" : "2015-02-08T12:48:43.511Z"
             }
          };
@@ -288,9 +288,9 @@ describe('Subarticles', function() {
            "content": "Nuts!",
            "date": "2015-02-06T12:48:43.511Z",
            "_votes": {
-             "up": 2,
-             "down": 1,
              "rate": 1,
+             "rating": 0,
+             "myId": 301,
              "lastUpdated": "2015-02-06T12:48:43.511Z"
            },
            "myId": 200,
@@ -443,9 +443,9 @@ describe('Comments', function() {
         "content": "Nuts!",
         "date": "2015-02-06T12:48:43.511Z",
         "_votes": {
-          "up": 2,
-          "down": 1,
           "rate": 1,
+          "rating": 0,
+          "myId": 300,
           "lastUpdated": "2015-02-06T12:48:43.511Z"
         },
         "myId": 300,
@@ -468,7 +468,7 @@ describe('Comments', function() {
    });
 
    it('User should be able to upvote an comment', function(done) {
-      api.post('/api/comments/1/upvote')
+      api.post('/api/comments/1/upVotes')
       .set('Authorization', token.id)
       .expect(200)
       .end( function(err, res) {
@@ -478,7 +478,7 @@ describe('Comments', function() {
    });
 
    it('User should be able to downvote an comment', function(done) {
-      api.post('/api/comments/1/downvote')
+      api.post('/api/comments/1/downVotes')
       .set('Authorization', token.id)
       .expect(200)
       .end( function(err, res) {

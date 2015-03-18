@@ -1,0 +1,28 @@
+{
+  "name": "vote",
+  "base": "PersistedModel",
+  "idInjection": true,
+  "properties": {
+    "myId": {
+      "type": "number",
+      "id": true,
+      "index": true
+    },
+     "date" : {
+        "type" : "date"
+     }
+  },
+  "validations": [],
+  "relations": {
+    "journalist": {
+      "type": "belongsTo",
+      "model": "journalist"
+    },
+    "votable": {
+      "type": "belongsTo",
+      "polymorphic": true
+    }
+  },
+  "acls": [],
+  "methods": []
+}

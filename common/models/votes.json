@@ -1,40 +1,44 @@
 {
   "name": "votes",
-  "base": "Model",
+  "base": "PersistedModel",
   "strict": false,
   "idInjection": false,
   "properties": {
-    "up": {
-      "type": "number"
-    },
-    "down": {
-      "type": "number"
-    },
     "rate": {
       "type": "number"
     },
-    "ranking": {
+    "rating": {
       "type": "number"
     },
-    "lastUpdated": {
+    "myId": {
+      "type": "number",
+      "id": true,
+      "required": true,
+      "index": true
+    },
+    "date": {
       "type": "date"
     }
   },
   "validations": [],
-  "relations": {},
+  "relations": {
+    "upVotes": {
+      "type": "hasMany",
+      "polymorphic": "votable",
+      "model": "upVote"
+    },
+    "downVotes": {
+      "type": "hasMany",
+      "polymorphic": "votable",
+      "model": "downVote"
+    }
+  },
   "acls": [
     {
       "accessType": "*",
       "principalType": "ROLE",
       "principalId": "$everyone",
-      "permission": "DENY"
-    },
-    {
-      "accessType": "EXECUTE",
-      "principalType": "ROLE",
-      "principalId": "$authenticated",
-      "permission": "ALLOW",
-      "property": "upvote"
+      "permission": "ALLOW"
     }
   ],
   "methods": []

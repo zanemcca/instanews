@@ -2,6 +2,8 @@ var common = require('./common');
 
 module.exports = function(Comment) {
 
+   common.initVotes(Comment);
+
    var staticDisable = [
       'create',
       'find',
@@ -19,28 +21,6 @@ module.exports = function(Comment) {
    common.disableRemotes(Comment,staticDisable,true);
    common.disableRemotes(Comment,nonStaticDisable,false);
 
-   //Upvote function
-   Comment.prototype.upvote = function( cb) {
-      common.upvote(this,cb);
-   };
-
-   Comment.remoteMethod( 'upvote', {
-      isStatic: false,
-      http: { path: '/upvote',  verb: 'post'},
-      returns: { arg: 'instance', type: 'string'}
-   });
-
-   //Downvote function
-   Comment.prototype.downvote = function( cb) {
-      common.downvote(this,cb);
-   };
-
-   Comment.remoteMethod( 'downvote', {
-      isStatic: false,
-      http: { path: '/downvote',  verb: 'post'},
-      returns: { arg: 'instance', type: 'string'}
-   });
-
    Comment.beforeValidate = function(next) {
 
       if (!this.myId) {
@@ -51,6 +31,7 @@ module.exports = function(Comment) {
 
       this.date =  Date.now();
 
+      /*
       if (!this._votes) {
          this._votes = {
                up: 0,
@@ -58,6 +39,7 @@ module.exports = function(Comment) {
                lastUpdated: Date.now()
          };
       }
+      */
       next();
    };
 };

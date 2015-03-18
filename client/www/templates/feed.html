@@ -9,7 +9,7 @@
       <ion-refresher pulling-text="Fresh Stuff" on-refresh="onRefresh()">
       </ion-refresher>
       <ul class="list">
-         <ion-item class="no-padding card" ng-repeat="article in articles | orderBy: '-(_votes.up - _votes.down)'">
+         <ion-item class="no-padding card" ng-repeat="article in articles | orderBy: '-(rating)'">
             <div class="item item-avatar item-text-wrap" style="min-height:65px" >
                <img src="img/ionic.png">
                <a class="button button-clear no-padding button-small"

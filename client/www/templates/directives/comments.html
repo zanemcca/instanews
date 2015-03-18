@@ -12,7 +12,7 @@
    <div ng-if="owner.showComments">
       <ul class="list">
          <li class="item no-padding"
-         ng-repeat="comment in owner.comments | orderBy: '-(_votes.up - _votes.down)'">
+         ng-repeat="comment in owner.comments | orderBy: '-(rating)'">
             <div class="item item-avatar item-text-wrap item-divider"
                style="padding-bottom: 0px; border-bottom-color: transparent">
                <img src="img/ionic.png">
@@ -30,7 +30,7 @@
          </li>
       </ul>
       <form name="form" class="item no-padding" style="border-color: transparent">
-         <div style="padding-right:60px">
+         <div style="width:100%; padding-right:60px">
             <textarea type="text" ng-model="newComment" placeholder="Comment" required></textarea>
          </div>
          <div class="item-icon-right">

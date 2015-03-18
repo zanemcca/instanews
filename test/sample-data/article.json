@@ -9,9 +9,9 @@
          "lng": -65.38210
       },
       "_votes" : {
-         "up": 0,
-         "down": 0,
          "rate": 0,
+         "rating": 0,
+         "myId": 60,
          "lastUpdated" : "2015-02-06T12:48:43.511Z"
       }
    }

@@ -6,9 +6,8 @@
       "parentId": 1,
       "date": "2015-02-06T12:48:43.511Z",
       "_votes" : {
-         "up": 0,
-         "down": 0,
          "rate": 0,
+         "myId": 1,
          "rating": 0,
          "lastUpdated" : "2015-02-06T12:48:43.511Z"
       }
@@ -19,9 +18,8 @@
       "parentId": 1,
       "date": "2015-02-06T02:48:43.511Z",
       "_votes" : {
-         "up": 0,
-         "down": 0,
          "rate": 0,
+         "myId": 2,
          "rating": 0,
          "lastUpdated" : "2015-02-06T02:48:43.511Z"
       },
@@ -39,8 +37,7 @@
       "parentId": 200,
       "date": "2015-02-06T02:48:43.511Z",
       "_votes" : {
-         "up": 0,
-         "down": 0,
+         "myId": 4,
          "rate": 0,
          "rating": 0,
          "lastUpdated" : "2015-02-06T02:48:43.511Z"
@@ -52,8 +49,7 @@
       "parentId": 1,
       "date": "2015-02-06T03:48:43.511Z",
       "_votes" : {
-         "up": 0,
-         "down": 0,
+         "myId": 3,
          "rate": 0,
          "rating": 0,
          "lastUpdated" : "2015-02-06T03:48:43.511Z"

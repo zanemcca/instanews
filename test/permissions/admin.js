@@ -56,9 +56,9 @@ describe('Articles', function() {
          "isPrivate": false,
          "date": "2015-02-10T12:48:43.511Z",
          "_votes": {
-            "up": 50,
-            "down": 10,
             "rate": 5,
+            "rating": 0,
+            "myId": 100,
             "lastUpdated": "2015-02-10T12:48:43.511Z",
          },
          "myId": 100,
@@ -139,9 +139,9 @@ describe('Subarticles', function() {
              "title": "Sweet blazing glory",
              "text": "Holy crap look at that!",
              "_votes": {
-                  "up": 3,
-                  "down": 50,
                   "rate": -6,
+                  "rating": 0,
+                  "myId": 101,
                   "lastUpdated": "2015-02-06T12:48:43.511Z"
              },
              "date": "2015-02-06T12:48:43.511Z",
@@ -213,9 +213,9 @@ describe('Comments', function() {
         "content": "Nuts!",
         "date": "2015-02-06T12:48:43.511Z",
         "_votes": {
-          "up": 2,
-          "down": 1,
           "rate": 1,
+          "rating": 1,
+          "myId": 103,
           "lastUpdated": "2015-02-06T12:48:43.511Z"
         },
         "myId": 100,

@@ -1,0 +1,10 @@
+{
+  "name": "downVote",
+  "base": "vote",
+  "idInjection": true,
+  "properties": {},
+  "validations": [],
+  "relations": {},
+  "acls": [],
+  "methods": []
+}

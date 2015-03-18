@@ -1,21 +1,11 @@
 {
   "name": "comment",
-  "base": "PersistedModel",
+  "base": "votes",
   "idInjection": true,
   "properties": {
     "content": {
       "type": "string",
       "required": true
-    },
-    "date": {
-      "type": "date"
-    },
-    "myId": {
-      "type": "number",
-      "id": true,
-      "required": true,
-      "index": true
-
     }
   },
   "validations": [],
@@ -23,10 +13,6 @@
     "commentable": {
       "type": "belongsTo",
       "polymorphic": true
-    },
-    "votes": {
-      "type": "embedsOne",
-      "model": "votes"
     },
     "comments": {
       "type": "hasMany",
@@ -79,14 +65,14 @@
       "principalType": "ROLE",
       "principalId": "$authenticated",
       "permission": "ALLOW",
-      "property": "downvote"
+      "property": "__create__upVotes"
     },
     {
       "accessType": "EXECUTE",
       "principalType": "ROLE",
       "principalId": "$authenticated",
       "permission": "ALLOW",
-      "property": "upvote"
+      "property": "__create__downVotes"
     }
   ],
   "methods": []

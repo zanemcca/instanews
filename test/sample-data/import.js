@@ -16,6 +16,9 @@ module.exports = function (app, cb) {
    var RoleMapping = app.models.RoleMapping;
    var AccessToken = app.models.AccessToken;
 
+   var UpVotes = app.models.upVote;
+   var DownVotes = app.models.downVote;
+
    var ArticlesDB = app.datasources.Articles;
    var UserDB = app.datasources.Users;
    var db = app.datasources.db;
@@ -35,14 +38,19 @@ module.exports = function (app, cb) {
       Model.destroyAll( function(err) {
          if (err) return callb(err);
 
-         //Create a model instance for each member of the array
-         async.each(data, function (d, callback) {
-            Model.create(d, callback);
-         }, function(err, res) {
-            if(err) return callb(err);
+         if (data.length > 0) {
+            //Create a model instance for each member of the array
+            async.each(data, function (d, callback) {
+               Model.create(d, callback);
+            }, function(err, res) {
+               if(err) return callb(err);
 
-            callb(null, Model.modelName);
-         });
+               callb(null, Model.modelName);
+            });
+         }
+         else {
+            callb(null);
+         }
       });
    }
 
@@ -91,6 +99,8 @@ module.exports = function (app, cb) {
    async.series([
       importData.bind(null,Journalists, journalists),
       importData.bind(null,Articles, articles),
+      importData.bind(null,UpVotes, []),
+      importData.bind(null,DownVotes, []),
       importData.bind(null,Subarticles, subarticles),
       importData.bind(null,Comments, comments),
       createAdmin.bind(null),

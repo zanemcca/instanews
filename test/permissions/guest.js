@@ -11,7 +11,7 @@ describe('Articles', function() {
    });
 
    it('A guest should NOT be able to upvote an article', function(done) {
-      api.post('/api/articles/1/upvote')
+      api.post('/api/articles/1/upVotes')
       .expect(401)
       .end( function(err, res) {
          dump(err, res);
@@ -20,7 +20,7 @@ describe('Articles', function() {
    });
 
    it('A guest should NOT be able to downvote an article', function(done) {
-      api.post('/api/articles/1/downvote')
+      api.post('/api/articles/1/downVotes')
       .expect(401)
       .end( function(err, res) {
          dump(err, res);
@@ -69,7 +69,7 @@ describe('Articles', function() {
 describe('Subarticles', function() {
 
    it('A guest should NOT be able to upvote a subarticle', function(done) {
-      api.post('/api/subarticles/1/upvote')
+      api.post('/api/subarticles/1/upVotes')
       .expect(401)
       .end( function(err, res) {
          dump(err, res);
@@ -78,7 +78,7 @@ describe('Subarticles', function() {
    });
 
    it('A guest should NOT be able to downvote a subarticle', function(done) {
-      api.post('/api/subarticles/1/downvote')
+      api.post('/api/subarticles/1/downVotes')
       .expect(401)
       .end( function(err, res) {
          dump(err, res);
@@ -188,7 +188,7 @@ describe('Comments', function() {
    });
 
    it('A guest should NOT be able to upvote an comment', function(done) {
-      api.post('/api/comments/1/upvote')
+      api.post('/api/comments/1/upVotes')
       .expect(401)
       .end( function(err, res) {
          dump(err, res);
@@ -197,7 +197,7 @@ describe('Comments', function() {
    });
 
    it('A guest should NOT be able to downvote an comment', function(done) {
-      api.post('/api/comments/1/downvote')
+      api.post('/api/comments/1/downVotes')
       .expect(401)
       .end( function(err, res) {
          dump(err, res);
