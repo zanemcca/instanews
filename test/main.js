@@ -1,5 +1,4 @@
 
-/*jslint maxlen: 130 */
 
 var common = require('./common.js');
 var app = common.app;

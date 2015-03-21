@@ -83,66 +83,6 @@ app.service('Common', [
       }
    };
 
-   var upvote = function (instance) {
-      //Since comments are nested the constructor actually belongs
-      //to the parent model so we have to specifically check for it
-      if ( instance.commentableId ) {
-         Comment.prototype$__create__upVotes({
-            id: instance.myId,
-            votableId: instance.myId,
-            votableType: "comment"
-         })
-         .$promise
-         .then( function(res) {
-            instance.upVoteCount = res.upVoteCount;
-            instance.rating = res.rating;
-            console.log('Upvote ', res);
-         });
-      }
-      else {
-         instance.constructor.prototype$__create__upVotes({
-            id: instance.myId,
-            votableId: instance.myId,
-            votableType: instance.constructor.modelName.toLowerCase()
-         })
-         .$promise
-         .then( function(res) {
-            instance.upVoteCount = res.upVoteCount;
-            instance.rating = res.rating;
-            console.log('Upvote ', res);
-         });
-      }
-   };
-
-   var downvote = function (instance) {
-      if ( instance.commentableId ) {
-         Comment.prototype$__create__downVotes({
-            id: instance.myId,
-            votableId: instance.myId,
-            votableType: "comment"
-         })
-         .$promise
-         .then( function(res) {
-            instance.downVoteCount = res.downVoteCount;
-            instance.rating = res.rating;
-            console.log('Down ', res);
-         });
-      }
-      else {
-         instance.constructor.prototype$__create__downVotes({
-            id: instance.myId,
-            votableId: instance.myId,
-            votableType: instance.constructor.modelName.toLowerCase()
-         })
-         .$promise
-         .then( function(res) {
-            instance.downVoteCount = res.downVoteCount;
-            instance.rating = res.rating;
-            console.log('Down ', res);
-         });
-      }
-   };
-
    //Comments
    var createComment = function (instance, content) {
       instance.constructor.comments.create({
@@ -200,7 +140,5 @@ app.service('Common', [
       withinRange: withinRange,
       createComment: createComment,
       toggleComments: toggleComments,
-      downvote: downvote,
-      upvote: upvote
    };
 }]);

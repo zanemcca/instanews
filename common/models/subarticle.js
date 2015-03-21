@@ -17,9 +17,4 @@ module.exports = function(Subarticle) {
 
    common.disableRemotes(Subarticle,staticDisable,true);
    common.disableRemotes(Subarticle,nonStaticDisable,false);
-
-   Subarticle.beforeValidate = function (next) {
-      //TODO Pre validation of subarticle server side
-      next();
-   };
 };

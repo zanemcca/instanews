@@ -21,6 +21,7 @@ module.exports = function(Comment) {
    common.disableRemotes(Comment,staticDisable,true);
    common.disableRemotes(Comment,nonStaticDisable,false);
 
+   //TODO Change this to use opertion hooks since model hooks are depricated
    Comment.beforeValidate = function(next) {
 
       if (!this.myId) {
