@@ -39,7 +39,7 @@ app.controller('ArticleCtrl', [
 
    var lastUpdate = new Date(1975,1);
 
-   var loadLimit = 10;
+   var loadLimit = 3;
 
    var filter = {
       limit: loadLimit,

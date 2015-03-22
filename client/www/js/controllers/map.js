@@ -83,7 +83,7 @@ app.controller('MapCtrl', [
       for( var i = 0; i < $scope.articles.length; i++) {
          tempMarker.position = new google.maps.LatLng($scope.articles[i].location.lat, $scope.articles[i].location.lng);
          tempMarker.title = $scope.articles[i].title;
-//         tempMarker.icon.url = 'img/ionic.png';
+ //        tempMarker.icon.url = 'img/ionic.png';
 
          if (!Common.withinRange($scope.articles[i].location)) {
             tempMarker.visible = false;

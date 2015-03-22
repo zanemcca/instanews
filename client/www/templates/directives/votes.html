@@ -8,10 +8,8 @@
   ng-click="downvote(voteable)">
    {{voteable.downVoteCount}}
 </button>
-<div ng-if="!voteable._file">
-   <div class="item-icon-right">
-      <button class="item button button-clear icon button-small" ng-class="{'ion-arrow-right-b': !voteable.showComments, 'ion-arrow-down-b': voteable.showComments}"
-         ng-click="Common.toggleComments(voteable)">
-      </button>
-   </div>
+<div class="item-icon-right">
+   <button class="item button button-clear icon button-small" ng-class="{'ion-arrow-right-b': !voteable.showComments, 'ion-arrow-down-b': voteable.showComments}"
+      ng-click="Common.toggleComments(voteable)">
+   </button>
 </div>

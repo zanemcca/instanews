@@ -19,24 +19,25 @@
                </a>
                <p>{{subarticle.text}}</p>
 
-               <votes class="item no-padding"
-                  style="border: transparent"
-                  voteable="subarticle">
-               </votes>
             </div>
 
-            <div class="item item-body" ng-if="subarticle._file">
+            <div class="item item-body no-padding" ng-if="subarticle._file">
                <file-item></file-item>
             </div>
 
-            <comments owner="subarticle"></comments>
+            <div class="item" style="border:0px;padding-top:0px;padding-bottom:0px">
+               <votes style="border: transparent"
+                  voteable="subarticle">
+               </votes>
+               <comments owner="subarticle"></comments>
+            </div>
 
          </li>
       </ul>
       <ion-infinite-scroll
          ng-if="itemsAvailable"
          on-infinite="loadMore()"
-         distance="0%">
+         distance="30%">
       </ion-infinite-scroll>
    </ion-content>
 </ion-view>
