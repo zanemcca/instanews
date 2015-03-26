@@ -1,6 +1,6 @@
 {
   "name": "journalist",
-  "base": "User",
+  "base": "voteUser",
   "strict": false,
   "idInjection": false,
   "properties": {

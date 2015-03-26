@@ -4,25 +4,13 @@
       "myId": 1,
       "username": "zane",
       "parentId": 1,
-      "date": "2015-02-06T12:48:43.511Z",
-      "_votes" : {
-         "rate": 0,
-         "myId": 1,
-         "rating": 0,
-         "lastUpdated" : "2015-02-06T12:48:43.511Z"
-      }
+      "date": "2015-02-06T12:48:43.511Z"
    },
    {
       "myId": 2,
       "username": "bob",
       "parentId": 1,
       "date": "2015-02-06T02:48:43.511Z",
-      "_votes" : {
-         "rate": 0,
-         "myId": 2,
-         "rating": 0,
-         "lastUpdated" : "2015-02-06T02:48:43.511Z"
-      },
       "_file": {
          "type": "video",
          "size": 5000,
@@ -35,25 +23,13 @@
       "myId": 4,
       "username": "bob",
       "parentId": 200,
-      "date": "2015-02-06T02:48:43.511Z",
-      "_votes" : {
-         "myId": 4,
-         "rate": 0,
-         "rating": 0,
-         "lastUpdated" : "2015-02-06T02:48:43.511Z"
-      }
+      "date": "2015-02-06T02:48:43.511Z"
    },
    {
       "myId": 3,
       "username" : "jane",
       "parentId": 1,
       "date": "2015-02-06T03:48:43.511Z",
-      "_votes" : {
-         "myId": 3,
-         "rate": 0,
-         "rating": 0,
-         "lastUpdated" : "2015-02-06T03:48:43.511Z"
-      },
       "_file": {
          "type": "image",
          "size": 2000,

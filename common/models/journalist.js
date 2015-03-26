@@ -36,4 +36,13 @@ module.exports = function(Journalist) {
 
    common.disableRemotes(Journalist,staticDisable,true);
    common.disableRemotes(Journalist,nonStaticDisable,false);
+
+   Journalist.observe('access', function(ctx, next) {
+      var inst = ctx.instance;
+      if ( inst) {
+         //TODO Complete this
+         inst.password = "";
+      }
+      next();
+   });
 };
