@@ -1,4 +1,4 @@
-var app = angular.module('instanews.map', ['ionic', 'ngResource']);
+/*var app = angular.module('instanews.map', ['ionic', 'ngResource']);
 
 app.controller('MapCtrl', [
       '$scope',
@@ -78,7 +78,7 @@ app.controller('MapCtrl', [
             scaledSize: new google.maps.Size(30,30)
          }
          */
-      };
+ /*     };
 
       for( var i = 0; i < $scope.articles.length; i++) {
          tempMarker.position = new google.maps.LatLng($scope.articles[i].location.lat, $scope.articles[i].location.lng);
@@ -178,4 +178,4 @@ app.controller('MapCtrl', [
     });
 
 }]);
-
+*/

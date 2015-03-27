@@ -10,6 +10,7 @@ app.service('Common', [
 
    //Initialize and refresh
    var articles = Article.find();
+   var bounds;
 
    var user = {};
 
@@ -63,6 +64,18 @@ app.service('Common', [
 
    // Could replace with google API call, but this keeps it local and fast
    var withinRange = function (position) {
+
+      //Method for a square
+      if (bounds ) {
+         return bounds.contains(position);
+      }
+      else {
+         console.log('Bounds not loaded yet');
+         return false;
+      }
+
+      //Method for a circle
+      /*
       //haversine method
       var mLat = mPosition.lat.toRad();
       var lat = position.lat.toRad();
@@ -81,6 +94,7 @@ app.service('Common', [
       else {
          return (6371000 * c <= mPosition.radius);
       }
+      */
    };
 
    //Comments
@@ -130,12 +144,21 @@ app.service('Common', [
       }
    };
 
+   var setBounds = function(bnds) {
+      bounds = bnds;
+   };
+
+   var getBounds = function() {
+      return bounds;
+   }
 
    return {
       articles: articles,
       user: user,
       getArticle: getArticle,
       radToSlide: radToSlide,
+      setBounds: setBounds,
+      getBounds: getBounds,
       mPosition: mPosition,
       withinRange: withinRange,
       createComment: createComment,

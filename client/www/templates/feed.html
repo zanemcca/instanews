@@ -8,6 +8,11 @@
    <ion-content>
       <ion-refresher pulling-text="Fresh Stuff" on-refresh="onRefresh()">
       </ion-refresher>
+      <div class="item no-padding" style="width:100%;height:38%">
+         <inMap>
+            <div style="width:100%;height:100%" id="feedMap"></div>
+         </inMap>
+      </div>
       <ul class="list">
          <ion-item class="no-padding card" ng-repeat="article in articles | orderBy: '-(rating)'">
             <div class="item item-avatar item-text-wrap" style="min-height:65px" >
@@ -19,7 +24,7 @@
 
                <a class="button button-clear button-full"
                   style="margin: 0px;"
-                  href="#/tab/articles/{{article.myId}}">
+                  href="#/articles/{{article.myId}}">
                   {{article.title}}
                </a>
             </div>

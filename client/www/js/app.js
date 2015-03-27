@@ -52,50 +52,45 @@ angular.module('instanews', [
    })
 
   // setup an abstract state for the tabs directive
+  /*
     .state('tab', {
     url: "/tab",
     abstract: true,
     templateUrl: "templates/tabs.html"
   })
 
+  */
   // Each tab has its own nav history stack:
 
-   .state('tab.feed', {
+   .state('feed', {
       url: '/feed',
-      views: {
-         'tab-feed': {
-            templateUrl: 'templates/feed.html',
-            controller: 'FeedCtrl'
-         }
-      }
+      templateUrl: 'templates/feed.html',
+      controller: 'FeedCtrl'
    })
 
-   .state('tab.article', {
+   .state('article', {
       url: '/articles/{id}',
-      views: {
-         'tab-feed': {
-            templateUrl: 'templates/article.html',
-            controller: 'ArticleCtrl'
-         }
-      }
+      templateUrl: 'templates/article.html',
+      controller: 'ArticleCtrl'
    })
 
-   .state('tab.map', {
+   /*
+   .state('map', {
       url: '/map',
       views: {
-         'tab-map': {
+         'map': {
             templateUrl: 'templates/map.html',
             controller: 'MapCtrl'
          }
       }
-   });
+   })*/;
 
   // if none of the above states are matched, use this as the fallback
   if ( true ) {
      $urlRouterProvider.otherwise('/login');
   }
   else {
-     $urlRouterProvider.otherwise('/tab/feed');
+     $urlRouterProvider.otherwise('/feed');
   }
 
 });

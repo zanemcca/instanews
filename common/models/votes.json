@@ -27,13 +27,13 @@
   "relations": {
     "upVotes": {
       "type": "hasMany",
-      "polymorphic": "votable",
-      "model": "upVote"
+      "model": "upVote",
+      "polymorphic": "votable"
     },
     "downVotes": {
       "type": "hasMany",
-      "polymorphic": "votable",
-      "model": "downVote"
+      "model": "downVote",
+      "polymorphic": "votable"
     }
   },
   "acls": [

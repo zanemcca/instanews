@@ -39,6 +39,7 @@ module.exports = function (app, cb) {
          if (err) return callb(err);
 
          if (data.length > 0) {
+            console.log('Populating...');
             //Create a model instance for each member of the array
             async.each(data, function (d, callback) {
                Model.create(d, callback);
@@ -101,8 +102,8 @@ module.exports = function (app, cb) {
       importData.bind(null,Articles, articles),
       importData.bind(null,UpVotes, []),
       importData.bind(null,DownVotes, []),
-      importData.bind(null,Subarticles, subarticles),
       importData.bind(null,Comments, comments),
+      importData.bind(null,Subarticles, subarticles),
       createAdmin.bind(null),
       updateDB.bind(null)
    ], function(err,res) {

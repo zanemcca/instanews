@@ -18,5 +18,8 @@
     "gulp-util": "^3.0.4",
     "jshint-stylish": "^1.0.1",
     "shelljs": "^0.3.0"
-  }
+  },
+  "cordovaPlugins": [
+    "org.apache.cordova.camera"
+  ]
 }

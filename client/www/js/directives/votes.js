@@ -26,7 +26,6 @@ app.directive('votes', [
                .then( function(res) {
                   instance.upVoteCount = res.upVoteCount;
                   instance.rating = res.rating;
-                  console.log('Upvote ', res);
                });
             }
             else {
@@ -39,7 +38,6 @@ app.directive('votes', [
                .then( function(res) {
                   instance.upVoteCount = res.upVoteCount;
                   instance.rating = res.rating;
-                  console.log('Upvote ', res);
                });
             }
          };
@@ -55,7 +53,6 @@ app.directive('votes', [
                .then( function(res) {
                   instance.downVoteCount = res.downVoteCount;
                   instance.rating = res.rating;
-                  console.log('Down ', res);
                });
             }
             else {
@@ -68,7 +65,6 @@ app.directive('votes', [
                .then( function(res) {
                   instance.downVoteCount = res.downVoteCount;
                   instance.rating = res.rating;
-                  console.log('Down ', res);
                });
             }
          };
