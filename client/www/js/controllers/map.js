@@ -170,7 +170,7 @@ app.controller('MapCtrl', [
     //Wait for the device to be ready and then load the map
     //TODO Re initialize the map
     ionic.DomUtil.ready( function() {
-       if (navigator.userAgent.match(/(iPhone|iPod|Android|BlackBerry)/)) { //Mobile map load
+       if (navigator.userAgent.match(/(iPhone|iPod|iPad|Android|BlackBerry)/)) { //Mobile map load
           document.addEventListener("deviceready", initializeMap, false);
        } else { //Web version
           initializeMap();

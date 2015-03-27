@@ -1,7 +1,6 @@
 var app = angular.module('instanews.file', ['ionic', 'ngResource']);
 
-var urlBase = 'http://172.20.10.6:3000/api';
-//var urlBase = 'http://192.168.100.10:3000/api';
+var urlBase = 'http://192.168.100.10:3000/api';
 
 app.directive('fileItem', function ($compile) {
 
@@ -50,7 +49,7 @@ app.directive('fileItem', function ($compile) {
 
    var disableTap = function(disable) {
       container = document.getElementById('video-container');
-      if (disable) {
+      if (disable && !ionic.platform.isIOS()) {
          angular.element(container).attr('data-tap-disabled','true');
       }
       else {

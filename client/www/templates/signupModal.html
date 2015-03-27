@@ -29,7 +29,9 @@
                <span class="input-label" >Email</span>
                <input type="email" placeholder="Email" ng-model="newUser.email" validate required>
             </label>
-            <label class="item item-input item-floating-label">
+            <label class="item item-input item-floating-label"
+               ng-class="{'box-invalid' : newUser.password.length < 8 ,
+               'box-valid' : newUser.password.length >= 8 }">
                <span class="input-label" >Password</span>
                <input type="password" placeholder="Password" ng-model="newUser.password" required>
             </label>

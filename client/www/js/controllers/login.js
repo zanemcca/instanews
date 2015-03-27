@@ -102,11 +102,14 @@ app.controller('LoginCtrl', [
       var user = {
          firstName: $scope.newUser.first,
          lastName: $scope.newUser.last,
-         username: $scope.newUser.username.toLowerCase(),
          email: $scope.newUser.email,
          lastUpdated: Date.now(),
          password: $scope.newUser.password
       };
+
+      if ( $scope.newUser.username ) {
+         user.username = $scope.newUser.username.toLowerCase();
+      }
 
       console.log('User: ', user);
       Journalist.create(user, function (res) {

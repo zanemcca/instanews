@@ -19,6 +19,9 @@
     "date": {
       "type": "date"
     }
+    "lastUpdated": {
+      "type": "date"
+    }
   },
   "validations": [],
   "relations": {
