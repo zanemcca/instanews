@@ -22,8 +22,29 @@ app.directive('inmap', [
          var northPole = new google.maps.LatLng(90.0000, 0.0000);
          var southPole = new google.maps.LatLng(-90.0000, 0.0000);
 
+         //Update our position
+         function updatePosition(position) {
+            $scope.mPos.lat = position.coords.latitude;
+            $scope.mPos.lng = position.coords.longitude;
+            $scope.mPos.accuracy = position.coords.accuracy;
+
+            //updateMyCircle();
+            //updateMarkers();
+            updateHeatmap();
+         }
+
+         //Reload the markers when we recieve new articles
+         $scope.$watch('articles', function (newValue, oldValue) {
+            if (newValue !== oldValue) {
+              updateHeatmap();
+              //getMarkers();
+            }
+         }, true);
+
+
 //My Circle =============================================================
 
+         /*
          var myCircle;
 
          //Watch our accuracy so that we always know if we hit our limit
@@ -83,26 +104,14 @@ app.directive('inmap', [
             console.log(options.radius);
             $scope.mPos.radSlider = Common.radToSlide(options.radius);
          }
+         */
 
-         //Update our position
-         function updatePosition(position) {
-            $scope.mPos.lat = position.coords.latitude;
-            $scope.mPos.lng = position.coords.longitude;
-            $scope.mPos.accuracy = position.coords.accuracy;
-
-            updateMyCircle();
-            updateMarkers();
-         }
 
 //MARKERS =============================================================
 
+         /*
          var markers = [];
          var articleMarker;
-
-         //Reload the markers when we recieve new articles
-         $scope.$watch('articles', function (newValue, oldValue) {
-            if (newValue !== oldValue) getMarkers();
-         }, true);
 
          //Update the markers on the map
          function updateMarkers() {
@@ -136,7 +145,7 @@ app.directive('inmap', [
                   scaledSize: new google.maps.Size(30,30)
                }
                */
-            };
+ /*           };
 
             for( var i = 0; i < $scope.articles.length; i++) {
                tempMarker.position = new google.maps.LatLng($scope.articles[i].location.lat, $scope.articles[i].location.lng);
@@ -150,7 +159,33 @@ app.directive('inmap', [
             }
          }
 
+      */
 // Heat Map ======================================================
+
+         var heatmap;
+
+         function updateHeatmap() {
+            var articleHeatArray = [];
+            for(var i = 0; i < $scope.articles.length; i++) {
+               var position = new google.maps.LatLng($scope.articles[i].location.lat, $scope.articles[i].location.lng);
+               if (Common.withinRange(position)) {
+                  articleHeatArray.push({
+                     location: position,
+                     weight: Math.pow(2,$scope.articles[i].rating)
+                  });
+               }
+            }
+
+            if (!heatmap) {
+               heatmap = new google.maps.visualization.HeatmapLayer({
+                  map: map,
+                  data: articleHeatArray
+               });
+            }
+            else {
+               heatmap.setData(articleHeatArray);
+            }
+         }
 
 // MAP ======================================================
 
@@ -175,6 +210,11 @@ app.directive('inmap', [
             if ( element && element.textContent.indexOf('Map') === -1) {
                map = new google.maps.Map(element, mapOptions);
                posWatch = navigator.geolocation.watchPosition( updatePosition, error, {enableHighAccuracy: true});
+
+               google.maps.event.addListener(map, 'bounds_changed', function() {
+                  Common.setBounds(map.getBounds());
+                  updateHeatmap();
+               });
             }
 
             //Article map only contains a marker to the current article
@@ -184,7 +224,7 @@ app.directive('inmap', [
                if ( $stateParams.id) {
                   $scope.article = Common.getArticle($stateParams.id);
                   mapOptions.center = new google.maps.LatLng($scope.article.location.lat, $scope.article.location.lng);
-                  mapOptions.zoom = 12;
+                  mapOptions.zoom = 15;
                }
                articleMap = new google.maps.Map(element, mapOptions);
                var tempMarker = {
@@ -200,7 +240,6 @@ app.directive('inmap', [
                google.maps.event.trigger(map, 'resize');
                google.maps.event.trigger(articleMap, 'resize');
             });
-
           };
 
 

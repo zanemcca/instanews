@@ -23,6 +23,7 @@ module.exports = function(Subarticle) {
 
       if ( inst ) {
       }
+      next();
    });
 
 };

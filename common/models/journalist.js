@@ -41,7 +41,7 @@ module.exports = function(Journalist) {
       var inst = ctx.instance;
       if ( inst) {
          //TODO Complete this
-         inst.password = "";
+         inst.password = '';
       }
       next();
    });
