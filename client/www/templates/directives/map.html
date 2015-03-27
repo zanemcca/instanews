@@ -1,0 +1,7 @@
+<!DOCTYPE html>
+<div class="item item-dark range" ng-class="{'range-assertive' : mPos.limit , 'range-calm' : !mPos.limit}">
+   <i class="icon ion-location"></i>
+   <input type="range" name="radius" min="0" max="500" ng-model="mPos.radSlider">
+   <i class="icon ion-earth"></i>
+</div>
+<div style="width:100%; height:100%" id="map"></div>
