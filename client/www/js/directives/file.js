@@ -58,42 +58,49 @@ app.directive('fileItem', function ($compile) {
    };
 
    var linker = function (scope, element, attrs) {
-      element.html(getTemplate(scope.subarticle));
+      if (scope.subarticle && scope.subarticle._file) {
+         element.html(getTemplate(scope.subarticle));
 
-      if (scope.subarticle._file.type === 'video') {
+         if (scope.subarticle._file.type === 'video') {
 
-         console.log('Created ' + id);
+            console.log('Created ' + id);
 
-         videojs(id).ready( function() {
+            videojs(id).ready( function() {
 
-            var player = this;
-            scope.$on('$destroy', function () {
-               player.dispose();
-               console.log('Destroyed ', id);
+               var player = this;
+               scope.$on('$destroy', function () {
+                  player.dispose();
+                  console.log('Destroyed ', id);
+               });
+
+               player.on('play', function(err) {
+                  disableTap(true);
+                  console.log('Playing!!');
+               });
+
+               player.on('pause', function(err) {
+                  disableTap(false);
+                  console.log('PAUSED!!');
+               });
+
+               player.on('ended', function(err) {
+                  disableTap();
+                  console.log('ENDED!!');
+               });
             });
-
-            player.on('play', function(err) {
-               disableTap(true);
-               console.log('Playing!!');
-            });
-
-            player.on('pause', function(err) {
-               disableTap(false);
-               console.log('PAUSED!!');
-            });
-
-            player.on('ended', function(err) {
-               disableTap();
-               console.log('ENDED!!');
-            });
-         });
+         }
+         $compile(element.contents())(scope);
       }
-      $compile(element.contents())(scope);
-
+      else {
+         console.log('Bad subarticle');
+      }
    };
 
    return {
       restrict: 'E',
+      scope: {
+         subarticle: '='
+      },
       link: linker
    };
 });

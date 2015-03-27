@@ -6,14 +6,12 @@ app.directive('inmap', [
 
    return {
       restrict: 'E',
-      scope: {},
       controller: function($scope,
          $stateParams,
          $ionicLoading,
          $compile,
          Common) {
 
-         $scope.articles = Common.articles;
          $scope.mPos = Common.mPosition;
 
          var map, articleMap;

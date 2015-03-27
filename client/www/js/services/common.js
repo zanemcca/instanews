@@ -8,8 +8,9 @@ app.service('Common', [
       'Comment',
       function($rootScope, $filter, Article, Comment){
 
+   var articles = [];
    //Initialize and refresh
-   var articles = Article.find();
+
    var bounds;
 
    var user = {};
@@ -152,8 +153,17 @@ app.service('Common', [
       return bounds;
    }
 
+   var getArticles = function() {
+      return articles;
+   };
+
+   var setArticles = function(arts) {
+      articles = arts;
+   };
+
    return {
-      articles: articles,
+      getArticles: getArticles,
+      setArticles: setArticles,
       user: user,
       getArticle: getArticle,
       radToSlide: radToSlide,
