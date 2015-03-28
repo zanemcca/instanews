@@ -33,11 +33,14 @@ angular.module('instanews', [
   });
 })
 
-.config(function($stateProvider, $urlRouterProvider, $ionicConfigProvider) {
+.config(function($stateProvider, $urlRouterProvider, $ionicConfigProvider, $compileProvider) {
 
-   $ionicConfigProvider.tabs.position("bottom"); //Places them at the bottom for all OS
+//   $compileProvider.aHrefSanitizationWhitelist(/^\s*(https?|ftp|mailto|file|tel):/);
+//   $compileProvider.imgSrcSanitizationWhitelist(/^\s*(https?|ftp|mailto|file|tel):/);
+
+   //$ionicConfigProvider.tabs.position("bottom"); //Places them at the bottom for all OS
    //$ionicConfigProvider.tabs.style("standard"); //Makes them all look the same across all OS
-   $ionicConfigProvider.backButton.previousTitleText(false).text('');
+   //$ionicConfigProvider.backButton.previousTitleText(false).text('');
 
   // Ionic uses AngularUI Router which uses the concept of states
   // Learn more here: https://github.com/angular-ui/ui-router

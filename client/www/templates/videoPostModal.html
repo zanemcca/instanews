@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<ion-modal-view>
+   <ion-header-bar class="bar-dark">
+      <button class="button button-clear icon ion-trash-a" ng-click="trashVideo()"></button>
+      <h1 class="title">Post</h1>
+      <button class="button button-clear icon ion-forward" ng-click="postVideo()"></button>
+   </ion-header-bar>
+   <ion-content>
+      <div class="item no-padding item-divider" style="height:100%">
+
+         <div class="item item-divider">
+            <textarea type="text" style="width:100%;" ng-model="data.caption" placeholder=" Caption" required></textarea>
+         </div>
+
+         <div class="item item-divider">
+            <span class="input-label">Thumbnail</span>
+            <div class="row" ng-if="!data.imageURI">
+               <div class="col">
+                  <button class="button button-full button-dark icon ion-camera" ng-click="captureThumbnail()"></button>
+               </div>
+               <div class="col">
+                  <button class="button button-full button-dark icon ion-image" ng-click="getThumbnail()"></button>
+               </div>
+            </div>
+            <div class="item no-padding item-image"
+               ng-if="data.imageURI">
+               <img src="{{data.imageURI}}">
+            </div>
+         </div>
+      </div>
+   </ion-content>
+</ion-modal-view>

@@ -34,7 +34,10 @@ app.controller('ArticleCtrl', [
    $scope.article = Common.getArticle($stateParams.id);
    //Form entry structure
    $scope.data = {
-      text: ''
+      text: '',
+      caption: '',
+      video: {},
+      imageURI: ''
    };
 
    var lastUpdate = new Date(1975,1);
@@ -138,6 +141,13 @@ app.controller('ArticleCtrl', [
       });
    };
 
+   $ionicModal.fromTemplateUrl('templates/videoPostModal.html', {
+      scope: $scope,
+      animation: 'slide-in-up'
+   }).then( function (modal) {
+      $scope.videoPostModal = modal;
+   });
+
    $ionicModal.fromTemplateUrl('templates/postTextModal.html', {
       scope: $scope,
       animation: 'slide-in-up'
@@ -157,17 +167,24 @@ app.controller('ArticleCtrl', [
       $scope.postTextModal.hide();
    };
 
+   $scope.trashImage = function() {
+      $scope.data.imageURI = '';
+      $scope.data.caption = '';
+   }
+
+   $scope.trashVideo = function() {
+      $scope.data.video = {};
+      $scope.data.caption = '';
+      $scope.data.imageURI = '';
+      $scope.videoPostModal.hide();
+   }
+
    $scope.postText = function() {
       Article.subarticles.create({
          id: $stateParams.id,
          date: Date.now(),
          myId: Math.floor(Math.random()*Math.pow(2,32)),
          parentId: $stateParams.id,
-         _votes: {
-            up: Math.floor(Math.random()*100),
-            down: Math.floor(Math.random()*50),
-            lastUpdated: Date.now()
-         },
          username: $scope.user.username,
          text: $scope.data.text
       })
@@ -177,37 +194,74 @@ app.controller('ArticleCtrl', [
       $scope.trashText();
    };
 
-   $scope.postPhoto = function() {
+   $scope.postPhoto = function(imageURI) {
+      Article.subarticles.create({
+         id: $stateParams.id,
+         date: Date.now(),
+         myId: Math.floor(Math.random()*Math.pow(2,32)),
+         parentId: $stateParams.id,
+         username: $scope.user.username,
+         _file: {
+            type: 'image',
+            name: imageURI,
+            size: 5000,
+            caption: 'Look at that'
+         }
+      })
+      .$promise.then( function(res) {
+         $scope.subarticles.push(res);
+      });
+   }
+
+   $scope.capturePhoto = function() {
       Camera.getPicture()
       .then( function(imageURI) {
          console.log(imageURI);
-
-         Article.subarticles.create({
-            id: $stateParams.id,
-            date: Date.now(),
-            myId: Math.floor(Math.random()*Math.pow(2,32)),
-            parentId: $stateParams.id,
-            _votes: {
-               up: 0,
-               down: 0,
-               rating: 0,
-               lastUpdated: Date.now()
-            },
-            username: $scope.user.username,
-            _file: {
-               type: 'image',
-               name: imageURI,
-               size: 5000,
-               caption: 'Look at that'
-            }
-         })
-         .$promise.then( function(res) {
-            $scope.subarticles.push(res);
-         });
+         $scope.postPhoto(imageURI);
       }, function(err) {
          console.err(err);
       });
    };
 
+   $scope.postVideo = function() {
+      var video = $scope.data.video;
+      Article.subarticles.create({
+         id: $stateParams.id,
+         date: Date.now(),
+         myId: Math.floor(Math.random()*Math.pow(2,32)),
+         parentId: $stateParams.id,
+         username: $scope.user.username,
+         _file: {
+            type: video.type,
+            name: video.fullPath, //TODO load to media service then change this to filename
+            size: video.size,
+            caption: $scope.data.caption
+         }
+      })
+      .$promise.then( function(res) {
+         $scope.subarticles.push(res);
+         $scope.trashVideo();
+      });
+   }
+
+   $scope.captureThumbnail = function() {
+      Camera.getPicture()
+      .then( function(imageURI) {
+         $scope.data.imageURI = imageURI;
+      }, function(err) {
+         console.log(err);
+      });
+   };
+
+   $scope.captureVideo = function() {
+      Camera.getVideo()
+      .then( function(video) {
+         console.log(video);
+         $scope.data.video = video[0];
+         $scope.videoPostModal.show();
+      }, function(err) {
+         console.err(err);
+      });
+   };
 }]);
 

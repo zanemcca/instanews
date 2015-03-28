@@ -20,6 +20,7 @@
     "shelljs": "^0.3.0"
   },
   "cordovaPlugins": [
-    "org.apache.cordova.camera"
+    "org.apache.cordova.camera",
+    "org.apache.cordova.media-capture"
   ]
 }

@@ -44,6 +44,13 @@ app.directive('fileItem', function ($compile) {
          '</video></div>';
             break;
       }
+
+      template += '<div class="item" style="padding-bottom:0px">' +
+         '<p class="no-margin">' +
+         subarticle._file.caption +
+         '</p>' +
+      '</div>';
+
       return template;
    };
 
