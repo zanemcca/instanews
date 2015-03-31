@@ -25,34 +25,36 @@ app.directive('fileItem', function ($compile) {
    var getTemplate = function (subarticle) {
       var template = '';
 
-      switch(subarticle._file.type) {
-         case 'image':
-            template = '<div class="item no-padding item-image">' +
-               '<img height="auto" width="auto" src='+
-               getSrc(subarticle) + '></div>';
-            break;
-         case 'video':
-            id = 'video_' + subarticle.myId;
+      var type = subarticle._file.type;
+      if(type.indexOf('image') > -1) {
+         template = '<div class="item no-padding item-image">' +
+            '<img height="auto" width="auto" src='+
+            getSrc(subarticle) + '></div>';
+      }
+      else if (type.indexOf('video') > -1) {
+         id = 'video_' + subarticle.myId;
 
-            template = '<div id="video-container">' +
-            '<video poster="' + subarticle._file.poster +
-            '" controls width="100%" id="'+ id + '"';
+         template = '<div id="video-container">' +
+         '<video poster="' + subarticle._file.poster +
+         '" controls width="100%" id="'+ id + '"';
 
-            if (ionic.Platform.isIOS()) {
-               console.log('isIOS');
-               template += '>'
-            }
-            else {
-               console.log('is not IOS');
-               template += ' class="video-js vjs-default-skin' +
-               ' vjs-big-play-centered vjs-paused vjs-controls-enabled' +
-               ' vjs-user-active" data-setup={}>';
-            }
+         if (ionic.Platform.isIOS()) {
+            console.log('isIOS');
+            template += '>'
+         }
+         else {
+            console.log('is not IOS');
+            template += ' class="video-js vjs-default-skin' +
+            ' vjs-big-play-centered vjs-paused vjs-controls-enabled' +
+            ' vjs-user-active" data-setup={}>';
+         }
 
-            template += '<source src="http://vjs.zencdn.net/v/oceans.mp4" type="video/mp4">'+
-            '<source src="http://vjs.zencdn.net/v/oceans.webm" type="video/webm">'+
-            '</video></div>';
-            break;
+         template += '<source src="http://vjs.zencdn.net/v/oceans.mp4" type="video/mp4">'+
+         '<source src="http://vjs.zencdn.net/v/oceans.webm" type="video/webm">'+
+         '</video></div>';
+      }
+      else {
+         console.log('Bad file type... ', subarticle._file.type);
       }
 
       template += '<div class="item" style="padding-bottom:0px">' +
@@ -78,7 +80,7 @@ app.directive('fileItem', function ($compile) {
       if (scope.subarticle && scope.subarticle._file) {
          element.html(getTemplate(scope.subarticle));
 
-         if (scope.subarticle._file.type === 'video') {
+         if (scope.subarticle._file.type.indexOf('video') > -1) {
 
             console.log('Created ' + id);
 

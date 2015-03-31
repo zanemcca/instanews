@@ -235,6 +235,7 @@ app.controller('ArticleCtrl', [
             type: video.type,
             name: video.fullPath, //TODO load to media service then change this to filename
             size: video.size,
+            poster: $scope.data.imageURI,
             caption: $scope.data.caption
          }
       })
