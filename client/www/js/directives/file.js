@@ -35,13 +35,23 @@ app.directive('fileItem', function ($compile) {
             id = 'video_' + subarticle.myId;
 
             template = '<div id="video-container">' +
-         '<video id="'+ id +
-            '" width="100%" class="video-js vjs-default-skin' +
-            ' vjs-big-play-centered vjs-paused vjs-controls-enabled' +
-            ' vjs-user-active" controls data-setup={}>' +
-         '<source src="http://vjs.zencdn.net/v/oceans.mp4" type="video/mp4">'+
-         '<source src="http://vjs.zencdn.net/v/oceans.webm" type="video/webm">'+
-         '</video></div>';
+            '<video poster="' + subarticle._file.poster +
+            '" controls width="100%" id="'+ id + '"';
+
+            if (ionic.Platform.isIOS()) {
+               console.log('isIOS');
+               template += '>'
+            }
+            else {
+               console.log('is not IOS');
+               template += ' class="video-js vjs-default-skin' +
+               ' vjs-big-play-centered vjs-paused vjs-controls-enabled' +
+               ' vjs-user-active" data-setup={}>';
+            }
+
+            template += '<source src="http://vjs.zencdn.net/v/oceans.mp4" type="video/mp4">'+
+            '<source src="http://vjs.zencdn.net/v/oceans.webm" type="video/webm">'+
+            '</video></div>';
             break;
       }
 
@@ -72,29 +82,31 @@ app.directive('fileItem', function ($compile) {
 
             console.log('Created ' + id);
 
-            videojs(id).ready( function() {
+            if ( !ionic.Platform.isIOS()) {
+               videojs(id).ready( function() {
 
-               var player = this;
-               scope.$on('$destroy', function () {
-                  player.dispose();
-                  console.log('Destroyed ', id);
-               });
+                  var player = this;
+                  scope.$on('$destroy', function () {
+                     player.dispose();
+                     console.log('Destroyed ', id);
+                  });
 
-               player.on('play', function(err) {
-                  disableTap(true);
-                  console.log('Playing!!');
-               });
+                  player.on('play', function(err) {
+                     disableTap(true);
+                     console.log('Playing!!');
+                  });
 
-               player.on('pause', function(err) {
-                  disableTap(false);
-                  console.log('PAUSED!!');
-               });
+                  player.on('pause', function(err) {
+                     disableTap(false);
+                     console.log('PAUSED!!');
+                  });
 
-               player.on('ended', function(err) {
-                  disableTap();
-                  console.log('ENDED!!');
+                  player.on('ended', function(err) {
+                     disableTap();
+                     console.log('ENDED!!');
+                  });
                });
-            });
+            }
          }
          $compile(element.contents())(scope);
       }

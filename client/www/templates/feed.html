@@ -25,9 +25,19 @@
                </div>
                <div class="item"
                   style="border-top:0px;padding-right:0px;padding-left:0px;padding-top:0px;padding-bottom:1px">
+
                   <file-item ng-if="article.topSub._file"
                      subarticle="article.topSub">
                   </file-item>
+                  <!--div ng-if="article.topSub._file"
+                     class="item no-padding item-image">
+                     <div ng-if="article.topSub._file.type === 'image'">
+                        <img src="{{article.topSub._file.name}}">
+                     </div>
+                     <div ng-if="article.topSub._file.type === 'video'">
+                        <img src="{{article.topSub._file.poster}}">
+                     </div>
+                  </div-->
 
                   <div class="item item-icon-right"
                      style="padding-top:0px;border-top:0px">
