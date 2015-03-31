@@ -3,14 +3,18 @@ var app = angular.module('instanews.feed', ['ionic', 'ngResource','ngAutocomplet
 app.controller('FeedCtrl', [
       '$scope',
       '$ionicModal',
+      '$location',
       'Article',
       'Common',
       'Comment',
+      'Post',
       function($scope,
          $ionicModal,
+         $location,
          Article,
          Common,
-         Comment) {
+         Comment,
+         Post) {
 
    $scope.user = Common.user.user;
    $scope.articles = [];
@@ -51,20 +55,20 @@ app.controller('FeedCtrl', [
 
    //TODO load more server side using session management
    $scope.loadMore = function() {
+      console.log('No more articles');
+      $scope.itemsAvailable = false;
       $scope.$broadcast('scroll.infiniteScrollComplete');
+   };
+
+   $scope.useMyLocation = function() {
+      //TODO Change this to lookup the name of the user location
+      $scope.newArticle.search = 'My Location';
    };
 
    $scope.newArticle = {
       title: '',
       search: ''
    };
-
-   $ionicModal.fromTemplateUrl('templates/postArticleModal.html', {
-      scope: $scope,
-      animation: 'slide-in-up'
-   }).then( function (modal) {
-      $scope.postArticleModal = modal;
-   });
 
    var autocomplete;
    $scope.$on('modal.shown', function(modal) {
@@ -82,50 +86,14 @@ app.controller('FeedCtrl', [
 
    $scope.trashArticle = function() {
       $scope.newArticle.title = '';
-      $scope.postArticleModal.hide();
+      $location.path('/feed');
    };
-
-   $scope.useMyLocation = function() {
-      //TODO Change this to lookup the name of the user location
-      $scope.newArticle.search = 'My Location';
-   };
-
-
 
    $scope.postArticle = function() {
-      if ( $scope.newArticle.search ) {
-         //TODO Lookup the lat-lng
-         $scope.newArticle.search = 'My Location';
-         loc = {
-            lat: Common.mPosition.lat,
-            lng: Common.mPosition.lng
-         }
-      }
-      else {
-         $scope.newArticle.search = 'My Location';
-         loc = $scope.newArticle.place.
-         loc = {
-            lat: Common.mPosition.lat,
-            lng: Common.mPosition.lng
-         }
-      }
-      Article.create({
-         date: Date.now(),
-         isPrivate: false,
-         myId: Math.floor(Math.random()*Math.pow(2,32)),
-         location: loc,
-         _votes: {
-            up: Math.floor(Math.random()*100),
-            down: Math.floor(Math.random()*50),
-            lastUpdated: Date.now()
-         },
-         username: $scope.user.username,
-         title: $scope.newArticle.title
-      })
-      .$promise.then( function(res) {
+      Post.article($scope.user.username, $scope.newArticle, function(res) {
          $scope.articles.push(res);
+         $scope.trashArticle();
       });
-      $scope.trashArticle();
    };
 
 }]);

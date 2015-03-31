@@ -16,6 +16,7 @@ angular.module('instanews', [
       'instanews.comments',
       'instanews.map',
       'instanews.camera',
+      'instanews.post',
       'lbServices',
       'ui.router'])
 
@@ -75,6 +76,12 @@ angular.module('instanews', [
       url: '/articles/{id}',
       templateUrl: 'templates/article.html',
       controller: 'ArticleCtrl'
+   })
+
+   .state('articlePost', {
+      url: '/post/article',
+      templateUrl: 'templates/articlePost.html',
+      controller: 'FeedCtrl'
    })
 
    /*

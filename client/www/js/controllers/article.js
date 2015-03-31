@@ -11,6 +11,7 @@ app.controller('ArticleCtrl', [
       'Comment',
       'Common',
       'Camera',
+      'Post',
       'Storage',
       function($scope,
          $stateParams,
@@ -22,6 +23,7 @@ app.controller('ArticleCtrl', [
          Comment,
          Common,
          Camera,
+         Post,
          Storage) {
 
    //Add the Models to the scope
@@ -88,7 +90,7 @@ app.controller('ArticleCtrl', [
          })
          .$promise
          .then( function (res) {
-            if (res.length === count) {
+            if (res.length >= count) {
                console.log('No more items');
                $scope.itemsAvailable = false;
             }
@@ -141,18 +143,18 @@ app.controller('ArticleCtrl', [
       });
    };
 
-   $ionicModal.fromTemplateUrl('templates/videoPostModal.html', {
-      scope: $scope,
-      animation: 'slide-in-up'
-   }).then( function (modal) {
-      $scope.videoPostModal = modal;
-   });
-
    $ionicModal.fromTemplateUrl('templates/photoPostModal.html', {
       scope: $scope,
       animation: 'slide-in-up'
    }).then( function (modal) {
       $scope.photoPostModal = modal;
+   });
+
+   $ionicModal.fromTemplateUrl('templates/videoPostModal.html', {
+      scope: $scope,
+      animation: 'slide-in-up'
+   }).then( function (modal) {
+      $scope.videoPostModal = modal;
    });
 
    $ionicModal.fromTemplateUrl('templates/postTextModal.html', {
@@ -188,39 +190,18 @@ app.controller('ArticleCtrl', [
    }
 
    $scope.postText = function() {
-      Article.subarticles.create({
-         id: $stateParams.id,
-         date: Date.now(),
-         myId: Math.floor(Math.random()*Math.pow(2,32)),
-         parentId: $stateParams.id,
-         username: $scope.user.username,
-         text: $scope.data.text
-      })
-      .$promise.then( function(res) {
+      Post.text($stateParams.id, $scope.user.username, $scope.data, function(res) {
          $scope.subarticles.push(res);
+         $scope.trashText();
       });
-      $scope.trashText();
    };
 
    $scope.postPhoto = function() {
-      Article.subarticles.create({
-         id: $stateParams.id,
-         date: Date.now(),
-         myId: Math.floor(Math.random()*Math.pow(2,32)),
-         parentId: $stateParams.id,
-         username: $scope.user.username,
-         _file: {
-            type: 'image',
-            name: $scope.data.imageURI,
-            size: 5000,
-            caption: $scope.data.caption
-         }
-      })
-      .$promise.then( function(res) {
+      Post.photo($stateParams.id, $scope.user.username, $scope.data, function(res) {
          $scope.subarticles.push(res);
          $scope.trashPhoto();
       });
-   }
+   };
 
    $scope.capturePhoto = function() {
       Camera.getPicture()
@@ -234,22 +215,7 @@ app.controller('ArticleCtrl', [
    };
 
    $scope.postVideo = function() {
-      var video = $scope.data.video;
-      Article.subarticles.create({
-         id: $stateParams.id,
-         date: Date.now(),
-         myId: Math.floor(Math.random()*Math.pow(2,32)),
-         parentId: $stateParams.id,
-         username: $scope.user.username,
-         _file: {
-            type: video.type,
-            name: video.fullPath, //TODO load to media service then change this to filename
-            size: video.size,
-            poster: $scope.data.imageURI,
-            caption: $scope.data.caption
-         }
-      })
-      .$promise.then( function(res) {
+      Post.video($stateParams.id, $scope.user.username, $scope.data, function(res) {
          $scope.subarticles.push(res);
          $scope.trashVideo();
       });

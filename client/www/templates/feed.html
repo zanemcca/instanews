@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <ion-view view-title="Instanews - {{user.username}}" style="background: #C0C0C0">
    <ion-nav-buttons side="secondary">
-      <button class="button button-clear icon ion-plus-round"
-         ng-click="postArticleModal.show($event)">
-      </button>
+      <a class="button button-clear icon ion-plus-round"
+         href="#/post/article">
+      </a>
    </ion-nav-buttons>
    <ion-content>
       <ion-refresher pulling-text="Fresh Stuff" on-refresh="onRefresh()">
@@ -62,6 +62,7 @@
          </li>
       </ul>
       <ion-infinite-scroll
+         ng-if="itemsAvailable"
          on-infinite="loadMore()"
          distance="1%">
       </ion-infinite-scroll>
