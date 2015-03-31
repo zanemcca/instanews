@@ -15,6 +15,9 @@
       "type": "string",
       "required": true
     },
+    "poster": {
+      "type": "string"
+    },
     "caption": {
       "type": "string"
     }
