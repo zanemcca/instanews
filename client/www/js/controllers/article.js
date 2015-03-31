@@ -148,6 +148,13 @@ app.controller('ArticleCtrl', [
       $scope.videoPostModal = modal;
    });
 
+   $ionicModal.fromTemplateUrl('templates/photoPostModal.html', {
+      scope: $scope,
+      animation: 'slide-in-up'
+   }).then( function (modal) {
+      $scope.photoPostModal = modal;
+   });
+
    $ionicModal.fromTemplateUrl('templates/postTextModal.html', {
       scope: $scope,
       animation: 'slide-in-up'
@@ -167,9 +174,10 @@ app.controller('ArticleCtrl', [
       $scope.postTextModal.hide();
    };
 
-   $scope.trashImage = function() {
+   $scope.trashPhoto = function() {
       $scope.data.imageURI = '';
       $scope.data.caption = '';
+      $scope.photoPostModal.hide();
    }
 
    $scope.trashVideo = function() {
@@ -194,7 +202,7 @@ app.controller('ArticleCtrl', [
       $scope.trashText();
    };
 
-   $scope.postPhoto = function(imageURI) {
+   $scope.postPhoto = function() {
       Article.subarticles.create({
          id: $stateParams.id,
          date: Date.now(),
@@ -203,13 +211,14 @@ app.controller('ArticleCtrl', [
          username: $scope.user.username,
          _file: {
             type: 'image',
-            name: imageURI,
+            name: $scope.data.imageURI,
             size: 5000,
-            caption: 'Look at that'
+            caption: $scope.data.caption
          }
       })
       .$promise.then( function(res) {
          $scope.subarticles.push(res);
+         $scope.trashPhoto();
       });
    }
 
@@ -217,7 +226,8 @@ app.controller('ArticleCtrl', [
       Camera.getPicture()
       .then( function(imageURI) {
          console.log(imageURI);
-         $scope.postPhoto(imageURI);
+         $scope.data.imageURI = imageURI;
+         $scope.photoPostModal.show();
       }, function(err) {
          console.err(err);
       });

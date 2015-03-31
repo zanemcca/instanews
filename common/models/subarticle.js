@@ -26,7 +26,7 @@ module.exports = function(Subarticle) {
             if ( inst._file.type === 'video') {
                console.log('Saving a video');
                if ( !inst._file.poster ) {
-                  inst._file.poster = "img/ionic.png"
+                  inst._file.poster = 'img/ionic.png';
                }
             }
             else {
