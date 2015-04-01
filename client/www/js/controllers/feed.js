@@ -7,6 +7,7 @@ app.controller('FeedCtrl', [
       'Article',
       'Common',
       'Comment',
+      'Camera',
       'Post',
       function($scope,
          $ionicModal,
@@ -14,6 +15,7 @@ app.controller('FeedCtrl', [
          Article,
          Common,
          Comment,
+         Camera,
          Post) {
 
    $scope.user = Common.user.user;
@@ -67,7 +69,8 @@ app.controller('FeedCtrl', [
 
    $scope.newArticle = {
       title: '',
-      search: ''
+      search: '',
+      subarticles: []
    };
 
    var autocomplete;
@@ -96,4 +99,87 @@ app.controller('FeedCtrl', [
       });
    };
 
+
+   $scope.data = {
+      text: '',
+      video: '',
+      caption: '',
+      imageURI: ''
+   };
+
+   $ionicModal.fromTemplateUrl('templates/postTextModal.html', {
+      scope: $scope,
+      animation: 'slide-in-up'
+   }).then( function (modal) {
+      $scope.postTextModal = modal;
+   });
+
+   $scope.trashText = function() {
+      $scope.data.text = '';
+      $scope.postTextModal.hide();
+   };
+
+   $scope.postText = function() {
+      $scope.newArticle.subarticles.push({
+         text: $scope.data.text
+      });
+      $scope.trashText();
+   };
+
+   $scope.trashVideo = function() {
+      $scope.data.video = {};
+      $scope.data.caption = '';
+      $scope.data.imageURI = '';
+   }
+
+   $scope.captureVideo = function() {
+      Camera.getVideo()
+      .then( function(video) {
+         $scope.newArticle.subarticles.push({
+            video: video[0]
+         });
+         $scope.trashVideo();
+      }, function(err) {
+         console.err(err);
+      });
+   };
+
+   $scope.trashPhoto = function() {
+      $scope.data.imageURI = '';
+      $scope.data.caption = '';
+      $scope.data.images = [];
+   }
+
+   $scope.getPhotos = function() {
+      window.imagePicker.getPictures( function(res) {
+         $scope.data.images = [];
+         for ( var i = 0; i < res.length; i++) {
+            //console.log('ImageURI: ' + res[i]);
+            image = {
+               URI: res[i],
+               caption: ''
+            };
+            $scope.data.images.push(image);
+         }
+         $scope.newArticle.subarticles.push({
+            images: $scope.data.images
+         });
+         $scope.trashPhoto();
+      }, function(err) {
+         console.log('Error: ', err);
+      });
+   };
+
+   $scope.capturePhoto = function() {
+      Camera.getPicture()
+      .then( function(imageURI) {
+         $scope.data.imageURI = imageURI;
+         $scope.newArticle.subarticles.push({
+            imageURI: $scope.data.imageURI
+         });
+         $scope.trashPhoto();
+      }, function(err) {
+         console.err(err);
+      });
+   };
 }]);

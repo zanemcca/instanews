@@ -21,6 +21,7 @@
   },
   "cordovaPlugins": [
     "org.apache.cordova.camera",
+    "com.synconset.imagepicker",
     "org.apache.cordova.media-capture"
   ]
 }

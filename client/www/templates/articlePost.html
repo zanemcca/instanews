@@ -17,7 +17,8 @@
          <label class="item item-input">
             <input type="text" placeholder="Title" ng-model="newArticle.title" required>
          </label>
-         <div class="item item-input item-stacked-label">
+
+         <!--div class="item item-input item-stacked-label">
             <span class="input-label">
                <div ng-if="!newArticle.place.name">
                   Location
@@ -29,10 +30,6 @@
             <div class="item item-icon-right no-padding" style="border:0px;">
                <div data-tap-disabled="true" style="width:60%">
                   <input type="text" ng-autocomplete placeholder="Search" ng-model="newArticle.search">
-                     <!--
-                  <input id="placeSearch" type="text" placeholder="Search"
-                     googleplace="">
-                  -->
                </div>
                <div class="icon">
                   <button class="button button-clear ion-location"
@@ -41,15 +38,18 @@
                   <a class="button button-clear ion-map" href="#/tab/map"></a>
                </div>
             </div>
+         </div-->
+         <div class="item" ng-repeat="subarticle in newArticle.subarticles">
+            <p>{{subarticle.text}}</p>
          </div>
       </div>
    </ion-content>
    <ion-footer-bar class="bar-dark">
       <div class="row">
-         <button class="button button-clear icon ion-camera"></button>
-         <button class="button button-clear icon ion-compose"></button>
-         <button class="button button-clear icon ion-videocamera"></button>
-         <button class="button button-clear icon ion-mic-b"></button>
+         <button class="col button button-clear icon ion-camera" ng-click="capturePhoto()"></button>
+         <button class="col button button-clear icon ion-image" ng-click="getPhotos()"></button>
+         <button class="col button button-clear icon ion-videocamera" ng-click="captureVideo()"></button>
+         <button class="col button button-clear icon ion-compose" ng-click="postTextModal.show()"></button>
       </div>
    </ion-footer-bar>
 </ion-view>

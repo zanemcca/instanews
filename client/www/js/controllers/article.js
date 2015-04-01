@@ -179,6 +179,7 @@ app.controller('ArticleCtrl', [
    $scope.trashPhoto = function() {
       $scope.data.imageURI = '';
       $scope.data.caption = '';
+      $scope.data.images = [];
       $scope.photoPostModal.hide();
    }
 
@@ -198,8 +199,30 @@ app.controller('ArticleCtrl', [
 
    $scope.postPhoto = function() {
       Post.photo($stateParams.id, $scope.user.username, $scope.data, function(res) {
-         $scope.subarticles.push(res);
+         if( res.length > 0 ) {
+            $scope.subarticles = $scope.subarticles.concat(res);
+         }
+         else {
+            $scope.subarticles.push(res);
+         }
          $scope.trashPhoto();
+      });
+   };
+
+   $scope.getPhotos = function() {
+      window.imagePicker.getPictures( function(res) {
+         $scope.data.images = [];
+         for ( var i = 0; i < res.length; i++) {
+            //console.log('ImageURI: ' + res[i]);
+            image = {
+               URI: res[i],
+               caption: ''
+            };
+            $scope.data.images.push(image);
+         }
+         $scope.photoPostModal.show();
+      }, function(err) {
+         console.log('Error: ', err);
       });
    };
 

@@ -6,8 +6,7 @@
       <button class="button button-clear icon ion-forward" ng-click="postPhoto()"></button>
    </ion-header-bar>
    <ion-content>
-      <div class="item no-padding item-divider" style="height:100%">
-
+      <div class="item no-padding item-divider" style="height:100%" ng-if="data.imageURI">
          <div class="item item-divider">
             <textarea type="text" style="width:100%;" ng-model="data.caption" placeholder=" Caption" required></textarea>
          </div>
@@ -18,5 +17,15 @@
             </div>
          </div>
       </div>
+
+      <ul class="list" ng-if="data.images.length > 0">
+         <div class="item item-divider" ng-repeat="image in data.images">
+            <div class="item no-padding item-image">
+               <img src="{{image.URI}}">
+            </div>
+            <textarea type="text" style="width:100%;" ng-model="image.caption" placeholder=" Caption" required></textarea>
+         </div>
+      </ul>
+
    </ion-content>
 </ion-modal-view>

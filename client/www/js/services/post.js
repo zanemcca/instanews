@@ -8,21 +8,54 @@ app.factory('Post', [
       function(Article, Common) {
 
    var photo = function(id, username,  data, cb) {
-      console.log('Posting a photo');
-      Article.subarticles.create({
-         id: id,
-         date: Date.now(),
-         myId: Math.floor(Math.random()*Math.pow(2,32)),
-         parentId: id,
-         username: username,
-         _file: {
-            type: 'image',
-            name: data.imageURI,
-            size: 5000,
-            caption: data.caption
+
+      if ( data.images && data.images.length > 0 ) {
+         var subs = [];
+
+         for( var i = 0; i < data.images.length; i++) {
+            var image = data.images[i];
+
+            var subarticle = {
+               id: id,
+               parentId: id,
+               date: Date.now(),
+               username: username,
+               myId: Math.floor(Math.random()*Math.pow(2,32)),
+               _file: {
+                  type: 'image',
+                  name: image.URI,
+                  size: 5000,
+                  caption: image.caption
+               }
+            }
+            Article.subarticles.create(subarticle)
+            .$promise.then( function (res) {
+               subs.push(res);
+               if ( subs.length === data.images.length) {
+                  cb(subs);
+               }
+            });
          }
-      })
-      .$promise.then(cb);
+      }
+      else if ( data.imageURI ) {
+         console.log('Posting a photo');
+         var subarticle = {
+            id: id,
+            parentId: id,
+            date: Date.now(),
+            username: username,
+            myId: Math.floor(Math.random()*Math.pow(2,32)),
+            _file: {
+               type: 'image',
+               name: data.imageURI,
+               size: 5000,
+               caption: data.caption
+            }
+         }
+         Article.subarticles.create(subarticle)
+         .$promise.then(cb);
+      }
+
    };
 
    var video = function(id, username, data, cb) {
@@ -80,7 +113,30 @@ app.factory('Post', [
          username: username,
          title: newArticle.title
       })
-      .$promise.then(cb);
+      .$promise.then( function(res) {
+
+         if( newArticle.subarticles.length > 0 ){
+            for( var i = 0; i < newArticle.subarticles.length; i++) {
+               var sub = newArticle.subarticles[i];
+               var func;
+               if( sub.text ) {
+                  func = text;
+               }
+               else if ( sub.video ) {
+                  func = video;
+               }
+               else {
+                  func = photo;
+               }
+
+               func(res.myId,username,sub,function(res) {
+                  console.log('Succesful sub creation');
+               });
+
+            }
+         }
+         cb(res);
+      });
    };
 
   return {
