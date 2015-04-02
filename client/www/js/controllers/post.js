@@ -23,6 +23,13 @@ app.controller('PostCtrl', [
    if( $stateParams.id ) {
       $scope.article = Common.getArticle($stateParams.id);
    }
+   else {
+      //Refresh the map everytime we enter the view
+      $scope.$on('$ionicView.enter', function() {
+         google.maps.event.trigger(Common.getArticleMap(), 'resize');
+      });
+   }
+
 
    $scope.useMyLocation = function() {
       //TODO Change this to lookup the name of the user location

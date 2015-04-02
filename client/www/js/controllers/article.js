@@ -44,6 +44,12 @@ app.controller('ArticleCtrl', [
 
    getSubarticles();
 
+   //Refresh the map everytime we enter the view
+   $scope.$on('$ionicView.enter', function() {
+      google.maps.event.trigger(Common.getArticleMap(), 'resize');
+   });
+
+
    //TODO Only load modified or new subarticles
    //    not all of them. I think server side session
    //    management is the key

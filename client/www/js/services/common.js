@@ -12,6 +12,23 @@ app.service('Common', [
    //Initialize and refresh
 
    var bounds;
+   var feedMap, articleMap;
+
+   var getArticleMap = function() {
+      return articleMap;
+   };
+
+   var setArticleMap = function(map) {
+      articleMap = map;
+   };
+
+   var getFeedMap = function() {
+      return feedMap;
+   };
+
+   var setFeedMap = function(map) {
+      feedMap = map;
+   };
 
    var user = {};
 
@@ -181,6 +198,10 @@ app.service('Common', [
       getArticles: getArticles,
       setArticles: setArticles,
       user: user,
+      setFeedMap: setFeedMap,
+      getFeedMap: getFeedMap,
+      getArticleMap: getArticleMap,
+      setArticleMap: setArticleMap,
       getArticle: getArticle,
       radToSlide: radToSlide,
       setBounds: setBounds,

@@ -44,6 +44,11 @@ app.controller('FeedCtrl', [
 
    $scope.onRefresh();
 
+   //Refresh the map everytime we enter the view
+   $scope.$on('$ionicView.enter', function() {
+      google.maps.event.trigger(Common.getFeedMap(), 'resize');
+   });
+
    //TODO load more server side using session management
    $scope.loadMore = function() {
       console.log('No more articles');

@@ -14,7 +14,8 @@ app.directive('inmap', [
 
          $scope.mPos = Common.mPosition;
 
-         var map, articleMap;
+         var map = Common.getFeedMap();
+         var map = Common.getArticleMap();
          var posWatch;
 
          var northPole = new google.maps.LatLng(90.0000, 0.0000);
@@ -213,6 +214,8 @@ app.directive('inmap', [
                   Common.setBounds(map.getBounds());
                   updateHeatmap();
                });
+
+               Common.setFeedMap(map);
             }
 
             //Article map only contains a marker to the current article
@@ -231,13 +234,10 @@ app.directive('inmap', [
                   position: mapOptions.center
                };
                articleMarker = new google.maps.Marker(tempMarker);
+
+               Common.setArticleMap(articleMap);
             }
 
-            //Refresh the map everytime we enter the view
-            $scope.$on('$ionicView.enter', function() {
-               google.maps.event.trigger(map, 'resize');
-               google.maps.event.trigger(articleMap, 'resize');
-            });
           };
 
 
