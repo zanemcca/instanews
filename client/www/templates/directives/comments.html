@@ -16,6 +16,37 @@
                style="border: transparent"
                votable="comment">
             </inVotes>
+
+            <div ng-if="comment.showComments">
+               <ul class="list">
+                  <li class="item no-padding"
+                  ng-repeat="com in comment.comments | orderBy: '-(date)'">
+                     <div class="item item-text-wrap"
+                        style="padding-bottom: 0px; border-bottom-color: transparent">
+                        <a class="button button-clear button-small"
+                           href="#/tab/journalists/{{com.username}}" >
+                           {{com.username}}
+                        </a>
+                        <p>{{com.content}}</p>
+
+                        <inVotes class="item no-padding"
+                           style="border: transparent"
+                           votable="com">
+                        </inVotes>
+                     </div>
+                  </li>
+               </ul>
+               <form name="form" class="item item-divider no-padding" style="border-color: transparent">
+                  <div style="padding-right:60px">
+                     <textarea style="width:100%" type="text" ng-model="newComment" placeholder="Comment" required></textarea>
+                  </div>
+                  <div class="item-icon-right">
+                     <button type="reset" class="button button-clear icon ion-forward"
+                        ng-click="Common.createComment(comment, newComment)" ng-disabled="!newComment">
+                     </button>
+                  </div>
+               </form>
+            </div>
          </div>
       </li>
    </ul>

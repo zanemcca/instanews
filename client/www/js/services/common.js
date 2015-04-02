@@ -100,12 +100,28 @@ app.service('Common', [
 
    //Comments
    var createComment = function (instance, content) {
-      instance.constructor.comments.create({
-         id: instance.myId,
-         content: content,
-         commentableId: instance.myId,
-         commentableType: instance.constructor.modelName.toLowerCase()
-      })
+      var Create = {};
+      var model = {};
+      if (instance.commentableId ) {
+         Create = Comment.prototype$__create__comments;
+         model = {
+            id: instance.myId,
+            content: content,
+            commentableId: instance.myId,
+            commentableType: "comment"
+         };
+      }
+      else {
+         Create = instance.constructor.comments.create;
+         model = {
+            id: instance.myId,
+            content: content,
+            commentableId: instance.myId,
+            commentableType: instance.constructor.modelName.toLowerCase()
+         };
+      }
+
+      Create(model)
       .$promise
       .then( function(res, err) {
          instance.comments.push(res);
