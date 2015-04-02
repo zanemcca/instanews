@@ -39,8 +39,8 @@
                </div>
             </div>
          </div-->
-         <div class="item" ng-repeat="subarticle in newArticle.subarticles">
-            <p>{{subarticle.text}}</p>
+         <div ng-repeat="data in newArticle.data">
+            <inDataPreview data="data"></inDataPreview>
          </div>
       </div>
    </ion-content>

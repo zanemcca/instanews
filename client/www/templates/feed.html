@@ -26,9 +26,9 @@
                <div class="item"
                   style="border-top:0px;padding-right:0px;padding-left:0px;padding-top:0px;padding-bottom:1px">
 
-                  <file-item ng-if="article.topSub._file"
-                     subarticle="article.topSub">
-                  </file-item>
+                  <inData ng-if="article.topSub._file"
+                     data="article.topSub._file" id="article.topSub.myId">
+                  </inData>
                   <div class="item item-icon-right"
                      style="padding-top:0px;border-top:0px">
                      <div class="icon">
@@ -43,10 +43,10 @@
             </a>
 
             <div class="item" style="border:0px;padding-top:0px;padding-bottom:0px">
-               <votes style="border: transparent"
-                  voteable="article">
-               </votes>
-               <comments owner="article"></comments>
+               <inVotes style="border: transparent"
+                  votable="article">
+               </inVotes>
+               <inComments owner="article"></inComments>
             </div>
 
          </ion-item>

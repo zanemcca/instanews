@@ -1,9 +1,12 @@
 <!DOCTYPE html>
 <ion-view view-title="{{article.title}}" style="background-color: #C0C0C0">
    <ion-nav-buttons side="secondary">
-      <button class="button button-clear icon ion-plus-round"
+      <a class="button button-clear icon ion-plus-round"
+         href="#/post/article/{{article.myId}}">
+      </a>
+      <!--button class="button button-clear icon ion-plus-round"
          ng-click="postPopover.show($event)">
-      </button>
+      </button-->
    </ion-nav-buttons>
    <ion-content>
       <ion-refresher pulling-text="Fresh Stuff" on-refresh="onRefresh()">
@@ -29,14 +32,14 @@
             <div class="item item-body"
                style="padding-right:0px;padding-left:0px;padding-top:0px;padding-bottom:1px"
                ng-if="subarticle._file">
-               <file-item subarticle="subarticle"></file-item>
+               <inData data="subarticle._file" id="subarticle.myId"></inData>
             </div>
 
             <div class="item" style="border:0px;padding-top:0px;padding-bottom:0px">
-               <votes style="border: transparent"
-                  voteable="subarticle">
-               </votes>
-               <comments owner="subarticle"></comments>
+               <inVotes style="border: transparent"
+                  votable="subarticle">
+               </inVotes>
+               <inComments owner="subarticle"></inComments>
             </div>
 
          </li>

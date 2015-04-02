@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<ion-view view-title="{{article.title}}">
+   <ion-nav-buttons side="secondary">
+      <button class="button button-clear icon ion-forward" ng-click="postSubarticle()"></button>
+   </ion-nav-buttons>
+   <ion-content>
+      <div ng-repeat="data in newArticle.data">
+         <inDataPreview data="data"></inDataPreview>
+      </div>
+   </ion-content>
+   <ion-footer-bar class="bar-dark">
+      <div class="row">
+         <button class="col button button-clear icon ion-camera" ng-click="capturePhoto()"></button>
+         <button class="col button button-clear icon ion-image" ng-click="getPhotos()"></button>
+         <button class="col button button-clear icon ion-videocamera" ng-click="captureVideo()"></button>
+         <button class="col button button-clear icon ion-compose" ng-click="postTextModal.show()"></button>
+      </div>
+   </ion-footer-bar>
+</ion-view>

@@ -1,49 +1,71 @@
-var app = angular.module('instanews.file', ['ionic', 'ngResource']);
+var app = angular.module('instanews.data', ['ionic', 'ngResource']);
 
+//TODO move this into a JSON or something
 var urlBase = 'http://192.168.100.10:3000/api';
 
-app.directive('fileItem', function ($compile) {
+//This directive will display data in a preview format
+app.directive('indatapreview', [
+      function () {
 
-   var id;
+   return {
+      restrict: 'E',
+      scope: {
+         data: '='
+      },
+      controller: function($scope) {
+      },
+      templateUrl: 'templates/directives/dataPreview.html'
+   };
+}]);
 
+//This directive will display subarticle data in a consumable format
+app.directive('indata',
+      function ($compile) {
 
-   var getSrc = function (subarticle) {
-      if (subarticle._file.name.indexOf('file:///') > -1) {
-         return subarticle._file.name;
+   var getSrc = function (data) {
+      var name;
+      if (data.name) {
+         name = data.name;
+      }
+      else if(data.fullPath) {
+         name = data.fullPath;
+      }
+      else if(data.imageURI) {
+         name = data.URI;
+      }
+
+      if (name.indexOf('file:///') > -1) {
+         return name;
       }
       else {
-         return '"' + urlBase + '/storages/' +
-            subarticle.parentId + '/download/' +
-            subarticle._file.name + '"';
+         //TODO get rid of this method the URL should be in the data
+         return '"' + urlBase + '/storages/1/download/' +
+            name + '"';
       }
    };
 
-   var getWidth = function (file) {
-
-   };
-
-   var getTemplate = function (subarticle) {
+   //TODO move this into an HTML file instead of writing on the fly
+   var videoId;
+   var getTemplate = function (id, data) {
       var template = '';
 
-      var type = subarticle._file.type;
+      var type = data.type;
       if(type.indexOf('image') > -1) {
          template = '<div class="item no-padding item-image">' +
             '<img height="auto" width="auto" src='+
-            getSrc(subarticle) + '></div>';
+            getSrc(data) + '></div>';
       }
       else if (type.indexOf('video') > -1) {
-         id = 'video_' + subarticle.myId;
+         videoId = 'video_' + id;
 
          template = '<div id="video-container">' +
-         '<video poster="' + subarticle._file.poster +
-         '" controls width="100%" id="'+ id + '"';
+         '<video poster="' + data.poster +
+         '" controls width="100%" id="'+ videoId + '"';
 
          if (ionic.Platform.isIOS()) {
-            console.log('isIOS');
             template += '>'
          }
          else {
-            console.log('is not IOS');
             template += ' class="video-js vjs-default-skin' +
             ' vjs-big-play-centered vjs-paused vjs-controls-enabled' +
             ' vjs-user-active" data-setup={}>';
@@ -54,12 +76,12 @@ app.directive('fileItem', function ($compile) {
          '</video></div>';
       }
       else {
-         console.log('Bad file type... ', subarticle._file.type);
+         console.log('Bad file type... ', data.type);
       }
 
       template += '<div class="item" style="padding-bottom:0px">' +
          '<p class="no-margin">' +
-         subarticle._file.caption +
+         data.caption +
          '</p>' +
       '</div>';
 
@@ -77,20 +99,17 @@ app.directive('fileItem', function ($compile) {
    };
 
    var linker = function (scope, element, attrs) {
-      if (scope.subarticle && scope.subarticle._file) {
-         element.html(getTemplate(scope.subarticle));
+      if (scope.data) {
+         element.html(getTemplate(scope.id, scope.data));
 
-         if (scope.subarticle._file.type.indexOf('video') > -1) {
-
-            console.log('Created ' + id);
+         if (scope.data.type.indexOf('video') > -1) {
 
             if ( !ionic.Platform.isIOS()) {
-               videojs(id).ready( function() {
+               videojs(videoId).ready( function() {
 
                   var player = this;
                   scope.$on('$destroy', function () {
                      player.dispose();
-                     console.log('Destroyed ', id);
                   });
 
                   player.on('play', function(err) {
@@ -120,7 +139,8 @@ app.directive('fileItem', function ($compile) {
    return {
       restrict: 'E',
       scope: {
-         subarticle: '='
+         data: '=',
+         id: '='
       },
       link: linker
    };

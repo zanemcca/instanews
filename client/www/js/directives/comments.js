@@ -1,6 +1,6 @@
 var app = angular.module('instanews.comments', ['ionic', 'ngResource']);
 
-app.directive('comments', [
+app.directive('incomments', [
       'Common',
       function (Common) {
 

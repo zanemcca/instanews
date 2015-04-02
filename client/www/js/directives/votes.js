@@ -1,6 +1,6 @@
 var app = angular.module('instanews.votes', ['ionic', 'ngResource']);
 
-app.directive('votes', [
+app.directive('invotes', [
       'Comment',
       'Common',
       function (Comment, Common) {
@@ -8,7 +8,7 @@ app.directive('votes', [
    return {
       restrict: 'E',
       scope: {
-         voteable: '='
+         votable: '='
       },
       controller: function($scope) {
          $scope.Common = Common;

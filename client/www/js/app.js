@@ -10,11 +10,11 @@ angular.module('instanews', [
       'instanews.common',
       'instanews.article',
       'instanews.feed',
-      'instanews.file',
       'instanews.votes',
       'instanews.login',
       'instanews.comments',
       'instanews.map',
+      'instanews.data',
       'instanews.camera',
       'instanews.post',
       'lbServices',
@@ -55,17 +55,6 @@ angular.module('instanews', [
       controller: "LoginCtrl"
    })
 
-  // setup an abstract state for the tabs directive
-  /*
-    .state('tab', {
-    url: "/tab",
-    abstract: true,
-    templateUrl: "templates/tabs.html"
-  })
-
-  */
-  // Each tab has its own nav history stack:
-
    .state('feed', {
       url: '/feed',
       templateUrl: 'templates/feed.html',
@@ -81,19 +70,14 @@ angular.module('instanews', [
    .state('articlePost', {
       url: '/post/article',
       templateUrl: 'templates/articlePost.html',
-      controller: 'FeedCtrl'
+      controller: 'PostCtrl'
    })
 
-   /*
-   .state('map', {
-      url: '/map',
-      views: {
-         'map': {
-            templateUrl: 'templates/map.html',
-            controller: 'MapCtrl'
-         }
-      }
-   })*/;
+   .state('subarticlePost', {
+      url: '/post/article/{id}',
+      templateUrl: 'templates/subarticlePost.html',
+      controller: 'PostCtrl'
+   })
 
   // if none of the above states are matched, use this as the fallback
   if ( true ) {
