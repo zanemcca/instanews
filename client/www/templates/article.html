@@ -20,7 +20,7 @@
       </div>
       <ul class="list">
          <ion-item class="no-padding card"
-         collection-repeat="subarticle in subarticles | orderBy: '-(rating)'">
+         ng-repeat="subarticle in subarticles | orderBy: '-(rating)'">
             <div class="item item-avatar item-text-wrap" style="min-height:65px" >
                <img src="img/ionic.png">
                <a class="button button-clear no-padding button-small"

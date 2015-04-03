@@ -17,7 +17,7 @@
       </div>
       <ul class="list">
          <ion-item class="no-padding card"
-            collection-repeat="article in articles | orderBy: '-(rating)'">
+            ng-repeat="article in articles | orderBy: '-(rating)'">
             <a class="item no-padding item-text-wrap"
                style="border:transparent"
                href="#/articles/{{article.myId}}">
