@@ -30,12 +30,14 @@ app.directive('inmap', [
             //updateMyCircle();
             //updateMarkers();
             updateHeatmap();
+            console.log('Update position');
          }
 
          //Reload the markers when we recieve new articles
          $scope.$watch('articles', function (newValue, oldValue) {
             if (newValue !== oldValue) {
               updateHeatmap();
+              console.log('Articles updated');
               //getMarkers();
             }
          }, true);
@@ -211,6 +213,7 @@ app.directive('inmap', [
                posWatch = navigator.geolocation.watchPosition( updatePosition, error, {enableHighAccuracy: true});
 
                google.maps.event.addListener(map, 'bounds_changed', function() {
+                  console.log('Updating map');
                   Common.setBounds(map.getBounds());
                   updateHeatmap();
                });

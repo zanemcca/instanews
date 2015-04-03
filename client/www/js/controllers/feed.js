@@ -12,6 +12,7 @@ app.controller('FeedCtrl', [
 
    var loadLimit = 10;
    $scope.onRefresh = function () {
+      console.log('Refresh');
       var filter = {
          limit: loadLimit,
          include: {
@@ -45,7 +46,7 @@ app.controller('FeedCtrl', [
    $scope.onRefresh();
 
    //Refresh the map everytime we enter the view
-   $scope.$on('$ionicView.enter', function() {
+   $scope.$on('$ionicView.afterEnter', function() {
       google.maps.event.trigger(Common.getFeedMap(), 'resize');
    });
 

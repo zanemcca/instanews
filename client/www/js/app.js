@@ -36,6 +36,9 @@ angular.module('instanews', [
 
 .config(function($stateProvider, $urlRouterProvider, $ionicConfigProvider, $compileProvider) {
 
+   //No transitions for performance
+   $ionicConfigProvider.views.transition('none');
+
 //   $compileProvider.aHrefSanitizationWhitelist(/^\s*(https?|ftp|mailto|file|tel):/);
 //   $compileProvider.imgSrcSanitizationWhitelist(/^\s*(https?|ftp|mailto|file|tel):/);
 

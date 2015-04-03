@@ -40,6 +40,7 @@ app.service('Common', [
       radSlider: 0
    };
 
+   /*
    //Radius Slider
    var RadiusMax = Math.PI*6371000; //Half the earths circumference
    var RadiusMin = 500; //Minimum radius in meters
@@ -79,6 +80,7 @@ app.service('Common', [
       var radius =  Math.exp(parseInt(radSlider) / scale) + RadiusMin - 1;
       return radius;
    }
+   */
 
    // Could replace with google API call, but this keeps it local and fast
    var withinRange = function (position) {
@@ -203,7 +205,7 @@ app.service('Common', [
       getArticleMap: getArticleMap,
       setArticleMap: setArticleMap,
       getArticle: getArticle,
-      radToSlide: radToSlide,
+//      radToSlide: radToSlide,
       setBounds: setBounds,
       getBounds: getBounds,
       mPosition: mPosition,
