@@ -79,7 +79,7 @@ app.controller('LoginCtrl', [
             }
 
             $scope.invalidLogin = false;
-            $state.go('feed');
+            $state.go('app.feed');
       }, function (err) {
          $scope.invalidLogin = true;
          $scope.cred.password = '';

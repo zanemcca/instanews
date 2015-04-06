@@ -5,6 +5,9 @@
          href="#/post/article">
       </a>
    </ion-nav-buttons>
+   <ion-nav-buttons side="primary">
+      <button ng-click="toggleMenu()" class="button button-icon icon ion-navicon"></button>
+   </ion-nav-buttons>
    <ion-content>
       <ion-refresher pulling-text="Fresh Stuff" on-refresh="onRefresh()">
       </ion-refresher>
@@ -18,7 +21,7 @@
             ng-repeat="article in articles | orderBy: '-(rating)'">
             <a class="item no-padding item-text-wrap"
                style="border:transparent"
-               href="#/articles/{{article.myId}}">
+               href="#/app/articles/{{article.myId}}">
                <div class="item"
                   style="border-bottom:0px;">
                   {{article.title}}

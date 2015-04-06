@@ -34,6 +34,11 @@ angular.module('instanews', [
   });
 })
 
+.controller('AppCtrl', [
+   '$scope',
+   function ($scope) {
+   }])
+
 .config(function($stateProvider, $urlRouterProvider, $ionicConfigProvider, $compileProvider) {
 
    //No transitions for performance
@@ -52,22 +57,37 @@ angular.module('instanews', [
   // Each state's controller can be found in controllers.js
   $stateProvider
 
-   .state('login', {
-      url:'/login',
-      templateUrl: "templates/login.html",
-      controller: "LoginCtrl"
+   .state('app', {
+      url:'/app',
+      abstract: true,
+      templateUrl: "templates/menu.html",
+      controller: "AppCtrl"
    })
 
-   .state('feed', {
-      url: '/feed',
-      templateUrl: 'templates/feed.html',
-      controller: 'FeedCtrl'
+   .state('app.feed', {
+      url:'/feed',
+      views: {
+         'menuContent' : {
+            templateUrl: "templates/feed.html",
+            controller: "FeedCtrl"
+         }
+      }
    })
 
-   .state('article', {
+   .state('app.article', {
       url: '/articles/{id}',
-      templateUrl: 'templates/article.html',
-      controller: 'ArticleCtrl'
+      views: {
+         'menuContent' : {
+            templateUrl: 'templates/article.html',
+            controller: 'ArticleCtrl'
+         }
+      }
+   })
+
+   .state('login', {
+      url: '/login',
+      templateUrl: 'templates/login.html',
+      controller: 'LoginCtrl'
    })
 
    .state('articlePost', {

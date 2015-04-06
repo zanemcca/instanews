@@ -4,9 +4,10 @@ var app = angular.module('instanews.common', ['ionic', 'ngResource']);
 app.service('Common', [
       '$rootScope',
       '$filter',
+      '$ionicSideMenuDelegate',
       'Article',
       'Comment',
-      function($rootScope, $filter, Article, Comment){
+      function($rootScope, $filter, $ionicSideMenuDelegate, Article, Comment){
 
    var articles = [];
    //Initialize and refresh
@@ -201,7 +202,21 @@ app.service('Common', [
       articles = arts;
    };
 
+   var toggleMenu = function() {
+      console.log('Toggling menu');
+
+      if( $ionicSideMenuDelegate.isOpenLeft()) {
+         console.log('Open already');
+      }
+      else {
+         console.log('Not Opened');
+      }
+
+      $ionicSideMenuDelegate.toggleLeft();
+   };
+
    return {
+      toggleMenu: toggleMenu,
       getArticles: getArticles,
       setArticles: setArticles,
       user: user,

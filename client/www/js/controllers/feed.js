@@ -9,6 +9,7 @@ app.controller('FeedCtrl', [
          Common) {
 
    $scope.articles = Common.getArticles();
+   $scope.toggleMenu = Common.toggleMenu;
    $scope.itemsAvailable = true;
 
    var filter = {

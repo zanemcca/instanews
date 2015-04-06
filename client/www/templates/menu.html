@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<div ng-controller="AppCtrl">
+   <ion-side-menus>
+
+     <ion-side-menu-content enable-menu-with-back-views="true">
+        <ion-nav-view name="menuContent"></ion-nav-view>
+     </ion-side-menu-content>
+
+     <ion-side-menu side="left">
+       <header class="bar bar-header bar-stable">
+         <h1 class="title">Menu</h1>
+       </header>
+       <ion-content class="has-header">
+        <ion-item nav-clear menu-close ui-sref="app.logout">
+          Logout
+        </ion-item>
+       </ion-content>
+     </ion-side-menu>
+
+   </ion-side-menus>
+</div>
