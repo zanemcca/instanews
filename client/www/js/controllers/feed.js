@@ -9,9 +9,10 @@ app.controller('FeedCtrl', [
          Common) {
 
    $scope.articles = Common.getArticles();
+   $scope.itemsAvailable = true;
 
    var filter = {
-      limit: 1,
+      limit: 50,
       skip: 0,
       include: {
          relation: 'subarticles',
@@ -104,5 +105,5 @@ app.controller('FeedCtrl', [
    });
 
    //Initialization
-   $scope.onRefresh();
+//   $scope.onRefresh();
 }]);

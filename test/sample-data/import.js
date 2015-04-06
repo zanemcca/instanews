@@ -55,6 +55,44 @@ module.exports = function (app, cb) {
       });
    }
 
+   function importArticles(cb) {
+
+      function randomLat() {
+         max = 46;
+         min = 45;
+         return Math.random()*(max - min) + min;
+      };
+
+      function randomLng() {
+         max = -65.5;
+         min = -67;
+         return Math.random()*(max - min) + min;
+      };
+
+      function randomId() {
+         var id = Math.floor(Math.random()*Math.pow(2,32));
+         console.log(id);
+         return id;
+      };
+
+      var limit = 200;
+      for( var i = 0; i < limit ; i++ ) {
+         Articles.create({
+            title: i,
+            myId: randomId(),
+            location: {
+               lat: randomLat(),
+               lng: randomLng()
+            },
+            isPrivate: false
+         }, function(err, res) {
+            console.log(res);
+         });
+      }
+      cb(null);
+
+   }
+
    function createAdmin(callback) {
       AccessToken.destroyAll( function(err) {
          if (err) return callback(err);
@@ -105,6 +143,7 @@ module.exports = function (app, cb) {
       importData.bind(null,Comments, comments),
       importData.bind(null,Subarticles, subarticles),
       createAdmin.bind(null),
+      importArticles.bind(null),
       updateDB.bind(null)
    ], function(err,res) {
          if (err) {

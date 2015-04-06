@@ -36,6 +36,16 @@ describe('Articles', function() {
       });
    });
 
+   it('User should be able to upvote an article', function(done) {
+      api.post('/api/articles/1/upVotes')
+      .set('Authorization', token.id)
+      .expect(200)
+      .end( function(err, res) {
+         dump(err, res);
+         done(err, res);
+      });
+   });
+
    it('User should be able to downvote an article', function(done) {
       api.post('/api/articles/1/downVotes')
       .set('Authorization', token.id)

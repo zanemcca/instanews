@@ -16,7 +16,7 @@ app.controller('ArticleCtrl', [
    $scope.itemsAvailable = true;
 
    var filter = {
-      limit: 1,
+      limit: 10,
       skip: 0,
       order: 'rating DESC'
    }
@@ -79,8 +79,5 @@ app.controller('ArticleCtrl', [
          $scope.$broadcast('scroll.infiniteScrollComplete');
       });
    };
-
-   //Initialization
-   $scope.onRefresh();
 }]);
 
