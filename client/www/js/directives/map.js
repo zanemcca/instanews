@@ -1,8 +1,9 @@
-var app = angular.module('instanews.map', ['ionic', 'ngResource']);
+var app = angular.module('instanews.map', ['ionic', 'ngResource', 'underscore']);
 
 app.directive('inmap', [
+      '_',
       'Common',
-      function (Common) {
+      function (_, Common) {
 
    return {
       restrict: 'E',
@@ -167,6 +168,11 @@ app.directive('inmap', [
 
          function updateHeatmap() {
             var articleHeatArray = [];
+
+            if( !Common.getBounds()) {
+               return;
+            }
+
             for(var i = 0; i < $scope.articles.length; i++) {
                var position = new google.maps.LatLng($scope.articles[i].location.lat, $scope.articles[i].location.lng);
                if (Common.withinRange(position)) {
@@ -230,13 +236,18 @@ app.directive('inmap', [
             var element = document.getElementById("feedMap");
             if ( element && element.textContent.indexOf('Map') === -1) {
                map = new google.maps.Map(element, mapOptions);
-               posWatch = navigator.geolocation.watchPosition( updatePosition, error, {enableHighAccuracy: true});
+               posWatch = navigator.geolocation.watchPosition(
+                     _.debounce(updatePosition, 500),
+                     error,
+                     {
+                        enableHighAccuracy: true
+                     });
 
-               google.maps.event.addListener(map, 'bounds_changed', function() {
+               google.maps.event.addListener(map, 'bounds_changed', _.debounce(function() {
                   console.log('Updating map');
                   Common.setBounds(map.getBounds());
                   updateHeatmap();
-               });
+               }, 500));
 
                Common.setFeedMap(map);
             }

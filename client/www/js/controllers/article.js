@@ -1,14 +1,16 @@
-var app = angular.module('instanews.article', ['ionic', 'ngResource']);
+var app = angular.module('instanews.article', ['ionic', 'ngResource', 'underscore']);
 
 app.controller('ArticleCtrl', [
       '$scope',
       '$stateParams',
       'Article',
       'Common',
+      '_',
       function($scope,
          $stateParams,
          Article,
-         Common) {
+         Common,
+         _) {
 
    //Scope variables
    $scope.subarticles = [];
@@ -74,10 +76,10 @@ app.controller('ArticleCtrl', [
    };
 
    $scope.loadMore = function() {
-      console.log('Loading more');
-      load( function() {
+      _.debounce( load( function() {
+         console.log('Loading more');
          $scope.$broadcast('scroll.infiniteScrollComplete');
-      });
+      }), 500);
    };
 }]);
 
