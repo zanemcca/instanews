@@ -159,8 +159,13 @@ app.service('Common', [
             model = instance.constructor;
          }
 
+         var filter = {
+            limit: 10,
+            order: 'rating DESC'
+         }
+
          //Retrieve the comments from the server
-         model.prototype$__get__comments({id: instance.myId})
+         model.prototype$__get__comments({id: instance.myId, filter: filter})
          .$promise
          .then( function (res) {
             instance.comments = res;

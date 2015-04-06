@@ -15,112 +15,72 @@ app.controller('ArticleCtrl', [
    $scope.article = Common.getArticle($stateParams.id);
    $scope.itemsAvailable = true;
 
-   var lastUpdate = new Date(1975,1);
-
-   var loadLimit = 3;
-
    var filter = {
-      limit: loadLimit,
+      limit: 1,
       skip: 0,
-      order: 'rating DESC'/*,
-      where: {
-         date: {gt: lastUpdate}
-      }*/
+      order: 'rating DESC'
    }
-
-   var getSubarticles = function(cb) {
-
-      filter.skip = 0;
- //     lastUpdate = new Date(1975,1);
- //     filter.where.date.gt = lastUpdate;
-      Article.subarticles({id: $stateParams.id, filter: filter})
-      .$promise
-      .then( function (res) {
-         $scope.subarticles = res;
-         $scope.itemsAvailable = true;
-         if (cb) cb();
-      });
-   };
-
-   getSubarticles();
 
    //Refresh the map everytime we enter the view
    $scope.$on('$ionicView.afterEnter', function() {
       google.maps.event.trigger(Common.getArticleMap(), 'resize');
    });
 
-
-   //TODO Only load modified or new subarticles
-   //    not all of them. I think server side session
-   //    management is the key
-   $scope.loadMore = function () {
-      filter.limit = $scope.subarticles.length + loadLimit;
-      //TODO Dynamic loadLimit based on scroll speed & ping time
-
-      Article.subarticles.count({id: $stateParams.id})
+   var load = function(cb) {
+      Article.subarticles({id: $stateParams.id, filter: filter })
       .$promise
-      .then ( function (res) {
+      .then( function (subarticles) {
+         if ( subarticles.length <= 0 ) {
+            $scope.itemsAvailable = false;
+         }
+         else {
+            //Update our skip amount
+            filter.skip += subarticles.length;
 
-         var count = res.count;
+            //Set the top article and remove duplicates
+            for( var i = 0; i < subarticles.length; i++) {
+               var subarticle = subarticles[i];
 
-         Article.subarticles({
-            id: $stateParams.id,
-            filter: filter
-         })
-         .$promise
-         .then( function (res) {
-            if (res.length >= count) {
-               console.log('No more items');
-               $scope.itemsAvailable = false;
-            }
-            for(var j = 0; j < res.length; j++) {
-               item = res[j];
-               var update = false;
-               for(var i = 0; i < $scope.subarticles.length; i++ ) {
-                  var sub = $scope.subarticles[i];
-                  if( sub.myId === item.myId) {
-                     update = true;
-                     if ( Date.parse(sub.date) < Date.parse(item.date)) {
-                        //Only update the votes for now so that media doesn't
-                        //have to reload
-                        sub._votes = item._votes;
-                        sub.date = item.date;
-
-                        console.log('Updated: ' + item.text);
-                        console.log('@ ' + item.date);
-                        if ( item._file) {
-                           console.log(item._file.name);
-                        }
-                     }
+               //Remove duplicates
+               for(var j = 0; j < $scope.subarticles.length; j++ ) {
+                  var sub = $scope.subarticles[j];
+                  if( sub.myId === subarticle.myId) {
+                     subarticles.splice(i,1);
                      break;
                   }
                }
-               if(!update) {
-                  $scope.subarticles.push(item);
-               }
-
-               /*
-               //Set our last update as the latest updated article we recieve back
-               //This makes sure there is no possibility of forming gaps .
-               var tempDate = Date.parse(item._votes.lastUpdated);
-               if ( lastUpdate < tempDate) {
-                  console.log('lastUpdate: ' + lastUpdate + '\tRemote: ' + tempDate);
-                  lastUpdate = tempDate;
-                 // filter.where.date.gt = lastUpdate;
-               }
-               */
             }
-         });
-      });
 
-      $scope.$broadcast('scroll.infiniteScrollComplete');
+            //Update our local subarticles
+            $scope.subarticles = $scope.subarticles.concat(subarticles);
+         }
+
+         cb();
+      });
    };
 
    $scope.onRefresh = function () {
-      getSubarticles( function () {
+      console.log('Refresh');
+
+      //Reset all necessary values
+      $scope.itemsAvailable = true;
+      filter.skip = 0;
+      $scope.subarticles = [];
+
+      //Load the initial articles
+      load( function() {
          $scope.$broadcast('scroll.refreshComplete');
       });
    };
 
+   $scope.loadMore = function() {
+      console.log('Loading more');
+      load( function() {
+         $scope.$broadcast('scroll.infiniteScrollComplete');
+      });
+   };
+
+   //Initialization
+   $scope.onRefresh();
 }]);
 
