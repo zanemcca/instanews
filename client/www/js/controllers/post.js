@@ -52,7 +52,7 @@ app.controller('PostCtrl', [
       $scope.newArticle.title = '';
       $scope.newArticle.data = [];
       $scope.newArticle.serch = '';
-      $location.path('/feed');
+      $location.path('/app/feed');
    };
 
    //Post the new article to the server and also post any subarticles that may be
@@ -98,7 +98,7 @@ app.controller('PostCtrl', [
       $scope.data.text = '';
       $scope.images = [];
       $scope.videos = [];
-      $location.path('/articles/' + $stateParams.id);
+      $location.path('/app/articles/' + $stateParams.id);
    };
 
    //Wrapper for easy calling from view

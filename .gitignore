@@ -3,5 +3,6 @@ node_modules/
 *npm-debug.log
 strongloop.json
 client/platforms/
+client/engine/
 client/plugins/
 client/resources/
