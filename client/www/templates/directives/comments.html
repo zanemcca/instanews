@@ -7,7 +7,7 @@
             style="padding-bottom: 0px; border-bottom-color: transparent">
             <img src="img/ionic.png">
             <a class="button button-clear button-small"
-               href="#/tab/journalists/{{comment.username}}" >
+               ui-sref="app.profile({username: comment.username})" >
                {{comment.username}}
             </a>
             <p>{{comment.content}}</p>
@@ -24,7 +24,7 @@
                      <div class="item item-text-wrap"
                         style="padding-bottom: 0px; border-bottom-color: transparent">
                         <a class="button button-clear button-small"
-                           href="#/tab/journalists/{{com.username}}" >
+                           ui-sref="app.profile({username: com.username})" >
                            {{com.username}}
                         </a>
                         <p>{{com.content}}</p>

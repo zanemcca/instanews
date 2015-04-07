@@ -5,7 +5,7 @@ app.controller('PostCtrl', [
       '$stateParams',
       '$scope',
       '$ionicModal',
-      '$location',
+      '$ionicHistory',
       'Article',
       'Common',
       'Camera',
@@ -13,12 +13,18 @@ app.controller('PostCtrl', [
          $stateParams,
          $scope,
          $ionicModal,
-         $location,
+         $ionicHistory,
          Article,
          Common,
          Camera) {
 
-   $scope.user = Common.user.user;
+   $scope.user = Common.getUser();
+   var updateUser = function() {
+      $scope.user = Common.getUser();
+   };
+
+   Common.registerUserObserver(updateUser);
+
 
    if( $stateParams.id ) {
       $scope.article = Common.getArticle($stateParams.id);
@@ -52,7 +58,7 @@ app.controller('PostCtrl', [
       $scope.newArticle.title = '';
       $scope.newArticle.data = [];
       $scope.newArticle.serch = '';
-      $location.path('/app/feed');
+      $ionicHistory.goBack();
    };
 
    //Post the new article to the server and also post any subarticles that may be
@@ -98,7 +104,7 @@ app.controller('PostCtrl', [
       $scope.data.text = '';
       $scope.images = [];
       $scope.videos = [];
-      $location.path('/app/articles/' + $stateParams.id);
+      $ionicHistory.goBack();
    };
 
    //Wrapper for easy calling from view

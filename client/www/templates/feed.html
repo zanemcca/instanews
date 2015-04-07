@@ -2,7 +2,7 @@
 <ion-view view-title="Instanews" style="background: #C0C0C0">
    <ion-nav-buttons side="secondary">
       <a class="button button-clear icon ion-plus-round"
-         href="#/post/article">
+         ui-sref="articlePost">
       </a>
    </ion-nav-buttons>
    <ion-nav-buttons side="primary">
@@ -21,7 +21,7 @@
             ng-repeat="article in articles | orderBy: '-(rating)'">
             <a class="item no-padding item-text-wrap"
                style="border:transparent"
-               href="#/app/articles/{{article.myId}}">
+               ui-sref="app.article({id: article.myId})">
                <div class="item"
                   style="border-bottom:0px;">
                   {{article.title}}
@@ -38,7 +38,7 @@
                      <div class="icon">
                         <a class="button button-clear no-padding button-small"
                            style="border:transparent"
-                           href="#/journalists/{{article.topSub.username}}">
+                           ui-sref="app.profile({username: article.topSub.username})">
                            {{article.topSub.username}}
                         </a>
                      </div>

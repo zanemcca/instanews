@@ -104,7 +104,4 @@ app.controller('FeedCtrl', [
    $scope.$on('$ionicView.afterEnter', function() {
       google.maps.event.trigger(Common.getFeedMap(), 'resize');
    });
-
-   //Initialization
-//   $scope.onRefresh();
 }]);

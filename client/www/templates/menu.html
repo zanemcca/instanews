@@ -8,20 +8,26 @@
 
       <ion-side-menu side="left">
          <ion-content>
-            <div class="item item-avatar" nav-clear menu-close ui-sref="app.journalist/{{user.username}}">
-               <img src="img/ionic.png">
-               <div ng-if="user.username">
-                  {{user.username}}
-               </div>
-               <div ng-if="!user.username">
-                  Anonymous
-               </div>
+         <div class="item item-avatar" nav-clear menu-close ui-sref="app.profile({username: user.username})">
+            <img src="img/ionic.png">
+            <div ng-if="user.username">
+               {{user.username}}
             </div>
-            <ul class="list">
-               TODO Add notifications here in a list
-               <ion-item ng-repeat="note in notifications" >
-               </ion-item>
-            </ul>
+            <div ng-if="!user.username">
+               Anonymous
+            </div>
+         </div>
+
+         <div class="item" ui-sref="app.feed" >
+            <i class="icon ion-home"></i>
+            Home
+         </div>
+
+         <ul class="list">
+            TODO Add notifications here in a list
+            <ion-item ng-repeat="note in notifications" >
+            </ion-item>
+         </ul>
          </ion-content>
          <ion-footer-bar class="bar-dark">
             <div class="row">

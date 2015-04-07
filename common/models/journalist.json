@@ -69,13 +69,6 @@
       "accessType": "EXECUTE",
       "principalType": "ROLE",
       "principalId": "$everyone",
-      "permission": "DENY",
-      "property": "find"
-    },
-    {
-      "accessType": "EXECUTE",
-      "principalType": "ROLE",
-      "principalId": "$everyone",
       "permission": "ALLOW",
       "property": "__get__downVotes"
     },
@@ -92,13 +85,6 @@
       "principalId": "$owner",
       "permission": "ALLOW",
       "property": "__link__upVotes"
-    },
-    {
-      "accessType": "EXECUTE",
-      "principalType": "ROLE",
-      "principalId": "admin",
-      "permission": "ALLOW",
-      "property": "find"
     }
   ],
   "methods": []

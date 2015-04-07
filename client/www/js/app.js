@@ -17,6 +17,7 @@ angular.module('instanews', [
       'instanews.data',
       'instanews.camera',
       'instanews.post',
+      'instanews.profile',
       'lbServices',
       'ui.router'])
 
@@ -36,10 +37,11 @@ angular.module('instanews', [
 
 .controller('AppCtrl', [
    '$scope',
-   '$location',
+   '$state',
+   '$ionicHistory',
    'Common',
    'Journalist',
-   function ($scope, $location, Common, Journalist) {
+   function ($scope,$state,$ionicHistory, Common, Journalist) {
 
       //Update user function
       var updateUser = function() {
@@ -49,9 +51,19 @@ angular.module('instanews', [
       //Set up an observer on the user model
       Common.registerUserObserver(updateUser);
 
+      $scope.home = function() {
+         $ionicHistory.nextViewOptions({
+            disableBack: true
+         });
+         $state.go('app.home');
+      };
+
       //Load the login page
       $scope.login = function() {
-         $location.path('login');
+         $ionicHistory.nextViewOptions({
+            disableBack: true
+         });
+         $state.go('login');
       };
 
       //Logout
@@ -70,6 +82,9 @@ angular.module('instanews', [
 
    //No transitions for performance
    $ionicConfigProvider.views.transition('none');
+
+   //Setup back button to not have text
+   $ionicConfigProvider.backButton.text('').previousTitleText(false);
 
 //   $compileProvider.aHrefSanitizationWhitelist(/^\s*(https?|ftp|mailto|file|tel):/);
 //   $compileProvider.imgSrcSanitizationWhitelist(/^\s*(https?|ftp|mailto|file|tel):/);
@@ -107,6 +122,16 @@ angular.module('instanews', [
          'menuContent' : {
             templateUrl: 'templates/article.html',
             controller: 'ArticleCtrl'
+         }
+      }
+   })
+
+   .state('app.profile', {
+      url:'/profile/{username}',
+      views: {
+         'menuContent' : {
+            templateUrl: "templates/profile.html",
+            controller: "ProfileCtrl"
          }
       }
    })

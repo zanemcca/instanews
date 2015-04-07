@@ -2,7 +2,7 @@
 <ion-view view-title="{{article.title}}" style="background-color: #C0C0C0">
    <ion-nav-buttons side="secondary">
       <a class="button button-clear icon ion-plus-round"
-         href="#/post/article/{{article.myId}}">
+         ui-sref="subarticlePost({id: article.myId})">
       </a>
    </ion-nav-buttons>
    <ion-content>
@@ -19,7 +19,7 @@
             <div class="item item-avatar item-text-wrap" style="min-height:65px" >
                <img src="img/ionic.png">
                <a class="button button-clear no-padding button-small"
-                  href="#/journalists/{{subarticle.username}}">
+                  ui-sref="app.profile({username: subarticle.username})">
                   {{subarticle.username}}
                </a>
                <p>{{subarticle.text}}</p>
