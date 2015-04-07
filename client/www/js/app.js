@@ -36,7 +36,34 @@ angular.module('instanews', [
 
 .controller('AppCtrl', [
    '$scope',
-   function ($scope) {
+   '$location',
+   'Common',
+   'Journalist',
+   function ($scope, $location, Common, Journalist) {
+
+      //Update user function
+      var updateUser = function() {
+         $scope.user = Common.getUser();
+      };
+
+      //Set up an observer on the user model
+      Common.registerUserObserver(updateUser);
+
+      //Load the login page
+      $scope.login = function() {
+         $location.path('login');
+      };
+
+      //Logout
+      $scope.logout = function() {
+
+         Journalist.logout()
+         .$promise
+         .then( function(res) {
+            Common.setUser({});
+            console.log('Logged out');
+         });
+      };
    }])
 
 .config(function($stateProvider, $urlRouterProvider, $ionicConfigProvider, $compileProvider) {

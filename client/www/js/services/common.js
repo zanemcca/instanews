@@ -215,11 +215,35 @@ app.service('Common', [
       $ionicSideMenuDelegate.toggleLeft();
    };
 
+
+   var userObserverCallbacks = [];
+
+   var registerUserObserver = function(cb) {
+      userObserverCallbacks.push(cb);
+   };
+
+   var notifyUserObservers = function() {
+      angular.forEach(userObserverCallbacks, function(cb) {
+         cb();
+      });
+   };
+
+   var getUser = function() {
+      return user.user;
+   };
+
+   var setUser = function(usr) {
+      user = usr;
+      notifyUserObservers();
+   };
+
    return {
       toggleMenu: toggleMenu,
       getArticles: getArticles,
       setArticles: setArticles,
-      user: user,
+      getUser: getUser,
+      setUser: setUser,
+      registerUserObserver: registerUserObserver,
       setFeedMap: setFeedMap,
       getFeedMap: getFeedMap,
       getArticleMap: getArticleMap,

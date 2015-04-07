@@ -66,7 +66,7 @@ app.controller('LoginCtrl', [
       }, credentials)
       .$promise
       .then( function(res) {
-            Common.user = res;
+            Common.setUser(res);
 
             //TODO Persist saved credentials
             if ($scope.cred.rememberMe) {
