@@ -1,5 +1,8 @@
 <!DOCTYPE html>
 <ion-view view-title="{{article.title}}">
+   <ion-nav-buttons side="primary">
+      <button class="button button-clear icon ion-trash-a" ng-click="trashSubarticle()"></button>
+   </ion-nav-buttons>
    <ion-nav-buttons side="secondary">
       <button class="button button-clear icon ion-forward" ng-click="postSubarticle()"></button>
    </ion-nav-buttons>

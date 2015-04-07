@@ -21,8 +21,14 @@
   "relations": {
     "articles": {
       "type": "hasMany",
+      "model": "article",
+      "through" : "subarticle",
+      "foreignKey": "username"
+    },
+    "subarticles": {
+      "type": "hasMany",
       "model": "subarticle",
-      "foreignKey": "journalistId"
+      "foreignKey": "username"
     },
     "votes": {
       "type": "embedsOne",

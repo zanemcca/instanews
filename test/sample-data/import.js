@@ -61,21 +61,26 @@ module.exports = function (app, cb) {
          max = 46;
          min = 45;
          return Math.random()*(max - min) + min;
-      };
+      }
 
       function randomLng() {
          max = -65.5;
          min = -67;
          return Math.random()*(max - min) + min;
-      };
+      }
 
       function randomId() {
          var id = Math.floor(Math.random()*Math.pow(2,32));
          console.log(id);
          return id;
-      };
+      }
+
+      function callback(err, res) {
+         console.log(res);
+      }
 
       var limit = 200;
+
       for( var i = 0; i < limit ; i++ ) {
          Articles.create({
             title: i,
@@ -85,9 +90,7 @@ module.exports = function (app, cb) {
                lng: randomLng()
             },
             isPrivate: false
-         }, function(err, res) {
-            console.log(res);
-         });
+         }, callback);
       }
       cb(null);
 

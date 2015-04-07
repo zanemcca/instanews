@@ -7,5 +7,24 @@
       <div class="item">
          <img src="img/ionic.png" width="38%">
       </div>
+      <ul class="list">
+         <ion-item class="no-padding card"
+            ng-repeat="article in articles | orderBy: '-(date)'">
+            <a class="item no-padding item-text-wrap"
+               style="border:transparent"
+               ui-sref="app.article({id: article.myId})">
+               <div class="item"
+                  style="border-bottom:0px;">
+                  {{article.title}}
+               </div>
+               <div class="item"
+                  ng-repeat="sub in article.subarticles | orderBy: '-(rating)'">
+
+                  <p>{{sub.text}}</p>
+                  <inData ng-if="sub._file"
+                     data="sub._file" id="sub.myId">
+                  </inData>
+               </div>
+            </a>
    </ion-content>
 </ion-view>
