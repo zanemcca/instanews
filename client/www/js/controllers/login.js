@@ -79,6 +79,8 @@ app.controller('LoginCtrl', [
             }
 
             $scope.invalidLogin = false;
+
+            Common.disableNextBack();
             $state.go('app.feed');
       }, function (err) {
          $scope.invalidLogin = true;

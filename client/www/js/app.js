@@ -38,10 +38,9 @@ angular.module('instanews', [
 .controller('AppCtrl', [
    '$scope',
    '$state',
-   '$ionicHistory',
    'Common',
    'Journalist',
-   function ($scope,$state,$ionicHistory, Common, Journalist) {
+   function ($scope,$state, Common, Journalist) {
 
       //Update user function
       var updateUser = function() {
@@ -52,18 +51,14 @@ angular.module('instanews', [
       Common.registerUserObserver(updateUser);
 
       $scope.home = function() {
-         $ionicHistory.nextViewOptions({
-            disableBack: true
-         });
+         Common.disableNextBack();
          $state.go('app.home');
       };
 
       //Load the login page
       $scope.login = function() {
-         $ionicHistory.nextViewOptions({
-            disableBack: true
-         });
-         $state.go('login');
+         Common.disableNextBack();
+         $state.go('app.login');
       };
 
       //Logout
@@ -136,10 +131,14 @@ angular.module('instanews', [
       }
    })
 
-   .state('login', {
+   .state('app.login', {
       url: '/login',
-      templateUrl: 'templates/login.html',
-      controller: 'LoginCtrl'
+      views: {
+         'menuContent' : {
+            templateUrl: 'templates/login.html',
+            controller: 'LoginCtrl'
+         }
+      }
    })
 
    .state('articlePost', {
@@ -156,10 +155,10 @@ angular.module('instanews', [
 
   // if none of the above states are matched, use this as the fallback
   if ( true ) {
-     $urlRouterProvider.otherwise('/login');
+     $urlRouterProvider.otherwise('/app/login');
   }
   else {
-     $urlRouterProvider.otherwise('/feed');
+     $urlRouterProvider.otherwise('/app/feed');
   }
 
 });

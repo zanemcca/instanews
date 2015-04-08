@@ -1,15 +1,29 @@
-var app = angular.module('instanews.feed', ['ionic', 'ngResource']);
+var app = angular.module('instanews.feed', ['ionic', 'ngResource', 'underscore']);
 
 app.controller('FeedCtrl', [
       '$scope',
       'Article',
+      '_',
       'Common',
       function($scope,
          Article,
+         _,
          Common) {
 
    $scope.articles = Common.getArticles();
    $scope.toggleMenu = Common.toggleMenu;
+   $scope.scrollTop = Common.scrollTop;
+
+   $scope.scroll = {
+      buttonOn: false
+   };
+
+   //TODO debounce this and get the scroll to top button disabling appropriately
+   $scope.onScroll = function() {
+      $scope.scroll.buttonOn = Common.onScroll();
+      console.log('Scroll top on ? ' + $scope.scroll.buttonOn);
+   };
+
    $scope.itemsAvailable = true;
 
    var filter = {

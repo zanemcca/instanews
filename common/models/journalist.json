@@ -53,7 +53,7 @@
     {
       "accessType": "EXECUTE",
       "principalType": "ROLE",
-      "principalId": "$everyone",
+      "principalId": "admin",
       "permission": "ALLOW",
       "property": "find"
     },

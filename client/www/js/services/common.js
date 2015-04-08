@@ -5,9 +5,11 @@ app.service('Common', [
       '$rootScope',
       '$filter',
       '$ionicSideMenuDelegate',
+      '$ionicScrollDelegate',
+      '$ionicHistory',
       'Article',
       'Comment',
-      function($rootScope, $filter, $ionicSideMenuDelegate, Article, Comment){
+      function($rootScope, $filter, $ionicSideMenuDelegate, $ionicScrollDelegate, $ionicHistory, Article, Comment){
 
    var articles = [];
    //Initialize and refresh
@@ -237,8 +239,30 @@ app.service('Common', [
       notifyUserObservers();
    };
 
+   var disableNextBack = function() {
+      $ionicHistory.nextViewOptions({
+         disableBack: true
+      });
+   };
+
+   var scrollTop = function() {
+      $ionicScrollDelegate.scrollTop();
+   };
+
+   var onScroll = function() {
+      if($ionicScrollDelegate.getScrollPosition().top > 0) {
+         return true;
+      }
+      else {
+         return false;
+      }
+   };
+
    return {
       toggleMenu: toggleMenu,
+      scrollTop: scrollTop,
+      onScroll: onScroll,
+      disableNextBack: disableNextBack,
       getArticles: getArticles,
       setArticles: setArticles,
       getUser: getUser,

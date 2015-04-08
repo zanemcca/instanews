@@ -166,6 +166,28 @@ app.directive('inmap', [
 
          var heatmap;
 
+         function createGradient() {
+
+            var third = 8;
+            var subValue = 256/third;
+
+            //Transistion from baby blue to blue to red
+            var gradient = ['rgba(0, 255, 255, 0)'];
+            for(var i = 0; i < third; i++) {
+               var temp =  'rgba(0,' + (255-subValue*i) + ',255, 1)'
+               gradient.push(temp);
+            }
+            for(var i = 0; i < third; i++) {
+               gradient.push( 'rgba(0,0,'+ (255 - subValue/2*i) +', 1)');
+            }
+            for(var i = 0; i < third; i++) {
+               gradient.push( 'rgba('+ (subValue*i) +',0,'+ (128 - subValue/2*i) +', 1)');
+            }
+            gradient.push('rgba(255, 0, 0, 1)');
+
+            return gradient;
+         }
+
          function updateHeatmap() {
             var articleHeatArray = [];
 
@@ -178,34 +200,16 @@ app.directive('inmap', [
                if (Common.withinRange(position)) {
                   articleHeatArray.push({
                      location: position,
-                     weight: Math.pow(2,$scope.articles[i].rating)
+                     weight: $scope.articles[i].rating
                   });
                }
             }
 
             if (!heatmap) {
 
-               //Custom gradient
-               var gradient = [
-                   'rgba(0, 255, 255, 0)',
-                   'rgba(0, 255, 255, 1)',
-                   'rgba(0, 191, 255, 1)',
-                   'rgba(0, 127, 255, 1)',
-                   'rgba(0, 63, 255, 1)',
-                   'rgba(0, 0, 255, 1)',
-                   'rgba(0, 0, 223, 1)',
-                   'rgba(0, 0, 191, 1)',
-                   'rgba(0, 0, 159, 1)',
-                   'rgba(0, 0, 127, 1)',
-                   'rgba(63, 0, 91, 1)',
-                   'rgba(127, 0, 63, 1)',
-                   'rgba(191, 0, 31, 1)',
-                   'rgba(255, 0, 0, 1)'
-               ];
-
                heatmap = new google.maps.visualization.HeatmapLayer({
                   map: map,
-                  gradient: gradient,
+                  gradient: createGradient(),
                   data: articleHeatArray
                });
             }

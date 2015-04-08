@@ -71,12 +71,37 @@ module.exports = function (app, cb) {
 
       function randomId() {
          var id = Math.floor(Math.random()*Math.pow(2,32));
-         console.log(id);
          return id;
       }
 
       function callback(err, res) {
-         console.log(res);
+         if( err) {
+            console.log('Erorr: ' + err);
+         }
+         //console.log(res);
+      }
+
+      function fillArticle(err, res) {
+         Subarticles.create({
+            parentId: res.myId,
+            username: 'bob',
+            _file: {
+               type: 'image',
+               size: 2000,
+               name: '123456.jpg',
+               caption: 'Nuts photo!!'
+            }
+         }, callback);
+
+
+         //console.log('Voting on ' + res.myId);
+         var max = Math.floor(Math.random()*100);
+         for( var i =0; i < max; i++) {
+            UpVotes.create({
+               votableId: res.myId,
+               votableType: 'article'
+            }, callback);
+         };
       }
 
       var limit = 200;
@@ -90,7 +115,7 @@ module.exports = function (app, cb) {
                lng: randomLng()
             },
             isPrivate: false
-         }, callback);
+         }, fillArticle);
       }
       cb(null);
 
