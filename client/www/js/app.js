@@ -18,29 +18,73 @@ angular.module('instanews', [
       'instanews.camera',
       'instanews.post',
       'instanews.profile',
+      'instanews.platform',
       'lbServices',
-      'ui.router'])
+      'ui.router',
+      'ngCordova'])
 
-.run(function($ionicPlatform) {
-  $ionicPlatform.ready(function() {
-    // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
-    // for form inputs)
-    if (window.cordova && window.cordova.plugins.Keyboard) {
-      cordova.plugins.Keyboard.hideKeyboardAccessoryBar(true);
-    }
-    if (window.StatusBar) {
-      // org.apache.cordova.statusbar required
-      StatusBar.styleDefault();
-    }
-  });
-})
+.run(['$ionicPlatform',function($ionicPlatform) {
+}])
 
 .controller('AppCtrl', [
    '$scope',
    '$state',
+   '$cordovaPush',
    'Common',
    'Journalist',
-   function ($scope,$state, Common, Journalist) {
+   'Platform',
+   function ($scope,$state, $cordovaPush, Common, Journalist, Platform) {
+
+      Platform.ready
+      .then(function() {
+         /*
+
+         // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
+         // for form inputs)
+         if (window.cordova && window.cordova.plugins.Keyboard) {
+            cordova.plugins.Keyboard.hideKeyboardAccessoryBar(true);
+         }
+         if (window.StatusBar) {
+            // org.apache.cordova.statusbar required
+            StatusBar.styleDefault();
+         }
+
+         */
+         var config = {};
+
+         var device = Common.getDevice();
+
+         if( ionic.Platform.isAndroid()) {
+            config = {
+               senderID: '1081316781214'
+            }
+            device.type = 'android';
+         }
+         else if( ionic.Platform.isIOS()) {
+            config = {
+               badge: true,
+               sounde: true,
+               alert: true
+            }
+            device.type = 'ios';
+         }
+         else {
+            console.log('Cannot register! Unknown device!');
+            return;
+         }
+
+         console.log('Attempting to register device for push notifications');
+         $cordovaPush.register(config)
+         .then( function (res) {
+
+            console.log('Registered for push notification with cordovaPush: ', res);
+            device.token = res;
+            Common.setDevice(device);
+         }, function(err) {
+            console.log(err);
+         });
+
+      });
 
       //Update user function
       var updateUser = function() {
@@ -154,11 +198,6 @@ angular.module('instanews', [
    })
 
   // if none of the above states are matched, use this as the fallback
-  if ( true ) {
-     $urlRouterProvider.otherwise('/app/login');
-  }
-  else {
-     $urlRouterProvider.otherwise('/app/feed');
-  }
+  $urlRouterProvider.otherwise('/app/feed');
 
 });

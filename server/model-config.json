@@ -70,5 +70,21 @@
   "voteUser": {
     "dataSource": null,
     "public": false
+  },
+  "notification": {
+    "dataSource": "Notifications",
+    "public": true
+  },
+  "installation": {
+    "dataSource": "Installations",
+    "public": true
+  },
+  "app": {
+    "dataSource": "db",
+    "public": true
+  },
+  "push": {
+    "dataSource": "push",
+    "public": false
   }
 }

@@ -22,8 +22,8 @@
     "articles": {
       "type": "hasMany",
       "model": "article",
-      "through" : "subarticle",
-      "foreignKey": "username"
+      "foreignKey": "username",
+      "through": "subarticle"
     },
     "subarticles": {
       "type": "hasMany",

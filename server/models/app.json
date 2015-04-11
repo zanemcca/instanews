@@ -1,0 +1,10 @@
+{
+  "name": "app",
+  "base": "Application",
+  "idInjection": true,
+  "properties": {},
+  "validations": [],
+  "relations": {},
+  "acls": [],
+  "methods": []
+}

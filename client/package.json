@@ -23,7 +23,9 @@
     "org.apache.cordova.camera",
     "com.synconset.imagepicker",
     "org.apache.cordova.media-capture",
-    "org.apache.cordova.splashscreen"
+    "https://github.com/phonegap-build/PushPlugin.git",
+    "org.apache.cordova.splashscreen",
+    "org.apache.cordova.device"
   ],
   "cordovaPlatforms": [
     {

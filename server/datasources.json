@@ -3,6 +3,22 @@
     "name": "db",
     "connector": "memory"
   },
+  "Installations": {
+    "host": "localhost",
+    "port": 27017,
+    "database": "installations",
+    "name": "Installations",
+    "connector": "mongodb",
+    "debug": true
+  },
+  "Notifications": {
+    "host": "localhost",
+    "port": 27017,
+    "database": "notifications",
+    "name": "Notifications",
+    "connector": "mongodb",
+    "debug": true
+  },
   "Articles": {
     "host": "localhost",
     "port": 27017,
@@ -17,6 +33,13 @@
     "database": "users",
     "name": "Users",
     "connector": "mongodb"
+  },
+  "push": {
+    "name": "push",
+    "connector": "loopback-component-push",
+    "installation": "installation",
+    "notification": "notification",
+    "application": "app"
   },
   "Storage": {
     "name": "Storage",

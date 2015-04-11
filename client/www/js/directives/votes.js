@@ -13,12 +13,21 @@ app.directive('invotes', [
       controller: function($scope) {
          $scope.Common = Common;
 
+         var user = Common.getUser();
+
+         var updateUser = function() {
+            user = Common.getUser();
+         };
+
+         Common.registerUserObserver(updateUser);
+
          $scope.upvote = function (instance) {
             //Since comments are nested the constructor actually belongs
             //to the parent model so we have to specifically check for it
             if ( instance.commentableId ) {
                Comment.prototype$__create__upVotes({
                   id: instance.myId,
+                  username: user.username,
                   votableId: instance.myId,
                   votableType: "comment"
                })
@@ -31,6 +40,7 @@ app.directive('invotes', [
             else {
                instance.constructor.prototype$__create__upVotes({
                   id: instance.myId,
+                  username: user.username,
                   votableId: instance.myId,
                   votableType: instance.constructor.modelName.toLowerCase()
                })
@@ -46,6 +56,7 @@ app.directive('invotes', [
             if ( instance.commentableId ) {
                Comment.prototype$__create__downVotes({
                   id: instance.myId,
+                  username: user.username,
                   votableId: instance.myId,
                   votableType: "comment"
                })
@@ -58,6 +69,7 @@ app.directive('invotes', [
             else {
                instance.constructor.prototype$__create__downVotes({
                   id: instance.myId,
+                  username: user.username,
                   votableId: instance.myId,
                   votableType: instance.constructor.modelName.toLowerCase()
                })

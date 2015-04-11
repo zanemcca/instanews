@@ -16,6 +16,7 @@
   "relations": {
     "journalist": {
       "type": "belongsTo",
+      "foreignKey" : "username",
       "model": "journalist"
     },
     "votable": {

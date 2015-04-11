@@ -1,0 +1,11 @@
+{
+  "name": "push",
+  "base": "Model",
+  "plural": "Push",
+  "idInjection": true,
+  "properties": {},
+  "validations": [],
+  "relations": {},
+  "acls": [],
+  "methods": []
+}

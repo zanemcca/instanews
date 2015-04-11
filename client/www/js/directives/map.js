@@ -30,6 +30,8 @@ app.directive('inmap', [
 
             //updateMyCircle();
             //updateMarkers();
+            map.setCenter({lat: $scope.mPos.lat, lng: $scope.mPos.lng});
+            map.setZoom(15);
             updateHeatmap();
             console.log('Update position');
          }

@@ -1,5 +1,5 @@
 
-var app = angular.module('instanews.common', ['ionic', 'ngResource']);
+var app = angular.module('instanews.common', ['ionic', 'ngResource', 'ngCordova']);
 
 app.service('Common', [
       '$rootScope',
@@ -7,12 +7,29 @@ app.service('Common', [
       '$ionicSideMenuDelegate',
       '$ionicScrollDelegate',
       '$ionicHistory',
+      '$cordovaPush',
+      '$cordovaDevice',
       'Article',
+      'Installation',
       'Comment',
-      function($rootScope, $filter, $ionicSideMenuDelegate, $ionicScrollDelegate, $ionicHistory, Article, Comment){
+      function(
+         $rootScope,
+         $filter,
+         $ionicSideMenuDelegate,
+         $ionicScrollDelegate,
+         $ionicHistory,
+         $cordovaPush,
+         $cordovaDevice,
+         Article,
+         Installation,
+         Comment){
 
    var articles = [];
-   //Initialize and refresh
+
+   var device = {
+      type: '',
+      token: ''
+   };
 
    var bounds;
    var feedMap, articleMap;
@@ -205,6 +222,7 @@ app.service('Common', [
    };
 
    var toggleMenu = function() {
+      /*
       console.log('Toggling menu');
 
       if( $ionicSideMenuDelegate.isOpenLeft()) {
@@ -214,6 +232,7 @@ app.service('Common', [
          console.log('Not Opened');
       }
 
+      */
       $ionicSideMenuDelegate.toggleLeft();
    };
 
@@ -236,8 +255,66 @@ app.service('Common', [
 
    var setUser = function(usr) {
       user = usr;
+
       notifyUserObservers();
+      install();
    };
+
+
+   var install = function() {
+      if ( user
+            && user.user
+            && user.user.username
+            && device
+            && device.type
+            && device.token
+            && device.token !== 'OK') {
+         console.log('Attempting to install device on the server');
+
+         var appConfig = {
+            appId: 'instanews',
+            userId: user.user.username,
+            deviceType: device.type,
+            deviceToken: device.token,
+            created: new Date(),
+            modified: new Date(),
+            status: 'Active'
+         };
+
+         /*
+         if( device.type === 'ios') {
+            appConfig.deviceToken =  device.token;
+         }
+         else if( device.type === 'android') {
+            appConfig.deviceToken = $cordovaDevice.getUUID();
+         }
+         */
+
+         Installation.create(appConfig, function (err, result) {
+            if (err) {
+               console.log('Error trying to install device', err);
+            }
+            else {
+               console.log('Created a new device installation : ' , result);
+            }
+         });
+      }
+      else {
+         console.log('Could not register for notification because of invalid parameters'
+               + '\nUser: ' + user
+               + '\ndevice.type: ' + device.type
+               + '\ndevice.token: ' + device.token);
+      }
+   };
+
+   $rootScope.$on('$cordovaPush:notificationReceived', function (event, notification) {
+
+      console.log('Notification recieved');
+      if( notification.event === 'registered' ) {
+         device.token = notification.regid;
+         install();
+      }
+   });
 
    var disableNextBack = function() {
       $ionicHistory.nextViewOptions({
@@ -246,7 +323,7 @@ app.service('Common', [
    };
 
    var scrollTop = function() {
-      $ionicScrollDelegate.scrollTop();
+      $ionicScrollDelegate.scrollTop(true);
    };
 
    var onScroll = function() {
@@ -256,6 +333,14 @@ app.service('Common', [
       else {
          return false;
       }
+   };
+
+   var getDevice = function() {
+      return device;
+   };
+
+   var setDevice = function(dev) {
+      device = dev;
    };
 
    return {
@@ -276,6 +361,8 @@ app.service('Common', [
 //      radToSlide: radToSlide,
       setBounds: setBounds,
       getBounds: getBounds,
+      setDevice: setDevice,
+      getDevice: getDevice,
       mPosition: mPosition,
       withinRange: withinRange,
       createComment: createComment,
