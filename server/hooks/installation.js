@@ -42,7 +42,7 @@ module.exports = function(app) {
                   res[0].userId = inst.userId;
                   //Possibly an infinite loop here
                   console.log('Installation was found so updating it instead of creating a new one');
-                  Installation.update(res[0], function(err, res) {
+                  Installation.upsert(res[0], function(err, res) {
                      if (err) next(err);
                      else {
                         console.log('Installation update was successful');

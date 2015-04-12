@@ -24,8 +24,9 @@
          </div>
 
          <ul class="list">
-            TODO Add notifications here in a list
-            <ion-item ng-repeat="note in notifications" >
+            <ion-item ng-repeat="note in notifications"
+                  ng-if="note.message">
+                  {{note.message}}
             </ion-item>
          </ul>
          </ion-content>

@@ -25,6 +25,11 @@
       "foreignKey": "username",
       "through": "subarticle"
     },
+    "notifications": {
+      "type": "hasMany",
+      "model": "notification",
+      "foreignKey": "username"
+    },
     "subarticles": {
       "type": "hasMany",
       "model": "subarticle",
@@ -63,6 +68,13 @@
       "principalId": "$everyone",
       "permission": "ALLOW",
       "property": "findById"
+    },
+    {
+      "accessType": "EXECUTE",
+      "principalType": "ROLE",
+      "principalId": "$owner",
+      "permission": "ALLOW",
+      "property": "__get__notifications"
     },
     {
       "accessType": "EXECUTE",

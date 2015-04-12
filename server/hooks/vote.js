@@ -10,19 +10,21 @@ module.exports = function(app) {
       var inst = ctx.instance;
       if (inst) {
 
-         //console.log('Starting push ...');
+         console.log('Starting push ...');
 
-         var note = new Notification({
+         var note = Notification({
+            username: inst.__data.username,
             expirationInterval: 3600, //Expire in 1 hr
-             badge: badge++,
-             sound: 'ping.aiff',
-             message: '\u270C\u2764\u263A ' + 'You just voted on some shit!!',
-             messageFrom: 'zane'
+            badge: badge++,
+            sound: 'ping.aiff',
+            message: '\u270C\u2764\u263A ' + 'You just voted on some shit!!',
+            messageFrom: 'zane'
          });
 
          console.log('Push Notification created : ', note);
 
-         Push.notifyByQuery({ userId: inst.__data.username} , note, function(err) {
+         //TODO Store the notifications on a db
+         Push.notifyByQuery({ userId: note.username} , note, function(err, res) {
             if (err) {
                console.log('Error pushing notification: ' + err);
             }

@@ -25,7 +25,8 @@
     "org.apache.cordova.media-capture",
     "https://github.com/phonegap-build/PushPlugin.git",
     "org.apache.cordova.splashscreen",
-    "org.apache.cordova.device"
+    "org.apache.cordova.device",
+    "org.apache.cordova.dialogs"
   ],
   "cordovaPlatforms": [
     {

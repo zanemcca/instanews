@@ -16,6 +16,8 @@ require('./pushSetup.js')(app);
 require('./hooks/votes.js')(app);
 require('./hooks/vote.js')(app);
 require('./hooks/installation.js')(app);
+require('./hooks/notification.js')(app);
+require('./hooks/push.js')(app);
 
 app.start = function() {
   // start the web server

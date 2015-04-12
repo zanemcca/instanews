@@ -1,4 +1,11 @@
 {
    "name" : "notification",
-   "base" : "Notification"
+   "base" : "Notification",
+   "relations" : {
+      "journalist": {
+         "type": "belongsTo",
+         "model": "journalist",
+         "foreignKey": "username"
+      }
+   }
 }

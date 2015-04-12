@@ -8,6 +8,7 @@ app.service('Common', [
       '$ionicScrollDelegate',
       '$ionicHistory',
       '$cordovaPush',
+      '$cordovaDialogs',
       '$cordovaDevice',
       'Article',
       'Installation',
@@ -19,6 +20,7 @@ app.service('Common', [
          $ionicScrollDelegate,
          $ionicHistory,
          $cordovaPush,
+         $cordovaDialogs,
          $cordovaDevice,
          Article,
          Installation,
@@ -51,6 +53,8 @@ app.service('Common', [
    };
 
    var user = {};
+
+   var notifications = [];
 
    var mPosition = {
       lat: 45.61545,
@@ -314,6 +318,19 @@ app.service('Common', [
          device.token = notification.regid;
          install();
       }
+      else if (notification.event === 'message') {
+         //Save the notification
+         notifications.push(notification);
+         notifyNotificationObservers();
+
+         $cordovaDialogs.alert(notification.message, 'instanews', 'Fuck yeah!')
+         .then( function() {
+            console.log('Notifcation is confirmed');
+         });
+      }
+      else {
+         console.log('Un-handled notification!');
+      }
    });
 
    var disableNextBack = function() {
@@ -343,6 +360,28 @@ app.service('Common', [
       device = dev;
    };
 
+
+   var getNotifications = function() {
+      return notifications;
+   };
+
+   var setNotifications = function(notes) {
+      notifications = notes;
+      notifyNotificationObservers();
+   };
+
+   var notificationObserverCallbacks = [];
+
+   var registerNotificationObserver = function(cb) {
+      notificationObserverCallbacks.push(cb);
+   };
+
+   var notifyNotificationObservers = function() {
+      angular.forEach(notificationObserverCallbacks, function(cb) {
+         cb();
+      });
+   };
+
    return {
       toggleMenu: toggleMenu,
       scrollTop: scrollTop,
@@ -363,6 +402,9 @@ app.service('Common', [
       getBounds: getBounds,
       setDevice: setDevice,
       getDevice: getDevice,
+      setNotifications: setNotifications,
+      getNotifications: getNotifications,
+      registerNotificationObserver: registerNotificationObserver,
       mPosition: mPosition,
       withinRange: withinRange,
       createComment: createComment,

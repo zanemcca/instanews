@@ -86,9 +86,19 @@ angular.module('instanews', [
 
       });
 
+
+      $scope.notifications = [];
+
+      var updateNotifications = function() {
+         $scope.notifications = Common.getNotifications();
+      };
+
+      Common.registerNotificationObserver(updateNotifications);
+
       //Update user function
       var updateUser = function() {
          $scope.user = Common.getUser();
+         loadNotifications();
       };
 
       //Set up an observer on the user model
@@ -115,6 +125,29 @@ angular.module('instanews', [
             console.log('Logged out');
          });
       };
+
+      var loadNotifications = function() {
+         if( $scope.user && $scope.user.username ){
+            var filter = {
+               limit: 25,
+               skip: 0,
+               order: 'date DESC',
+            };
+
+            Journalist.prototype$__get__notifications({
+               id: $scope.user.username,
+               filter: filter
+            }).$promise
+            .then( function(res) {
+               console.log('Result: ' + res);
+               Common.setNotifications(res);
+            });
+         }
+         else {
+            console.log('Cannot load notifications because user is not set yet');
+         }
+      };
+
    }])
 
 .config(function($stateProvider, $urlRouterProvider, $ionicConfigProvider, $compileProvider) {
