@@ -2,6 +2,11 @@
    "name" : "notification",
    "base" : "Notification",
    "relations" : {
+      "installation": {
+         "type": "belongsTo",
+         "model": "installation",
+         "foreignKey": "installationId"
+      },
       "journalist": {
          "type": "belongsTo",
          "model": "journalist",

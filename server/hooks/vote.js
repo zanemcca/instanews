@@ -2,45 +2,84 @@
 module.exports = function(app) {
 
    var Notification = app.models.notification;
-   var Push = app.models.push;
+   var Installation = app.models.installation;
+   var Push = require('./push');
    var Vote = app.models.vote;
 
-   var badge = 1;
    Vote.observe('after save', function(ctx, next) {
       var inst = ctx.instance;
-      if (inst) {
+      if (inst && ctx.isNewInstance) {
 
-         console.log('Starting push ...');
+         switch(inst.votableType) {
+            case 'article':
+               /*
+               app.models.Article.findById( inst.votableId, function(err, res) {
+                  if (err) console.log('Error after saving vote: ' + err);
+                  else {
+                     var username = res.username;
 
-         var note = Notification({
-            username: inst.__data.username,
-            expirationInterval: 3600, //Expire in 1 hr
-            badge: badge++,
-            sound: 'ping.aiff',
-            message: '\u270C\u2764\u263A ' + 'You just voted on some shit!!',
-            messageFrom: 'zane'
-         });
+                     var message = inst.username + ' voted on your article';
+                     Push.notifyUser(app, username, message);
+                  }
+               });
+               */
+               app.models.Subarticle.find({
+                  limit: 1,
+                  order: 'rating DESC',
+                  where: {
+                     parentId: inst.votableId
+                  }
+               }, function(err, res) {
+                  if (err) console.log('Error after saving vote: ' + err);
+                  else {
+                     var username = res[0].username;
 
-         console.log('Push Notification created : ', note);
+                     if( username !== inst.username) {
+                        var message = inst.username + ' voted on your article';
+                        Push.notifyUser(app, username, message);
+                     }
+                  }
+               });
+               break;
+            case 'subarticle':
+               app.models.Subarticle.findById( inst.votableId,
+               function(err,res) {
+                  if (err) console.log('Error after saving vote: ' + err);
+                  else {
+                     var username = res.username;
 
-         //TODO Store the notifications on a db
-         Push.notifyByQuery({ userId: note.username} , note, function(err, res) {
-            if (err) {
-               console.log('Error pushing notification: ' + err);
-            }
-            console.log('Pushing notification to ', inst.__data.username);
-         });
+                     if( username !== inst.username) {
+                        var message = inst.username +
+                           ' voted on your subarticle';
+                        Push.notifyUser(app, username, message);
+                     }
+                  }
+               });
+               break;
+            case 'comment':
+               app.models.Comment.findById( inst.votableId,
+               function(err,res) {
+                  if (err) console.log('Error after saving vote: ' + err);
+                  else {
+                     var username = res.username;
+
+                     if( username !== inst.username) {
+                        var message = inst.username +
+                           ' voted on your comment';
+                        Push.notifyUser(app, username, message);
+                     }
+                  }
+               });
+               break;
+            default:
+               console.log('Unknown votable type!');
+               next();
+         }
+
+      }
+      else {
+         console.log('After saving vote the instance is null');
       }
       next();
    });
-
-   /*
-   Vote.observe('before save', function(ctx, next) {
-      var inst = ctx.instance;
-      if (inst) {
-      }
-
-      next();
-   });
-   */
-}
+};

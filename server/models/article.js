@@ -1,8 +1,6 @@
 
 var common = require('./common');
 
-var app =
-
 module.exports = function(Article) {
 
    common.initVotes(Article);
@@ -26,16 +24,4 @@ module.exports = function(Article) {
 
    common.disableRemotes(Article,staticDisable,true);
    common.disableRemotes(Article,nonStaticDisable,false);
-
-   /*
-   Article.afterRemote('find', function(ctx, articles, next) {
-
-      for(var i = 0; i < articles.length; i++) {
-         articles[i].__count__upVotes(function (res) {
-            console.log('upVotes ', res);
-         });
-      }
-      next();
-   });
-   */
 };

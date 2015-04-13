@@ -39,7 +39,7 @@ module.exports = function (app) {
             console.log('Error Registering app: ' , err);
          }
          else {
-            console.log('Registration of app successful: ' , app);
+//            console.log('Registration of app successful: ' , app);
          }
       });
    }

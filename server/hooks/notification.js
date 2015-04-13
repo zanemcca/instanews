@@ -1,17 +1,14 @@
 
 module.exports = function(app) {
 
-   /*
    var Notification = app.models.notification;
    var Push = app.models.push;
 
-   Notification.observe('before save', function(ctx, next) {
+   Notification.observe('after save', function(ctx, next) {
       var note = ctx.instance;
-      if (note) {
+      if (note && ctx.isNewInstance) {
 
-         console.log('Push Notification created : ', note);
-
-         Push.notifyByQuery({ userId: note.__data.username} , note, function(err) {
+         Push.notifyById( note.__data.installationId , note, function(err) {
             if (err) {
                console.log('Error pushing notification: ' + err);
             }
@@ -21,15 +18,4 @@ module.exports = function(app) {
       }
       next();
    });
-   */
-
-   /*
-   Vote.observe('before save', function(ctx, next) {
-      var inst = ctx.instance;
-      if (inst) {
-      }
-
-      next();
-   });
-   */
-}
+};

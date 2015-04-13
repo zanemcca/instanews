@@ -101,7 +101,7 @@ module.exports = function (app, cb) {
                votableId: res.myId,
                votableType: 'article'
             }, callback);
-         };
+         }
       }
 
       var limit = 200;

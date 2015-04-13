@@ -145,10 +145,12 @@ app.service('Common', [
    var createComment = function (instance, content) {
       var Create = {};
       var model = {};
+      var user = getUser();
       if (instance.commentableId ) {
          Create = Comment.prototype$__create__comments;
          model = {
             id: instance.myId,
+            username: user.username,
             content: content,
             commentableId: instance.myId,
             commentableType: "comment"
@@ -158,6 +160,7 @@ app.service('Common', [
          Create = instance.constructor.comments.create;
          model = {
             id: instance.myId,
+            username: user.username,
             content: content,
             commentableId: instance.myId,
             commentableType: instance.constructor.modelName.toLowerCase()

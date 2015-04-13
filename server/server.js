@@ -11,13 +11,8 @@ boot(app, __dirname);
 
 //Setup the push server
 require('./pushSetup.js')(app);
-
-//Setup all server side hooks that we need
-require('./hooks/votes.js')(app);
-require('./hooks/vote.js')(app);
-require('./hooks/installation.js')(app);
-require('./hooks/notification.js')(app);
-require('./hooks/push.js')(app);
+//Setup all the back end hooks
+require('./hooks/hookSetup.js')(app);
 
 app.start = function() {
   // start the web server

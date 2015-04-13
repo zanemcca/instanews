@@ -8,7 +8,7 @@ var importer = require('./sample-data/import');
 
 describe('Top', function() {
 
-   this.timeout(10000);
+   this.timeout(30000);
 
    before( function(done) {
       importer(app, done);

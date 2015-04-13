@@ -38,9 +38,11 @@ module.exports = function(Journalist) {
    common.disableRemotes(Journalist,nonStaticDisable,false);
 
 
-   Journalist.afterRemote('prototype.__get__articles', function(ctx, instance, next) {
+   Journalist.afterRemote('prototype.__get__articles',
+   function(ctx, instance, next) {
 
-      //Automatically remove all duplicate articles since they are gotten through a through model
+      //Automatically remove all duplicate articles
+      //since they are gotten through a through model
       var uniqueIds = [];
       for(var i = 0; i < instance.length; i++) {
          if(uniqueIds.indexOf(instance[i].myId) > -1 ) {

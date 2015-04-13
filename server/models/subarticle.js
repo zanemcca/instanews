@@ -24,13 +24,13 @@ module.exports = function(Subarticle) {
       if ( inst ) {
          if ( inst._file ) {
             if ( inst._file.type === 'video') {
-               console.log('Saving a video');
+  //             console.log('Saving a video');
                if ( !inst._file.poster ) {
                   inst._file.poster = 'img/ionic.png';
                }
             }
             else {
-               console.log('Saving some other media type');
+//               console.log('Saving some other media type');
             }
          }
       }
