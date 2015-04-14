@@ -1,15 +1,19 @@
-var app = angular.module('instanews.login', ['ionic', 'ngResource']);
+var app = angular.module('instanews.login', ['ionic', 'ngResource', 'ngCordova']);
 
 app.controller('LoginCtrl', [
       '$scope',
       '$state',
       '$ionicModal',
+      '$cordovaDevice',
       'Common',
+      'LocalStorage',
       'Journalist',
       function($scope,
          $state,
          $ionicModal,
+         $cordovaDevice,
          Common,
+         LocalStorage,
          Journalist) {
 
    $scope.cred = {
@@ -68,9 +72,18 @@ app.controller('LoginCtrl', [
       .then( function(res) {
             Common.setUser(res);
 
-            //TODO Persist saved credentials
             if ($scope.cred.rememberMe) {
 
+               var device = Common.getDevice();
+               if(res && device.type) {
+                  var session = {
+                     user: res
+                  };
+                  LocalStorage.secureWrite($cordovaDevice.getUUID(), session);
+               }
+               else {
+                  console.log('Error: Cannot save user!');
+               }
             }
 
             $scope.cred = {

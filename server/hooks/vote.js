@@ -10,6 +10,7 @@ module.exports = function(app) {
       var inst = ctx.instance;
       if (inst && ctx.isNewInstance) {
 
+         //Create notifications for whoever needs one
          switch(inst.votableType) {
             case 'article':
                /*

@@ -24,8 +24,9 @@
          </div>
 
          <ul class="list">
-            <ion-item ng-repeat="note in notifications"
-                  ng-if="note.message">
+            <ion-item class="item-text-wrap"
+               ng-repeat="note in notifications"
+               ng-if="note.message">
                   {{note.message}}
             </ion-item>
          </ul>

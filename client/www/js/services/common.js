@@ -1,5 +1,5 @@
 
-var app = angular.module('instanews.common', ['ionic', 'ngResource', 'ngCordova']);
+var app = angular.module('instanews.common', ['ionic', 'ngResource','ngCordova']);
 
 app.service('Common', [
       '$rootScope',
@@ -11,6 +11,7 @@ app.service('Common', [
       '$cordovaDialogs',
       '$cordovaDevice',
       'Article',
+      'LocalStorage',
       'Installation',
       'Comment',
       function(
@@ -23,6 +24,7 @@ app.service('Common', [
          $cordovaDialogs,
          $cordovaDevice,
          Article,
+         LocalStorage,
          Installation,
          Comment){
 
@@ -63,6 +65,7 @@ app.service('Common', [
       accuracy: 0,
       radSlider: 0
    };
+
 
    /*
    //Radius Slider
@@ -269,6 +272,7 @@ app.service('Common', [
 
 
    var install = function() {
+
       if ( user
             && user.user
             && user.user.username
@@ -306,12 +310,14 @@ app.service('Common', [
             }
          });
       }
+      /*
       else {
          console.log('Could not register for notification because of invalid parameters'
                + '\nUser: ' + user
                + '\ndevice.type: ' + device.type
                + '\ndevice.token: ' + device.token);
       }
+      */
    };
 
    $rootScope.$on('$cordovaPush:notificationReceived', function (event, notification) {
@@ -385,7 +391,14 @@ app.service('Common', [
       });
    };
 
+   var clearUserData = function() {
+      setUser({});
+      setNotifications([]);
+      LocalStorage.secureDelete($cordovaDevice.getUUID());
+   };
+
    return {
+      clearUserData: clearUserData,
       toggleMenu: toggleMenu,
       scrollTop: scrollTop,
       onScroll: onScroll,

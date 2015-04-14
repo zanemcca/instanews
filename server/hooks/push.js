@@ -9,7 +9,7 @@ var notifyUser = function(app, username, message) {
    var cb = function(err, res) {
       if(err) console.log('Failed to create notification! ' + err);
       else {
-         console.log('Successfully created a notification! ' + res);
+         //console.log('Successfully created a notification! ' + res);
       }
    };
 
@@ -34,7 +34,7 @@ var notifyUser = function(app, username, message) {
             }
          }
          else {
-            console.log('No devices found for ' + username);
+          //  console.log('No devices found for ' + username);
          }
       }
    });

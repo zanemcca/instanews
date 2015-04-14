@@ -3,8 +3,11 @@ module.exports = function(app) {
 
    var Votes = app.models.votes;
 
-   Votes.observe('before save', function(ctx, next) {
+   var getRating = function(instance) {
+      return  (instance.upVoteCount - instance.downVoteCount);
+   };
 
+   Votes.observe('before save', function(ctx, next) {
 
       var generateId = function() {
          return Math.floor(Math.random()*Math.pow(2,128));
@@ -14,26 +17,18 @@ module.exports = function(app) {
       if (inst) {
 
          if(ctx.isNewInstance) {
-            console.log('New comment!!');
             if(!inst.myId ) {
                inst.myId = generateId();
             }
-         }
-         if ( !inst.upVoteCount ) {
             inst.upVoteCount = 0;
-         }
-         if ( !inst.downVoteCount ) {
             inst.downVoteCount = 0;
-         }
-
-         inst.rating = inst.upVoteCount - inst.downVoteCount;
-
-         if( !inst.date ) {
             inst.date = Date.now();
          }
 
+         //Update the rating
+         inst.rating = getRating(inst);
+         //Update the modification date
          inst.lastUpdated = Date.now();
-
       }
       next();
    });

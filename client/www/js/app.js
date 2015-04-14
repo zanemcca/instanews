@@ -8,6 +8,7 @@
 angular.module('instanews', [
       'ionic',
       'instanews.common',
+      'instanews.localStorage',
       'instanews.article',
       'instanews.feed',
       'instanews.votes',
@@ -30,26 +31,38 @@ angular.module('instanews', [
    '$scope',
    '$state',
    '$cordovaPush',
+   '$cordovaDevice',
    'Common',
+   'LocalStorage',
    'Journalist',
    'Platform',
-   function ($scope,$state, $cordovaPush, Common, Journalist, Platform) {
+   function ($scope,
+      $state,
+      $cordovaPush,
+      $cordovaDevice,
+      Common,
+      LocalStorage,
+      Journalist,
+      Platform) {
 
       Platform.ready
       .then(function() {
-         /*
 
          // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
          // for form inputs)
+         /*
          if (window.cordova && window.cordova.plugins.Keyboard) {
             cordova.plugins.Keyboard.hideKeyboardAccessoryBar(true);
          }
+         */
+
+         /*
          if (window.StatusBar) {
             // org.apache.cordova.statusbar required
             StatusBar.styleDefault();
          }
-
          */
+
          var config = {};
 
          var device = Common.getDevice();
@@ -73,15 +86,26 @@ angular.module('instanews', [
             return;
          }
 
-         console.log('Attempting to register device for push notifications');
-         $cordovaPush.register(config)
-         .then( function (res) {
+         var UUID = $cordovaDevice.getUUID();
 
-            console.log('Registered for push notification with cordovaPush: ', res);
-            device.token = res;
-            Common.setDevice(device);
-         }, function(err) {
-            console.log(err);
+         LocalStorage.secureRead(UUID, function(err, session) {
+
+            if(session) {
+               Common.setUser(session.user);
+            }
+            else {
+               console.log('Attempting to register device for push notifications');
+               $cordovaPush.register(config)
+               .then( function (res) {
+
+                  console.log('Registered for push notification with cordovaPush: ', res);
+                  device.token = res;
+                  Common.setDevice(device);
+
+               }, function(err) {
+                  console.log(err);
+               });
+            }
          });
 
       });
@@ -121,7 +145,7 @@ angular.module('instanews', [
          Journalist.logout()
          .$promise
          .then( function(res) {
-            Common.setUser({});
+            Common.clearUserData();
             console.log('Logged out');
          });
       };
@@ -139,7 +163,6 @@ angular.module('instanews', [
                filter: filter
             }).$promise
             .then( function(res) {
-               console.log('Result: ' + res);
                Common.setNotifications(res);
             });
          }
