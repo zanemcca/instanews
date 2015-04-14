@@ -19,7 +19,7 @@ app.controller('LoginCtrl', [
    $scope.cred = {
       username: '',
       password: '',
-      rememberMe: true
+      remember: true
    }
 
    $scope.invalidLogin = false;
@@ -72,7 +72,7 @@ app.controller('LoginCtrl', [
       .then( function(res) {
             Common.setUser(res);
 
-            if ($scope.cred.rememberMe) {
+            if ($scope.cred.remember) {
 
                var device = Common.getDevice();
                if(res && device.type) {
@@ -88,7 +88,8 @@ app.controller('LoginCtrl', [
 
             $scope.cred = {
                username: '',
-               password: ''
+               password: '',
+               remember: true
             }
 
             $scope.invalidLogin = false;

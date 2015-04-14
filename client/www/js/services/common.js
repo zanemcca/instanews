@@ -394,7 +394,9 @@ app.service('Common', [
    var clearUserData = function() {
       setUser({});
       setNotifications([]);
-      LocalStorage.secureDelete($cordovaDevice.getUUID());
+      if( ionic.Platform.isIOS() || ionic.Platform.isAndroid()) {
+         LocalStorage.secureDelete($cordovaDevice.getUUID());
+      }
    };
 
    return {
