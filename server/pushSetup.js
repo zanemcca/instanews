@@ -1,4 +1,8 @@
 
+
+var fs = require('fs');
+var path = require('path');
+
 module.exports = function (app) {
    // Setup push notifications
    var App = app.models.app;
@@ -8,6 +12,17 @@ module.exports = function (app) {
    var appName = 'instanews';
    //TODO Keep this key private
    var gcmServerApiKey = 'AIzaSyBPBlcVkSFmWc2_BxXs0OsWxJ7V5mSIEjQ';
+   var apnsCertData = readCredentialsFile('apns_cert_dev.pem');
+   var apnsKeyData = readCredentialsFile('apns_key_dev.pem');
+
+
+
+   function readCredentialsFile(name) {
+      return fs.readFileSync(
+         path.resolve(__dirname, 'credentials', name),
+         'UTF-8'
+      );
+   }
 
    function startPushServer() {
 
@@ -29,7 +44,17 @@ module.exports = function (app) {
       App.register('zanemcca', appName,{
          description: 'Local Citizen Journalism',
          pushSettings: {
-            //TODO Apple credentials
+            apns: {
+               certData: apnsCertData,
+               keyData: apnsKeyData,
+               pushOptions: {
+                  //Could add aditional options in here
+               },
+               feedbackOptions: {
+                  batchFeedback: true,
+                  interval: 300
+               }
+            },
             gcm: {
                serverApiKey: gcmServerApiKey
             }
@@ -39,7 +64,7 @@ module.exports = function (app) {
             console.log('Error Registering app: ' , err);
          }
          else {
-//            console.log('Registration of app successful: ' , app);
+            console.log('Registration of app successful: ' , app);
          }
       });
    }
