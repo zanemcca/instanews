@@ -27,13 +27,13 @@
     "org.apache.cordova.splashscreen",
     "org.apache.cordova.device",
     "org.apache.cordova.dialogs",
-    "com.crypho.plugins.securestorage",
     "org.apache.cordova.file"
   ],
   "cordovaPlatforms": [
     {
       "platform": "android",
       "locator": "./engine/cordova-android-c0.6.1/"
-    }
+    },
+    "ios"
   ]
 }

@@ -323,6 +323,33 @@ app.service('Common', [
    $rootScope.$on('$cordovaPush:notificationReceived', function (event, notification) {
 
       console.log('Notification recieved');
+
+      if(ionic.Platform.isIOS()) {
+         iosPushHandler(notification);
+      }
+      else if (ionic.Platform.isAndroid()) {
+         androidPushHandler(notification);
+      }
+      else {
+         console.log('Unkown platform cannot handle notification!');
+      }
+   });
+
+   var iosPushHandler = function(notification) {
+      if(notification.alert) {
+         notification.message = notification.alert;
+      }
+      notifications.push(notification);
+      notifyNotificationObservers();
+
+      $cordovaDialogs.alert(notification.message, 'instanews', 'Fuck yeah!')
+      .then( function() {
+         console.log('Notifcation is confirmed');
+      });
+
+   };
+
+   var androidPushHandler = function(notification) {
       if( notification.event === 'registered' ) {
          device.token = notification.regid;
          install();
@@ -340,7 +367,7 @@ app.service('Common', [
       else {
          console.log('Un-handled notification!');
       }
-   });
+   };
 
    var disableNextBack = function() {
       $ionicHistory.nextViewOptions({
