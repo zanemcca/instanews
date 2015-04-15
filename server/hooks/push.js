@@ -20,17 +20,36 @@ var notifyUser = function(app, username, message) {
          if( res.length > 0) {
             for(var i = 0; i < res.length; i++) {
 
-               Notification.create({
-                  username: username,
-                  installationId: res[i].id,
-                  deviceType: res[i].deviceType,
-                  deviceToken: res[i].deviceToken,
-                  expirationInterval: 3600, //Expire in 1 hr
-                  badge: 1,
-                  sound: 'ping.aiff',
-                  message: message,
-                  messageFrom: 'zane'
-               }, cb);
+               var note = {};
+               if(res[i].deviceType === 'android') {
+                  note = {
+                     username: username,
+                     installationId: res[i].id,
+                     deviceType: res[i].deviceType,
+                     deviceToken: res[i].deviceToken,
+                     expirationInterval: 3600, //Expire in 1 hr
+                     message: message,
+                     messageFrom: 'zane'
+                  };
+               }
+               else if (res[i].deviceType === 'ios') {
+                  note = {
+                     username: username,
+                     installationId: res[i].id,
+                     deviceType: res[i].deviceType,
+                     deviceToken: res[i].deviceToken,
+                     expirationInterval: 3600, //Expire in 1 hr
+                     badge: 1,
+                     sound: 'ping.aiff',
+                     alert: message,
+                     messageFrom: 'zane'
+                  };
+               }
+               else {
+                  console.log('Unkown device! Note creatinf a notification');
+                  break;
+               }
+               Notification.create(note, cb);
             }
          }
          else {

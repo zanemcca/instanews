@@ -12,8 +12,8 @@ module.exports = function (app) {
    var appName = 'instanews';
    //TODO Keep this key private
    var gcmServerApiKey = 'AIzaSyBPBlcVkSFmWc2_BxXs0OsWxJ7V5mSIEjQ';
-   var apnsCertData = readCredentialsFile('apns_cert_dev.pem');
-   var apnsKeyData = readCredentialsFile('apns_key_dev.pem');
+   var apnsCertData = readCredentialsFile('apnsCertDev.pem');
+   var apnsKeyData = readCredentialsFile('apnsKeyDev.pem');
 
 
 
