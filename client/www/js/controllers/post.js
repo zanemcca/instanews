@@ -37,7 +37,10 @@ app.controller('PostCtrl', [
    else {
       //Refresh the map everytime we enter the view
       $scope.$on('$ionicView.afterEnter', function() {
-         google.maps.event.trigger(Position.getArticleMap(), 'resize');
+         var map = Position.getArticleMap();
+         if(map) {
+            google.maps.event.trigger(map, 'resize');
+         }
       });
    }
 
@@ -69,37 +72,46 @@ app.controller('PostCtrl', [
    //Post the new article to the server and also post any subarticles that may be
    //attached to it
    $scope.postArticle = function() {
+
+      var cb = function(err, position) {
+         if(err) console.log('Error getting users position: ' + err.message);
+
+         var loc = {
+            lat: position.coords.latitude,
+            lng: position.coords.longitude
+         }
+
+         Position.set(position);
+
+         Article.create({
+            date: Date.now(),
+            isPrivate: false,
+            myId: Math.floor(Math.random()*Math.pow(2,32)),
+            location: loc,
+            username: $scope.user.username,
+            title: $scope.newArticle.title
+         })
+         .$promise.then( function(res) {
+            if( $scope.newArticle.data.length > 0 ){
+               postSubarticle(res.myId, function(res) {
+                  console.log('Succesful sub creation');
+               });
+            }
+            $scope.trashArticle();
+         });
+      };
+
       if ($scope.newArticle.search ) {
          //TODO Lookup the lat-lng
          $scope.newArticle.search = 'My Location';
-         loc = {
-            lat: Position.mPosition.lat,
-            lng: Position.mPosition.lng
-         }
+         Position.getCurrent(cb);
       }
       else {
          $scope.newArticle.search = 'My Location';
-         loc = {
-            lat: Position.mPosition.lat,
-            lng: Position.mPosition.lng
-         }
+
+         Position.getCurrent(cb);
       }
-      Article.create({
-         date: Date.now(),
-         isPrivate: false,
-         myId: Math.floor(Math.random()*Math.pow(2,32)),
-         location: loc,
-         username: $scope.user.username,
-         title: $scope.newArticle.title
-      })
-      .$promise.then( function(res) {
-         if( $scope.newArticle.data.length > 0 ){
-            postSubarticle(res.myId, function(res) {
-               console.log('Succesful sub creation');
-            });
-         }
-         $scope.trashArticle();
-      });
+
    };
 
    /* Subarticle posting */

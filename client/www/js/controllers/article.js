@@ -27,7 +27,10 @@ app.controller('ArticleCtrl', [
 
    //Refresh the map everytime we enter the view
    $scope.$on('$ionicView.afterEnter', function() {
-      google.maps.event.trigger(Position.getArticleMap(), 'resize');
+      var map = Position.getArticleMap();
+      if(map) {
+         google.maps.event.trigger(map, 'resize');
+      }
    });
 
    var load = function(cb) {

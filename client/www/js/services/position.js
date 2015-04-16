@@ -34,6 +34,7 @@ app.service('Position', [
    */
    var mPosition = {};
 
+   /*
    // Watch the users position
    var posWatch = navigator.geolocation.watchPosition(
       updatePosition,
@@ -68,7 +69,7 @@ app.service('Position', [
       map.setCenter({lat: $scope.mPos.lat, lng: $scope.mPos.lng});
       map.setZoom(15);
       */
-   }
+ //  }
 
 
    /*
@@ -149,25 +150,44 @@ app.service('Position', [
 
    Platform.ready
    .then( function() {
-      var UUID = Platform.getUUID();
-      if(UUID) {
-         LocalStorage.secureRead('position' + UUID, function(err, res) {
-            if (err) {
-               console.log('Error reading position: ' + err);
-            }
-            else {
-               console.log('Read position from storage: ' + res.toString());
-               mPosition = res;
-               notifyObservers();
-            }
-         });
+      //If we have not filled the position by the time the platform is ready then
+      //attempt to load it from storage
+      if( !mPosition || !mPosition.coords) {
+         var UUID = Platform.getUUID();
+         if(UUID) {
+            LocalStorage.secureRead('position' + UUID, function(err, res) {
+               if (err) {
+                  console.log('Error reading position: ' + err);
+               }
+               else {
+                  console.log('Read position from storage: ' + res.toString());
+                  mPosition = res;
+                  notifyObservers();
+               }
+            });
+         }
       }
    });
 
-   var get = function() {
+
+   //Return the last position that was set
+   var getLast = function() {
       return mPosition;
    };
 
+   //Find and return the current position of the device
+   var getCurrent = function(cb) {
+      var options = {timeout: 10000, enableHighAccuracy: true};
+      navigator.geolocation.getCurrentPosition(
+         function(position) {
+            cb(null,position);
+         }, function(err) {
+            console.log('Error getting position: ' + err.message);
+            cb(err, null);
+         }, options);
+   };
+
+   //Set the position
    var set = function(position) {
       mPosition = position;
 
@@ -227,7 +247,8 @@ app.service('Position', [
 //      radToSlide: radToSlide,
       setBounds: setBounds,
       getBounds: getBounds,
-      get: get,
+      getCurrent: getCurrent,
+      getLast: getLast,
       set: set,
       withinRange: withinRange,
       registerObserver: registerObserver,

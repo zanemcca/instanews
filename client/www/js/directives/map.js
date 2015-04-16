@@ -205,10 +205,9 @@ app.directive('inmap', [
          }
 
          //Center the map on the current user position
-         var localizeMap = function() {
-            var mPos = Position.get();
-            if(mPos && mPos.coords) {
-               map.setCenter(posToLatLng(mPos));
+         var localizeMap = function(map, pos) {
+            if(pos && pos.coords) {
+               map.setCenter(posToLatLng(pos));
                return true;
             }
             return false;
@@ -217,7 +216,8 @@ app.directive('inmap', [
          //Observer callback function that waits on the users position
          // and will center the map one time
          var localizeOnceObserver = function() {
-            if(localizeMap()) {
+            var mPos = Position.getLast();
+            if(localizeMap(map, mPos)) {
                Position.unregisterObserver(localizeOnceObserver);
             }
          };
@@ -231,16 +231,15 @@ app.directive('inmap', [
          //Initialize the map
           var initializeMap = function() {
 
-            var position = Position.get();
+            var position = Position.getLast();
             var mPosition = {};
 
             if(position && position.coords) {
                mPosition = posToLatLng(position);
             }
             else {
-               console.log('No position for map!');
+               //Load Montreal for now
                mPosition = new google.maps.LatLng(45.5017 , -73.5673);
-               Position.registerObserver(localizeOnceObserver);
             }
 
             var mapOptions = {
@@ -254,13 +253,30 @@ app.directive('inmap', [
             var element = document.getElementById("feedMap");
             if ( element && element.textContent.indexOf('Map') === -1) {
                map = new google.maps.Map(element, mapOptions);
+
+               //Listener on bounds changing on the map
                google.maps.event.addListener(map, 'bounds_changed', _.debounce(function() {
                   console.log('Updating map');
                   Position.setBounds(map.getBounds());
                   updateHeatmap();
-               }, 500));
+               }, 100));
 
                Position.setFeedMap(map);
+
+               //TODO Remove this and set the map based on the bounds
+               Position.getCurrent( function(err, position) {
+                  var mPosition = {};
+                  //If we get a valid position then center the map
+                  if(position && position.coords) {
+                     //Save the new position
+                     Position.set(position);
+                     localizeMap(map, position);
+                  }
+                  else { //If we do not get a good position then wait for the position and localize
+                     console.log('No position for map!: '+ err.message);
+                     Position.registerObserver(localizeOnceObserver);
+                  }
+               });
             }
 
             //Article map only contains a marker to the current article
@@ -281,6 +297,24 @@ app.directive('inmap', [
                articleMarker = new google.maps.Marker(tempMarker);
 
                Position.setArticleMap(articleMap);
+
+               //If we have a new article we should make the first place it looks the
+               //users current location
+               if (!$stateParams.id) {
+                  Position.getCurrent( function(err, position) {
+                     var mPosition = {};
+                     //If we get a valid position then center the map
+                     if(position && position.coords) {
+                        //Save the new position
+                        Position.set(position);
+                        localizeMap(articleMap, position);
+                     }
+                     else { //If we do not get a good position then wait for the position and localize
+                        console.log('No position for map!: '+ err.message);
+                        Position.registerObserver(localizeOnceObserver);
+                     }
+                  });
+               }
             }
 
           };

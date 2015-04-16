@@ -120,6 +120,9 @@ app.controller('FeedCtrl', [
 
    //Refresh the map everytime we enter the view
    $scope.$on('$ionicView.afterEnter', function() {
-      google.maps.event.trigger(Position.getFeedMap(), 'resize');
+      var map = Position.getFeedMap();
+      if(map) {
+         google.maps.event.trigger(map, 'resize');
+      }
    });
 }]);
