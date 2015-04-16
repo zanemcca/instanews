@@ -27,7 +27,8 @@
     "org.apache.cordova.splashscreen",
     "org.apache.cordova.device",
     "org.apache.cordova.dialogs",
-    "org.apache.cordova.file"
+    "org.apache.cordova.file",
+    "org.apache.cordova.geolocation"
   ],
   "cordovaPlatforms": [
     {

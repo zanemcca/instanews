@@ -7,9 +7,10 @@
 // 'starter.controllers' is found in controllers.js
 angular.module('instanews', [
       'ionic',
-      'instanews.common',
+      'instanews.navigate',
       'instanews.localStorage',
       'instanews.article',
+      'instanews.articles',
       'instanews.feed',
       'instanews.votes',
       'instanews.login',
@@ -20,6 +21,9 @@ angular.module('instanews', [
       'instanews.post',
       'instanews.profile',
       'instanews.platform',
+      'instanews.user',
+      'instanews.position',
+      'instanews.notifications',
       'lbServices',
       'ui.router',
       'ngCordova'])
@@ -32,7 +36,9 @@ angular.module('instanews', [
    '$state',
    '$cordovaPush',
    '$cordovaDevice',
-   'Common',
+   'Navigate',
+   'Notifications',
+   'User',
    'LocalStorage',
    'Journalist',
    'Platform',
@@ -40,7 +46,9 @@ angular.module('instanews', [
       $state,
       $cordovaPush,
       $cordovaDevice,
-      Common,
+      Navigate,
+      Notifications,
+      User,
       LocalStorage,
       Journalist,
       Platform) {
@@ -65,7 +73,7 @@ angular.module('instanews', [
 
          var config = {};
 
-         var device = Common.getDevice();
+         var device = Platform.getDevice();
 
          if( ionic.Platform.isAndroid()) {
             config = {
@@ -99,7 +107,7 @@ angular.module('instanews', [
                   session.user.id = user.id;
                   session.user.created = user.created;
                   session.user.ttl = user.ttl;
-                  Common.setUser(session.user);
+                  User.set(session.user);
                }, function(err) {
                   console.log('Error: Cannot create token for user: ' + err);
                   LocalStorage.secureDelete(UUID);
@@ -112,7 +120,7 @@ angular.module('instanews', [
 
                   console.log('Registered for push notification with cordovaPush: ', res);
                   device.token = res;
-                  Common.setDevice(device);
+                  Platform.setDevice(device);
 
                }, function(err) {
                   console.log(err);
@@ -126,28 +134,29 @@ angular.module('instanews', [
       $scope.notifications = [];
 
       var updateNotifications = function() {
-         $scope.notifications = Common.getNotifications();
+         $scope.notifications = Notifications.get();
       };
 
-      Common.registerNotificationObserver(updateNotifications);
+      Notifications.registerObserver(updateNotifications);
 
       //Update user function
       var updateUser = function() {
-         $scope.user = Common.getUser();
+         $scope.user = User.get();
+         //TODO Fix race condition between logging in and asking for notifications
          loadNotifications();
       };
 
       //Set up an observer on the user model
-      Common.registerUserObserver(updateUser);
+      User.registerObserver(updateUser);
 
       $scope.home = function() {
-         Common.disableNextBack();
+         Navigate.disableNextBack();
          $state.go('app.home');
       };
 
       //Load the login page
       $scope.login = function() {
-         Common.disableNextBack();
+         Navigate.disableNextBack();
          $state.go('app.login');
       };
 
@@ -157,7 +166,7 @@ angular.module('instanews', [
          Journalist.logout()
          .$promise
          .then( function(res) {
-            Common.clearUserData();
+            User.clearData();
             console.log('Logged out');
          });
       };
@@ -175,7 +184,7 @@ angular.module('instanews', [
                filter: filter
             }).$promise
             .then( function(res) {
-               Common.setNotifications(res);
+               Notifications.set(res);
             });
          }
          else {

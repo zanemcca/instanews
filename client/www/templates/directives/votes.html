@@ -9,6 +9,6 @@
 </button>
 <div ng-if="votable.commentableType !== 'comment'" class="item-icon-right">
    <button class="item button button-clear icon button-small" ng-class="{'ion-arrow-right-b': !votable.showComments, 'ion-arrow-down-b': votable.showComments}"
-      ng-click="Common.toggleComments(votable)">
+      ng-click="toggleComments(votable)">
    </button>
 </div>

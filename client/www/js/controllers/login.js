@@ -5,14 +5,18 @@ app.controller('LoginCtrl', [
       '$state',
       '$ionicModal',
       '$cordovaDevice',
-      'Common',
+      'Navigate',
+      'Platform',
+      'User',
       'LocalStorage',
       'Journalist',
       function($scope,
          $state,
          $ionicModal,
          $cordovaDevice,
-         Common,
+         Navigate,
+         Platform,
+         User,
          LocalStorage,
          Journalist) {
 
@@ -70,11 +74,11 @@ app.controller('LoginCtrl', [
       }, credentials)
       .$promise
       .then( function(res) {
-            Common.setUser(res);
+            User.set(res);
 
             if ($scope.cred.remember) {
 
-               var device = Common.getDevice();
+               var device = Platform.getDevice();
                if(res && device.type) {
                   var session = {
                      user: res
@@ -94,7 +98,7 @@ app.controller('LoginCtrl', [
 
             $scope.invalidLogin = false;
 
-            Common.disableNextBack();
+            Navigate.disableNextBack();
             $state.go('app.feed');
       }, function (err) {
          $scope.invalidLogin = true;

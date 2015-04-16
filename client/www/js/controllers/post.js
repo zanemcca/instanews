@@ -7,7 +7,9 @@ app.controller('PostCtrl', [
       '$ionicModal',
       '$ionicHistory',
       'Article',
-      'Common',
+      'Articles',
+      'Position',
+      'User',
       'Camera',
       function($state,
          $stateParams,
@@ -15,24 +17,27 @@ app.controller('PostCtrl', [
          $ionicModal,
          $ionicHistory,
          Article,
-         Common,
+         Articles,
+         Position,
+         User,
          Camera) {
 
-   $scope.user = Common.getUser();
+   $scope.user = User.get();
    var updateUser = function() {
-      $scope.user = Common.getUser();
+      $scope.user = User.get();
    };
 
-   Common.registerUserObserver(updateUser);
+   User.registerObserver(updateUser);
 
 
+   //If we have an ID given then we know we are posting subarticles within an article
    if( $stateParams.id ) {
-      $scope.article = Common.getArticle($stateParams.id);
+      $scope.article = Articles.getOne($stateParams.id);
    }
    else {
       //Refresh the map everytime we enter the view
       $scope.$on('$ionicView.afterEnter', function() {
-         google.maps.event.trigger(Common.getArticleMap(), 'resize');
+         google.maps.event.trigger(Position.getArticleMap(), 'resize');
       });
    }
 
@@ -68,15 +73,15 @@ app.controller('PostCtrl', [
          //TODO Lookup the lat-lng
          $scope.newArticle.search = 'My Location';
          loc = {
-            lat: Common.mPosition.lat,
-            lng: Common.mPosition.lng
+            lat: Position.mPosition.lat,
+            lng: Position.mPosition.lng
          }
       }
       else {
          $scope.newArticle.search = 'My Location';
          loc = {
-            lat: Common.mPosition.lat,
-            lng: Common.mPosition.lng
+            lat: Position.mPosition.lat,
+            lng: Position.mPosition.lng
          }
       }
       Article.create({

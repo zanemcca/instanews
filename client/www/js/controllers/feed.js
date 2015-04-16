@@ -4,15 +4,19 @@ app.controller('FeedCtrl', [
       '$scope',
       'Article',
       '_',
-      'Common',
+      'Position',
+      'Articles',
+      'Navigate',
       function($scope,
          Article,
          _,
-         Common) {
+         Position,
+         Articles,
+         Navigate) {
 
-   $scope.articles = Common.getArticles();
-   $scope.toggleMenu = Common.toggleMenu;
-   $scope.scrollTop = Common.scrollTop;
+   $scope.articles = Articles.get();
+   $scope.toggleMenu = Navigate.toggleMenu;
+   $scope.scrollTop = Navigate.scrollTop;
 
    $scope.scroll = {
       buttonOn: false
@@ -20,7 +24,7 @@ app.controller('FeedCtrl', [
 
    //TODO debounce this and get the scroll to top button disabling appropriately
    $scope.onScroll = function() {
-      $scope.scroll.buttonOn = Common.onScroll();
+      $scope.scroll.buttonOn = Navigate.onScroll();
       console.log('Scroll top on ? ' + $scope.scroll.buttonOn);
    };
 
@@ -58,7 +62,7 @@ app.controller('FeedCtrl', [
       $scope.itemsAvailable = true;
       filter.skip = 0;
       $scope.articles = [];
-      Common.setArticles($scope.articles);
+      Articles.set($scope.articles);
 
       //Load the initial articles
       load( function() {
@@ -86,7 +90,7 @@ app.controller('FeedCtrl', [
                var article = articles[i];
 
                //Remove duplicates
-               if (Common.getArticle(article.myId)) {
+               if (Articles.getOne(article.myId)) {
                   articles.splice(i,1);
                   continue;
                }
@@ -100,7 +104,7 @@ app.controller('FeedCtrl', [
             $scope.articles = $scope.articles.concat(articles);
 
             //Update the global articles list
-            Common.setArticles($scope.articles);
+            Articles.set($scope.articles);
          }
 
          cb();
@@ -116,6 +120,6 @@ app.controller('FeedCtrl', [
 
    //Refresh the map everytime we enter the view
    $scope.$on('$ionicView.afterEnter', function() {
-      google.maps.event.trigger(Common.getFeedMap(), 'resize');
+      google.maps.event.trigger(Position.getFeedMap(), 'resize');
    });
 }]);

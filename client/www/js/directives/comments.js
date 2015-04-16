@@ -1,9 +1,9 @@
 var app = angular.module('instanews.comments', ['ionic', 'ngResource']);
 
 app.directive('incomments', [
-      'Common',
+      'User',
       'Comment',
-      function (Common, Comment) {
+      function (User, Comment) {
 
    return {
       restrict: 'E',
@@ -11,7 +11,38 @@ app.directive('incomments', [
          owner: '='
       },
       controller: function($scope) {
-         $scope.Common = Common;
+
+         $scope.createComment = function (instance, content) {
+            var Create = {};
+            var model = {};
+            var user = User.get();
+            if (instance.commentableId ) {
+               Create = Comment.prototype$__create__comments;
+               model = {
+                  id: instance.myId,
+                  username: user.username,
+                  content: content,
+                  commentableId: instance.myId,
+                  commentableType: "comment"
+               };
+            }
+            else {
+               Create = instance.constructor.comments.create;
+               model = {
+                  id: instance.myId,
+                  username: user.username,
+                  content: content,
+                  commentableId: instance.myId,
+                  commentableType: instance.constructor.modelName.toLowerCase()
+               };
+            }
+
+            Create(model)
+            .$promise
+            .then( function(res, err) {
+               instance.comments.push(res);
+            });
+         };
 
          var filter = {
             limit: 10,

@@ -4,17 +4,19 @@ app.controller('ArticleCtrl', [
       '$scope',
       '$stateParams',
       'Article',
-      'Common',
+      'Articles',
+      'Position',
       '_',
       function($scope,
          $stateParams,
          Article,
-         Common,
+         Articles,
+         Position,
          _) {
 
    //Scope variables
    $scope.subarticles = [];
-   $scope.article = Common.getArticle($stateParams.id);
+   $scope.article = Articles.getOne($stateParams.id);
    $scope.itemsAvailable = true;
 
    var filter = {
@@ -25,7 +27,7 @@ app.controller('ArticleCtrl', [
 
    //Refresh the map everytime we enter the view
    $scope.$on('$ionicView.afterEnter', function() {
-      google.maps.event.trigger(Common.getArticleMap(), 'resize');
+      google.maps.event.trigger(Position.getArticleMap(), 'resize');
    });
 
    var load = function(cb) {

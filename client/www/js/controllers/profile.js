@@ -3,19 +3,17 @@ var app = angular.module('instanews.profile', ['ionic', 'ngResource']);
 app.controller('ProfileCtrl', [
       '$scope',
       '$stateParams',
-      'Article',
       'Journalist',
-      'Common',
+      'Navigate',
       function($scope,
          $stateParams,
-         Article,
          Journalist,
-         Common) {
+         Navigate) {
 
    $scope.user = {};
 
    $scope.me = false;
-   $scope.toggleMenu = Common.toggleMenu;
+   $scope.toggleMenu = Navigate.toggleMenu;
 
    var filter = {
       limit: 50,
@@ -35,7 +33,7 @@ app.controller('ProfileCtrl', [
    //Refresh the map everytime we enter the view
    $scope.$on('$ionicView.beforeEnter', function() {
 
-      var user = Common.getUser();
+      var user = User.getUser();
 
       if( user && $stateParams.username === user.username) {
          $scope.user = user;

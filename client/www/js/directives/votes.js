@@ -2,8 +2,8 @@ var app = angular.module('instanews.votes', ['ionic', 'ngResource']);
 
 app.directive('invotes', [
       'Comment',
-      'Common',
-      function (Comment, Common) {
+      'User',
+      function (Comment, User) {
 
    return {
       restrict: 'E',
@@ -11,15 +11,44 @@ app.directive('invotes', [
          votable: '='
       },
       controller: function($scope) {
-         $scope.Common = Common;
 
-         var user = Common.getUser();
+         $scope.toggleComments = function(instance) {
+            if(!instance.showComments) {
 
-         var updateUser = function() {
-            user = Common.getUser();
+               //Comments can have any kind of parent
+               //so we check for it before updating
+               if ( instance.commentableId ) {
+                  model = Comment;
+               }
+               else {
+                  model = instance.constructor;
+               }
+
+               var filter = {
+                  limit: 10,
+                  order: 'rating DESC'
+               }
+
+               //Retrieve the comments from the server
+               model.prototype$__get__comments({id: instance.myId, filter: filter})
+               .$promise
+               .then( function (res) {
+                  instance.comments = res;
+                  instance.showComments = true;
+               });
+            }
+            else {
+               instance.showComments = false;
+            }
          };
 
-         Common.registerUserObserver(updateUser);
+         var user = User.get();
+
+         var updateUser = function() {
+            user = User.get();
+         };
+
+         User.registerObserver(updateUser);
 
          $scope.upvote = function (instance) {
             //Since comments are nested the constructor actually belongs
