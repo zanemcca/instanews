@@ -26,7 +26,6 @@ module.exports = function(Journalist) {
       '__destroyById__downVotes',
       '__delete__articles',
       '__get__accessTokens',
-      '__create__accessTokens',
       '__delete__accessTokens',
       '__updateById__accessTokens',
       '__findById__accessTokens',

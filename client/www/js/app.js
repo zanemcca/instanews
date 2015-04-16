@@ -91,7 +91,19 @@ angular.module('instanews', [
          LocalStorage.secureRead(UUID, function(err, session) {
 
             if(session) {
-               Common.setUser(session.user);
+               //Request a new token that expires in 2 weeks
+               Journalist.prototype$__create__accessTokens({
+                  id: session.user.user.username,
+                  ttl: 1209600
+               }, null, function(user) {
+                  session.user.id = user.id;
+                  session.user.created = user.created;
+                  session.user.ttl = user.ttl;
+                  Common.setUser(session.user);
+               }, function(err) {
+                  console.log('Error: Cannot create token for user: ' + err);
+                  LocalStorage.secureDelete(UUID);
+               });
             }
             else {
                console.log('Attempting to register device for push notifications');
