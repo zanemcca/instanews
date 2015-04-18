@@ -3,6 +3,7 @@ var app = angular.module('instanews.map', ['ionic', 'ngResource', 'underscore'])
 app.directive('inmap', [
       '_',
       'Position',
+      'Platform',
       'Articles',
       function (_, Position, Articles) {
 
@@ -11,6 +12,7 @@ app.directive('inmap', [
       controller: function($scope,
          $stateParams,
          Position,
+         Platform,
          Articles) {
 
 //         var map = Position.getFeedMap();
@@ -319,8 +321,7 @@ app.directive('inmap', [
 
           };
 
-
-          initializeMap();
+      Platform.ready.then(initializeMap());
           /*
           //Wait for the device to be ready and then load the map
           ionic.DomUtil.ready( function() {
