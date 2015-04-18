@@ -33,11 +33,13 @@ module.exports = function(app) {
                }, function(err, res) {
                   if (err) console.log('Error after saving vote: ' + err);
                   else {
-                     var username = res[0].username;
+                     if( res.length > 0) {
+                        var username = res[0].username;
 
-                     if( username !== inst.username) {
-                        var message = inst.username + ' voted on your article';
-                        Push.notifyUser(app, username, message);
+                        if( username !== inst.username) {
+                           var message = inst.username + ' voted on your article';
+                           Push.notifyUser(app, username, message);
+                        }
                      }
                   }
                });

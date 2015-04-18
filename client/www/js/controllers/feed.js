@@ -4,12 +4,14 @@ app.controller('FeedCtrl', [
       '$scope',
       'Article',
       '_',
+      'Maps',
       'Position',
       'Articles',
       'Navigate',
       function($scope,
          Article,
          _,
+         Maps,
          Position,
          Articles,
          Navigate) {
@@ -19,10 +21,79 @@ app.controller('FeedCtrl', [
    $scope.scrollTop = Navigate.scrollTop;
 
 
+// Heat Map ======================================================
+
+   var heatmap;
+
+   function createGradient() {
+
+      var third = 8;
+      var subValue = 256/third;
+
+      //Transistion from baby blue to blue to red
+      var gradient = ['rgba(0, 255, 255, 0)'];
+      for(var i = 0; i < third; i++) {
+         var temp =  'rgba(0,' + (255-subValue*i) + ',255, 1)'
+         gradient.push(temp);
+      }
+      for(var i = 0; i < third; i++) {
+         gradient.push( 'rgba(0,0,'+ (255 - subValue/2*i) +', 1)');
+      }
+      for(var i = 0; i < third; i++) {
+         gradient.push( 'rgba('+ (subValue*i) +',0,'+ (128 - subValue/2*i) +', 1)');
+      }
+      gradient.push('rgba(255, 0, 0, 1)');
+
+      return gradient;
+   }
+
+   function updateHeatmap() {
+      var articleHeatArray = [];
+
+      if( !Position.getBounds()) {
+         return;
+      }
+
+      for(var i = 0; i < $scope.articles.length; i++) {
+         var position = Position.posToLatLng($scope.articles[i].location);
+         if (Position.withinRange(position)) {
+            articleHeatArray.push({
+               location: position,
+               weight: $scope.articles[i].rating
+            });
+         }
+      }
+
+      if (!heatmap) {
+
+         heatmap = new google.maps.visualization.HeatmapLayer({
+            map: Maps.getFeedMap(),
+            gradient: createGradient(),
+            data: articleHeatArray
+         });
+      }
+      else {
+         heatmap.setData(articleHeatArray);
+      }
+   }
+
+//#############################################
+
+   var updateMap = function() {
+      $scope.articles = Articles.get();
+      updateHeatmap();
+      console.log('Updating map');
+   };
+
+   //Update the map if the articles are updated or
+   //if bounds get updated
+   Articles.registerObserver(updateMap);
+   Position.registerObserver(updateMap);
+
    $scope.localize = function() {
-      var map = Position.getFeedMap();
+      var map = Maps.getFeedMap();
       if( map) {
-         Position.localize(map);
+         Maps.localize(map);
       }
       else {
          console.log('Map not valid! Cannot localize!');
@@ -52,15 +123,14 @@ app.controller('FeedCtrl', [
          }
       },
       order: 'rating DESC'/*,
-       //TODO Try this again once loopback 2.24.0 comes out
+      //Based on loopback-datasource-juggler #544 this will not work
+      //with mongoDB
       where: {
-         location: {
-            lat: {
-               between: [40,50]
-            },
-            lng: {
-               between: [-70,-60]
-            }
+         'location.lat': {
+            between: [40,50]
+         },
+         'locaion.lng': {
+            between: [-70,-60]
          }
       }
       */
@@ -131,7 +201,7 @@ app.controller('FeedCtrl', [
 
    //Refresh the map everytime we enter the view
    $scope.$on('$ionicView.afterEnter', function() {
-      var map = Position.getFeedMap();
+      var map = Maps.getFeedMap();
       if(map) {
          google.maps.event.trigger(map, 'resize');
       }

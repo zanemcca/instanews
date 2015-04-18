@@ -9,6 +9,8 @@ app.controller('PostCtrl', [
       'Article',
       'Articles',
       'Position',
+      'Platform',
+      'Maps',
       'User',
       'Camera',
       function($state,
@@ -19,35 +21,129 @@ app.controller('PostCtrl', [
          Article,
          Articles,
          Position,
+         Platform,
+         Maps,
          User,
          Camera) {
 
    $scope.user = User.get();
+
    var updateUser = function() {
       $scope.user = User.get();
    };
 
    User.registerObserver(updateUser);
 
+   var marker;
+   var map;
 
-   //If we have an ID given then we know we are posting subarticles within an article
-   if( $stateParams.id ) {
-      $scope.article = Articles.getOne($stateParams.id);
-   }
-   else {
-      //Refresh the map everytime we enter the view
-      $scope.$on('$ionicView.afterEnter', function() {
-         var map = Position.getArticleMap();
-         if(map) {
-            google.maps.event.trigger(map, 'resize');
-         }
+   $scope.disableTap = function(){
+      console.log('Disabling tap');
+      container = document.getElementsByClassName('pac-container');
+      // disable ionic data tab
+      angular.element(container).attr('data-tap-disabled', 'true');
+      // leave input field if google-address-entry is selected
+      angular.element(container).on("click", function(){
+        document.getElementById('search-input').blur();
       });
-   }
+   };
 
+   Platform.ready
+   .then( function() {
+      //If we have an ID given then we know we are posting subarticles within an article
+      if( $stateParams.id ) {
+         $scope.article = Articles.getOne($stateParams.id);
+      }
+      else {
+         //Refresh the map everytime we enter the view
+         $scope.$on('$ionicView.afterEnter', function() {
+            $scope.localize();
+         });
 
-   $scope.useMyLocation = function() {
-      //TODO Change this to lookup the name of the user location
-      $scope.newArticle.search = 'My Location';
+         var element = document.getElementById("postMap");
+         if ( element && element.textContent.indexOf('Map') === -1) {
+
+            var position = Position.getLast();
+            var mPosition = {};
+
+            if(position && position.coords) {
+               mPosition = Position.posToLatLng(position);
+            }
+            else {
+               //Load Montreal for now
+               mPosition = new google.maps.LatLng(45.5017 , -73.5673);
+            }
+
+            var mapOptions = {
+               center: mPosition,
+               zoom: 8,
+               disableDefaultUI: true,
+               mapTypeId: google.maps.MapTypeId.ROADMAP
+            };
+
+            map = new google.maps.Map(element, mapOptions);
+
+            var input = document.getElementById('search-input');
+            var autocomplete = new google.maps.places.Autocomplete(input);
+
+            //Add a listener on the search box
+            google.maps.event.addListener(autocomplete, 'place_changed', function() {
+               var place = autocomplete.getPlace();
+
+               if(!place.geometry) {
+                  console.log('No geometry!');
+                  return;
+               }
+
+               $scope.newArticle.place = place;
+
+               if(place.geometry.viewport) {
+                  map.fitBounds(place.geometry.viewport);
+               }
+               else {
+                  Maps.setCenter(map, place.geometry.location);
+                  map.setZoom(17);
+               }
+
+               if(!marker) {
+                  Maps.setMarker(map, place.geometry.location);
+                  $scope.newArticle.markerSet = true;
+               }
+               else {
+                  marker.setPosition(place.geometry.location);
+               }
+            });
+
+            google.maps.event.addListener(map, 'click', function(event) {
+               if(!marker) {
+                  Maps.setMarker(map, event.latLng);
+                  $scope.newArticle.markerSet = true;
+               }
+               else {
+                  marker.setPosition(event.latLng);
+               }
+            });
+
+            Maps.setPostMap(map);
+         }
+
+      }
+   });
+
+   $scope.localize = function() {
+      if( map) {
+         Maps.localize(map, function(err, pos) {
+            if(err) console.log('Error: ' + err);
+            else {
+               marker = Maps.deleteMarker(marker);
+               marker = Maps.setMarker(map,pos);
+               $scope.newArticle.markerSet = true;
+            }
+         });
+      }
+      else {
+         console.log('Map not valid! Cannot localize!');
+      }
    };
 
    $scope.data = {
@@ -58,14 +154,15 @@ app.controller('PostCtrl', [
 
    $scope.newArticle = {
       title: '',
-      search: '',
+      markerSet: false,
+      place: {},
       data: []
    };
 
    $scope.trashArticle = function() {
       $scope.newArticle.title = '';
       $scope.newArticle.data = [];
-      $scope.newArticle.serch = '';
+      $scope.newArticle.place = {};
       $ionicHistory.goBack();
    };
 
@@ -77,11 +174,22 @@ app.controller('PostCtrl', [
          if(err) console.log('Error getting users position: ' + err.message);
 
          var loc = {
-            lat: position.coords.latitude,
-            lng: position.coords.longitude
-         }
+            lat: 0,
+            lng: 0
+         };
 
-         Position.set(position);
+         if(position.coords) {
+            if(!err) {
+               Position.set(position);
+            }
+            loc = {
+               lat: position.coords.latitude,
+               lng: position.coords.longitude
+            }
+         }
+         else {
+            loc = position;
+         }
 
          Article.create({
             date: Date.now(),
@@ -91,26 +199,44 @@ app.controller('PostCtrl', [
             username: $scope.user.username,
             title: $scope.newArticle.title
          })
-         .$promise.then( function(res) {
+         .$promise
+         .then( function(res) {
             if( $scope.newArticle.data.length > 0 ){
                postSubarticle(res.myId, function(res) {
                   console.log('Succesful sub creation');
                });
             }
             $scope.trashArticle();
+         }, function(err) {
+            console.log('Error posting article: ' + err);
          });
       };
 
-      if ($scope.newArticle.search ) {
-         //TODO Lookup the lat-lng
-         $scope.newArticle.search = 'My Location';
-         Position.getCurrent(cb);
+      var place = $scope.newArticle.place;
+      if(marker) {
+         var position = {
+            lat: marker.getPosition().lat(),
+            lng: marker.getPosition().lng()
+         };
+         cb(null, position);
+         console.log('Using marker position!!!');
       }
       else {
-         $scope.newArticle.search = 'My Location';
-
+         console.log('Cannot post article without position');
+      }
+      /*
+      else if (place && place.geometry) {
+         var position = {
+            lat: place.geometry.location.lat(),
+            lng: place.geometry.location.lng()
+         };
+         cb(null, position);
+      }
+      else {
+         console.log('Using current position');
          Position.getCurrent(cb);
       }
+      */
 
    };
 

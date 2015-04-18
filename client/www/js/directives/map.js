@@ -3,6 +3,7 @@ var app = angular.module('instanews.map', ['ionic', 'ngResource', 'underscore'])
 app.directive('inmap', [
       '_',
       'Position',
+      'Maps',
       'Platform',
       'Articles',
       function (_, Position, Articles) {
@@ -12,210 +13,20 @@ app.directive('inmap', [
       controller: function($scope,
          $stateParams,
          Position,
+         Maps,
          Platform,
          Articles) {
 
-//         var map = Position.getFeedMap();
-//         var map = Position.getArticleMap();
-
          var map = {};
-         //Reload the markers when we recieve new articles
-         var updateMap = function() {
-           updateHeatmap();
-           console.log('Articles updated');
-           //getMarkers();
-         };
-
-         Articles.registerObserver(updateMap);
-
-
-//My Circle =============================================================
-
-         /*
-         var myCircle;
-         var northPole = new google.maps.LatLng(90.0000, 0.0000);
-         var southPole = new google.maps.LatLng(-90.0000, 0.0000);
-
-
-         //Watch our accuracy so that we always know if we hit our limit
-         $scope.$watch('mPos.accuracy', function(newValue, oldValue) {
-            if (newValue !== oldValue) {
-               if (newValue >= $scope.mPos.radius) {
-                  $scope.mPos.limit = true;
-                  $scope.mPos.radius =  newValue;
-               }
-               else {
-                  $scope.mPos.limit = false;
-               }
-            }
-         });
-
-         //Update our circle and markers when the radius changes
-         $scope.$watch('mPos.radius', function (newValue, oldValue) {
-            if (newValue !== oldValue) {
-               updateMyCircle();
-               updateMarkers();
-            }
-         }, true);
-
-         //Update my circle
-         function updateMyCircle() {
-            if( !myCircle) {
-               drawMyCircle();
-            }
-
-            myCircle.setRadius($scope.mPos.radius);
-            //Update the map to contain the circle
-            var bounds = myCircle.getBounds();
-            map.fitBounds(bounds);
-            //If the bounds contain either the north or south pole then
-            // move to the equator for the center of the map
-            if ( bounds.contains(northPole) || bounds.contains(southPole)) {
-               var equator = new google.maps.LatLng(0.0000, $scope.mPos.lng);
-               map.setCenter(equator);
-            }
-         }
-
-         //Draw my circle initially
-         function drawMyCircle() {
-            var options = {
-               strokeColor: 'blue',
-               strokeOpacity: 0.3,
-               strokeWeight: 0,
-               fillColor: 'blue',
-               fillOpacity: 0.1,
-               map: map,
-               center: new google.maps.LatLng($scope.mPos.lat,$scope.mPos.lng)
-            };
-            options.radius = $scope.mPos.radius;
-
-            myCircle = new google.maps.Circle(options);
-            map.fitBounds(myCircle.getBounds());
-            console.log(options.radius);
-            $scope.mPos.radSlider = Position.radToSlide(options.radius);
-         }
-         */
-
-
-//MARKERS =============================================================
-
-         /*
-         var markers = [];
-         var articleMarker;
-
-         //Update the markers on the map
-         function updateMarkers() {
-            if( markers.length === 0) {
-               getMarkers();
-            }
-            angular.forEach( markers, function (marker) {
-               if (!Position.withinRange({lat: marker.position.k, lng: marker.position.D})) {
-                  marker.setVisible(false);
-               }
-               else marker.setVisible(true);
-            });
-         }
-
-         //Get the markers initially
-         function getMarkers() {
-            //TODO only update the changed ones not all
-            for( var i = 0 ; i < markers.length ; i++) {
-               markers[i].setMap(null);
-            }
-            markers = [];
-
-            var tempMarker = {
-               map: map,
-               animation: google.maps.Animation.DROP//,
-               /*
-               icon: {
-                  size: new google.maps.Size(120, 120),
-                  origin: new google.maps.Point(0, 0),
-                  anchor: new google.maps.Point(0, 20),
-                  scaledSize: new google.maps.Size(30,30)
-               }
-               */
- /*           };
-
-            for( var i = 0; i < $scope.articles.length; i++) {
-               tempMarker.position = new google.maps.LatLng($scope.articles[i].location.lat, $scope.articles[i].location.lng);
-               tempMarker.title = $scope.articles[i].title;
-       //        tempMarker.icon.url = 'img/ionic.png';
-
-               if (!Position.withinRange($scope.articles[i].location)) {
-                  tempMarker.visible = false;
-               }
-               markers.push(new google.maps.Marker(tempMarker));
-            }
-         }
-
-      */
-// Heat Map ======================================================
-
-         var heatmap;
-
-         function createGradient() {
-
-            var third = 8;
-            var subValue = 256/third;
-
-            //Transistion from baby blue to blue to red
-            var gradient = ['rgba(0, 255, 255, 0)'];
-            for(var i = 0; i < third; i++) {
-               var temp =  'rgba(0,' + (255-subValue*i) + ',255, 1)'
-               gradient.push(temp);
-            }
-            for(var i = 0; i < third; i++) {
-               gradient.push( 'rgba(0,0,'+ (255 - subValue/2*i) +', 1)');
-            }
-            for(var i = 0; i < third; i++) {
-               gradient.push( 'rgba('+ (subValue*i) +',0,'+ (128 - subValue/2*i) +', 1)');
-            }
-            gradient.push('rgba(255, 0, 0, 1)');
-
-            return gradient;
-         }
-
-         function updateHeatmap() {
-            var articleHeatArray = [];
-
-            if( !Position.getBounds()) {
-               return;
-            }
-
-            for(var i = 0; i < $scope.articles.length; i++) {
-               var position = new google.maps.LatLng($scope.articles[i].location.lat, $scope.articles[i].location.lng);
-               if (Position.withinRange(position)) {
-                  articleHeatArray.push({
-                     location: position,
-                     weight: $scope.articles[i].rating
-                  });
-               }
-            }
-
-            if (!heatmap) {
-
-               heatmap = new google.maps.visualization.HeatmapLayer({
-                  map: map,
-                  gradient: createGradient(),
-                  data: articleHeatArray
-               });
-            }
-            else {
-               heatmap.setData(articleHeatArray);
-            }
-         }
 
          //Observer callback function that waits on the users position
          // and will center the map one time
          var localizeOnceObserver = function() {
             var mPos = Position.getLast();
-            if(Position.positionMap(map, mPos)) {
+            if(Maps.setCenter(map, mPos)) {
                Position.unregisterObserver(localizeOnceObserver);
             }
          };
-
-// MAP ======================================================
 
          //Initialize the map
           var initializeMap = function() {
@@ -234,6 +45,7 @@ app.directive('inmap', [
             var mapOptions = {
                center: mPosition,
                zoom: 8,
+               disableDefaultUI: true,
                mapTypeId: google.maps.MapTypeId.ROADMAP
             };
 
@@ -245,12 +57,11 @@ app.directive('inmap', [
 
                //Listener on bounds changing on the map
                google.maps.event.addListener(map, 'bounds_changed', _.debounce(function() {
-                  console.log('Updating map');
+                  console.log('Updating bounds');
                   Position.setBounds(map.getBounds());
-                  updateHeatmap();
                }, 100));
 
-               Position.setFeedMap(map);
+               Maps.setFeedMap(map);
 
                //TODO Remove this and set the map based on the bounds
                Position.getCurrent( function(err, position) {
@@ -259,7 +70,7 @@ app.directive('inmap', [
                   if(position && position.coords) {
                      //Save the new position
                      Position.set(position);
-                     Position.positionMap(map, position);
+                     Maps.setCenter(map, position);
                   }
                   else { //If we do not get a good position then wait for the position and localize
                      console.log('No position for map!: '+ err.message);
@@ -277,50 +88,18 @@ app.directive('inmap', [
                   mapOptions.center = new google.maps.LatLng($scope.article.location.lat, $scope.article.location.lng);
                   mapOptions.zoom = 15;
                }
-               articleMap = new google.maps.Map(element, mapOptions);
-               var tempMarker = {
-                  map: articleMap,
-                  animation: google.maps.Animation.DROP,
-                  position: mapOptions.center
-               };
-               articleMarker = new google.maps.Marker(tempMarker);
-
-               Position.setArticleMap(articleMap);
-
-               //If we have a new article we should make the first place it looks the
-               //users current location
-               if (!$stateParams.id) {
-                  Position.getCurrent( function(err, position) {
-                     var mPosition = {};
-                     //If we get a valid position then center the map
-                     if(position && position.coords) {
-                        //Save the new position
-                        Position.set(position);
-                        Position.positionMap(articleMap, position);
-                     }
-                     else { //If we do not get a good position then wait for the position and localize
-                        console.log('No position for map!: '+ err.message);
-                        Position.registerObserver(localizeOnceObserver);
-                     }
-                  });
+               else {
+                  console.log('Not id given! The article map is dependent on knowing the article location!');
                }
+               articleMap = new google.maps.Map(element, mapOptions);
+
+               Maps.setArticleMap(articleMap);
+
             }
 
           };
 
       Platform.ready.then(initializeMap());
-          /*
-          //Wait for the device to be ready and then load the map
-          ionic.DomUtil.ready( function() {
-             if (navigator.userAgent.match(/(iPhone|iPod|Android|BlackBerry)/)) { //Mobile map load
-                document.addEventListener("deviceready", initializeMap, false);
-             } else { //Web version
-                initializeMap();
-             }
-          });
-          */
-      }/*,
-      templateUrl: 'templates/directives/map.html'
-      */
+      }
    };
 }]);

@@ -16,6 +16,7 @@ angular.module('instanews', [
       'instanews.login',
       'instanews.comments',
       'instanews.map',
+      'instanews.maps',
       'instanews.data',
       'instanews.camera',
       'instanews.post',
@@ -263,12 +264,14 @@ angular.module('instanews', [
    })
 
    .state('articlePost', {
+      cache: false,
       url: '/post/article',
       templateUrl: 'templates/articlePost.html',
       controller: 'PostCtrl'
    })
 
    .state('subarticlePost', {
+      cache: false,
       url: '/post/article/{id}',
       templateUrl: 'templates/subarticlePost.html',
       controller: 'PostCtrl'

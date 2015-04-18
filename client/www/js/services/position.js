@@ -33,6 +33,7 @@ app.service('Position', [
    };
    */
    var mPosition = {};
+   var modified = 0;
 
    /*
    // Watch the users position
@@ -169,7 +170,6 @@ app.service('Position', [
       }
    });
 
-
    //Return the last position that was set
    var getLast = function() {
       return mPosition;
@@ -177,19 +177,27 @@ app.service('Position', [
 
    //Find and return the current position of the device
    var getCurrent = function(cb) {
-      var options = {timeout: 10000, enableHighAccuracy: true};
-      navigator.geolocation.getCurrentPosition(
-         function(position) {
-            cb(null,position);
-         }, function(err) {
-            console.log('Error getting position: ' + err.message);
-            cb(err, null);
-         }, options);
+      var time = new Date().getTime();
+      //If we have updated the position in the last minute then just use it
+      if(time - modified < 60000) {
+         cb(null, getLast());
+      }
+      else {
+         var options = {timeout: 10000, enableHighAccuracy: true};
+         navigator.geolocation.getCurrentPosition(
+            function(position) {
+               cb(null,position);
+            }, function(err) {
+               console.log('Error getting position: ' + err.message);
+               cb(err, null);
+            }, options);
+      }
    };
 
    //Set the position
    var set = function(position) {
       mPosition = position;
+      modified = new Date().getTime();
 
       //Store the position
       var UUID = Platform.getUUID();
@@ -220,58 +228,21 @@ app.service('Position', [
       });
    };
 
-   /* Maps are held here for now */
-   var feedMap, articleMap;
-
-   var getArticleMap = function() {
-      return articleMap;
-   };
-
-   var setArticleMap = function(map) {
-      articleMap = map;
-   };
-
-   var getFeedMap = function() {
-      return feedMap;
-   };
-
-   var setFeedMap = function(map) {
-      feedMap = map;
-   };
-
-
-   var localize = function(map) {
-      getCurrent( function(err, position) {
-         if(positionMap(map, position)) {
-            console.log('Successful localization!');
-         }
-         else {
-            console.log('FAILED localization!');
-         }
-      });
-   };
-
-   var positionMap = function(map, pos) {
-      if(pos && pos.coords) {
-         map.setCenter(posToLatLng(pos));
-         return true;
-      }
-      return false;
-   };
-
    var posToLatLng = function(position) {
-      return new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
+      if( position.coords) {
+         //Position as returned from navigator.geolocation
+         return new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
+      }
+      else if(position.lat && position.lng) {
+         //Position as read from the database
+         return new google.maps.LatLng(position.lat, position.lng);
+      }
+      //Position is already in Googles LatLng format
+      else return position;
    };
 
    return {
-      localize: localize,
       posToLatLng: posToLatLng,
-      positionMap: positionMap,
-      setFeedMap: setFeedMap,
-      getFeedMap: getFeedMap,
-      getArticleMap: getArticleMap,
-      setArticleMap: setArticleMap,
-//      radToSlide: radToSlide,
       setBounds: setBounds,
       getBounds: getBounds,
       getCurrent: getCurrent,

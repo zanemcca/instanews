@@ -5,13 +5,13 @@ app.controller('ArticleCtrl', [
       '$stateParams',
       'Article',
       'Articles',
-      'Position',
+      'Maps',
       '_',
       function($scope,
          $stateParams,
          Article,
          Articles,
-         Position,
+         Maps,
          _) {
 
    //Scope variables
@@ -25,12 +25,19 @@ app.controller('ArticleCtrl', [
       order: 'rating DESC'
    }
 
+   var marker;
+
    //Refresh the map everytime we enter the view
    $scope.$on('$ionicView.afterEnter', function() {
-      var map = Position.getArticleMap();
+      var map = Maps.getArticleMap();
       if(map) {
+         marker = Maps.setMarker(map,$scope.article.location);
          google.maps.event.trigger(map, 'resize');
       }
+   });
+
+   $scope.$on('$ionicView.afterLeave', function() {
+      marker = Maps.deleteMarker(marker);
    });
 
    var load = function(cb) {

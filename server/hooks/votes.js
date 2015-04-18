@@ -8,7 +8,6 @@ module.exports = function(app) {
    };
 
    Votes.observe('before save', function(ctx, next) {
-
       var generateId = function() {
          return Math.floor(Math.random()*Math.pow(2,128));
       };
@@ -30,6 +29,7 @@ module.exports = function(app) {
          //Update the modification date
          inst.lastUpdated = Date.now();
       }
+
       next();
    });
 };
