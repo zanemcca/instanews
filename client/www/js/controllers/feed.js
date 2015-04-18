@@ -18,6 +18,17 @@ app.controller('FeedCtrl', [
    $scope.toggleMenu = Navigate.toggleMenu;
    $scope.scrollTop = Navigate.scrollTop;
 
+
+   $scope.localize = function() {
+      var map = Position.getFeedMap();
+      if( map) {
+         Position.localize(map);
+      }
+      else {
+         console.log('Map not valid! Cannot localize!');
+      }
+   };
+
    $scope.scroll = {
       buttonOn: false
    };

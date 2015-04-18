@@ -239,7 +239,34 @@ app.service('Position', [
       feedMap = map;
    };
 
+
+   var localize = function(map) {
+      getCurrent( function(err, position) {
+         if(positionMap(map, position)) {
+            console.log('Successful localization!');
+         }
+         else {
+            console.log('FAILED localization!');
+         }
+      });
+   };
+
+   var positionMap = function(map, pos) {
+      if(pos && pos.coords) {
+         map.setCenter(posToLatLng(pos));
+         return true;
+      }
+      return false;
+   };
+
+   var posToLatLng = function(position) {
+      return new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
+   };
+
    return {
+      localize: localize,
+      posToLatLng: posToLatLng,
+      positionMap: positionMap,
       setFeedMap: setFeedMap,
       getFeedMap: getFeedMap,
       getArticleMap: getArticleMap,

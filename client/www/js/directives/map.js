@@ -206,26 +206,13 @@ app.directive('inmap', [
             }
          }
 
-         //Center the map on the current user position
-         var localizeMap = function(map, pos) {
-            if(pos && pos.coords) {
-               map.setCenter(posToLatLng(pos));
-               return true;
-            }
-            return false;
-         };
-
          //Observer callback function that waits on the users position
          // and will center the map one time
          var localizeOnceObserver = function() {
             var mPos = Position.getLast();
-            if(localizeMap(map, mPos)) {
+            if(Position.positionMap(map, mPos)) {
                Position.unregisterObserver(localizeOnceObserver);
             }
-         };
-
-         var posToLatLng = function(position) {
-            return new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
          };
 
 // MAP ======================================================
@@ -237,7 +224,7 @@ app.directive('inmap', [
             var mPosition = {};
 
             if(position && position.coords) {
-               mPosition = posToLatLng(position);
+               mPosition = Position.posToLatLng(position);
             }
             else {
                //Load Montreal for now
@@ -272,7 +259,7 @@ app.directive('inmap', [
                   if(position && position.coords) {
                      //Save the new position
                      Position.set(position);
-                     localizeMap(map, position);
+                     Position.positionMap(map, position);
                   }
                   else { //If we do not get a good position then wait for the position and localize
                      console.log('No position for map!: '+ err.message);
@@ -309,7 +296,7 @@ app.directive('inmap', [
                      if(position && position.coords) {
                         //Save the new position
                         Position.set(position);
-                        localizeMap(articleMap, position);
+                        Position.positionMap(articleMap, position);
                      }
                      else { //If we do not get a good position then wait for the position and localize
                         console.log('No position for map!: '+ err.message);
