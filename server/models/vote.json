@@ -8,6 +8,9 @@
       "id": true,
       "index": true
     },
+    "location": {
+      "type": "geopoint"
+    },
     "date": {
       "type": "date"
     }

@@ -97,7 +97,7 @@ module.exports = function (app, cb) {
          //console.log('Voting on ' + res.myId);
          var max = Math.floor(Math.random()*100);
          for( var i =0; i < max; i++) {
-            UpVotes.create({
+            DownVotes.create({
                votableId: res.myId,
                votableType: 'article'
             }, callback);

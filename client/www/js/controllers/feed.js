@@ -56,7 +56,7 @@ app.controller('FeedCtrl', [
 
       for(var i = 0; i < $scope.articles.length; i++) {
          var position = Position.posToLatLng($scope.articles[i].location);
-         if (Position.withinRange(position)) {
+         if (Position.withinRange(position) && $scope.articles[i].rating > 0) {
             articleHeatArray.push({
                location: position,
                weight: $scope.articles[i].rating

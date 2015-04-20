@@ -37,7 +37,8 @@ module.exports = function(app) {
                         var username = res[0].username;
 
                         if( username !== inst.username) {
-                           var message = inst.username + ' voted on your article';
+                           var message = inst.username +
+                                    ' voted on your article';
                            Push.notifyUser(app, username, message);
                         }
                      }

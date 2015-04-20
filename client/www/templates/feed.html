@@ -24,9 +24,12 @@
             <a class="item no-padding item-text-wrap"
                style="border:transparent"
                ui-sref="app.article({id: article.myId})">
-               <div class="item"
+               <div class="item item-icon-right"
                   style="border-bottom:0px;">
                   {{article.title}}
+                  <div class="icon ion-checkmark balanced button-small"
+                     ng-if="article.verified">
+                  </div>
                   <p>{{article.topSub.text}}</p>
                </div>
                <div class="item"

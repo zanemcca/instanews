@@ -40,7 +40,8 @@ module.exports = function(app) {
                   next('Error: This device already has multiple installations');
                }
                else {
-                  console.log('Device installation not found. Creating a new one');
+                  console.log('Device installation not found.'+
+                        'Creating a new one');
                   next();
                }
             }
