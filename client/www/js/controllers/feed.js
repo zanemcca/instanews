@@ -122,18 +122,7 @@ app.controller('FeedCtrl', [
             order: 'rating DESC'
          }
       },
-      order: 'rating DESC'/*,
-      //Based on loopback-datasource-juggler #544 this will not work
-      //with mongoDB
-      where: {
-         'location.lat': {
-            between: [40,50]
-         },
-         'locaion.lng': {
-            between: [-70,-60]
-         }
-      }
-      */
+      order: 'rating DESC'
    }
 
    $scope.onRefresh = function () {
@@ -151,11 +140,45 @@ app.controller('FeedCtrl', [
       });
    };
 
+
+   var reload = function() {
+
+      var bounds = Position.getBounds();
+
+      if(bounds) {
+         var sw = bounds.getSouthWest();
+         var ne = bounds.getNorthEast();
+         filter.skip = 0;
+         filter.where = {
+            location: {
+               geoWithin: {
+                  $box: [
+                     [sw.lat(), sw.lng()],
+                     [ne.lat(), ne.lng()]
+                  ]
+               }
+            }
+         }
+
+         $scope.articles = [];
+         Articles.set($scope.articles);
+         load( function() {
+            console.log('Loaded new articles within the new bounds: ' + $scope.articles.length);
+         });
+      }
+      else {
+         console.log('Bounds not set yet!');
+      }
+   };
+
+   Position.registerBoundsObserver(reload);
+
    var load = function(cb) {
 
       /* TODO Take into account fringe cases where content crosses pages.
        * Only dealing with duplicates for the moment
        */
+
       Article.find({filter: filter })
       .$promise
       .then( function (articles) {

@@ -4,10 +4,12 @@ app.controller('ProfileCtrl', [
       '$scope',
       '$stateParams',
       'Journalist',
+      'User',
       'Navigate',
       function($scope,
          $stateParams,
          Journalist,
+         User,
          Navigate) {
 
    $scope.user = {};
@@ -33,7 +35,7 @@ app.controller('ProfileCtrl', [
    //Refresh the map everytime we enter the view
    $scope.$on('$ionicView.beforeEnter', function() {
 
-      var user = User.getUser();
+      var user = User.get();
 
       if( user && $stateParams.username === user.username) {
          $scope.user = user;

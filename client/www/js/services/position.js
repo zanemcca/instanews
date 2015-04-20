@@ -15,7 +15,7 @@ app.service('Position', [
 
    var setBounds = function(bnds) {
       bounds = bnds;
-      notifyObservers();
+      notifyBoundsObservers();
    };
 
    var getBounds = function() {
@@ -228,6 +228,18 @@ app.service('Position', [
       });
    };
 
+   var boundsObserverCallbacks = [];
+
+   var registerBoundsObserver = function(cb) {
+      boundsObserverCallbacks.push(cb);
+   };
+
+   var notifyBoundsObservers = function() {
+      angular.forEach(boundsObserverCallbacks, function(cb) {
+         cb();
+      });
+   };
+
    var posToLatLng = function(position) {
       if( position.coords) {
          //Position as returned from navigator.geolocation
@@ -250,6 +262,7 @@ app.service('Position', [
       set: set,
       withinRange: withinRange,
       registerObserver: registerObserver,
+      registerBoundsObserver: registerBoundsObserver,
       unregisterObserver: unregisterObserver
    };
 }]);

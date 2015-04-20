@@ -102,6 +102,14 @@ module.exports = function (app, cb) {
                votableType: 'article'
             }, callback);
          }
+
+         max = Math.floor(Math.random()*20);
+         for(i =0; i < max; i++) {
+            UpVotes.create({
+               votableId: res.myId,
+               votableType: 'article'
+            }, callback);
+         }
       }
 
       var limit = 200;
