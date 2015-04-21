@@ -63,56 +63,6 @@ module.exports = function(app) {
          }
       });
 
-      /*
-      var Model;
-
-      var isArticle = false;
-      //console.log('Upvote !!!!!');
-      switch(ctx.instance.votableType) {
-         case 'article':
-            Model = app.models.Article;
-            isArticle = true;
-            break;
-         case 'subarticle':
-            Model = app.models.Subarticle;
-            break;
-         case 'comment':
-            Model = app.models.Comment;
-            break;
-         default:
-            console.log('Error: bad votableType');
-            next();
-      }
-
-      Model.findOne({
-         where: {
-            id: ctx.instance.votableId
-         }
-      }, function(err, instance) {
-         if(isArticle) {
-            instance.verified = nearBy(
-               ctx.instance.location,
-               instance.location);
-         }
-
-         /* jshint camelcase: false */
-/*
-         if (err) console.log('Error: ' + err);
-         instance.__count__upVotes( function(err, res) {
-            instance.upVoteCount = res;
-            //console.log('Up Count: ' + res);
-            instance.save( function(err, res) {
-               if (err) console.log('Error: ' + err);
-               ctx.instance.upVoteCount = instance.upVoteCount;
-               ctx.instance.rating = res.rating;
-               if(isArticle) {
-                  ctx.instance.verified = instance.verified;
-               }
-               next();
-            });
-         });
-      });
-      */
    });
 
 };

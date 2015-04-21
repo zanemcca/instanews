@@ -71,7 +71,7 @@
     "dataSource": null,
     "public": false
   },
-  "notification": {
+  "notif": {
     "dataSource": "Notifications",
     "public": true
   },

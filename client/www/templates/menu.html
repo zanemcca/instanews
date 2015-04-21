@@ -27,6 +27,7 @@
             <div class="item item-text-wrap"
                ng-repeat="note in notifications"
                ng-if="note.message"
+               ng-class="{'item-divider': !note.seen}"
                ng-click="handleNotification(note)">
                   {{note.message}}
             </div>

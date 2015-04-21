@@ -175,13 +175,22 @@ angular.module('instanews', [
       };
 
       $scope.handleNotification = function(note) {
-         if(note.type === 'article') {
-            $state.go('app.article',{ id: note.parentId});
+         if(note.notifiableType === 'article') {
+            $state.go('app.article',{ id: note.notifiableId});
          }
          else {
             $state.go('app.notif', { id: note.id});
          }
          Navigate.toggleMenu();
+         note.seen = true;
+
+         Journalist.notifications.updateById({
+            id: $scope.user.username,
+            fk: note.id,
+         },note ).$promise
+         .then(function(res) {
+            console.log('Notification updated: ' + res);
+         });
       };
 
       var loadNotifications = function() {

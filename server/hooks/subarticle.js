@@ -2,7 +2,7 @@
 module.exports = function(app) {
 
    var Subarticle = app.models.subarticle;
-   var Push = require('./push');
+   var Notification = app.models.notif;
 
    Subarticle.observe('before save', function(ctx, next) {
       var inst = ctx.instance;
@@ -38,11 +38,18 @@ module.exports = function(app) {
                      var username = res[i].username;
                      var message = inst.username +
                         ' collaborated with you on an article';
-                     Push.notifyUser(app, {
-                        username: username,
+
+                     Notification.create({
                         message: message,
-                        parentId: inst.id,
-                        type: 'subarticle'
+                        notifiableId: inst.parentId,
+                        notifiableType: 'article',
+                        messageFrom: inst.username,
+                        username: username
+                     }, function(err, res) {
+                        if (err) console.log('Error: ' + err);
+                        else {
+                           console.log('Created a notification!');
+                        }
                      });
 
                      users.push(res[i].username);

@@ -3,7 +3,13 @@
   "base": "Installation",
   "properties": {},
   "validations": [],
-  "relations": {},
+  "relations": {
+    "journalist": {
+      "type": "belongsTo",
+      "model": "journalist",
+      "foreignKey": "userId"
+    }
+  },
   "acls": [],
   "methods": []
 }

@@ -25,7 +25,7 @@ app.controller('NotificationCtrl', [
 
    var notification = Notifications.getOne($stateParams.id);
 
-   $scope.type = notification.type;
+   $scope.type = notification.notifiableType;
    if( $scope.type === 'subarticle') {
       var filter = {
          include: {
@@ -33,7 +33,7 @@ app.controller('NotificationCtrl', [
          }
       };
 
-      Subarticle.findById({ id: notification.parentId, filter: filter})
+      Subarticle.findById({ id: notification.notifiableId, filter: filter})
       .$promise
       .then( function(res) {
          $scope.subarticle = res;
@@ -47,7 +47,7 @@ app.controller('NotificationCtrl', [
          }
       };
 
-      Comment.findById({id: notification.parentId, filter: filter})
+      Comment.findById({id: notification.notifiableId, filter: filter})
       .$promise
       .then(function(res) {
          handleCommentResult(res);

@@ -1,0 +1,36 @@
+{
+  "name": "notif",
+  "base": "PersistedModel",
+  "properties": {
+    "seen": {
+      "type": "boolean"
+    },
+    "date": {
+      "type": "date",
+      "required": true
+    },
+    "modified": {
+      "type": "date",
+      "required": true
+    }
+  },
+  "validations": [],
+  "relations": {
+    "notifiable": {
+      "type": "belongsTo",
+      "polymorphic": true
+    },
+    "from": {
+      "type": "belongsTo",
+      "model": "journalist",
+      "foreignKey": "messageFrom"
+    },
+    "to": {
+      "type": "belongsTo",
+      "model": "journalist",
+      "foreignKey": "username"
+    }
+  },
+  "acls": [],
+  "methods": []
+}

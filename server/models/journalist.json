@@ -27,7 +27,7 @@
     },
     "notifications": {
       "type": "hasMany",
-      "model": "notification",
+      "model": "notif",
       "foreignKey": "username"
     },
     "subarticles": {
@@ -46,6 +46,11 @@
     "downVotes": {
       "type": "hasMany",
       "model": "downVote"
+    },
+    "installations": {
+      "type": "hasMany",
+      "model": "installation",
+      "foreignKey": "userId"
     }
   },
   "acls": [
@@ -75,6 +80,20 @@
       "principalId": "$owner",
       "permission": "ALLOW",
       "property": "__create__accessTokens"
+    },
+    {
+      "accessType": "EXECUTE",
+      "principalType": "ROLE",
+      "principalId": "$owner",
+      "permission": "ALLOW",
+      "property": "__get__installations"
+    },
+    {
+      "accessType": "EXECUTE",
+      "principalType": "ROLE",
+      "principalId": "$owner",
+      "permission": "ALLOW",
+      "property": "__updateById__notifications"
     },
     {
       "accessType": "EXECUTE",

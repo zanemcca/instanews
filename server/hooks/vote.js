@@ -1,9 +1,8 @@
 
 module.exports = function(app) {
 
-   var Notification = app.models.notification;
+   var Notification = app.models.notif;
    var Installation = app.models.installation;
-   var Push = require('./push');
    var Vote = app.models.vote;
 
    Vote.observe('before save', function(ctx, next) {
@@ -49,11 +48,18 @@ module.exports = function(app) {
                         if( username !== inst.username) {
                            var message = inst.username +
                                     ' voted on your article';
-                           Push.notifyUser(app,{
-                              username: username,
+
+                           Notification.create({
                               message: message,
-                              type: 'article',
-                              parentId: inst.votableId
+                              notifiableId: inst.votableId,
+                              notifiableType: 'article',
+                              messageFrom: inst.username,
+                              username: username
+                           }, function(err, res) {
+                              if (err) console.log('Error: ' + err);
+                              else {
+                                 console.log('Created a notification!');
+                              }
                            });
                         }
                      }
@@ -70,11 +76,18 @@ module.exports = function(app) {
                      if( username !== inst.username) {
                         var message = inst.username +
                            ' voted on your subarticle';
-                        Push.notifyUser(app,{
-                           username: username,
+
+                        Notification.create({
                            message: message,
-                           parentId: inst.votableId,
-                           type: 'subarticle'
+                           notifiableId: inst.votableId,
+                           notifiableType: 'subarticle',
+                           messageFrom: inst.username,
+                           username: username
+                        }, function(err, res) {
+                           if (err) console.log('Error: ' + err);
+                           else {
+                              console.log('Created a notification!');
+                           }
                         });
                      }
                   }
@@ -90,11 +103,18 @@ module.exports = function(app) {
                      if( username !== inst.username) {
                         var message = inst.username +
                            ' voted on your comment';
-                        Push.notifyUser(app, {
-                           username: username,
+
+                        Notification.create({
                            message: message,
-                           parentId: inst.votableId,
-                           type: 'comment'
+                           notifiableId: inst.votableId,
+                           notifiableType: 'comment',
+                           messageFrom: inst.username,
+                           username: username
+                        }, function(err, res) {
+                           if (err) console.log('Error: ' + err);
+                           else {
+                              console.log('Created a notification!');
+                           }
                         });
                      }
                   }
