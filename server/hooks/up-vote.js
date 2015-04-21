@@ -32,9 +32,41 @@ module.exports = function(app) {
 
    UpVote.observe('after save', function(ctx, next) {
 
-      var Model;
-      var isArticle = false;
 
+      ctx.instance.__get__votable( function(err, instance) {
+         if(err) {
+            console.log('Error: ' + err);
+            next(err);
+         }
+         else {
+            if(instance.modelName === 'article') {
+               instance.verified = nearBy(
+                  ctx.instance.location,
+                  instance.location);
+            }
+
+            instance.upVoteCount += 1;
+            instance.save( function(err, res) {
+               if (err) {
+                  console.log('Error: ' + err);
+                  next(err);
+               }
+               else {
+                  ctx.instance.upVoteCount = instance.upVoteCount;
+                  ctx.instance.rating = res.rating;
+                  if(instance.modelName === 'article') {
+                     ctx.instance.verified = instance.verified;
+                  }
+                  next();
+               }
+            });
+         }
+      });
+
+      /*
+      var Model;
+
+      var isArticle = false;
       //console.log('Upvote !!!!!');
       switch(ctx.instance.votableType) {
          case 'article':
@@ -64,6 +96,7 @@ module.exports = function(app) {
          }
 
          /* jshint camelcase: false */
+/*
          if (err) console.log('Error: ' + err);
          instance.__count__upVotes( function(err, res) {
             instance.upVoteCount = res;
@@ -79,6 +112,7 @@ module.exports = function(app) {
             });
          });
       });
+      */
    });
 
 };
