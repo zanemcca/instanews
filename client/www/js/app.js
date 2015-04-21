@@ -10,6 +10,7 @@ angular.module('instanews', [
       'instanews.navigate',
       'instanews.localStorage',
       'instanews.article',
+      'instanews.notif',
       'instanews.articles',
       'instanews.feed',
       'instanews.votes',
@@ -168,8 +169,19 @@ angular.module('instanews', [
          .$promise
          .then( function(res) {
             User.clearData();
+            Notifications.set([]);
             console.log('Logged out');
          });
+      };
+
+      $scope.handleNotification = function(note) {
+         if(note.type === 'article') {
+            $state.go('app.article',{ id: note.parentId});
+         }
+         else {
+            $state.go('app.notif', { id: note.id});
+         }
+         Navigate.toggleMenu();
       };
 
       var loadNotifications = function() {
@@ -239,6 +251,17 @@ angular.module('instanews', [
          'menuContent' : {
             templateUrl: 'templates/article.html',
             controller: 'ArticleCtrl'
+         }
+      }
+   })
+
+   .state('app.notif', {
+      cache: false,
+      url: '/notif/{id}',
+      views: {
+         'menuContent' : {
+            templateUrl: 'templates/notif.html',
+            controller: 'NotificationCtrl'
          }
       }
    })

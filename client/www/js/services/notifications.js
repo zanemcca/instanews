@@ -6,12 +6,14 @@ app.service('Notifications', [
       '$cordovaPush',
       'Platform',
       'User',
+      '$filter',
       '$cordovaDialogs',
       function(
          $rootScope,
          $cordovaPush,
          Platform,
          User,
+         $filter,
          $cordovaDialogs){
 
    var notifications = [];
@@ -86,9 +88,17 @@ app.service('Notifications', [
       });
    };
 
+   var getOne = function (id) {
+      var val = $filter('filter')(notifications, {id: id});
+      if (val.length > 0) {
+         return val[0];
+      }
+   };
+
    return {
       set: set,
       get: get,
+      getOne: getOne,
       registerObserver: registerObserver
    };
 }]);

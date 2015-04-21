@@ -9,8 +9,7 @@ module.exports = function(Comment) {
       'find',
       'exists',
       'upsert',
-      'updateAll',
-      'findById'
+      'updateAll'
    ];
 
    var nonStaticDisable = [

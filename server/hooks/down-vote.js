@@ -23,7 +23,7 @@ module.exports = function(app) {
 
       Model.findOne({
          where: {
-            myId: ctx.instance.votableId
+            id: ctx.instance.votableId
          }
       }, function(err, instance) {
          /* jshint camelcase: false */

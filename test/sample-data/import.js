@@ -83,7 +83,7 @@ module.exports = function (app, cb) {
 
       function fillArticle(err, res) {
          Subarticles.create({
-            parentId: res.myId,
+            parentId: res.id,
             username: 'bob',
             _file: {
                type: 'image',
@@ -94,11 +94,11 @@ module.exports = function (app, cb) {
          }, callback);
 
 
-         //console.log('Voting on ' + res.myId);
+         //console.log('Voting on ' + res.id);
          var max = Math.floor(Math.random()*100);
          for( var i =0; i < max; i++) {
             DownVotes.create({
-               votableId: res.myId,
+               votableId: res.id,
                votableType: 'article'
             }, callback);
          }
@@ -106,7 +106,7 @@ module.exports = function (app, cb) {
          max = Math.floor(Math.random()*20);
          for(i =0; i < max; i++) {
             UpVotes.create({
-               votableId: res.myId,
+               votableId: res.id,
                votableType: 'article'
             }, callback);
          }
@@ -117,7 +117,6 @@ module.exports = function (app, cb) {
       for( var i = 0; i < limit ; i++ ) {
          Articles.create({
             title: i,
-            myId: randomId(),
             location: {
                lat: randomLat(),
                lng: randomLng()

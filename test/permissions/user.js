@@ -116,13 +116,7 @@ describe('Articles', function() {
             "title": "Boring article",
             "isPrivate": false,
             "date": "2015-02-10T12:48:43.511Z",
-            "_votes": {
-               "rate": 5,
-                "rating": 0,
-                "myId": 200,
-               "lastUpdated": "2015-02-10T12:48:43.511Z",
-            },
-            "myId": 200,
+            "id": 200,
             "location":{
                "lat": 45.61950,
                "lng": -65.45772
@@ -131,15 +125,9 @@ describe('Articles', function() {
          comment = {
            "content": "Nuts!",
            "date": "2015-02-06T12:48:43.511Z",
-           "_votes": {
-             "rate": 1,
-             "rating": 0,
-             "myId": 201,
-             "lastUpdated": "2015-02-06T12:48:43.511Z"
-           },
-           "myId": 201,
+           "id": 201,
            "username" : user.username,
-           "commentableId": article.myId,
+           "commentableId": article.id,
            "commentableType": "article"
          };
          done();
@@ -157,7 +145,7 @@ describe('Articles', function() {
       });
 
       it('User should be able to create a comment on a article', function(done) {
-         api.post('/api/articles/'+ article.myId + '/comments')
+         api.post('/api/articles/'+ article.id + '/comments')
          .send(comment)
          .set('Authorization', token.id)
          .expect(200)
@@ -168,7 +156,7 @@ describe('Articles', function() {
       });
 
       it('User should NOT be able to update a comment on their article', function(done) {
-         api.put('/api/articles/'+ article.myId + '/comments/'+comment.myId)
+         api.put('/api/articles/'+ article.id + '/comments/'+comment.id)
          .set('Authorization', token.id)
          .send(comment)
          .expect(401)
@@ -179,7 +167,7 @@ describe('Articles', function() {
       });
 
       it('User should NOT be able to delete a comment on a their article', function(done) {
-         api.delete('/api/articles/'+ article.myId + '/comments/'+comment.myId)
+         api.delete('/api/articles/'+ article.id + '/comments/'+comment.id)
          .set('Authorization', token.id)
          .expect(401)
          .end( function(err, res) {
@@ -210,7 +198,7 @@ describe('Articles', function() {
       */
 
       it('User should NOT be allowed to delete an article', function(done) {
-         api.delete('/api/articles/'+ article.myId)
+         api.delete('/api/articles/'+ article.id)
          .set('Authorization', token.id)
          .expect(401)
          .end( function(err, res) {
@@ -283,29 +271,16 @@ describe('Subarticles', function() {
       before( function(done) {
          subarticle = {
             "text" : "There is a blaze!",
-            "myId": 200,
             "username": user.username,
             "parentId": 1,
             "date": "2015-02-08T12:48:43.511Z",
-            "_votes" : {
-               "rate": -6,
-                "rating": 0,
-                "myId": 302,
-               "lastUpdated" : "2015-02-08T12:48:43.511Z"
-            }
          };
          comment = {
            "content": "Nuts!",
            "date": "2015-02-06T12:48:43.511Z",
-           "_votes": {
-             "rate": 1,
-             "rating": 0,
-             "myId": 301,
-             "lastUpdated": "2015-02-06T12:48:43.511Z"
-           },
-           "myId": 200,
+           "id": 200,
            "username": user.username,
-           "commentableId": subarticle.myId,
+           "commentableId": subarticle.id,
            "commentableType": "subarticle"
          };
          done();
@@ -317,13 +292,14 @@ describe('Subarticles', function() {
          .set('Authorization', token.id)
          .expect(200)
          .end( function(err, res) {
+            subarticle = res.body;
             dump(err, res);
             done(err,res);
          });
       });
 
       it('User should be able to create a comment on a subarticle', function(done) {
-         api.post('/api/subarticles/'+ subarticle.myId + '/comments')
+         api.post('/api/subarticles/'+ subarticle.id + '/comments')
          .send(comment)
          .set('Authorization', token.id)
          .expect(200)
@@ -334,7 +310,7 @@ describe('Subarticles', function() {
       });
 
       it('User should NOT be able to update a comment on their subarticle', function(done) {
-         api.put('/api/subarticles/'+ subarticle.myId + '/comments/'+comment.myId)
+         api.put('/api/subarticles/'+ subarticle.id + '/comments/'+comment.id)
          .set('Authorization', token.id)
          .send(comment)
          .expect(401)
@@ -345,7 +321,7 @@ describe('Subarticles', function() {
       });
 
       it('User should NOT be able to delete a comment on a their subarticle', function(done) {
-         api.delete('/api/subarticles/'+ subarticle.myId + '/comments/'+comment.myId)
+         api.delete('/api/subarticles/'+ subarticle.id + '/comments/'+comment.id)
          .set('Authorization', token.id)
          .expect(401)
          .end( function(err, res) {
@@ -356,7 +332,7 @@ describe('Subarticles', function() {
 
 
       it('User should be allowed to update their subarticle', function(done) {
-         api.put('/api/subarticles/'+ subarticle.myId)
+         api.put('/api/subarticles/'+ subarticle.id)
          .send(subarticle)
          .set('Authorization', token.id)
          .expect(200)
@@ -367,7 +343,7 @@ describe('Subarticles', function() {
       });
 
       it('User should be allowed to delete their own subarticle', function(done) {
-         api.delete('/api/subarticles/'+ subarticle.myId)
+         api.delete('/api/subarticles/'+ subarticle.id)
          .set('Authorization', token.id)
          .expect(204)
          .end( function(err, res) {
@@ -388,7 +364,7 @@ describe('Subarticles', function() {
       it('User should NOT be allowed to update someone elses subarticle', function(done) {
          var subArt = subarticle;
          subArt.username = 1;
-         subArt.myId = 1;
+         subArt.id = 1;
 
          api.put('/api/subarticles')
          .send(subarticle)
@@ -401,7 +377,7 @@ describe('Subarticles', function() {
       });
 
       it('User should NOT be allowed to delete someone elses subarticle', function(done) {
-         api.delete('/api/subarticles/'+ subarticle.myId)
+         api.delete('/api/subarticles/'+ subarticle.id)
          .set('Authorization', token.id)
          .expect(401)
          .end( function(err, res) {
@@ -452,13 +428,6 @@ describe('Comments', function() {
       comment = {
         "content": "Nuts!",
         "date": "2015-02-06T12:48:43.511Z",
-        "_votes": {
-          "rate": 1,
-          "rating": 0,
-          "myId": 300,
-          "lastUpdated": "2015-02-06T12:48:43.511Z"
-        },
-        "myId": 300,
         "username": user.username,
         "commentableId": 1,
         "commentableType": "comment"
@@ -503,13 +472,16 @@ describe('Comments', function() {
       .send(comment)
       .expect(200)
       .end( function(err, res) {
+         //Replace the comment with the returned result so that we have
+         //a valid id element
+         comment = res.body;
          dump(err, res);
          done(err,res);
       });
    });
 
    it('User should be able to update their comment', function(done) {
-      api.put('/api/comments/'+comment.myId)
+      api.put('/api/comments/'+comment.id)
       .set('Authorization', token.id)
       .send(comment)
       .expect(200)
@@ -520,7 +492,7 @@ describe('Comments', function() {
    });
 
    it('User should be able to delete their comment', function(done) {
-      api.delete('/api/comments/'+comment.myId)
+      api.delete('/api/comments/'+ comment.id)
       .set('Authorization', token.id)
       .expect(204)
       .end( function(err, res) {

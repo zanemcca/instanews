@@ -10,7 +10,7 @@ module.exports = function(app) {
       //List of already notified users
       var users = [];
 
-      var notify = function(message, res) {
+      var notify = function(message, id, res) {
          var username;
          if( res.length ) {
             for(var i = 0; i < res.length; i++) {
@@ -18,7 +18,12 @@ module.exports = function(app) {
                   username = res[i].username;
                   console.log('Starting push to '+ username +'...');
 
-                  Push.notifyUser(app, username, message);
+                  Push.notifyUser(app, {
+                     username: username,
+                     message: message,
+                     parentId: id,
+                     type: 'comment'
+                  });
 
                   users.push(res[i].username);
                }
@@ -29,7 +34,12 @@ module.exports = function(app) {
                username = res.username;
                console.log('Starting push to '+ username +'...');
 
-               Push.notifyUser(app, username, message);
+               Push.notifyUser(app, {
+                  username: username,
+                  message: message,
+                  parentId: id,
+                  type: 'comment'
+               });
 
                users.push(res.username);
             }
@@ -57,7 +67,7 @@ module.exports = function(app) {
                   else {
                      var message = inst.username +
                         ' commented on an article you contributed to';
-                     notify(message, res);
+                     notify(message, inst.id, res);
                   }
                });
                break;
@@ -71,7 +81,7 @@ module.exports = function(app) {
                   else {
                      var message = inst.username +
                         ' commented on your subarticle';
-                     notify(message, res);
+                     notify(message, inst.id, res);
                   }
                });
                break;
@@ -85,7 +95,7 @@ module.exports = function(app) {
                   }
                   else {
                      var message = inst.username + ' commented on your comment';
-                     notify(message, res);
+                     notify(message, inst.id, res);
                   }
                });
                Model.find({
@@ -101,7 +111,7 @@ module.exports = function(app) {
                   else {
                      var message = inst.username +
                         ' commented on a comment stream that you are part of';
-                     notify(message, res);
+                     notify(message, inst.id, res);
                   }
                });
                break;

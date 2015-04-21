@@ -58,7 +58,7 @@ app.controller('ArticleCtrl', [
                //Remove duplicates
                for(var j = 0; j < $scope.subarticles.length; j++ ) {
                   var sub = $scope.subarticles[j];
-                  if( sub.myId === subarticle.myId) {
+                  if( sub.id === subarticle.id) {
                      subarticles.splice(i,1);
                      break;
                   }

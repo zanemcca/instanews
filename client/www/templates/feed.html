@@ -23,7 +23,7 @@
             ng-repeat="article in articles | orderBy: '-(rating)'">
             <a class="item no-padding item-text-wrap"
                style="border:transparent"
-               ui-sref="app.article({id: article.myId})">
+               ui-sref="app.article({id: article.id})">
                <div class="item item-icon-right"
                   style="border-bottom:0px;">
                   {{article.title}}
@@ -36,7 +36,7 @@
                   style="border-top:0px;padding-right:0px;padding-left:0px;padding-top:0px;padding-bottom:1px">
 
                   <inData ng-if="article.topSub._file"
-                     data="article.topSub._file" id="article.topSub.myId">
+                     data="article.topSub._file" id="article.topSub.id">
                   </inData>
                   <div class="item item-icon-right"
                      style="padding-top:0px;border-top:0px">

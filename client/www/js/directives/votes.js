@@ -15,6 +15,7 @@ app.directive('invotes', [
       },
       controller: function($scope) {
 
+         //TODO rewrite this shit to not use the parent model
          $scope.toggleComments = function(instance) {
             if(!instance.showComments) {
 
@@ -32,8 +33,12 @@ app.directive('invotes', [
                   order: 'rating DESC'
                }
 
+               if(!model) {
+                  console.log('Model does not have a valid constructor');
+                  return;
+               }
                //Retrieve the comments from the server
-               model.prototype$__get__comments({id: instance.myId, filter: filter})
+               model.prototype$__get__comments({id: instance.id, filter: filter})
                .$promise
                .then( function (res) {
                   instance.comments = res;
@@ -51,9 +56,9 @@ app.directive('invotes', [
 
             Position.getCurrent( function(err,position) {
                var vote = {
-                  id: instance.myId,
+                  id: instance.id,
                   username: user.username,
-                  votableId: instance.myId,
+                  votableId: instance.id,
                   votableType: ''
                };
 
@@ -103,9 +108,9 @@ app.directive('invotes', [
 
             Position.getCurrent( function(err,position) {
                var vote = {
-                  id: instance.myId,
+                  id: instance.id,
                   username: user.username,
-                  votableId: instance.myId,
+                  votableId: instance.id,
                   votableType: ''
                };
 

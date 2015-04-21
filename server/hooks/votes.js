@@ -16,9 +16,12 @@ module.exports = function(app) {
       if (inst) {
 
          if(ctx.isNewInstance) {
-            if(!inst.myId ) {
-               inst.myId = generateId();
+            inst.id = null;
+            /*
+            if(!inst.id ) {
+               inst.id = generateId();
             }
+            */
             inst.upVoteCount = 0;
             inst.downVoteCount = 0;
             inst.date = Date.now();

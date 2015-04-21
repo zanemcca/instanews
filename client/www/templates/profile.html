@@ -12,7 +12,7 @@
             ng-repeat="article in articles | orderBy: '-(date)'">
             <a class="item no-padding item-text-wrap"
                style="border:transparent"
-               ui-sref="app.article({id: article.myId})">
+               ui-sref="app.article({id: article.id})">
                <div class="item"
                   style="border-bottom:0px;">
                   {{article.title}}
@@ -22,7 +22,7 @@
 
                   <p>{{sub.text}}</p>
                   <inData ng-if="sub._file"
-                     data="sub._file" id="sub.myId">
+                     data="sub._file" id="sub.id">
                   </inData>
                </div>
             </a>

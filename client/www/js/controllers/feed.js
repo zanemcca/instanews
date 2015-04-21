@@ -194,7 +194,7 @@ app.controller('FeedCtrl', [
                var article = articles[i];
 
                //Remove duplicates
-               if (Articles.getOne(article.myId)) {
+               if (Articles.getOne(article.id)) {
                   articles.splice(i,1);
                   continue;
                }

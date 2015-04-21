@@ -1,16 +1,20 @@
 {
-   "name" : "notification",
-   "base" : "Notification",
-   "relations" : {
-      "installation": {
-         "type": "belongsTo",
-         "model": "installation",
-         "foreignKey": "installationId"
-      },
-      "journalist": {
-         "type": "belongsTo",
-         "model": "journalist",
-         "foreignKey": "username"
-      }
-   }
+  "name": "notification",
+  "base": "Notification",
+  "properties": {},
+  "validations": [],
+  "relations": {
+    "installation": {
+      "type": "belongsTo",
+      "model": "installation",
+      "foreignKey": "installationId"
+    },
+    "journalist": {
+      "type": "belongsTo",
+      "model": "journalist",
+      "foreignKey": "username"
+    }
+  },
+  "acls": [],
+  "methods": []
 }

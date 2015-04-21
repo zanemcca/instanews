@@ -2,7 +2,7 @@
 <ion-view view-title="{{article.title}}" style="background-color: #C0C0C0">
    <ion-nav-buttons side="secondary">
       <a class="button button-clear icon ion-plus-round"
-         ui-sref="subarticlePost({id: article.myId})">
+         ui-sref="subarticlePost({id: article.id})">
       </a>
    </ion-nav-buttons>
    <ion-content>
@@ -14,6 +14,12 @@
          <inMap>
             <div style="width:100%;height:100%" id="articleMap"></div>
          </inMap>
+      </div>
+      <div class="item" style="border:0px;padding-top:0px;padding-bottom:0px">
+         <inVotes style="border: transparent"
+            votable="article">
+         </inVotes>
+         <inComments owner="article"></inComments>
       </div>
       <ul class="list">
          <ion-item class="no-padding card"
@@ -31,7 +37,7 @@
             <div class="item item-body"
                style="padding-right:0px;padding-left:0px;padding-top:0px;padding-bottom:1px"
                ng-if="subarticle._file">
-               <inData data="subarticle._file" id="subarticle.myId"></inData>
+               <inData data="subarticle._file" id="subarticle.id"></inData>
             </div>
 
             <div class="item" style="border:0px;padding-top:0px;padding-bottom:0px">

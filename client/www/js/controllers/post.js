@@ -194,7 +194,6 @@ app.controller('PostCtrl', [
          Article.create({
             date: Date.now(),
             isPrivate: false,
-            myId: Math.floor(Math.random()*Math.pow(2,32)),
             location: loc,
             username: $scope.user.username,
             title: $scope.newArticle.title
@@ -202,7 +201,7 @@ app.controller('PostCtrl', [
          .$promise
          .then( function(res) {
             if( $scope.newArticle.data.length > 0 ){
-               postSubarticle(res.myId, function(res) {
+               postSubarticle(res.id, function(res) {
                   console.log('Succesful sub creation');
                });
             }
@@ -313,7 +312,6 @@ app.controller('PostCtrl', [
       Article.subarticles.create({
          id: id,
          date: Date.now(),
-         myId: Math.floor(Math.random()*Math.pow(2,32)),
          parentId: id,
          username: $scope.user.username,
          text: data.text
@@ -351,7 +349,6 @@ app.controller('PostCtrl', [
          Article.subarticles.create({
             id: id,
             date: Date.now(),
-            myId: Math.floor(Math.random()*Math.pow(2,32)),
             parentId: id,
             username: $scope.user.username,
             _file: {
@@ -443,7 +440,6 @@ app.controller('PostCtrl', [
             parentId: id,
             date: Date.now(),
             username: $scope.user.username,
-            myId: Math.floor(Math.random()*Math.pow(2,32)),
             _file: {
                type: 'image',
                name: image.URI,

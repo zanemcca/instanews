@@ -19,20 +19,20 @@ app.directive('incomments', [
             if (instance.commentableId ) {
                Create = Comment.prototype$__create__comments;
                model = {
-                  id: instance.myId,
+                  id: instance.id,
                   username: user.username,
                   content: content,
-                  commentableId: instance.myId,
+                  commentableId: instance.id,
                   commentableType: "comment"
                };
             }
             else {
                Create = instance.constructor.comments.create;
                model = {
-                  id: instance.myId,
+                  id: instance.id,
                   username: user.username,
                   content: content,
-                  commentableId: instance.myId,
+                  commentableId: instance.id,
                   commentableType: instance.constructor.modelName.toLowerCase()
                };
             }
@@ -65,7 +65,7 @@ app.directive('incomments', [
             filter.skip = instance.comments.length;
 
             //Retrieve the comments from the server
-            model.prototype$__get__comments({id: instance.myId, filter: filter})
+            model.prototype$__get__comments({id: instance.id, filter: filter})
             .$promise
             .then( function (comments) {
 
@@ -73,7 +73,7 @@ app.directive('incomments', [
                for( var i = 0; i < comments.length; i++) {
                   for( var j = 0; j < instance.comments.length; j++) {
                      var comment = instance.comments[j];
-                     if( comment.myId === comments[i].myId) {
+                     if( comment.id === comments[i].id) {
                         comments.splice(i,1);
                         break;
                      }

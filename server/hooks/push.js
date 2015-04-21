@@ -1,6 +1,6 @@
 
 
-var notifyUser = function(app, username, message) {
+var notifyUser = function(app, note) {
 
    var Installation = app.models.installation;
    var Notification = app.models.notification;
@@ -13,42 +13,33 @@ var notifyUser = function(app, username, message) {
       }
    };
 
-   Installation.find({where: { userId: username }}, function(err, res) {
+   Installation.find({where: { userId: note.username }}, function(err, res) {
       if (err)
          console.log('Error finding installation!: ' + err);
       else {
          if( res.length > 0) {
             for(var i = 0; i < res.length; i++) {
 
-               var note = {};
                if(res[i].deviceType === 'android') {
-                  note = {
-                     username: username,
-                     installationId: res[i].id,
-                     deviceType: res[i].deviceType,
-                     deviceToken: res[i].deviceToken,
-                     expirationInterval: 3600, //Expire in 1 hr
-                     message: message,
-                     messageFrom: 'zane'
-                  };
+                  note.installationId = res[i].id;
+                  note.deviceType = res[i].deviceType;
+                  note.deviceToken = res[i].deviceToken;
+                  note.expirationInterval = 3600; //Expire in 1 hr
                }
                else if (res[i].deviceType === 'ios') {
-                  note = {
-                     username: username,
-                     installationId: res[i].id,
-                     deviceType: res[i].deviceType,
-                     deviceToken: res[i].deviceToken,
-                     expirationInterval: 3600, //Expire in 1 hr
-                     badge: 1,
-                     sound: 'ping.aiff',
-                     alert: message,
-                     messageFrom: 'zane'
-                  };
+                  note.installationId = res[i].id;
+                  note.deviceType = res[i].deviceType;
+                  note.deviceToken = res[i].deviceToken;
+                  note.expirationInterval = 3600; //Expire in 1 hr
+                  note.badge =  1;
+                  note.sound = 'ping.aiff';
+                  note.alert =  note.message;
                }
                else {
-                  console.log('Unkown device! Note creatinf a notification');
+                  console.log('Unkown device! Not creating a notification');
                   break;
                }
+               console.log('Creating notification: ' + note.toString());
                Notification.create(note, cb);
             }
          }

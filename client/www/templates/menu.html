@@ -24,11 +24,12 @@
          </div>
 
          <ul class="list">
-            <ion-item class="item-text-wrap"
+            <div class="item item-text-wrap"
                ng-repeat="note in notifications"
-               ng-if="note.message">
+               ng-if="note.message"
+               ng-click="handleNotification(note)">
                   {{note.message}}
-            </ion-item>
+            </div>
          </ul>
          </ion-content>
          <ion-footer-bar class="bar-dark">

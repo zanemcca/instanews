@@ -1,13 +1,13 @@
 [
    {
       "text" : "There is a large blaze at Poley Mountain in the Sussex area. Residence of near by homes have been evacutated as a precaution.",
-      "myId": 1,
+      "id": 1,
       "username": "zane",
       "parentId": 1,
       "date": "2015-02-06T12:48:43.511Z"
    },
    {
-      "myId": 2,
+      "id": 2,
       "username": "bob",
       "parentId": 1,
       "date": "2015-02-06T02:48:43.511Z",
@@ -20,13 +20,13 @@
    },
    {
       "text": "A subarticle for an article",
-      "myId": 4,
+      "id": 4,
       "username": "bob",
       "parentId": 200,
       "date": "2015-02-06T02:48:43.511Z"
    },
    {
-      "myId": 3,
+      "id": 3,
       "username" : "jane",
       "parentId": 1,
       "date": "2015-02-06T03:48:43.511Z",

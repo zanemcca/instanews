@@ -28,7 +28,12 @@ module.exports = function(app) {
                      var username = res[i].username;
                      var message = inst.username +
                         ' collaborated with you on an article';
-                     Push.notifyUser(app, username, message);
+                     Push.notifyUser(app, {
+                        username: username,
+                        message: message,
+                        parentId: inst.id,
+                        type: 'subarticle'
+                     });
 
                      users.push(res[i].username);
                   }

@@ -6,6 +6,14 @@ module.exports = function(app) {
    var Push = require('./push');
    var Vote = app.models.vote;
 
+   Vote.observe('before save', function(ctx, next) {
+      var inst = ctx.instance;
+      if (inst && ctx.isNewInstance) {
+         inst.id = null;
+      }
+      next();
+   });
+
    Vote.observe('after save', function(ctx, next) {
       var inst = ctx.instance;
       if (inst && ctx.isNewInstance) {
@@ -14,6 +22,7 @@ module.exports = function(app) {
          switch(inst.votableType) {
             case 'article':
                /*
+               //Notify the original poster
                app.models.Article.findById( inst.votableId, function(err, res) {
                   if (err) console.log('Error after saving vote: ' + err);
                   else {
@@ -24,6 +33,7 @@ module.exports = function(app) {
                   }
                });
                */
+               //Notify the top contributer
                app.models.Subarticle.find({
                   limit: 1,
                   order: 'rating DESC',
@@ -39,7 +49,12 @@ module.exports = function(app) {
                         if( username !== inst.username) {
                            var message = inst.username +
                                     ' voted on your article';
-                           Push.notifyUser(app, username, message);
+                           Push.notifyUser(app,{
+                              username: username,
+                              message: message,
+                              type: 'article',
+                              parentId: inst.votableId
+                           });
                         }
                      }
                   }
@@ -55,7 +70,12 @@ module.exports = function(app) {
                      if( username !== inst.username) {
                         var message = inst.username +
                            ' voted on your subarticle';
-                        Push.notifyUser(app, username, message);
+                        Push.notifyUser(app,{
+                           username: username,
+                           message: message,
+                           parentId: inst.votableId,
+                           type: 'subarticle'
+                        });
                      }
                   }
                });
@@ -70,7 +90,12 @@ module.exports = function(app) {
                      if( username !== inst.username) {
                         var message = inst.username +
                            ' voted on your comment';
-                        Push.notifyUser(app, username, message);
+                        Push.notifyUser(app, {
+                           username: username,
+                           message: message,
+                           parentId: inst.votableId,
+                           type: 'comment'
+                        });
                      }
                   }
                });

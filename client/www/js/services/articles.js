@@ -12,7 +12,7 @@ app.service('Articles', [
 
    //Getters
    var getOne = function (id) {
-      var val = $filter('filter')(articles, {myId: id});
+      var val = $filter('filter')(articles, {id: id});
       if (val.length > 0) {
          return val[0];
       }
