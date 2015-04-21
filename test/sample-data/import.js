@@ -173,10 +173,10 @@ module.exports = function (app, cb) {
    async.series([
       importData.bind(null,Journalists, journalists),
       importData.bind(null,Articles, articles),
+      importData.bind(null,Subarticles, subarticles),
       importData.bind(null,UpVotes, []),
       importData.bind(null,DownVotes, []),
       importData.bind(null,Comments, comments),
-      importData.bind(null,Subarticles, subarticles),
       createAdmin.bind(null),
       importArticles.bind(null),
       updateDB.bind(null)

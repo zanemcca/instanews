@@ -8,5 +8,6 @@ module.exports = function(app) {
    require('./up-vote.js')(app);
    require('./down-vote.js')(app);
    require('./subarticle.js')(app);
+   require('./article.js')(app);
    require('./comment.js')(app);
 };

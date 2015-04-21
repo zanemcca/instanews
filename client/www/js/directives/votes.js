@@ -2,9 +2,13 @@ var app = angular.module('instanews.votes', ['ionic', 'ngResource']);
 
 app.directive('invotes', [
       'Comment',
+      'UpVote',
+      'DownVote',
       'Position',
       'User',
       function (Comment,
+         UpVote,
+         DownVote,
          Position,
          User) {
 
@@ -15,35 +19,24 @@ app.directive('invotes', [
       },
       controller: function($scope) {
 
-         //TODO rewrite this shit to not use the parent model
          $scope.toggleComments = function(instance) {
             if(!instance.showComments) {
 
-               //Comments can have any kind of parent
-               //so we check for it before updating
-               if ( instance.commentableId ) {
-                  model = Comment;
-               }
-               else {
-                  model = instance.constructor;
-               }
-
-               var filter = {
-                  limit: 10,
-                  order: 'rating DESC'
-               }
-
-               if(!model) {
-                  console.log('Model does not have a valid constructor');
-                  return;
-               }
-               //Retrieve the comments from the server
-               model.prototype$__get__comments({id: instance.id, filter: filter})
-               .$promise
+               Comment.find({
+                  filter: {
+                     where: {
+                        commentableId: instance.id,
+                        commentableType: instance.modelName
+                     },
+                     limit: 10,
+                     order: 'rating DESC'
+                  }
+               }).$promise
                .then( function (res) {
                   instance.comments = res;
                   instance.showComments = true;
                });
+
             }
             else {
                instance.showComments = false;
@@ -59,7 +52,7 @@ app.directive('invotes', [
                   id: instance.id,
                   username: user.username,
                   votableId: instance.id,
-                  votableType: ''
+                  votableType: instance.modelName
                };
 
                if(err) {
@@ -72,34 +65,15 @@ app.directive('invotes', [
                   };
                }
 
-               //Since comments are nested the constructor actually belongs
-               //to the parent model so we have to specifically check for it
-               if ( instance.commentableId ) {
-                  vote.votableType = 'comment';
-
-                  Comment.prototype$__create__upVotes(vote)
-                  .$promise
-                  .then( function(res) {
-                     instance.upVoteCount = res.upVoteCount;
-                     instance.rating = res.rating;
-                     if(res.verified) {
-                        instance.verified = res.verified;
-                     }
-                  });
-               }
-               else {
-                  vote.votableType = instance.constructor.modelName.toLowerCase();
-
-                  instance.constructor.prototype$__create__upVotes(vote)
-                  .$promise
-                  .then( function(res) {
-                     instance.upVoteCount = res.upVoteCount;
-                     instance.rating = res.rating;
-                     if(res.verified) {
-                        instance.verified = res.verified;
-                     }
-                  });
-               }
+               UpVote.create(vote)
+               .$promise
+               .then( function(res) {
+                  instance.upVoteCount = res.upVoteCount;
+                  instance.rating = res.rating;
+                  if(res.verified) {
+                     instance.verified = res.verified;
+                  }
+               });
             });
          };
 
@@ -111,7 +85,7 @@ app.directive('invotes', [
                   id: instance.id,
                   username: user.username,
                   votableId: instance.id,
-                  votableType: ''
+                  votableType: instance.modelName
                };
 
                if(err) {
@@ -124,26 +98,12 @@ app.directive('invotes', [
                   };
                }
 
-               if ( instance.commentableId ) {
-                  vote.votableType = "comment";
-
-                  Comment.prototype$__create__downVotes(vote)
-                  .$promise
-                  .then( function(res) {
-                     instance.downVoteCount = res.downVoteCount;
-                     instance.rating = res.rating;
-                  });
-               }
-               else {
-                  vote.votableType = instance.constructor.modelName.toLowerCase();
-
-                  instance.constructor.prototype$__create__downVotes(vote)
-                  .$promise
-                  .then( function(res) {
-                     instance.downVoteCount = res.downVoteCount;
-                     instance.rating = res.rating;
-                  });
-               }
+               DownVote.create(vote)
+               .$promise
+               .then( function(res) {
+                  instance.downVoteCount = res.downVoteCount;
+                  instance.rating = res.rating;
+               });
             });
          };
       },

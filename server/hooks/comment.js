@@ -12,10 +12,27 @@ module.exports = function(app) {
 
       var notify = function(message, id, res) {
          var username;
-         if( res.length ) {
-            for(var i = 0; i < res.length; i++) {
-               if( users.indexOf(res[i].username) === -1) {
-                  username = res[i].username;
+         if(res) {
+            if( res.length ) {
+               for(var i = 0; i < res.length; i++) {
+                  if( users.indexOf(res[i].username) === -1) {
+                     username = res[i].username;
+                     console.log('Starting push to '+ username +'...');
+
+                     Push.notifyUser(app, {
+                        username: username,
+                        message: message,
+                        parentId: id,
+                        type: 'comment'
+                     });
+
+                     users.push(res[i].username);
+                  }
+               }
+            }
+            else {
+               if( users.indexOf(res.username) === -1) {
+                  username = res.username;
                   console.log('Starting push to '+ username +'...');
 
                   Push.notifyUser(app, {
@@ -25,23 +42,8 @@ module.exports = function(app) {
                      type: 'comment'
                   });
 
-                  users.push(res[i].username);
+                  users.push(res.username);
                }
-            }
-         }
-         else {
-            if( users.indexOf(res.username) === -1) {
-               username = res.username;
-               console.log('Starting push to '+ username +'...');
-
-               Push.notifyUser(app, {
-                  username: username,
-                  message: message,
-                  parentId: id,
-                  type: 'comment'
-               });
-
-               users.push(res.username);
             }
          }
       };
@@ -127,7 +129,10 @@ module.exports = function(app) {
 
    Comment.observe('before save', function(ctx, next) {
 
-      this.date =  Date.now();
+      var inst = ctx.instance;
+      if(inst && ctx.isNewInstance) {
+         inst.modelName = 'comment';
+      }
 
       next();
    });

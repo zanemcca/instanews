@@ -7,6 +7,10 @@
     "rate": {
       "type": "number"
     },
+    "modelName": {
+      "type": "string",
+      "required": true
+    },
     "rating": {
       "type": "number"
     },

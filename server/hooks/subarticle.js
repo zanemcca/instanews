@@ -4,6 +4,16 @@ module.exports = function(app) {
    var Subarticle = app.models.subarticle;
    var Push = require('./push');
 
+   Subarticle.observe('before save', function(ctx, next) {
+      var inst = ctx.instance;
+
+      if (inst && ctx.isNewInstance) {
+         inst.modelName = 'subarticle';
+      }
+
+      next();
+   });
+
    Subarticle.observe('after save', function(ctx, next) {
       var inst = ctx.instance;
 

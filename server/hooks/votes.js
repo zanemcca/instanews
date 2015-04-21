@@ -8,20 +8,12 @@ module.exports = function(app) {
    };
 
    Votes.observe('before save', function(ctx, next) {
-      var generateId = function() {
-         return Math.floor(Math.random()*Math.pow(2,128));
-      };
 
       var inst = ctx.instance;
       if (inst) {
 
          if(ctx.isNewInstance) {
             inst.id = null;
-            /*
-            if(!inst.id ) {
-               inst.id = generateId();
-            }
-            */
             inst.upVoteCount = 0;
             inst.downVoteCount = 0;
             inst.date = Date.now();

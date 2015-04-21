@@ -5,8 +5,6 @@ module.exports = function(Comment) {
    common.initVotes(Comment);
 
    var staticDisable = [
-      'create',
-      'find',
       'exists',
       'upsert',
       'updateAll'
