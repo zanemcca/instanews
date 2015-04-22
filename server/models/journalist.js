@@ -36,32 +36,4 @@ module.exports = function(Journalist) {
    common.disableRemotes(Journalist,staticDisable,true);
    common.disableRemotes(Journalist,nonStaticDisable,false);
 
-
-   Journalist.afterRemote('prototype.__get__articles',
-   function(ctx, instance, next) {
-
-      //Automatically remove all duplicate articles
-      //since they are gotten through a through model
-      var uniqueIds = [];
-      for(var i = 0; i < instance.length; i++) {
-         if(uniqueIds.indexOf(instance[i].myId) > -1 ) {
-            instance.splice(i,1);
-            i--;
-         }
-         else {
-            uniqueIds.push(instance[i].myId);
-         }
-      }
-
-      next();
-   });
-
-   Journalist.observe('access', function(ctx, next) {
-      var inst = ctx.instance;
-      if ( inst) {
-         //TODO Complete this
-         inst.password = '';
-      }
-      next();
-   });
 };

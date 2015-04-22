@@ -9,5 +9,6 @@ module.exports = function(app) {
    require('./down-vote.js')(app);
    require('./subarticle.js')(app);
    require('./article.js')(app);
+   require('./journalist.js')(app);
    require('./comment.js')(app);
 };
