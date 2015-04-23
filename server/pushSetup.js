@@ -63,9 +63,10 @@ module.exports = function (app) {
          if (err) {
             console.log('Error Registering app: ' , err);
          }
-         else {
+   /*      else {
             console.log('Registration of app successful: ' , app);
          }
+         */
       });
    }
 

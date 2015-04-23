@@ -8,6 +8,9 @@ RUN apt-get update
 # install npm
 RUN apt-get install -y npm
 
+# install openssl
+RUN apt-get install -y openssl
+
 # Copy our source files into the new docker
 # TODO Change this to pull them from git
 COPY . /src
@@ -26,6 +29,7 @@ ENV NODE_ENV production
 
 # expose our port
 EXPOSE 3000
+EXPOSE 3443
 
 # Run the application
 #CMD cd /src && slc run

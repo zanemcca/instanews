@@ -1,7 +1,13 @@
 var loopback = require('loopback');
 var boot = require('loopback-boot');
 var path = require('path');
+var https = require('https');
+var pem = require('pem');
+var helmet = require('helmet');
 var app = module.exports = loopback();
+
+//Security module
+app.use(helmet());
 
 app.use(loopback.static(path.resolve(__dirname, '../client/www/')));
 
@@ -9,30 +15,39 @@ app.use(loopback.static(path.resolve(__dirname, '../client/www/')));
 // Sub-apps like REST API are mounted via boot scripts.
 boot(app, __dirname);
 
-
-if( app.settings.env === 'development') {
-   console.log(app.settings.env);
-
-}
-else if( app.settings.env === 'staging') {
-   console.log(app.settings.env);
-
-}
-else {
-   console.log('Should be in production mode: ' + app.settings.env);
-}
-
 //Setup the push server
 require('./pushSetup.js')(app);
 //Setup all the back end hooks
 require('./hooks/hookSetup.js')(app);
 
 app.start = function() {
-  // start the web server
-  return app.listen(function() {
+
+  // start the htto web server
+  app.listen(function() {
     app.emit('started');
     console.log('Web server listening at: %s', app.get('url'));
   });
+
+   //Create certificates
+   //TODO Use a Certificate Authority such as Comodo.com
+   pem.createCertificate({
+      days:1,
+      selfSigned: true
+   }, function(err, keys) {
+      if(err) {
+         console.log('Error generating SSL keys: ' + err);
+         return;
+      }
+      //Create our https server
+      var server = https.createServer({ key: keys.serviceKey, cert: keys.certificate}, app);
+      server.listen(3443, function() {
+         var baseUrl = 'https://' + app.get('host') + ':3443';
+         app.emit('started', baseUrl);
+         console.log('Loopback server listening @ %s%s', baseUrl, '/');
+      });
+      return server;
+   });
+
 };
 
 // start the server if `$ node server.js`
