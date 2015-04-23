@@ -9,6 +9,19 @@ app.use(loopback.static(path.resolve(__dirname, '../client/www/')));
 // Sub-apps like REST API are mounted via boot scripts.
 boot(app, __dirname);
 
+
+if( app.settings.env === 'development') {
+   console.log(app.settings.env);
+
+}
+else if( app.settings.env === 'staging') {
+   console.log(app.settings.env);
+
+}
+else {
+   console.log('Should be in production mode: ' + app.settings.env);
+}
+
 //Setup the push server
 require('./pushSetup.js')(app);
 //Setup all the back end hooks
