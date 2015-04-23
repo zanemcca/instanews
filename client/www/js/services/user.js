@@ -89,7 +89,7 @@ app.service('User', [
    var clearData = function() {
       set({});
       if( ionic.Platform.isIOS() || ionic.Platform.isAndroid()) {
-         LocalStorage.secureDelete($cordovaDevice.getUUID());
+         LocalStorage.secureDelete(Platform.getUUID());
       }
    };
 

@@ -22,8 +22,10 @@ app.directive('indatapreview', [
 }]);
 
 //This directive will display subarticle data in a consumable format
-app.directive('indata',
-      function ($compile) {
+app.directive('indata',[
+      '$compile',
+      'Platform',
+      function ($compile, Platform) {
 
    var getSrc = function (data) {
       var name;
@@ -65,7 +67,7 @@ app.directive('indata',
          '<video poster="' + data.poster +
          '" controls width="100%" id="'+ videoId + '"';
 
-         if (ionic.Platform.isIOS()) {
+         if (Platform.isIOS()) {
             template += '>'
          }
          else {
@@ -93,7 +95,7 @@ app.directive('indata',
 
    var disableTap = function(disable) {
       container = document.getElementById('video-container');
-      if (disable && !ionic.platform.isIOS()) {
+      if (disable && !Platform.isIOS()) {
          angular.element(container).attr('data-tap-disabled','true');
       }
       else {
@@ -107,7 +109,7 @@ app.directive('indata',
 
          if (scope.data.type.indexOf('video') > -1) {
 
-            if ( !ionic.Platform.isIOS()) {
+            if ( !Platform.isIOS()) {
                videojs(videoId).ready( function() {
 
                   var player = this;
@@ -147,4 +149,4 @@ app.directive('indata',
       },
       link: linker
    };
-});
+}]);

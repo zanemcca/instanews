@@ -38,8 +38,13 @@ app.factory('Platform', [
       return;
    };
 
+   var isIOS = function() {
+      return ionic.Platform.isIOS();
+   };
+
    return {
       getUUID: getUUID,
+      isIOS: isIOS,
       getDevice: getDevice,
       setDevice: setDevice,
       setDeviceToken: setDeviceToken,
