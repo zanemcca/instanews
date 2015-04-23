@@ -20,7 +20,7 @@ app.service('Position', [
 
    var getBounds = function() {
       return bounds;
-   }
+   };
 
    //Position stuff
    /*

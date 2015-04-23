@@ -81,8 +81,8 @@ app.directive('inmap', [
 
             //Article map only contains a marker to the current article
             //so all of its setup is done here
-            var element = document.getElementById("articleMap");
-            if ( element && element.textContent.indexOf('Map') === -1) {
+            var elem = document.getElementById("articleMap");
+            if ( elem && elem.textContent.indexOf('Map') === -1) {
                if ( $stateParams.id) {
                   $scope.article = Articles.getOne($stateParams.id);
                   mapOptions.center = new google.maps.LatLng($scope.article.location.lat, $scope.article.location.lng);

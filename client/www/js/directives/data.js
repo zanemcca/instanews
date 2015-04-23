@@ -68,7 +68,7 @@ app.directive('indata',[
          '" controls width="100%" id="'+ videoId + '"';
 
          if (Platform.isIOS()) {
-            template += '>'
+            template += '>';
          }
          else {
             template += ' class="video-js vjs-default-skin' +
@@ -99,7 +99,7 @@ app.directive('indata',[
          angular.element(container).attr('data-tap-disabled','true');
       }
       else {
-         angular.element(container).removeAttr('data-tap-disabled')
+         angular.element(container).removeAttr('data-tap-disabled');
       }
    };
 

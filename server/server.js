@@ -9,6 +9,9 @@ var app = module.exports = loopback();
 //Security module
 app.use(helmet());
 
+// Compress everything
+app.use(loopback.compress());
+
 app.use(loopback.static(path.resolve(__dirname, '../client/www/')));
 
 // Bootstrap the application, configure models, datasources and middleware.

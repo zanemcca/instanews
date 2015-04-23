@@ -23,7 +23,7 @@ app.controller('ArticleCtrl', [
       limit: 10,
       skip: 0,
       order: 'rating DESC'
-   }
+   };
 
    var marker;
 

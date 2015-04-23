@@ -185,7 +185,7 @@ app.controller('PostCtrl', [
             loc = {
                lat: position.coords.latitude,
                lng: position.coords.longitude
-            }
+            };
          }
          else {
             loc = position;
@@ -254,12 +254,19 @@ app.controller('PostCtrl', [
       postSubarticle($stateParams.id, function(res) {
          $scope.trashSubarticle();
       });
-   }
+   };
 
    //Determine the type of subarticle the data is posting and then
    // call the appropriate posting function
    var postSubarticle = function(id, cb) {
       var datas = $scope.newArticle.data;
+
+      var handle = function(res) {
+         subs.push(res);
+         if( subs.length === datas.length) {
+            cb(subs);
+         }
+      };
 
       var subs = [];
       for( var i = 0; i < datas.length; i++) {
@@ -274,12 +281,7 @@ app.controller('PostCtrl', [
          else {
             func = postPhoto;
          }
-         func(id,data, function(res) {
-            subs.push(res);
-            if( subs.length === datas.length) {
-               cb(subs);
-            }
-         });
+         func(id,data, handle);
       }
    };
 
@@ -325,7 +327,7 @@ app.controller('PostCtrl', [
    //Clean up the video temp files
    $scope.trashVideo = function() {
       $scope.data.videos = [];
-   }
+   };
 
    //Capture video using the video camera
    $scope.captureVideo = function() {
@@ -344,6 +346,13 @@ app.controller('PostCtrl', [
    var postVideo = function(id, data, cb) {
       var subs = [];
 
+      var handle = function (res) {
+         subs.push(res);
+         if ( subs.length === data.videos.length) {
+            cb(subs);
+         }
+      };
+
       for( var i = 0; i < data.videos.length; i++) {
          var video = data.videos[i];
          Article.subarticles.create({
@@ -359,14 +368,9 @@ app.controller('PostCtrl', [
                caption: video.caption
             }
          })
-         .$promise.then( function (res) {
-            subs.push(res);
-            if ( subs.length === data.videos.length) {
-               cb(subs);
-            }
-         });
+         .$promise.then(handle);
       }
-   }
+   };
 
    /*
    $scope.captureThumbnail = function() {
@@ -386,7 +390,7 @@ app.controller('PostCtrl', [
    //Delete the temporary photos so that the form is empty
    $scope.trashPhoto = function() {
       $scope.data.images = [];
-   }
+   };
 
    //Get a photo(s) from the gallery
    $scope.getPhotos = function() {
@@ -432,6 +436,13 @@ app.controller('PostCtrl', [
    var postPhoto = function(id, data, cb) {
       var subs = [];
 
+      var handle = function (res) {
+         subs.push(res);
+         if ( subs.length === data.images.length) {
+            cb(subs);
+         }
+      };
+
       for( var i = 0; i < data.images.length; i++) {
          var image = data.images[i];
 
@@ -446,14 +457,10 @@ app.controller('PostCtrl', [
                size: 5000,
                caption: image.caption
             }
-         }
+         };
+
          Article.subarticles.create(subarticle)
-         .$promise.then( function (res) {
-            subs.push(res);
-            if ( subs.length === data.images.length) {
-               cb(subs);
-            }
-         });
+         .$promise.then(handle);
       }
    };
 

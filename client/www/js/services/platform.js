@@ -49,6 +49,6 @@ app.factory('Platform', [
       setDevice: setDevice,
       setDeviceToken: setDeviceToken,
       ready: ready.promise
-   }
+   };
 }]);
 

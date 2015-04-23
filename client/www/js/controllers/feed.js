@@ -33,13 +33,13 @@ app.controller('FeedCtrl', [
       //Transistion from baby blue to blue to red
       var gradient = ['rgba(0, 255, 255, 0)'];
       for(var i = 0; i < third; i++) {
-         var temp =  'rgba(0,' + (255-subValue*i) + ',255, 1)'
+         var temp =  'rgba(0,' + (255-subValue*i) + ',255, 1)';
          gradient.push(temp);
       }
-      for(var i = 0; i < third; i++) {
+      for(i = 0; i < third; i++) {
          gradient.push( 'rgba(0,0,'+ (255 - subValue/2*i) +', 1)');
       }
-      for(var i = 0; i < third; i++) {
+      for(i = 0; i < third; i++) {
          gradient.push( 'rgba('+ (subValue*i) +',0,'+ (128 - subValue/2*i) +', 1)');
       }
       gradient.push('rgba(255, 0, 0, 1)');
@@ -123,7 +123,7 @@ app.controller('FeedCtrl', [
          }
       },
       order: 'rating DESC'
-   }
+   };
 
    $scope.onRefresh = function () {
       console.log('Refresh');
@@ -158,7 +158,7 @@ app.controller('FeedCtrl', [
                   ]
                }
             }
-         }
+         };
 
          $scope.articles = [];
          Articles.set($scope.articles);

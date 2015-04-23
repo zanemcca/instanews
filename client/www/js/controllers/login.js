@@ -24,7 +24,7 @@ app.controller('LoginCtrl', [
       username: '',
       password: '',
       remember: true
-   }
+   };
 
    $scope.invalidLogin = false;
 
@@ -35,7 +35,7 @@ app.controller('LoginCtrl', [
       email: '',
       password: '',
       confirmPassword: ''
-   }
+   };
 
    $ionicModal.fromTemplateUrl('templates/signupModal.html', {
       scope: $scope,
@@ -49,7 +49,7 @@ app.controller('LoginCtrl', [
       $scope.cred.username = 'zane';
       $scope.cred.password = 'password';
       $scope.login();
-   }
+   };
 
    $scope.login = function () {
 
@@ -94,7 +94,7 @@ app.controller('LoginCtrl', [
                username: '',
                password: '',
                remember: true
-            }
+            };
 
             $scope.invalidLogin = false;
 
@@ -114,7 +114,7 @@ app.controller('LoginCtrl', [
          email: '',
          password: '',
          confirmPassword: ''
-      }
+      };
       $scope.signupModal.hide();
    };
 

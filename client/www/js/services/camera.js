@@ -6,13 +6,13 @@ app.factory('Camera', [
       '$q',
       function($q) {
 
+   var options = {
+      correctOrientation: true
+   };
+
 
    var captureVideo = function() {
       var q = $q.defer();
-
-      var options = {
-         correctOrientation: true
-      };
 
       if (!navigator.device.capture) {
          q.resolve(null);
@@ -26,14 +26,10 @@ app.factory('Camera', [
       }, options);
 
       return q.promise;
-   }
+   };
 
    var capturePicture = function(options) {
       var q = $q.defer();
-
-      var options = {
-         correctOrientation: true
-      };
 
       if (!navigator.device.capture) {
          q.resolve(null);
@@ -48,7 +44,8 @@ app.factory('Camera', [
       }, options);
 
       return q.promise;
-    }
+    };
+
   return {
     getPicture: capturePicture,
     getVideo: captureVideo

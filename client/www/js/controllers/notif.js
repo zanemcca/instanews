@@ -27,13 +27,14 @@ app.controller('NotificationCtrl', [
 
    $scope.type = notification.notifiableType;
    if( $scope.type === 'subarticle') {
-      var filter = {
-         include: {
-            relation: 'article'
-         }
-      };
 
-      Subarticle.findById({ id: notification.notifiableId, filter: filter})
+      Subarticle.findById({ id: notification.notifiableId,
+         filter: {
+            include: {
+               relation: 'article'
+            }
+         }
+      })
       .$promise
       .then( function(res) {
          $scope.subarticle = res;
@@ -41,13 +42,14 @@ app.controller('NotificationCtrl', [
       });
    }
    else if( $scope.type === 'comment') {
-      var filter = {
-         include: {
-            relation: 'commentable'
-         }
-      };
 
-      Comment.findById({id: notification.notifiableId, filter: filter})
+      Comment.findById({id: notification.notifiableId,
+         filter: {
+            include: {
+               relation: 'commentable'
+            }
+         }
+      })
       .$promise
       .then(function(res) {
          handleCommentResult(res);
@@ -63,7 +65,13 @@ app.controller('NotificationCtrl', [
 
          var tempComment = res;
 
-         Comment.findById({id: res.commentableId, filter: filter})
+         Comment.findById({id: res.commentableId,
+            filter: {
+               include: {
+                  relation: 'commentable'
+               }
+            }
+         })
          .$promise
          .then(function(res) {
             res.showComments = true;

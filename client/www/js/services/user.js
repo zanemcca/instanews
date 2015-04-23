@@ -39,13 +39,13 @@ app.service('User', [
 
       var device = Platform.getDevice();
 
-      if ( user
-            && user.user
-            && user.user.username
-            && device
-            && device.type
-            && device.token
-            && device.token !== 'OK') {
+      if ( user &&
+            user.user &&
+            user.user.username &&
+            device &&
+            device.type &&
+            device.token &&
+            device.token !== 'OK') {
          console.log('Attempting to install device on the server');
 
          var appConfig = {
