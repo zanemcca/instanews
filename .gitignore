@@ -6,4 +6,16 @@ client/platforms/
 client/engine/
 client/plugins/
 client/resources/
-client/www/lib/
+client/www/
+
+client/coverage
+client/app/bower_components
+client/app/scripts/configuration.js
+
+.idea
+.temp
+.sass-cache
+*.swp
+*.swo
+*.log
+*.DS_Store

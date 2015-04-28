@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<ion-view>
+   <ion-nav-bar class="bar-dark">
+      <ion-nav-title>Instanews</ion-nav-title>
+   </ion-nav-bar>
+   <ion-content scroll=false>
+      <div class="item item-divider" style="height:100%">
+         <div class="list">
+            <label class="item item-input" ng-class="{'box-invalid' : invalidLogin}">
+               <input type="text" placeholder="Username or Email" ng-model="cred.username" required>
+            </label>
+            <div class="item item-input" ng-class="{'box-invalid' : invalidLogin}">
+               <input type="password" placeholder="Password" ng-model="cred.password" required>
+            </div>
+            <div class="item item-divider item-toggle"
+               style="border-bottom: 0px; border-left: 0px; border-right:0px; min-height:47px">
+               <p>Remember Me</p>
+               <label class="toggle toggle-calm">
+                  <input type="checkbox" ng-model="cred.remember">
+                  <div class="track">
+                     <div class="handle"></div>
+                  </div>
+               </label>
+            </div>
+            <button class="button button-balanced button-full no-padding`" ng-click="login()">
+               Login
+            </button>
+            <button class="button button-positive button-full" ng-click="signupModal.show()">
+               Signup
+            </button>
+            <!--
+            <div class="item item-divider">
+               <button class="button button-positive button-full ion-social-facebook"
+                  style="background: #3b5998"
+                  ng-click="fbSignup()">
+                  Use Facebook
+               </button>
+               <button class="button button-calm button-full icon ion-social-twitter"
+                  style="background: #4099FF"
+                  ng-click="twitterSignup()">
+                  Use Twitter
+               </button>
+               <button class="button button-assertive button-full icon ion-social-googleplus"
+                  style="background: #db4a39"
+                  ng-click="gPlusSignup()">
+                  Use Google+
+               </button>
+            </div>
+            -->
+            <button class="button button-clear button-full" ng-click="skip()">
+               Forgot Password
+            </button>
+         </div>
+      </div>
+   </ion-content>
+</ion-view>
