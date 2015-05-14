@@ -82,9 +82,7 @@ var testOne = function(role, test, next) {
    }
    else if(test.type === 'put') {
       //Try to find the model in the database
-      var mod = findModel(type,models);
-
-      func = api.put(endpoint).send(mod);
+      func = api.put(endpoint).send(findModel(type,models));
    }
    else if(test.type === 'delete') {
       func = api.delete(endpoint);
