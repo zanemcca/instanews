@@ -2,9 +2,11 @@
 
 /* jshint ignore:start */
 var urlBase = ('https:' === document.location.protocol ?
-   "https://192.168.100.10:3443/api" :
-   "http://192.168.100.10:3000/api");
-
+   'https://172.20.10.9:3443/api' :
+   'http://172.20.10.9:3000/api');
+   /*"https://192.168.1.2:3443/api" :
+   "http://192.168.1.2:3000/api");
+*/
 var authHeader = 'authorization';
 
 /**

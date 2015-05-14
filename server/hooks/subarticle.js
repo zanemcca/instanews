@@ -27,6 +27,14 @@ module.exports = function(app) {
             //Error checking
             if(err) console.log(err);
             else {
+
+               var report = function(err, res) {
+                  if (err) console.log('Error: ' + err);
+                  else {
+                     console.log('Created a notification!');
+                  }
+               };
+
                //List of already notified users
                var users = [
                   inst.username
@@ -45,12 +53,7 @@ module.exports = function(app) {
                         notifiableType: 'article',
                         messageFrom: inst.username,
                         username: username
-                     }, function(err, res) {
-                        if (err) console.log('Error: ' + err);
-                        else {
-                           console.log('Created a notification!');
-                        }
-                     });
+                     }, report);
 
                      users.push(res[i].username);
                   }

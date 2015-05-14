@@ -10,11 +10,23 @@ module.exports = function(app) {
       if (note && ctx.isNewInstance) {
 
          //Find all installations for the given user
-         Installation.find({where: { userId: note.username }}, function(err, res) {
+         Installation.find({
+            where: {
+               userId: note.username
+            }
+         }, function(err, res) {
             if (err)
                console.log('Error finding installation!: ' + err);
             else {
                if( res.length > 0) {
+
+                  var report = function(err) {
+                     if (err) {
+                        console.log('Error pushing notification: ' + err);
+                     }
+                     console.log('Pushing notification to ', note.username);
+                  };
+
                   for(var i = 0; i < res.length; i++) {
 
                      if(res[i].deviceType === 'android') {
@@ -43,22 +55,21 @@ module.exports = function(app) {
                         if(err) console.log('Error: ' + err);
                         else {
                            //Push the notification
-                           Push.notifyById(notif.installationId , notif, function(err) {
+                           Push.notifyById(notif.installationId,
+                           notif,
+                           function(err) {
                               if (err) {
-                                 console.log('Error pushing notification: ' + err);
+                                 console.log('Error pushing notification: '
+                                 + err);
                               }
-                              console.log('Pushing notification to ', note.username);
+                              console.log('Pushing notification to ',
+                              note.username);
                            });
                         }
                      });
                         */
                      //Push the notification
-                     Push.notifyById(res[i].id , note, function(err) {
-                        if (err) {
-                           console.log('Error pushing notification: ' + err);
-                        }
-                        console.log('Pushing notification to ', note.username);
-                     });
+                     Push.notifyById(res[i].id , note, report);
                   }
                }
                else {

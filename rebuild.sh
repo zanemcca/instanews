@@ -1,4 +1,4 @@
-sudo docker stop insta
-sudo docker rm insta
-sudo docker build -t instanews .
+docker stop insta
+docker rm insta
+docker build -t instanews .
 ./clean.sh

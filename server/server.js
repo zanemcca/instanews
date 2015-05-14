@@ -25,7 +25,7 @@ require('./hooks/hookSetup.js')(app);
 
 app.start = function() {
 
-  // start the htto web server
+  // start the http web server
   app.listen(function() {
     app.emit('started');
     console.log('Web server listening at: %s', app.get('url'));
@@ -42,7 +42,11 @@ app.start = function() {
          return;
       }
       //Create our https server
-      var server = https.createServer({ key: keys.serviceKey, cert: keys.certificate}, app);
+      var server = https.createServer({
+         key: keys.serviceKey,
+          cert: keys.certificate
+      }, app);
+
       server.listen(3443, function() {
          var baseUrl = 'https://' + app.get('host') + ':3443';
          app.emit('started', baseUrl);

@@ -4,6 +4,13 @@ module.exports = function(app) {
    var Comment = app.models.comment;
    var Notification = app.models.notif;
 
+   var report = function(err,res) {
+      if (err) console.log('Error: ' + err);
+      else {
+         console.log('Created a notification!');
+      }
+   };
+
    Comment.observe('after save', function(ctx, next) {
       var inst = ctx.instance;
 
@@ -25,12 +32,7 @@ module.exports = function(app) {
                         notifiableType: 'comment',
                         messageFrom: inst.username,
                         username: username
-                     }, function(err, res) {
-                        if (err) console.log('Error: ' + err);
-                        else {
-                           console.log('Created a notification!');
-                        }
-                     });
+                     }, report );
 
                      users.push(res[i].username);
                   }
@@ -47,12 +49,7 @@ module.exports = function(app) {
                      notifiableType: 'comment',
                      messageFrom: inst.username,
                      username: username
-                  }, function(err, res) {
-                     if (err) console.log('Error: ' + err);
-                     else {
-                        console.log('Created a notification!');
-                     }
-                  });
+                  }, report);
 
                   users.push(res.username);
                }
