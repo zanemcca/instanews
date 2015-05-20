@@ -24,7 +24,7 @@ module.exports = function(app) {
                      if (err) {
                         console.log('Error pushing notification: ' + err);
                      }
-                     console.log('Pushing notification to ', note.username);
+                     //console.log('Pushing notification to ', note.username);
                   };
 
                   for(var i = 0; i < res.length; i++) {
@@ -48,7 +48,7 @@ module.exports = function(app) {
                         console.log('Unkown device! Not pusing a notification');
                         break;
                      }
-                     console.log('Creating notification: ' + note.toString());
+                     //console.log('Creating notification: ' + note.toString());
 
                      /*
                      Notif.create(note, function(err, notif) {

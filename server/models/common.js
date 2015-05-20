@@ -8,11 +8,13 @@
       console.log('\nDisabling nonStatic remote methods on ' + Model.modelName);
    }*/
 
+    /*
    for(var i = 0; i < list.length; i++) {
       var method = list[i];
       //console.log('\tDisabling ' + method);
       Model.disableRemoteMethod(method, isStatic);
    }
+   */
 };
 
 var initVotes = function(Model) {

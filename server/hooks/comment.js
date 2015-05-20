@@ -7,7 +7,7 @@ module.exports = function(app) {
    var report = function(err,res) {
       if (err) console.log('Error: ' + err);
       else {
-         console.log('Created a notification!');
+         //console.log('Created a notification!');
       }
    };
 
