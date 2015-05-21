@@ -6,12 +6,7 @@
 module.exports = {
    //   #/apps
    endpoint: 'apps',
-   models: [
-   {
-      type: 'apps',
-      name: 'app'
-   }],
-   results: [
+   myResults: [
    {
       request: 'get',
       admin: 200,
@@ -33,7 +28,7 @@ module.exports = {
    children: [
    {
       // #/apps/{id}
-      results: [
+      myResults: [
       {
          request: 'put',
          admin: 200,
@@ -62,7 +57,7 @@ module.exports = {
       {
          // #/apps/{id}/exists
          endpoint: 'exists',
-         results: [
+         myResults: [
          {
             request: 'get',
             all: 200
@@ -72,7 +67,7 @@ module.exports = {
    {
       // #/apps/count
       endpoint: 'count',
-      results: [
+      myResults: [
       {
          request: 'get',
          admin: 200,
@@ -83,7 +78,7 @@ module.exports = {
    {
       // #/apps/findOne
       endpoint: 'findOne',
-      results: [
+      myResults: [
       {
          request: 'get',
          admin: 200,
@@ -94,7 +89,7 @@ module.exports = {
    {
       // #/apps/update
       endpoint: 'update',
-      results: [
+      myResults: [
       {
          request: 'post',
          all: 500

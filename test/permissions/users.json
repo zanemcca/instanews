@@ -1,0 +1,17 @@
+{
+   "admin": {
+      "email": "alice@instanews.com",
+      "username": "alice",
+      "password": "password"
+   },
+   "user": {
+      "email": "bob@instanews.com",
+      "username": "bob",
+      "password": "password"
+   },
+   "diffUser": {
+      "email": "jane@instanews.com",
+      "username": "jane",
+      "password": "password"
+   }
+}

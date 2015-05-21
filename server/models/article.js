@@ -7,11 +7,21 @@ module.exports = function(Article) {
 
    var staticDisable = [
       'exists',
+      'count',
+      'findOne',
       'updateAll'
    ];
 
    var nonStaticDisable = [
       '__delete__comments',
+      '__findById__downVotes',
+      '__updateById__downVotes',
+      '__delete__downVotes',
+      '__destroyById__downVotes',
+      '__findById__upVotes',
+      '__updateById__upVotes',
+      '__delete__upVotes',
+      '__destroyById__upVotes',
       '__create__journalists',
       '__updateById__journalists',
       '__exists__journalists',
