@@ -50,8 +50,11 @@ var findModel = function(type, models) {
 
 var token = {
    id: ''
-}
-//var tests = [];
+};
+var diffUserToken = {
+   id: ''
+};
+
 var models = [];
 
 var testEndpoint = function(oldEndpoint, test, role, next) {
@@ -154,6 +157,34 @@ var testEndpoint = function(oldEndpoint, test, role, next) {
 
 
       /*
+       * This function will add the given model based on the given endpoint
+       * from the diffUser account
+       */
+      var diffUserAddModel = function(model, endpoint, cb) {
+         //Create the model
+         api.post(endpoint)
+         .send(model)
+         .set('Authorization', diffUserToken.id)
+         .expect(200)
+         .end( function(err, res) {
+            //Save the model locally
+            var body = res.body;
+            if(err) {
+               //console.log(err);
+            }
+            if(body.error) {
+               //console.log(body.error);
+            }
+            else {
+               body.type = type;
+               models.push(body);
+            }
+            //console.log('Created a model: ' + JSON.stringify(body));
+            cb(err,res);
+         });
+      };
+
+      /*
        * This function is meant to be recursively called before the
        * execution of each unittest.
        * It will create any models that are needed and it will prepare
@@ -161,11 +192,12 @@ var testEndpoint = function(oldEndpoint, test, role, next) {
        */
       var prepEndpoint = function(ends, count, callback, diffUser) {
          //Ending condition
+         var tempModel = {};
          if(count === ends.length) {
             callback();
          }
          else if( ends[count] === '{id}') {
-            var tempModel = findModel(ends[count-1], models);
+            tempModel = findModel(ends[count-1], models);
 
             if( tempModel && tempModel.id) {
                endpoint += '/' + tempModel.id;
@@ -180,9 +212,8 @@ var testEndpoint = function(oldEndpoint, test, role, next) {
          else {
             type = ends[count];
             endpoint += '/' + type;
-            //Check for a model instance designed specifically for this
-            //testcase
-            var tempModel = findModel(ends[count], test.models);
+            //Check for a model instance designed specifically for this testcase
+            tempModel = findModel(ends[count], test.models);
             if( !tempModel) {
                //Since a model was not given in the test it is assumed
                //that a generic model will suffice
@@ -196,49 +227,8 @@ var testEndpoint = function(oldEndpoint, test, role, next) {
                // user than the one logged in. This is always
                // the case with a guest
                if( diffUser || role === 'guest') {
-                  var credentials = users.diffUser;
-
-                  var tempToken = {};
-                  //Login before the tests are run
-                  api.post('/api/journalists/login')
-                  .send(credentials)
-                  .expect(200)
-                  .end(function(err, res) {
-                     if (err) return callback(err);
-
-                     tempToken = res.body;
-                     expect(tempToken.userId).to.equal(credentials.username);
-
-                     //Create the model
-                     api.post(endpoint)
-                     .send(tempModel)
-                     .set('Authorization', tempToken.id)
-                     .expect(200)
-                     .end( function(err, res) {
-                        //Save the model locally
-                        var body = res.body;
-                        if(err) {
-                          // console.log(err);
-                        }
-                        if(body.error) {
-                         //  console.log(body.error);
-                        }
-                        else {
-                           body.type = type;
-                           models.push(body);
-                        }
-
-                        //console.log('Created a model: ' + JSON.stringify(body));
-
-                        //Logout
-                        api.post('/api/journalists/logout')
-                        .set('Authorization', tempToken.id)
-                        .expect(204)
-                        .end( function(err,res) {
-                           dump(err, res);
-                           prepEndpoint(ends,count + 1,callback, true);
-                        });
-                     });
+                  diffUserAddModel(tempModel, endpoint, function() {
+                     prepEndpoint(ends,count + 1,callback, true);
                   });
                }
                else {
@@ -394,11 +384,39 @@ var testModel = function(tests) {
                   else {
                      Journalists.create(users.user, function(err,res) {
                         if(err) return done(err);
-                        Journalists.create(users.diffUser, done);
+                        Journalists.create(users.diffUser, function(err,res) {
+                           if(err) return done(err);
+
+                           var credentials = users.diffUser;
+                           //Login as the diffUser and save the credentials
+                           api.post('/api/journalists/login')
+                           .send(credentials)
+                           .expect(200)
+                           .end(function(err, res) {
+                              if (err) return callback(err);
+
+                              diffUserToken = res.body;
+                              expect(diffUserToken.userId).to.equal(credentials.username);
+
+                              //console.log('Before Setup was successful');
+                              done(err,res);
+                           });
+                        });
                      });
                   }
                });
             });
+         });
+      });
+
+      after( function (done) {
+         //Logout
+         api.post('/api/journalists/logout')
+         .set('Authorization', diffUserToken.id)
+         .expect(204)
+         .end( function(err,res) {
+            dump(err, res);
+            done(err,res);
          });
       });
 
