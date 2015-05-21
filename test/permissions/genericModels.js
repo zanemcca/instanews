@@ -17,9 +17,11 @@ module.exports = [
 },
 {
    type: 'downVotes',
+   votableType: 'comment'
 },
 {
    type: 'upVotes',
+   votableType: 'comment'
 },
 {
    type: 'journalists',
@@ -36,5 +38,6 @@ module.exports = [
 {
    type: 'comments',
    content: 'Nuts!',
+   commentableType: 'comment',
    date: '2015-02-06T12:48:43.511Z'
 }];

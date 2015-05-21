@@ -4,8 +4,8 @@
  */
 
 module.exports = {
-   //   #/articles
-   endpoint: 'articles',
+   //   #/journalists
+   endpoint: 'journalists',
    theirResults: [
    {
       request: 'get',
@@ -27,7 +27,7 @@ module.exports = {
    }],
    children: [
    {
-      // #/articles/{id}
+      // #/journalists/{id}
       theirResults: [
       {
          request: 'put',
@@ -53,8 +53,8 @@ module.exports = {
       }],
       children: [
       {
-         // #/articles/{id}/comments
-         endpoint: 'comments',
+         // #/journalists/{id}/accessTokens
+         endpoint: 'accessTokens',
          theirResults: [
          {
             request: 'post',
@@ -74,7 +74,7 @@ module.exports = {
          }],
          children: [
          {
-            // #/articles/{id}/comments/{fk}
+            // #/journalists/{id}/accessTokens/{fk}
             theirResults: [
             {
                request: 'put',
@@ -90,7 +90,7 @@ module.exports = {
             }]
          },
          {
-            // #/articles/{id}/comments/count
+            // #/journalists/{id}/accessTokens/count
             endpoint: 'count',
             theirResults: [
             {
@@ -100,7 +100,54 @@ module.exports = {
          }]
       },
       {
-         // #/articles/{id}/downVotes
+         // #/journalists/{id}/articles
+         endpoint: 'articles',
+         theirResults: [
+         {
+            request: 'post',
+            admin: 200,
+            guest: 401,
+            user: 200
+         },
+         {
+            request: 'get',
+            admin: 200,
+            guest: 200,
+            user: 200
+         },
+         {
+            request: 'delete',
+            all: 404
+         }],
+         children: [
+         {
+            // #/journalists/{id}/articles/{fk}
+            theirResults: [
+            {
+               request: 'put',
+               all: 401
+            },
+            {
+               request: 'get',
+               all: 401
+            },
+            {
+               request: 'delete',
+               all: 401
+            }]
+         },
+         {
+            // #/journalists/{id}/articles/count
+            endpoint: 'count',
+            theirResults: [
+            {
+               request: 'get',
+               all: 401
+            }]
+         }]
+      },
+      {
+         // #/journalists/{id}/downVotes
          endpoint: 'downVotes',
          theirResults: [
          {
@@ -119,7 +166,7 @@ module.exports = {
          }],
          children: [
          {
-            // #/articles/{id}/downVotes/{fk}
+            // #/journalists/{id}/downVotes/{fk}
             theirResults: [
             {
                request: 'put',
@@ -135,7 +182,7 @@ module.exports = {
             }]
          },
          {
-            // #/articles/{id}/downVotes/count
+            // #/journalists/{id}/downVotes/count
             endpoint: 'count',
             theirResults: [
             {
@@ -147,7 +194,7 @@ module.exports = {
          }]
       },
       {
-         // #/articles/{id}/exists
+         // #/journalists/{id}/exists
          endpoint: 'exists',
          theirResults: [
          {
@@ -156,8 +203,8 @@ module.exports = {
          }]
       },
       {
-         // #/articles/{id}/journalists
-         endpoint: 'journalists',
+         // #/journalists/{id}/installations
+         endpoint: 'installations',
          theirResults: [
          {
             request: 'post',
@@ -175,7 +222,7 @@ module.exports = {
          }],
          children: [
          {
-            // #/articles/{id}/journalists/{fk}
+            // #/journalists/{id}/installations/{fk}
             theirResults: [
             {
                request: 'put',
@@ -193,39 +240,65 @@ module.exports = {
             }]
          },
          {
-            // #/articles/{id}/journalists/count
+            // #/journalists/{id}/installations/count
             endpoint: 'count',
             theirResults: [
             {
                request: 'get',
                all: 401
             }]
+         }]
+      },
+      {
+         // #/journalists/{id}/notifications
+         endpoint: 'notifications',
+         theirResults: [
+         {
+            request: 'post',
+            all: 404
          },
          {
-            // #/articles/{id}/journalists/rel
-            endpoint: 'rel',
-            children: [
+            request: 'get',
+            admin: 200,
+            guest: 200,
+            user: 200
+         },
+         {
+            request: 'delete',
+            all: 404
+         }],
+         children: [
+         {
+            // #/journalists/{id}/notifications/{fk}
+            theirResults: [
             {
-               // #/articles/{id}/journalists/rel/{fk}
-               theirResults: [
-               {
-                  request: 'head',
-                  all: 404
-               },
-               {
-                  request: 'delete',
-                  all: 404
-               },
-               {
-                  request: 'put',
-                  all: 404
-               }]
+               request: 'put',
+               all: 404
+            },
+            {
+               request: 'get',
+               admin: 401,
+               guest: 401,
+               user: 401
+            },
+            {
+               request: 'delete',
+               all: 404
+            }]
+         },
+         {
+            // #/journalists/{id}/notifications/count
+            endpoint: 'count',
+            theirResults: [
+            {
+               request: 'get',
+               all: 401
             }]
          }]
       },
       {
-         // #/articles/{id}/subarticles
-         endpoint: 'subarticles',
+         // #/journalists/{id}/subarticles
+         endpoint: 'subjournalists',
          theirResults: [
          {
             request: 'post',
@@ -245,7 +318,7 @@ module.exports = {
          }],
          children: [
          {
-            // #/articles/{id}/subarticles/{fk}
+            // #/journalists/{id}/subarticles/{fk}
             theirResults: [
             {
                request: 'put',
@@ -261,7 +334,7 @@ module.exports = {
             }]
          },
          {
-            // #/articles/{id}/subarticles/count
+            // #/journalists/{id}/subarticles/count
             endpoint: 'count',
             theirResults: [
             {
@@ -273,7 +346,7 @@ module.exports = {
          }]
       },
       {
-         // #/articles/{id}/upVotes
+         // #/journalists/{id}/upVotes
          endpoint: 'upVotes',
          theirResults: [
          {
@@ -292,7 +365,7 @@ module.exports = {
          }],
          children: [
          {
-            // #/articles/{id}/upVotes/{fk}
+            // #/journalists/{id}/upVotes/{fk}
             theirResults: [
             {
                request: 'put',
@@ -308,7 +381,7 @@ module.exports = {
             }]
          },
          {
-            // #/articles/{id}/upVotes/count
+            // #/journalists/{id}/upVotes/count
             endpoint: 'count',
             theirResults: [
             {
@@ -321,7 +394,16 @@ module.exports = {
       }]
    },
    {
-      // #/articles/count
+      // #/journalists/confirm
+      endpoint: 'confirm',
+      theirResults: [
+      {
+         request: 'get',
+         all: 404
+      }]
+   },
+   {
+      // #/journalists/count
       endpoint: 'count',
       theirResults: [
       {
@@ -330,7 +412,7 @@ module.exports = {
       }]
    },
    {
-      // #/articles/findOne
+      // #/journalists/findOne
       endpoint: 'findOne',
       theirResults: [
       {
@@ -339,7 +421,34 @@ module.exports = {
       }]
    },
    {
-      // #/articles/update
+      // #/journalists/login
+      endpoint: 'login',
+      theirResults: [
+      {
+         request: 'post',
+         all: 404
+      }]
+   },
+   {
+      // #/journalists/logout
+      endpoint: 'logout',
+      theirResults: [
+      {
+         request: 'post',
+         all: 404
+      }]
+   },
+   {
+      // #/journalists/reset
+      endpoint: 'reset',
+      theirResults: [
+      {
+         request: 'post',
+         all: 404
+      }]
+   },
+   {
+      // #/journalists/update
       endpoint: 'update',
       theirResults: [
       {

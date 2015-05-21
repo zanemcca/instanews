@@ -10,10 +10,18 @@ var RoleMapping = app.models.RoleMapping;
 var AccessToken = app.models.AccessToken;
 var Journalists = app.models.Journalist;
 
-var genericModels = require('./genericModels');
 var users = require('./users.json');
+//Import the genericModels to be used by the testcases
+var genericModels = require('./genericModels');
 var articles = require('./articles');
 var apps = require('./apps');
+var comments = require('./comments');
+var upVotes = require('./upVotes');
+var downVotes = require('./downVotes');
+var subarticles = require('./subarticles');
+var installations = require('./installations');
+var journalists = require('./journalists');
+var storages = require('./storages');
 
 require('it-each')({ testPerIteration: true });
 //require('it-each')();
@@ -501,7 +509,15 @@ var testModel = function(tests) {
 };
 
 exports.run = function() {
+   //TODO Deal with storages as a special case
+   //testModel(storages);
+   testModel(comments);
+   testModel(journalists);
+   testModel(upVotes);
+   testModel(downVotes);
+   testModel(installations);
    testModel(apps);
    testModel(articles);
+   testModel(subarticles);
 };
 

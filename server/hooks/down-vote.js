@@ -11,7 +11,7 @@ module.exports = function(app) {
             console.log('Error: ' + err);
             next(err);
          }
-         else {
+         else if(instance) {
             instance.downVoteCount += 1;
             instance.save( function(err, res) {
                if (err) {
@@ -24,6 +24,10 @@ module.exports = function(app) {
                   next();
                }
             });
+         }
+         else {
+            console.log('Warning: Votable instance was not found');
+            next();
          }
       });
 

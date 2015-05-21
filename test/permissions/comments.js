@@ -4,8 +4,8 @@
  */
 
 module.exports = {
-   //   #/articles
-   endpoint: 'articles',
+   //   #/comments
+   endpoint: 'comments',
    theirResults: [
    {
       request: 'get',
@@ -27,7 +27,7 @@ module.exports = {
    }],
    children: [
    {
-      // #/articles/{id}
+      // #/comments/{id}
       theirResults: [
       {
          request: 'put',
@@ -53,7 +53,14 @@ module.exports = {
       }],
       children: [
       {
-         // #/articles/{id}/comments
+         endpoint: 'commentable',
+         theirResults: [
+         {
+            request: 'get',
+            all: 404
+         }]
+      },
+      {
          endpoint: 'comments',
          theirResults: [
          {
@@ -74,7 +81,6 @@ module.exports = {
          }],
          children: [
          {
-            // #/articles/{id}/comments/{fk}
             theirResults: [
             {
                request: 'put',
@@ -90,7 +96,6 @@ module.exports = {
             }]
          },
          {
-            // #/articles/{id}/comments/count
             endpoint: 'count',
             theirResults: [
             {
@@ -100,7 +105,7 @@ module.exports = {
          }]
       },
       {
-         // #/articles/{id}/downVotes
+         // #/comments/{id}/downVotes
          endpoint: 'downVotes',
          theirResults: [
          {
@@ -119,7 +124,7 @@ module.exports = {
          }],
          children: [
          {
-            // #/articles/{id}/downVotes/{fk}
+            // #/comments/{id}/downVotes/{fk}
             theirResults: [
             {
                request: 'put',
@@ -135,7 +140,7 @@ module.exports = {
             }]
          },
          {
-            // #/articles/{id}/downVotes/count
+            // #/comments/{id}/downVotes/count
             endpoint: 'count',
             theirResults: [
             {
@@ -147,7 +152,7 @@ module.exports = {
          }]
       },
       {
-         // #/articles/{id}/exists
+         // #/comments/{id}/exists
          endpoint: 'exists',
          theirResults: [
          {
@@ -156,124 +161,18 @@ module.exports = {
          }]
       },
       {
-         // #/articles/{id}/journalists
+         // #/comments/{id}/journalists
          endpoint: 'journalists',
          theirResults: [
          {
-            request: 'post',
-            all: 404
-         },
-         {
             request: 'get',
             admin: 200,
             guest: 200,
             user: 200
-         },
-         {
-            request: 'delete',
-            all: 404
          }],
-         children: [
-         {
-            // #/articles/{id}/journalists/{fk}
-            theirResults: [
-            {
-               request: 'put',
-               all: 404
-            },
-            {
-               request: 'get',
-               admin: 401,
-               guest: 401,
-               user: 401
-            },
-            {
-               request: 'delete',
-               all: 404
-            }]
-         },
-         {
-            // #/articles/{id}/journalists/count
-            endpoint: 'count',
-            theirResults: [
-            {
-               request: 'get',
-               all: 401
-            }]
-         },
-         {
-            // #/articles/{id}/journalists/rel
-            endpoint: 'rel',
-            children: [
-            {
-               // #/articles/{id}/journalists/rel/{fk}
-               theirResults: [
-               {
-                  request: 'head',
-                  all: 404
-               },
-               {
-                  request: 'delete',
-                  all: 404
-               },
-               {
-                  request: 'put',
-                  all: 404
-               }]
-            }]
-         }]
       },
       {
-         // #/articles/{id}/subarticles
-         endpoint: 'subarticles',
-         theirResults: [
-         {
-            request: 'post',
-            admin: 200,
-            guest: 401,
-            user: 200
-         },
-         {
-            request: 'get',
-            admin: 200,
-            guest: 200,
-            user: 200
-         },
-         {
-            request: 'delete',
-            all: 404
-         }],
-         children: [
-         {
-            // #/articles/{id}/subarticles/{fk}
-            theirResults: [
-            {
-               request: 'put',
-               all: 401
-            },
-            {
-               request: 'get',
-               all: 401
-            },
-            {
-               request: 'delete',
-               all: 401
-            }]
-         },
-         {
-            // #/articles/{id}/subarticles/count
-            endpoint: 'count',
-            theirResults: [
-            {
-               request: 'get',
-               admin: 200,
-               guest: 200,
-               user: 200
-            }]
-         }]
-      },
-      {
-         // #/articles/{id}/upVotes
+         // #/comments/{id}/upVotes
          endpoint: 'upVotes',
          theirResults: [
          {
@@ -292,7 +191,7 @@ module.exports = {
          }],
          children: [
          {
-            // #/articles/{id}/upVotes/{fk}
+            // #/comments/{id}/upVotes/{fk}
             theirResults: [
             {
                request: 'put',
@@ -308,7 +207,7 @@ module.exports = {
             }]
          },
          {
-            // #/articles/{id}/upVotes/count
+            // #/comments/{id}/upVotes/count
             endpoint: 'count',
             theirResults: [
             {
@@ -321,7 +220,7 @@ module.exports = {
       }]
    },
    {
-      // #/articles/count
+      // #/comments/count
       endpoint: 'count',
       theirResults: [
       {
@@ -330,7 +229,7 @@ module.exports = {
       }]
    },
    {
-      // #/articles/findOne
+      // #/comments/findOne
       endpoint: 'findOne',
       theirResults: [
       {
@@ -339,7 +238,7 @@ module.exports = {
       }]
    },
    {
-      // #/articles/update
+      // #/comments/update
       endpoint: 'update',
       theirResults: [
       {

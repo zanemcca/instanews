@@ -39,7 +39,7 @@ module.exports = function(app) {
             console.log('Error: ' + err);
             next(err);
          }
-         else {
+         else if(instance) {
             if(instance.modelName === 'article') {
                instance.verified = nearBy(
                   ctx.instance.location,
@@ -61,6 +61,10 @@ module.exports = function(app) {
                   next();
                }
             });
+         }
+         else {
+            console.log('Warning: Votable instance was not found');
+            next();
          }
       });
 
