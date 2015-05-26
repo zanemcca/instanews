@@ -73,7 +73,7 @@
   },
   "notif": {
     "dataSource": "Notifications",
-    "public": true
+    "public": false
   },
   "installation": {
     "dataSource": "Installations",
@@ -81,7 +81,7 @@
   },
   "app": {
     "dataSource": "db",
-    "public": true
+    "public": false
   },
   "push": {
     "dataSource": "push",

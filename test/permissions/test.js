@@ -212,7 +212,7 @@ var testEndpoint = function(oldEndpoint, test, role, next) {
                prepEndpoint(ends,count + 1,callback);
             }
             else {
-               console.log('Error: A model should be available for ' + ends[count-1]);
+               //console.log('Warning: A model should be available for ' + ends[count-1]);
                endpoint += '/{id}';
                prepEndpoint(ends,count + 1,callback);
             }
@@ -511,13 +511,14 @@ var testModel = function(tests) {
 exports.run = function() {
    //TODO Deal with storages as a special case
    //testModel(storages);
-   testModel(comments);
-   testModel(journalists);
-   testModel(upVotes);
-   testModel(downVotes);
-   testModel(installations);
+
    testModel(apps);
    testModel(articles);
+   testModel(comments);
+   testModel(downVotes);
+   testModel(upVotes);
+   testModel(installations);
+   testModel(journalists);
    testModel(subarticles);
 };
 

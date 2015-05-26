@@ -9,15 +9,11 @@ module.exports = {
    theirResults: [
    {
       request: 'get',
-      admin: 200,
-      guest: 200,
-      user: 200
+      all: 404
    },
    {
       request: 'put',
-      admin: 200,
-      guest: 401,
-      user: 401
+      all: 404
    },
    {
       request: 'post',
@@ -31,25 +27,21 @@ module.exports = {
       theirResults: [
       {
          request: 'put',
-         all: 401
+         all: 404
       },
       {
          request: 'head',
-         admin: 200,
-         guest: 200,
-         user: 200
+         all: 404
       },
       {
          request: 'get',
          admin: 200,
-         guest: 200,
+         guest: 401,
          user: 200
       },
       {
          request: 'delete',
-         admin: 204,
-         guest: 401,
-         user: 401
+         all: 404
       }],
       children: [
       {
@@ -64,9 +56,7 @@ module.exports = {
          },
          {
             request: 'get',
-            admin: 200,
-            guest: 200,
-            user: 200
+            all: 404
          },
          {
             request: 'delete',
@@ -78,15 +68,15 @@ module.exports = {
             theirResults: [
             {
                request: 'put',
-               all: 401
+               all: 404
             },
             {
                request: 'get',
-               all: 401
+               all: 404
             },
             {
                request: 'delete',
-               all: 401
+               all: 404
             }]
          },
          {
@@ -95,7 +85,7 @@ module.exports = {
             theirResults: [
             {
                request: 'get',
-               all: 401
+               all: 404
             }]
          }]
       },
@@ -105,9 +95,7 @@ module.exports = {
          theirResults: [
          {
             request: 'post',
-            admin: 200,
-            guest: 401,
-            user: 200
+            all: 404
          },
          {
             request: 'get',
@@ -125,15 +113,15 @@ module.exports = {
             theirResults: [
             {
                request: 'put',
-               all: 401
+               all: 404
             },
             {
                request: 'get',
-               all: 401
+               all: 404
             },
             {
                request: 'delete',
-               all: 401
+               all: 404
             }]
          },
          {
@@ -142,7 +130,7 @@ module.exports = {
             theirResults: [
             {
                request: 'get',
-               all: 401
+               all: 404
             }]
          }]
       },
@@ -152,13 +140,11 @@ module.exports = {
          theirResults: [
          {
             request: 'post',
-            admin: 200,
-            user: 200,
-            guest: 401
+            all: 404
          },
          {
             request: 'get',
-            all: 401
+            all: 404
          },
          {
             request: 'delete',
@@ -187,9 +173,7 @@ module.exports = {
             theirResults: [
             {
                request: 'get',
-               admin: 200,
-               user: 200,
-               guest: 401
+               all: 404
             }]
          }]
       },
@@ -212,9 +196,7 @@ module.exports = {
          },
          {
             request: 'get',
-            admin: 200,
-            guest: 200,
-            user: 200
+            all: 404
          },
          {
             request: 'delete',
@@ -230,9 +212,7 @@ module.exports = {
             },
             {
                request: 'get',
-               admin: 401,
-               guest: 401,
-               user: 401
+               all: 404
             },
             {
                request: 'delete',
@@ -245,7 +225,7 @@ module.exports = {
             theirResults: [
             {
                request: 'get',
-               all: 401
+               all: 404
             }]
          }]
       },
@@ -260,8 +240,8 @@ module.exports = {
          {
             request: 'get',
             admin: 200,
-            guest: 200,
-            user: 200
+            guest: 401,
+            user: 401
          },
          {
             request: 'delete',
@@ -273,13 +253,11 @@ module.exports = {
             theirResults: [
             {
                request: 'put',
-               all: 404
+               all: 401
             },
             {
                request: 'get',
-               admin: 401,
-               guest: 401,
-               user: 401
+               all: 404
             },
             {
                request: 'delete',
@@ -292,25 +270,21 @@ module.exports = {
             theirResults: [
             {
                request: 'get',
-               all: 401
+               all: 404
             }]
          }]
       },
       {
          // #/journalists/{id}/subarticles
-         endpoint: 'subjournalists',
+         endpoint: 'subarticles',
          theirResults: [
          {
             request: 'post',
-            admin: 200,
-            guest: 401,
-            user: 200
+            all: 404
          },
          {
             request: 'get',
-            admin: 200,
-            guest: 200,
-            user: 200
+            all: 404
          },
          {
             request: 'delete',
@@ -322,15 +296,15 @@ module.exports = {
             theirResults: [
             {
                request: 'put',
-               all: 401
+               all: 404
             },
             {
                request: 'get',
-               all: 401
+               all: 404
             },
             {
                request: 'delete',
-               all: 401
+               all: 404
             }]
          },
          {
@@ -339,9 +313,7 @@ module.exports = {
             theirResults: [
             {
                request: 'get',
-               admin: 200,
-               guest: 200,
-               user: 200
+               all: 404
             }]
          }]
       },
@@ -351,13 +323,11 @@ module.exports = {
          theirResults: [
          {
             request: 'post',
-            admin: 200,
-            guest: 401,
-            user: 200
+            all: 404
          },
          {
             request: 'get',
-            all: 401
+            all: 404
          },
          {
             request: 'delete',
@@ -386,9 +356,7 @@ module.exports = {
             theirResults: [
             {
                request: 'get',
-               admin: 200,
-               guest: 401,
-               user: 200
+               all: 404
             }]
          }]
       }]
@@ -427,6 +395,13 @@ module.exports = {
       {
          request: 'post',
          all: 404
+      }],
+      myResults: [
+      {
+         request: 'post',
+         admin: 200,
+         user: 200,
+         guest: 404
       }]
    },
    {
@@ -436,6 +411,13 @@ module.exports = {
       {
          request: 'post',
          all: 404
+      }],
+      myResults: [
+      {
+         request: 'post',
+         admin: 200,
+         user: 200,
+         guest: 404
       }]
    },
    {

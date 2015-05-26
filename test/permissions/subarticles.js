@@ -9,21 +9,15 @@ module.exports = {
    theirResults: [
    {
       request: 'get',
-      admin: 200,
-      guest: 200,
-      user: 200
+      all: 404
    },
    {
       request: 'put',
-      admin: 200,
-      guest: 401,
-      user: 401
+      all: 404
    },
    {
       request: 'post',
-      admin: 200,
-      guest: 401,
-      user: 200
+      all: 404
    }],
    children: [
    {
@@ -31,13 +25,11 @@ module.exports = {
       theirResults: [
       {
          request: 'put',
-         all: 401
+         all: 404
       },
       {
          request: 'head',
-         admin: 200,
-         guest: 200,
-         user: 200
+         all: 404
       },
       {
          request: 'get',
@@ -47,9 +39,7 @@ module.exports = {
       },
       {
          request: 'delete',
-         admin: 204,
-         guest: 401,
-         user: 401
+         all: 404
       }],
       children: [
       {
@@ -57,9 +47,7 @@ module.exports = {
          theirResults: [
          {
             request: 'get',
-            admin: 200,
-            guest: 401,
-            user: 200
+            all: 404
          }]
       },
       {
@@ -67,15 +55,11 @@ module.exports = {
          theirResults: [
          {
             request: 'post',
-            admin: 200,
-            guest: 401,
-            user: 200
+            all: 404
          },
          {
             request: 'get',
-            admin: 200,
-            guest: 200,
-            user: 200
+            all: 404
          },
          {
             request: 'delete',
@@ -86,15 +70,15 @@ module.exports = {
             theirResults: [
             {
                request: 'put',
-               all: 401
+               all: 404
             },
             {
                request: 'get',
-               all: 401
+               all: 404
             },
             {
                request: 'delete',
-               all: 401
+               all: 404
             }]
          },
          {
@@ -102,7 +86,7 @@ module.exports = {
             theirResults: [
             {
                request: 'get',
-               all: 401
+               all: 404
             }]
          }]
       },
@@ -112,13 +96,11 @@ module.exports = {
          theirResults: [
          {
             request: 'post',
-            admin: 200,
-            user: 200,
-            guest: 401
+            all: 404
          },
          {
             request: 'get',
-            all: 401
+            all: 404
          },
          {
             request: 'delete',
@@ -147,9 +129,7 @@ module.exports = {
             theirResults: [
             {
                request: 'get',
-               admin: 200,
-               user: 200,
-               guest: 401
+               all: 404
             }]
          }]
       },
@@ -168,19 +148,19 @@ module.exports = {
          theirResults: [
          {
             request: 'get',
-            all: 200
+            all: 404
          },
          {
             request: 'put',
-            all: 200
+            all: 404
          },
          {
             request: 'delete',
-            all: 200
+            all: 404
          },
          {
             request: 'post',
-            all: 200
+            all: 404
          }]
       },
       {
@@ -189,9 +169,7 @@ module.exports = {
          theirResults: [
          {
             request: 'get',
-            admin: 200,
-            guest: 200,
-            user: 200
+            all: 404
          }],
       },
       {
@@ -200,13 +178,11 @@ module.exports = {
          theirResults: [
          {
             request: 'post',
-            admin: 200,
-            guest: 401,
-            user: 200
+            all: 404
          },
          {
             request: 'get',
-            all: 401
+            all: 404
          },
          {
             request: 'delete',
@@ -235,9 +211,7 @@ module.exports = {
             theirResults: [
             {
                request: 'get',
-               admin: 200,
-               guest: 401,
-               user: 200
+               all: 404
             }]
          }]
       }]

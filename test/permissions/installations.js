@@ -9,20 +9,16 @@ module.exports = {
    myResults: [
    {
       request: 'get',
-      admin: 200,
-      guest: 200,
-      user: 200
+      all: 404
    },
    {
       request: 'put',
-      admin: 200,
-      guest: 200,
-      user: 200
+      all: 404
    },
    {
       request: 'post',
       admin: 200,
-      guest: 200,
+      guest: 401,
       user: 200
    }],
    children: [
@@ -31,27 +27,19 @@ module.exports = {
       myResults: [
       {
          request: 'put',
-         admin: 200,
-         guest: 200,
-         user: 200
+         all: 404
       },
       {
          request: 'head',
-         admin: 200,
-         guest: 200,
-         user: 200
+         all: 404
       },
       {
          request: 'get',
-         admin: 200,
-         guest: 200,
-         user: 200
+         all: 404
       },
       {
          request: 'delete',
-         admin: 204,
-         guest: 204,
-         user: 204
+         all: 404
       }],
       children: [
       {
@@ -60,7 +48,7 @@ module.exports = {
          myResults: [
          {
             request: 'get',
-            all: 200
+            all: 404
          }]
       },
       {
@@ -69,7 +57,7 @@ module.exports = {
          myResults: [
          {
             request: 'get',
-            all: 200
+            all: 404
          }]
       }]
    },
@@ -79,9 +67,7 @@ module.exports = {
       myResults: [
       {
          request: 'get',
-         admin: 200,
-         guest: 200,
-         user: 200
+         all: 404
       }]
    },
    {
@@ -90,9 +76,7 @@ module.exports = {
       myResults: [
       {
          request: 'get',
-         admin: 200,
-         guest: 200,
-         user: 200
+         all: 404
       }]
    },
    {
@@ -101,9 +85,7 @@ module.exports = {
       myResults: [
       {
          request: 'get',
-         admin: 200,
-         guest: 200,
-         user: 200
+         all: 404
       }]
    },
    {
@@ -112,9 +94,7 @@ module.exports = {
       myResults: [
       {
          request: 'get',
-         admin: 200,
-         guest: 200,
-         user: 200
+         all: 404
       }]
    },
    {
@@ -123,9 +103,7 @@ module.exports = {
       myResults: [
       {
          request: 'get',
-         admin: 200,
-         guest: 200,
-         user: 200
+         all: 404
       }]
    },
    {
@@ -134,7 +112,7 @@ module.exports = {
       myResults: [
       {
          request: 'post',
-         all: 500
+         all: 404
       }]
    }]
 };
