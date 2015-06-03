@@ -17,9 +17,12 @@ module.exports = {
    },
    {
       request: 'post',
+      all: 422
+         /*
       admin: 200,
       guest: 401,
       user: 200
+      */
    }],
    children: [
    {
@@ -31,12 +34,12 @@ module.exports = {
       },
       {
          request: 'head',
-         all: 404
+         all: 200
       },
       {
          request: 'get',
          admin: 200,
-         guest: 401,
+         guest: 200,
          user: 200
       },
       {
@@ -50,9 +53,7 @@ module.exports = {
          theirResults: [
          {
             request: 'post',
-            admin: 200,
-            guest: 401,
-            user: 200
+            all: 401
          },
          {
             request: 'get',
@@ -239,9 +240,7 @@ module.exports = {
          },
          {
             request: 'get',
-            admin: 200,
-            guest: 401,
-            user: 401
+            all: 401
          },
          {
             request: 'delete',
@@ -387,6 +386,7 @@ module.exports = {
          request: 'get',
          all: 404
       }]
+      /*
    },
    {
       // #/journalists/login
@@ -415,10 +415,11 @@ module.exports = {
       myResults: [
       {
          request: 'post',
-         admin: 200,
-         user: 200,
+         admin: 204,
+         user: 204,
          guest: 404
       }]
+      */
    },
    {
       // #/journalists/reset

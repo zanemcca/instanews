@@ -16,8 +16,8 @@
       "accessType": "EXECUTE",
       "principalType": "ROLE",
       "principalId": "$authenticated",
-      "property": "create",
-      "permission": "ALLOW"
+      "permission": "ALLOW",
+      "property": "create"
     }
   ],
   "methods": []

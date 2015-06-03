@@ -16,6 +16,10 @@ module.exports = [
    }
 },
 {
+   type: 'subarticles',
+   text: 'blah blah blah'
+},
+{
    type: 'downVotes',
    votableType: 'comment'
 },
@@ -25,15 +29,23 @@ module.exports = [
 },
 {
    type: 'journalists',
-   firstName: 'Jane',
+   //noPreCreate: true,
+   firstName: 'Tim',
    lastName: 'Henderson',
-   email: 'jane@instanews.com',
-   username: 'jane',
+   email: 'tim@instanews.com',
+   username: 'tim',
    password: 'password'
 },
 {
    type: 'apps',
    name: 'app'
+},
+{
+   type: 'installations',
+   noPreCreate: true,
+   appId: 1,
+   deviceToken: 1,
+   deviceType: 'android'
 },
 {
    type: 'comments',

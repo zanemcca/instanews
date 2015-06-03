@@ -29,7 +29,7 @@ module.exports = {
       },
       {
          request: 'head',
-         all: 404
+         all: 200
       },
       {
          request: 'get',

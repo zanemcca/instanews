@@ -9,6 +9,8 @@ var Roles =       app.models.Role;
 var RoleMapping = app.models.RoleMapping;
 var AccessToken = app.models.AccessToken;
 var Journalists = app.models.Journalist;
+var Installations = app.models.Installation;
+var Subarticles =  app.models.Subarticle;
 
 var users = require('./users.json');
 //Import the genericModels to be used by the testcases
@@ -27,20 +29,33 @@ require('it-each')({ testPerIteration: true });
 //require('it-each')();
 
 var dump = function(err, res) {
+   /*
    if (err) {
-      //console.log(err);
-
-      if(res && res.body && res.body.error) {
-         console.log('\nName: ' + res.body.error.name + '\tStatus: ' + res.body.error.status);
-         console.log('Message: ' + res.body.error.message);
-         console.log('\n' + res.body.error.stack + '\n');
-      }
-      /*
-      else {
-         console.log(res.body);
-      }
-      */
+      console.log(err);
    }
+   else if(res && res.body && res.body.error) {
+      console.log('\nName: ' + res.body.error.name + '\tStatus: ' + res.body.error.status);
+      console.log('Message: ' + res.body.error.message);
+      console.log('\n' + res.body.error.stack + '\n');
+   }
+   /*
+   else {
+      console.log(res.body);
+   }
+   */
+};
+
+var removeModel = function(model, models) {
+   if( models ) {
+      for(var i = 0; i < models.length; i++) {
+         if(models[i].type === model.type) {
+            models.splice(i,1);
+            return true;
+         }
+      }
+   }
+   //console.log('No model found for ' + type);
+   return false;
 };
 
 var findModel = function(type, models) {
@@ -55,6 +70,14 @@ var findModel = function(type, models) {
    return;
 };
 
+/*
+ * This function will purge the database of anything that could cause problems for the testcases
+ */
+var purgeDB = function(cb) {
+   Installations.destroyAll(function(err) {
+      cb(err);
+   });
+};
 
 var token = {
    id: ''
@@ -62,6 +85,8 @@ var token = {
 var diffUserToken = {
    id: ''
 };
+
+var user = {};
 
 var models = [];
 
@@ -151,7 +176,9 @@ var testEndpoint = function(oldEndpoint, test, role, next) {
                var body = ret.body;
                body.type = type;
                //console.log(JSON.stringify(ret));
-               models.push(body);
+               if(!body.error) {
+                  models.push(body);
+               }
             }
 
             /*
@@ -169,16 +196,14 @@ var testEndpoint = function(oldEndpoint, test, role, next) {
        * from the diffUser account
        */
       var diffUserAddModel = function(model, endpoint, cb) {
-         //Create the model
-         api.post(endpoint)
-         .send(model)
-         .set('Authorization', diffUserToken.id)
-         .expect(200)
-         .end( function(err, res) {
+
+         var handleResult =  function(err, res) {
+
+            dump(err, res);
             //Save the model locally
             var body = res.body;
-            if(err) {
-               //console.log(err);
+            if(!body) {
+               body = res;
             }
             if(body.error) {
                //console.log(body.error);
@@ -187,9 +212,70 @@ var testEndpoint = function(oldEndpoint, test, role, next) {
                body.type = type;
                models.push(body);
             }
+
             //console.log('Created a model: ' + JSON.stringify(body));
-            cb(err,res);
-         });
+            cb(err, res);
+         };
+
+         if( model.type === 'subarticles') {
+            model.username = users.diffUser.username;
+            Subarticles.create(model, handleResult);
+         }
+         else {
+            api.post(endpoint)
+            .send(model)
+            .set('Authorization', diffUserToken.id)
+            .expect(200)
+            .end( handleResult);
+         }
+      };
+
+      /*
+       * This function will clear all models that the current test has created
+       */
+      var clearEndpoint =  function(endpoint, ends, count, callback, diffUser) {
+         if(count ===  ends.length) {
+            callback();
+         }
+         else{
+            endpoint += '/' + ends[count];
+
+            var tempModel = findModel(ends[count], models);
+
+            if(tempModel) {
+
+               var id;
+               if(role === 'guest' || diffUser) {
+                  id = diffUserToken.id;
+               }
+               else {
+                  id = token.id;
+               }
+
+               //console.log('Deleting a model: ' + JSON.stringify(tempModel));
+               if( tempModel.type === 'journalists') {
+                  Journalists.deleteById(tempModel.username, function(err, res) {
+                     dump(err, res);
+                     removeModel(tempModel, models);
+                     clearEndpoint(endpoint, ends, count + 1, callback);
+                  });
+               }
+               else {
+                  api.delete(endpoint)
+                  .send(tempModel)
+                  .set('Authorization', id)
+                  .end( function(err, res) {
+
+                     dump(err, res);
+                     removeModel(tempModel, models);
+                     clearEndpoint(endpoint, ends, count +1, callback);
+                  });
+               }
+            }
+            else {
+               clearEndpoint(endpoint, ends, count +1, callback);
+            }
+         }
       };
 
       /*
@@ -207,8 +293,18 @@ var testEndpoint = function(oldEndpoint, test, role, next) {
          else if( ends[count] === '{id}') {
             tempModel = findModel(ends[count-1], models);
 
-            if( tempModel && tempModel.id) {
-               endpoint += '/' + tempModel.id;
+            if( tempModel ) {
+               if( tempModel.id ) {
+                  endpoint += '/' + tempModel.id;
+               }
+               else if( tempModel.username ) {
+                  endpoint += '/' + tempModel.username;
+               }
+               else {
+                  endpoint += '/{id}';
+                  console.log('Warning: Model was found but has an invalid id');
+               }
+
                prepEndpoint(ends,count + 1,callback);
             }
             else {
@@ -230,37 +326,55 @@ var testEndpoint = function(oldEndpoint, test, role, next) {
 
             if( tempModel ) {
 
-               //Check if the test is requesting for the
-               // models used to be created by a different
-               // user than the one logged in. This is always
-               // the case with a guest
-               if( diffUser || role === 'guest') {
-                  diffUserAddModel(tempModel, endpoint, function() {
-                     prepEndpoint(ends,count + 1,callback, true);
-                  });
-               }
-               else {
-                  //Create a model for every time {id} shows up
-                  //console.log('Creating a model: ' + JSON.stringify(tempModel));
-                  //console.log('At ' + endpoint);
-                  api.post(endpoint)
-                  .send(tempModel)
-                  .set('Authorization', token.id)
-                  .end( function(err, res) {
-                     //Save the model locally
-                     var body = res.body;
-                     if(body.error) {
-                        //console.log(body.error);
+               if( !tempModel.noPreCreate ) {
+
+                  //Check if the test is requesting for the
+                  // models used to be created by a different
+                  // user than the one logged in. This is always
+                  // the case with a guest
+                  if(diffUser || role === 'guest') {
+                     diffUserAddModel(tempModel, endpoint, function() {
+                        prepEndpoint(ends,count + 1,callback, true);
+                     });
+                  }
+                  else{
+
+                     var handleResult =  function(err, res) {
+                        //Save the model locally
+                        var body = res.body;
+                        if(!body) {
+                           body = res;
+                        }
+                        if(body.error) {
+                           //console.log(body.error);
+                        }
+                        else {
+                           body.type = type;
+                           models.push(body);
+                        }
+
+                        //console.log('Created a model: ' + JSON.stringify(body));
+                        dump(err, res);
+                        prepEndpoint(ends,count + 1,callback);
+                     };
+
+                     if( tempModel.type === 'subarticles') {
+                        tempModel.username = user.username;
+                        Subarticles.create(tempModel, handleResult);
                      }
                      else {
-                        body.type = type;
-                        models.push(body);
+                        api.post(endpoint)
+                        .send(tempModel)
+                        .set('Authorization', token.id)
+                        .end( handleResult);
                      }
-
-                     //console.log('Created a model: ' + JSON.stringify(body));
-                     dump(err, res);
-                     prepEndpoint(ends,count + 1,callback);
-                  });
+                     //Create a model for every time {id} shows up
+                     //console.log('Creating a model: ' + JSON.stringify(tempModel));
+                     //console.log('At ' + endpoint);
+                  }
+               }
+               else{
+                  prepEndpoint(ends, count + 1, callback);
                }
             }
             else {
@@ -279,12 +393,15 @@ var testEndpoint = function(oldEndpoint, test, role, next) {
             models = [];
             var ends = endpoint.split('/');
             endpoint = ends[0];
-            prepEndpoint(ends,1,done);
+            purgeDB( function(err) {
+               if(err) return done(err);
+               prepEndpoint(ends,1,done);
+            });
          });
 
          afterEach( function(done) {
-            //TODO  Destroy models
-            done();
+            var ends = endpoint.split('/');
+            clearEndpoint(ends[0], ends,1,done);
          });
 
          if( test.myResults) {
@@ -304,12 +421,15 @@ var testEndpoint = function(oldEndpoint, test, role, next) {
             models = [];
             var ends = endpoint.split('/');
             endpoint = ends[0];
-            prepEndpoint(ends,1,done, true);
+            purgeDB( function(err) {
+               if(err) return done(err);
+               prepEndpoint(ends,1,done, true);
+            });
          });
 
          afterEach( function(done) {
-            //TODO  Destroy models
-            done();
+            var ends = endpoint.split('/');
+            clearEndpoint(ends[0], ends,1,done, true);
          });
 
          if( test.theirResults) {
@@ -401,7 +521,7 @@ var testModel = function(tests) {
                            .send(credentials)
                            .expect(200)
                            .end(function(err, res) {
-                              if (err) return callback(err);
+                              if (err) return done(err);
 
                               diffUserToken = res.body;
                               expect(diffUserToken.userId).to.equal(credentials.username);
@@ -432,6 +552,7 @@ var testModel = function(tests) {
       describe('admin', function() {
          var role = 'admin';
          var credentials = users.admin;
+         user = credentials;
 
          //Login before the tests are run
          before( function(done) {
@@ -467,6 +588,7 @@ var testModel = function(tests) {
       describe('user', function() {
          var role = 'user';
          var credentials = users.user;
+         user = credentials;
 
          //Login before the tests are run
          before( function(done) {
