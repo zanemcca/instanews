@@ -9,6 +9,17 @@ module.exports = function(app) {
 
       if (inst && ctx.isNewInstance) {
          inst.modelName = 'subarticle';
+         if ( inst._file ) {
+            if ( inst._file.type === 'video') {
+               //console.log('Saving a video');
+               if ( !inst._file.poster ) {
+                  inst._file.poster = 'img/ionic.png';
+               }
+            }
+            else {
+               //console.log('Saving some other media type');
+            }
+         }
       }
 
       next();

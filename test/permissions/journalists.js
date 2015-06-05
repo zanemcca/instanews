@@ -246,6 +246,15 @@ module.exports = {
             request: 'delete',
             all: 404
          }],
+         /*
+         myResults: [
+         {
+            request: 'get',
+            admin: 200,
+            user: 200,
+            guest: 401
+         }],
+         */
          children: [
          {
             // #/journalists/{id}/notifications/{fk}
@@ -261,7 +270,16 @@ module.exports = {
             {
                request: 'delete',
                all: 404
+            }],
+            /*
+            myResults: [
+            {
+               request: 'put',
+               admin: 200,
+               user: 200,
+               guest: 401
             }]
+            */
          },
          {
             // #/journalists/{id}/notifications/count
@@ -386,7 +404,23 @@ module.exports = {
          request: 'get',
          all: 404
       }]
-      /*
+   },
+   /*
+   {
+      // #/journalists/logout
+      endpoint: 'logout',
+      theirResults: [
+      {
+         request: 'post',
+         all: 404
+      }],
+      myResults: [
+      {
+         request: 'post',
+         admin: 204,
+         user: 204,
+         guest: 404
+      }]
    },
    {
       // #/journalists/login
@@ -404,23 +438,7 @@ module.exports = {
          guest: 404
       }]
    },
-   {
-      // #/journalists/logout
-      endpoint: 'logout',
-      theirResults: [
-      {
-         request: 'post',
-         all: 404
-      }],
-      myResults: [
-      {
-         request: 'post',
-         admin: 204,
-         user: 204,
-         guest: 404
-      }]
-      */
-   },
+   */
    {
       // #/journalists/reset
       endpoint: 'reset',

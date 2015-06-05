@@ -14,7 +14,7 @@ var Subarticles =  app.models.Subarticle;
 
 var users = require('./users.json');
 //Import the genericModels to be used by the testcases
-var genericModels = require('./genericModels');
+var genericModels = require('../genericModels');
 var articles = require('./articles');
 var apps = require('./apps');
 var comments = require('./comments');
@@ -28,48 +28,9 @@ var storages = require('./storages');
 require('it-each')({ testPerIteration: true });
 //require('it-each')();
 
-var dump = function(err, res) {
-   /*
-   if (err) {
-      console.log(err);
-   }
-   else if(res && res.body && res.body.error) {
-      console.log('\nName: ' + res.body.error.name + '\tStatus: ' + res.body.error.status);
-      console.log('Message: ' + res.body.error.message);
-      console.log('\n' + res.body.error.stack + '\n');
-   }
-   /*
-   else {
-      console.log(res.body);
-   }
-   */
-};
-
-var removeModel = function(model, models) {
-   if( models ) {
-      for(var i = 0; i < models.length; i++) {
-         if(models[i].type === model.type) {
-            models.splice(i,1);
-            return true;
-         }
-      }
-   }
-   //console.log('No model found for ' + type);
-   return false;
-};
-
-var findModel = function(type, models) {
-   if( models ) {
-      for(var i = 0; i < models.length; i++) {
-         if(models[i].type === type) {
-            return models[i];
-         }
-      }
-   }
-   //console.log('No model found for ' + type);
-   return;
-};
-
+var dump =  common.dump;
+var removeModel = common.removeModel;
+var findModel = common.findModel;
 /*
  * This function will purge the database of anything that could cause problems for the testcases
  */
@@ -256,7 +217,7 @@ var testEndpoint = function(oldEndpoint, test, role, next) {
                if( tempModel.type === 'journalists') {
                   Journalists.deleteById(tempModel.username, function(err, res) {
                      dump(err, res);
-                     removeModel(tempModel, models);
+                     models = removeModel(tempModel, models);
                      clearEndpoint(endpoint, ends, count + 1, callback);
                   });
                }
@@ -267,7 +228,7 @@ var testEndpoint = function(oldEndpoint, test, role, next) {
                   .end( function(err, res) {
 
                      dump(err, res);
-                     removeModel(tempModel, models);
+                     models = removeModel(tempModel, models);
                      clearEndpoint(endpoint, ends, count +1, callback);
                   });
                }

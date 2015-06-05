@@ -41,6 +41,10 @@ module.exports = [
    name: 'app'
 },
 {
+   type: 'notifications',
+   message: 'Generic notification'
+},
+{
    type: 'installations',
    noPreCreate: true,
    appId: 1,

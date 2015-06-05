@@ -4,8 +4,6 @@ module.exports = function(app) {
 
    DownVote.observe('after save', function(ctx, next) {
 
-
-      //ctx.instance.__get__votable( function(err, instance) {
       ctx.instance.votable( function(err, instance) {
          if(err) {
             console.log('Error: ' + err);
@@ -19,6 +17,9 @@ module.exports = function(app) {
                   next(err);
                }
                else {
+                  // ????? I dont think we need to be updating the
+                  // downvote object.
+                  // Check the front end before taking it out
                   ctx.instance.downVoteCount = instance.downVoteCount;
                   ctx.instance.rating = res.rating;
                   next();

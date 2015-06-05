@@ -17,14 +17,14 @@ module.exports = function(app) {
       //List of already notified users
       var users = [];
 
-      var notify = function(message, id, res) {
+      var notify = function(message, id, models) {
          var username;
-         if(res) {
-            if( res.length ) {
-               for(var i = 0; i < res.length; i++) {
-                  if( users.indexOf(res[i].username) === -1) {
-                     username = res[i].username;
-                     console.log('Starting push to '+ username +'...');
+         if(models) {
+            if( models.length ) {
+               for(var i = 0; i < models.length; i++) {
+                  if( users.indexOf(models[i].username) === -1) {
+                     username = models[i].username;
+                     //console.log('Starting push to '+ username +'...');
 
                      Notification.create({
                         message: message,
@@ -34,14 +34,14 @@ module.exports = function(app) {
                         username: username
                      }, report );
 
-                     users.push(res[i].username);
+                     users.push(models[i].username);
                   }
                }
             }
             else {
-               if( users.indexOf(res.username) === -1) {
-                  username = res.username;
-                  console.log('Starting push to '+ username +'...');
+               if( users.indexOf(models.username) === -1) {
+                  username = models.username;
+                  //console.log('Starting push to '+ username +'...');
 
                   Notification.create({
                      message: message,
@@ -51,9 +51,12 @@ module.exports = function(app) {
                      username: username
                   }, report);
 
-                  users.push(res.username);
+                  users.push(models.username);
                }
             }
+         }
+         else {
+            console.log('Invalid models! Cannot create a notification');
          }
       };
 
@@ -78,6 +81,7 @@ module.exports = function(app) {
                   else {
                      var message = inst.username +
                         ' commented on an article you contributed to';
+
                      notify(message, inst.id, res);
                   }
                });

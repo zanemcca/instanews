@@ -50,24 +50,6 @@ module.exports = function(app) {
                      }
                      //console.log('Creating notification: ' + note.toString());
 
-                     /*
-                     Notif.create(note, function(err, notif) {
-                        if(err) console.log('Error: ' + err);
-                        else {
-                           //Push the notification
-                           Push.notifyById(notif.installationId,
-                           notif,
-                           function(err) {
-                              if (err) {
-                                 console.log('Error pushing notification: '
-                                 + err);
-                              }
-                              console.log('Pushing notification to ',
-                              note.username);
-                           });
-                        }
-                     });
-                        */
                      //Push the notification
                      Push.notifyById(res[i].id , note, report);
                   }
@@ -83,6 +65,10 @@ module.exports = function(app) {
 
    Notification.observe('before save', function(ctx, next) {
       var note = ctx.instance;
+      if(!note) {
+         note = ctx.data;
+      }
+
       if (note) {
          if(ctx.isNewInstance) {
             note.date = Date.now();

@@ -1,0 +1,46 @@
+
+/*jshint expr: true*/
+
+var expect = require('chai').expect;
+
+var common =  require('../common');
+var app = common.app;
+
+var Articles = app.models.Article;
+var DownVotes = app.models.DownVote;
+
+var genericModels = require('../genericModels');
+
+exports.run = function() {
+   describe('DownVote', function() {
+      var article = common.findModel('articles', genericModels);
+      if(!article) {
+         console.log('Error: Article model is invalid so the following tests will likely fail!');
+      }
+
+      it('should update the downVoteCount of the artcle voted on', function(done) {
+         Articles.create(article, function(err, res) {
+
+            if(err) return done(err);
+            expect(res).to.exist;
+
+            DownVotes.create({
+               votableType: 'article',
+               votableId: res.id
+            }, function(err, vote) {
+
+               if(err) return done(err);
+               expect(vote).to.exist;
+
+               Articles.findById(res.id, function(err,res) {
+                  if(err) return done(err);
+                  expect(res).to.exist;
+                  expect(res.downVoteCount).to.equal(1);
+                  done();
+               });
+            });
+
+         });
+      });
+   });
+};

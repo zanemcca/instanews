@@ -1,3 +1,3 @@
 
-var test = require('./permissions/test');
-test.run();
+//require('./permissions/test').run();
+require('./hooks/test').run();

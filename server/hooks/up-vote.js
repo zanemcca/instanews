@@ -32,8 +32,6 @@ module.exports = function(app) {
 
    UpVote.observe('after save', function(ctx, next) {
 
-
-      //ctx.instance.__get__votable( function(err, instance) {
       ctx.instance.votable( function(err, instance) {
          if(err) {
             console.log('Error: ' + err);
