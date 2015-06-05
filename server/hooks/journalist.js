@@ -28,7 +28,7 @@ module.exports = function(app) {
    Journalist.observe('access', function(ctx, next) {
       ctx.query.fields = {
          email: false,
-         password: false
+//         password: false
       };
       next();
    });

@@ -50,12 +50,19 @@ exports.run = function() {
 
             expect(res).to.exist;
 
-            Journalists.findById(res.username, function(err, res) {
+            /*
+             * The password does not get stripped until exiting the server
+             * so using supertest is needed
+             */
+            api.get('/api/journalists/' + journalist.username)
+            .expect(200)
+            .end( function(err, res) {
                if(err) return done(err);
 
                expect(res).to.exist;
-               expect(res.email).to.be.undefined;
-               expect(res.password).to.be.undefined;
+               expect(res.body).to.exist;
+               expect(res.body.email).to.be.undefined;
+               expect(res.body.password).to.be.undefined;
                done();
             });
 

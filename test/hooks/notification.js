@@ -32,7 +32,7 @@ exports.run = function() {
             if(err) return done(err);
 
             expect(res).to.exist;
-            expect(res.date).to.exist;
+            expect(res.date).to.equalDate(new Date());
             expect(res.modified).to.exist;
 
             var date = res.modified;
@@ -46,7 +46,7 @@ exports.run = function() {
                   expect(notif.date).to.equal(res.date);
                   expect(notif.modified).to.be.afterTime(date);
                   done();
-               })
+               });
             }, 10);
          });
       });

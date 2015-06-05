@@ -1,11 +1,14 @@
 
 /*jshint expr: true*/
-var expect = require('chai').expect;
+var chai = require('chai');
+chai.use(require('chai-datetime'));
+var expect = chai.expect;
 
 var common =  require('../common');
 var app = common.app;
 
 var Articles = app.models.Article;
+var UpVotes = app.models.UpVote;
 
 var genericModels = require('../genericModels');
 
@@ -17,17 +20,46 @@ exports.run = function() {
 
    describe('Votes', function() {
       it('should have initialized properly', function(done) {
-         Articles.create(article, function(err, res) {
-            expect(!err);
-            expect(res);
-            expect(res.upVoteCount === 0);
-            expect(res.downVoteCount === 0);
-            //Maybe make this a bit more specific
-            expect(res.date);
-            done(err);
+         Articles.create(article, function(err, art) {
+            if(err) return done(err);
+            expect(art).to.exist;
+            expect(art.upVoteCount).to.equal(0);
+            expect(art.downVoteCount).to.equal(0);
+            expect(art.date).to.equalDate(new Date());
+            expect(art.modified).to.equalDate(new Date());
+
+            done();
          });
       });
 
-      //TODO Check that the modification date and rating get updated properly
+      it('should update the rating and modified date but not the original date', function(done) {
+         Articles.create(article, function(err, art) {
+            if(err) return done(err);
+            expect(art).to.exist;
+            expect(art.upVoteCount).to.equal(0);
+            expect(art.downVoteCount).to.equal(0);
+            expect(art.date).to.equalDate(new Date());
+
+            UpVotes.create({
+               votableType: 'article',
+               votableId: art.id
+            }, function(err, res) {
+               if(err) return done(err);
+
+               expect(res).to.exist;
+
+               Articles.findById(res.votableId, function(err, res) {
+                  if(err) return done(err);
+
+                  expect(res).to.exist;
+                  expect(res.rating).to.be.above(art.rating);
+                  expect(res.modified).to.be.above(art.modified);
+                  expect(res.date).to.equalTime(art.date);
+                  done();
+               });
+
+            });
+         });
+      });
    });
 };

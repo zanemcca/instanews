@@ -21,7 +21,6 @@ exports.run = function() {
       require('./installation').run();
       require('./journalist').run();
       require('./notification').run();
-
       require('./subarticle').run();
       require('./up-vote').run();
       require('./vote').run();

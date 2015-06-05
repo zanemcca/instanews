@@ -5,6 +5,7 @@ var expect = require('chai').expect;
 
 var common =  require('../common');
 var app = common.app;
+var runTillDone = common.runTillDone;
 
 var Articles = app.models.Article;
 var Subarticles = app.models.Subarticle;
@@ -12,45 +13,6 @@ var Comments = app.models.Comment;
 var Notifications = app.models.notif;
 
 var genericModels = require('../genericModels');
-
-/*
- * This function will run the given function at the given
- * interval until the function either calls the stop
- * callback function or the given timeout occurs.
- * The given callback function will be called once the
- * loop stops
- */
-var runTillDone = function(func, cb, interval, timeout) {
-   if(!interval) {
-      //Default interval is 10 milliseconds
-      interval = 10;
-   }
-   if(!timeout) {
-      //Default timeout is 1 seconds
-      timeout = 1000;
-   }
-
-   var intervalFunc = setInterval(function() {
-      func(stop);
-   }, interval);
-
-   var timeoutFunc = setTimeout( function() {
-      clearInterval(intervalFunc);
-      console.log('The function has timed out!');
-      expect(false).to.be.true;
-      cb();
-   }, timeout);
-
-   var done = false;
-   var stop = function() {
-      if(!done) {
-         done = true;
-         clearTimeout(timeoutFunc);
-         clearInterval(intervalFunc);
-         cb();
-      }
-   };
-};
 
 exports.run = function() {
 
@@ -278,12 +240,22 @@ exports.run = function() {
                            }, function(err, res) {
                               if(!err && res && res.length > 0) {
                                  expect(res.length).to.equal(2);
-                                 expect(res[0].username).to.equal('jane');
-                                 expect(res[0].message).to
-                              .equal('alice commented on your comment');
-                                 expect(res[1].username).to.equal('bob');
-                                 expect(res[1].message).to
-                              .equal('alice commented on a comment stream that you are part of');
+                                 if(res[0].username === 'jane') {
+                                    expect(res[0].username).to.equal('jane');
+                                    expect(res[0].message).to
+                                    .equal('alice commented on your comment');
+                                    expect(res[1].username).to.equal('bob');
+                                    expect(res[1].message).to
+                                    .equal('alice commented on a comment stream that you are part of');
+                                 }
+                                 else {
+                                    expect(res[1].username).to.equal('jane');
+                                    expect(res[1].message).to
+                                    .equal('alice commented on your comment');
+                                    expect(res[0].username).to.equal('bob');
+                                    expect(res[0].message).to
+                                    .equal('alice commented on a comment stream that you are part of');
+                                 }
                                  stop();
                               }
                            });

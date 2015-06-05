@@ -5,6 +5,8 @@ var supertest = require('supertest'),
     api = supertest(app),
     assert = require('assert');
 
+var expect = require('chai').expect;
+
 function importTest(name, path) {
    describe(name, function () {
       require(path);
@@ -53,6 +55,46 @@ var findModel = function(type, models) {
    return;
 };
 
+/*
+ * This function will run the given function at the given
+ * interval until the function either calls the stop
+ * callback function or the given timeout occurs.
+ * The given callback function will be called once the
+ * loop stops
+ */
+var runTillDone = function(func, cb, interval, timeout) {
+   if(!interval) {
+      //Default interval is 10 milliseconds
+      interval = 10;
+   }
+   if(!timeout) {
+      //Default timeout is 1 seconds
+      timeout = 1000;
+   }
+
+   var intervalFunc = setInterval(function() {
+      func(stop);
+   }, interval);
+
+   var timeoutFunc = setTimeout( function() {
+      /*jshint expr: true*/
+      clearInterval(intervalFunc);
+      console.log('The function has timed out!');
+      expect(false).to.be.true;
+      cb();
+   }, timeout);
+
+   var done = false;
+   var stop = function() {
+      if(!done) {
+         done = true;
+         clearTimeout(timeoutFunc);
+         clearInterval(intervalFunc);
+         cb();
+      }
+   };
+};
+
 exports.assert = assert;
 exports.app = app;
 exports.api = api;
@@ -60,3 +102,4 @@ exports.importTest = importTest;
 exports.dump = dump;
 exports.findModel = findModel;
 exports.removeModel = removeModel;
+exports.runTillDone = runTillDone;

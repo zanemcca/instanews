@@ -16,13 +16,14 @@ module.exports = function(app) {
             inst.id = null;
             inst.upVoteCount = 0;
             inst.downVoteCount = 0;
-            inst.date = Date.now();
+            inst.date = new Date();
          }
 
          //Update the rating
          inst.rating = getRating(inst);
          //Update the modification date
-         inst.lastUpdated = Date.now();
+         inst.lastUpdated = new Date();
+         inst.modified = new Date();
       }
 
       next();
