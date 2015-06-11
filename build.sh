@@ -1,1 +1,1 @@
-sudo docker build -t instanews .
+docker build -t instanews .
