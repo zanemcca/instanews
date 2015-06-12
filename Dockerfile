@@ -20,7 +20,7 @@ RUN cd /src; \
   npm install; \
   rm server/boot/explorer.js; \
   rm -r client; \
-  rm -r test; ls -alrt
+  rm -r test
 
 # Install strongloop
 #RUN npm install -g strongloop

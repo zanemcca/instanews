@@ -15,8 +15,9 @@ test:
    override:
       - docker run -t -d -p 3000:3000 -name insta instanews
 
-deployment:
-   staging:
-     branch: /staging*/
-     commands:
-        - ./hello_world.sh
+#deployment:
+#   staging:
+      # Run for all branches that start with 'staging'
+#     branch: /staging*/
+#     commands:
+#        - ./hello_world.sh

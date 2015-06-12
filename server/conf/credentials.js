@@ -28,7 +28,7 @@ module.exports.mongoEast = decrypt(mongoEast);
 var aws = readFile('.credentials/aws.crypt');
 module.exports.aws = decrypt(aws);
 
-if( true ) {
+if( false ) {
   console.log('apnsCert: ' + module.exports.apnsCert); 
   console.log('apnsKey: ' + module.exports.apnsKey); 
   console.log('gcmServerApiKey: ' + module.exports.gcmServerApiKey); 
