@@ -35,4 +35,4 @@ EXPOSE 3443
 
 # Run the application
 #CMD cd /src && slc run
-CMD cd /src && DEBUG=loopback:* npm test 
+CMD cd /src && npm test 
