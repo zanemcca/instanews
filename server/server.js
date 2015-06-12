@@ -1,3 +1,4 @@
+var setupPush = require('./pushSetup.js');
 var loopback = require('loopback');
 var boot = require('loopback-boot');
 var path = require('path');
@@ -19,7 +20,7 @@ app.use(loopback.static(path.resolve(__dirname, '../client/www/')));
 boot(app, __dirname);
 
 //Setup the push server
-require('./pushSetup.js')(app);
+setupPush(app);
 //Setup all the back end hooks
 require('./hooks/hookSetup.js')(app);
 

@@ -2,6 +2,9 @@ node_modules/
 .strong-pm/
 *npm-debug.log
 strongloop.json
+
+server/conf/.credentials/unencrypted/
+
 client/platforms/
 client/engine/
 client/plugins/
