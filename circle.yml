@@ -1,7 +1,10 @@
 machine:
    services:
       - docker
+	environment: 
+		NODE_ENV: staging
 
+# Replace the Dockerfile with a staging version 
 checkout:
    post: 
       - mv .Dockerfile Dockerfile
@@ -14,6 +17,7 @@ dependencies:
 test:
    override:
       - docker run -t -d -p 3000:3000 -name insta instanews
+		- npm test
 
 #deployment:
 #   staging:
