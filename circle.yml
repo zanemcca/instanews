@@ -2,6 +2,10 @@ machine:
    services:
       - docker
 
+checkout:
+   post: 
+      - mv .Dockerfile Dockerfile
+
 dependencies:
    override:
       - npm install
@@ -10,11 +14,9 @@ dependencies:
 test:
    override:
       - docker run -t -d -p 3000:3000 -name insta instanews
-      - npm test 
 
 deployment:
-  hub:
-    branch: master
-    commands:
-      - $DEPLOY
-      - $DEPLOY2
+   staging:
+     branch: /staging*/
+     commands:
+        - ./hello_world.sh

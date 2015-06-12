@@ -29,7 +29,8 @@ RUN cd /src; \
 RUN ln -s /usr/bin/nodejs /usr/bin/node
 
 # Prepare for production
-ENV NODE_ENV production 
+ENV NODE_ENV staging 
+ENV ENCRYPT_PASSWORD  couchesareabit2fly4me
 
 # expose our port
 EXPOSE 3000
@@ -37,4 +38,4 @@ EXPOSE 3443
 
 # Run the application
 #CMD cd /src && slc run
-CMD cd /src && DEBUG=loopback:* node server/server.js 
+CMD cd /src && DEBUG=loopback:* npm test 
