@@ -13,8 +13,12 @@ test:
       - npm test 
 
 deployment:
-  hub:
-    branch: master
-    commands:
-      - $DEPLOY
-      - $DEPLOY2
+   preProduction:
+     branch: /staging*/
+     commands:
+        - ./hello_world.sh
+#  hub:
+#    branch: master
+#    commands:
+#      - $DEPLOY
+#      - $DEPLOY2
