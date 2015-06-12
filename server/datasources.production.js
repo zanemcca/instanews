@@ -48,7 +48,8 @@ module.exports = {
   Storage: {
     name: 'Storage',
     connector: 'loopback-component-storage',
-    provider: 'filesystem',
-    root: './server/storage'
+    provider: 'amazon',
+    key: cred.aws.key ,
+    keyId: cred.aws.keyId
   }
-}
+};

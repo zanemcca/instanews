@@ -93,6 +93,23 @@ prompt.get([
       }
       encryptObject('mongoEast', res);
 
+      console.log('AWS Credentials:');
+      prompt.get([
+        {
+          name: 'key',
+          hidden: true
+        },
+        {
+          name: 'keyId',
+          hidden: true
+        }], function(err, res) {
+        if (err) {
+          console.error(err);
+        }
+
+        encryptObject('aws', res);
+      });
+
     });
 
   });

@@ -12,13 +12,6 @@ module.exports = function (app) {
    var apnsCertData = cred.apnsCertData;
    var apnsKeyData = cred.apnsKeyData;
 
-   //TODO Keep this key private
-   /*
-   var gcmServerApiKey = 'AIzaSyBPBlcVkSFmWc2_BxXs0OsWxJ7V5mSIEjQ';
-   var apnsCertData = readCredentialsFile('apnsCertDev.pem');
-   var apnsKeyData = readCredentialsFile('apnsKeyDev.pem');
-   */
-
    function startPushServer() {
 
       Push.on('error', function (err) {
