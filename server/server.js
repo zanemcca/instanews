@@ -64,4 +64,6 @@ if (require.main === module) {
 }
 
 //export the app for testing
-exports = module.exports = app;
+if( process.env.NODE_ENV !== 'production') {
+  exports = module.exports = app;
+}

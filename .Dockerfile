@@ -37,4 +37,4 @@ EXPOSE 3443
 
 # Run the application
 #CMD cd /src && slc run
-CMD cd /src && DEBUG=loopback:* node server/server.js 
+CMD cd /src && DEBUG=loopback:* npm test 

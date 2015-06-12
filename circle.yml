@@ -17,7 +17,7 @@ dependencies:
 test:
    override:
       - docker run -t -d -p 3000:3000 -name insta instanews
-      - npm test
+#      - npm test
 
 #deployment:
 #   staging:

@@ -1,7 +1,14 @@
 
+var app;
+if( process.env.NODE_ENV === 'staging' ) {
+  app = require('../server/server');
+}
+else {
+  app = require('../server/server');
+}
+
 //var should = require('chai').should(),
 var supertest = require('supertest'),
-    app = require('../server/server'),
     api = supertest(app),
     assert = require('assert');
 

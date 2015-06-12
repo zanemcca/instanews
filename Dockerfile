@@ -12,7 +12,6 @@ RUN apt-get install -y npm
 RUN apt-get install -y openssl
 
 # Copy our source files into the new docker
-# TODO Change this to pull them from git
 COPY . /src
 
 # Install our dependencies
