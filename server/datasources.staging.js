@@ -1,9 +1,14 @@
 
 var cred = require('./conf/credentials');
 
+var mongo = cred.get('mongoEast');
+console.log(mongo);
+var aws = cred.get('aws');
+console.log(aws);
+
 var mongodb = 'mongodb://'+
-  cred.mongoEast.username + ':' +
-  cred.mongoEast.password +
+  mongo.username + ':' +
+  mongo.password +
   '@c1067.candidate.11.mongolayer.com:11067,candidate.16.mongolayer.com:11088/';
 
 module.exports = {
@@ -49,7 +54,7 @@ module.exports = {
     name: 'Storage',
     connector: 'loopback-component-storage',
     provider: 'amazon',
-    key: cred.aws.key ,
-    keyId: cred.aws.keyId
+    key: aws.key ,
+    keyId: aws.keyId
   }
 };

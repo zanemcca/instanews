@@ -11,9 +11,9 @@ module.exports = function (app) {
   {
 	 var cred = require('./conf/credentials');
 
-	 var gcmServerApiKey = cred.gcmServerApiKey; 
-	 var apnsCertData = cred.apnsCertData;
-	 var apnsKeyData = cred.apnsKeyData;
+	 var gcmServerApiKey = cred.get('gcmServerApiKey'); 
+	 var apnsCertData = cred.get('apnsCert');
+	 var apnsKeyData = cred.get('apnsKey');
 
 	 startPushServer();
   }
