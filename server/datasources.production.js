@@ -2,9 +2,7 @@
 var cred = require('./conf/credentials');
 
 var mongo = cred.get('mongoEast');
-console.log(mongo);
 var aws = cred.get('aws');
-console.log(aws);
 
 var mongodb = 'mongodb://'+
   mongo.username + ':' +

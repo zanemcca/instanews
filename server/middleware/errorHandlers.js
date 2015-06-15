@@ -9,8 +9,9 @@ var transport = nodemailer.createTransport({
 });
 
 module.exports = function(options) {
-  return function errHandler(err, req, res, next) {
-    if(process.env.NODE_ENV === 'production') {
+  return function errorHandlers(err, req, res, next) {
+    if(process.env.NODE_ENV === 'production' ||
+		process.env.NODE_ENV === 'staging') {
       if(err.status === 404) {
         res.status(404);
         res.send('This is not the page you\'re looking for ...');
@@ -25,18 +26,20 @@ module.exports = function(options) {
         console.log(err.message);
         console.error(err.stack);
 
-        //Send a notification to the backend manager
-        transport.sendMail({
-          from: 'error@instanews.com',
-          to: 'alertbackend@instanews.com',
-          subject: err.message,
-          text: err.stack
-        }, function(erri, info) {
-          if (err) console.error(err);
-          console.log('Error report has been mailed to' +
-            'alertbackend@instanews.com\n');
-          process.exit(1);
-        });
+		  if(process.env.NODE_ENV === 'production') {
+			 //Send a notification to the backend manager
+			 transport.sendMail({
+				from: 'error@instanews.com',
+				to: 'alertbackend@instanews.com',
+				subject: err.message,
+				text: err.stack
+			 }, function(erri, info) {
+				if (err) console.error(err);
+				console.log('Error report has been mailed to' +
+				  'alertbackend@instanews.com\n');
+				process.exit(1);
+			 });
+		  }
       }
     }
     else {
