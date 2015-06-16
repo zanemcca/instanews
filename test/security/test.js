@@ -25,6 +25,18 @@ exports.run = function() {
 			  });
 			});
 		 }
+
+		 it('should not show the "X-Powered-By"', function(done) {
+
+			api.get('/api/articles')
+			.expect(200)
+			.end( function(err, res) {
+			  expect(res).to.exist;
+			  expect(res.header).to.exist;
+			  expect(res.header['x-powered-by']).to.not.exist;
+			  done();
+			});
+		 });
 	  });
    });
 };
