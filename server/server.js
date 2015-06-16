@@ -5,7 +5,7 @@ var path = require('path');
 var https = require('https');
 var pem = require('pem');
 var helmet = require('helmet');
-var app = module.exports = loopback();
+var app = loopback();
 
 //Security module
 app.use(helmet());
@@ -64,8 +64,6 @@ if (require.main === module) {
 }
 
 //export the app for testing
-/*
 if( process.env.NODE_ENV !== 'production') {
   exports = module.exports = app;
 }
-*/

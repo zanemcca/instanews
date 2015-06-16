@@ -9,18 +9,16 @@ var transport = nodemailer.createTransport({
 });
 
 module.exports = function(options) {
-  return function errorHandlers(err, req, res, next) {
+  return function errorHandler(err, req, res, next) {
     if(process.env.NODE_ENV === 'production' ||
 		process.env.NODE_ENV === 'staging') {
       if(err.status === 404) {
         res.status(404);
-        res.send('This is not the page you\'re looking for ...');
-        next();
+		  res.send({ error: '404: This is not the page you are looking for ...' });
       }
       else if( err.status === 401) {
         res.status(401);
         res.send('Thou shalt not pass!!!');
-        next();
       }
       else {
         console.log(err.message);
