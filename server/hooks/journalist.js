@@ -25,6 +25,13 @@ module.exports = function(app) {
       next();
    });
 
+	Journalist.afterRemoteError('login',
+	function(ctx, next) {
+	  app.brute.prevent(ctx.req, ctx.res, function() {
+		 next();
+	  });
+	});
+
    Journalist.observe('access', function(ctx, next) {
       ctx.query.fields = {
          email: false,

@@ -7,6 +7,46 @@ var pem = require('pem');
 var helmet = require('helmet');
 var app = loopback();
 
+var ExpressBrute = require('express-brute');
+var MongoStore = require('express-brute-mongo');
+var MongoClient = require('mongodb').MongoClient;
+
+var cred = require('./conf/credentials');
+
+console.log('Starting in ' + process.env.NODE_ENV + ' environment');
+
+var store = new MongoStore(function (ready) {
+  var mongo = cred.get('mongoEast');
+  if(!mongo) {
+	 console.error(new Error('No database found!'));
+	//TODO Exit the application
+  }
+  else {
+	 var mongodb = 'mongodb://';
+	 if( mongo.username && mongo.password) {
+		mongodb += mongo.username +
+		':' + mongo.password;
+	 }
+
+	 mongodb  += mongo.url;
+	 mongodb += 'brute';
+
+	 if(mongo.replicaSet) {
+		mongodb += '?replicaSet=' + mongo.replicaSet;
+	 }
+
+//	 console.log('Connecting to ' + mongodb);
+
+	 MongoClient.connect(mongodb, function(err, db) {
+		if (err) return console.error(err);
+		app.bruteDB = db; 
+		ready(db.collection('store'));
+	 });
+ }
+});
+
+app.brute =  new ExpressBrute(store);
+
 //Security module
 app.use(helmet());
 

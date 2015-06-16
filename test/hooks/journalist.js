@@ -1,6 +1,8 @@
 
 /*jshint expr: true*/
-var expect = require('chai').expect;
+var chai = require('chai');
+var expect = chai.expect;
+chai.use(require('chai-datetime'));
 
 var common =  require('../common');
 var app = common.app;
@@ -13,6 +15,7 @@ var Subarticles = app.models.Subarticle;
 var genericModels = require('../genericModels');
 
 var purgeDB = function(cb) {
+
    Articles.destroyAll(function(err) {
       if(err) return cb(err);
 
@@ -21,7 +24,14 @@ var purgeDB = function(cb) {
 
          Journalists.destroyAll( function(err) {
             if(err) return cb(err);
-            cb();
+
+			  app.bruteDB.collection('store').remove( {}, function(err) {
+				 if (err) {
+					console.log(err);
+					return cb(err);
+				 }
+				 cb();
+			  });
          });
       });
    });
@@ -42,6 +52,55 @@ exports.run = function() {
       if(!journalist) {
          console.log('Error: No valid journalist was found. The following test cases will likely fail!');
       }
+
+		it('should limit the login attempts for the user', function(done) {
+
+		  this.timeout(5000);
+
+		  var limit = 10;
+		  var attempts = 0;
+		  var lastDate = null;
+		  var date;
+		  var delay = 0;
+		  var delayLast = 0;
+
+		  var badUser = journalist;
+		  badUser.password = 'akjgnbsaDOFIUJBO34987thg98h3598nberfjgn';
+		  var attemptLogin = function() {
+			 if(attempts < limit) {
+				attempts++;
+				//Journalists.login(badUser, function(err, res) {
+				api.post('/api/journalists/login')
+				.end( function(err, res) {
+				  var error = res.body.error;
+				  expect(error).to.exist;
+
+				  if(res.status === 429) {
+					 expect(error.nextValidRequestDate).to.exist;
+					 if( lastDate ) {
+						date = new Date(error.nextValidRequestDate);
+						expect(date).to.be.afterTime(lastDate);
+
+						delayLast = delay;
+						delay = date - lastDate;
+						expect(delay).to.be.above(delayLast);
+					 }
+					 lastDate = new Date(error.nextValidRequestDate);
+					 setTimeout( attemptLogin, lastDate - Date.now());
+				  }
+				  else {
+					 attemptLogin();
+				  }
+				});
+			 }
+			 else {
+				done();
+			 }
+		  };
+
+		  attemptLogin();
+
+		});
 
       it('should not include the journalists email or password when accessing the model', function(done) {
 

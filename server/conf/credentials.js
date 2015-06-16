@@ -74,16 +74,29 @@ var get = function(key) {
 
 
 // Read the keys and decrypt them
-if(!password) {
-  console.log('No password given');
-}
-else {
-  if( process.env.NODE_ENV === 'production') {
-	 keys = decryptFile('.keys');
+if( process.env.NODE_ENV === 'production' ||
+	process.env.NODE_ENV === 'staging') {
+  if(!password) {
+	 console.error('Error: No password given!');
+	 //TODO Quit the application
   }
   else {
-	 keys = decryptFile('.keys.staging');
+	 if( process.env.NODE_ENV === 'production') {
+		keys = decryptFile('.keys');
+	 }
+	 else {
+		keys = decryptFile('.keys.staging');
+	 }
   }
+}
+else {
+  //Place any development credentials you need here
+  keys = [{
+	 key: 'mongoEast',
+	 value: {
+		url: 'localhost:27017/'
+	 }
+  }];
 }
 
 // Export the get function
