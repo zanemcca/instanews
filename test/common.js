@@ -21,20 +21,16 @@ function importTest(name, path) {
 }
 
 var dump = function(err, res) {
-   /*
+  /*
    if (err) {
       console.log(err);
    }
-   else if(res && res.body && res.body.error) {
+   if(res && res.body && res.body.error) {
       console.log('\nName: ' + res.body.error.name + '\tStatus: ' + res.body.error.status);
       console.log('Message: ' + res.body.error.message);
       console.log('\n' + res.body.error.stack + '\n');
    }
-   /*
-   else {
-      console.log(res.body);
-   }
-   */
+	*/
 };
 
 var removeModel = function(model, models) {
