@@ -1,6 +1,7 @@
 
 var async = require('async');
 var expect = require('chai').expect;
+var path = require('path');
 
 var common =  require('../common');
 var api = common.api;
@@ -55,6 +56,8 @@ var testEndpoint = function(oldEndpoint, test, role, next) {
 
    describe('node', function() {
 
+	  this.timeout(10000);
+
       var type;
       var models = [];
 
@@ -78,24 +81,32 @@ var testEndpoint = function(oldEndpoint, test, role, next) {
          //Set up the request based on the request type given
          var func;
          if(res.request === 'post') {
-            //Try to find the model in the database
-            var mod = findModel(type,models);
-            if(!mod) {
-               //If the model is not in the database try the tests file
-               mod = findModel(type, test.models);
-               if(!mod) {
-                  //If the model is not in the testcase then use a generic one
-                  mod = findModel(type, genericModels);
-               }
-            }
-            /*
-            if(!mod) {
-               console.log('No model was found for the POST operation');
-               console.log('Please consider updating the tests file to include this model');
-            }
-            */
+				//Try to find the model in the database
+				var mod = findModel(type,models);
+				if(!mod) {
+					//If the model is not in the database try the tests file
+					mod = findModel(type, test.models);
+					if(!mod) {
+						//If the model is not in the testcase then use a generic one
+						mod = findModel(type, genericModels);
+					}
+				}
+				/*
+				if(!mod) {
+					console.log('No model was found for the POST operation');
+					console.log('Please consider updating the tests file to include this model');
+				}
+				*/
 
-            func = api.post(endpoint).send(mod);
+				if( endpoint.indexOf('/upload') > -1) {
+				  func = api.post(endpoint)
+						.attach('file', path.join(__dirname, '../' + mod.filename))
+						.set('Accept', 'application/json')
+						.expect('Content-Type', /json/)
+				}
+				else {
+				  func = api.post(endpoint).send(mod);
+				}
          }
          else if(res.request === 'get') {
             func = api.get(endpoint);
@@ -183,11 +194,22 @@ var testEndpoint = function(oldEndpoint, test, role, next) {
             Subarticles.create(model, handleResult);
          }
          else {
-            api.post(endpoint)
-            .send(model)
-            .set('Authorization', diffUserToken.id)
-            .expect(200)
-            .end( handleResult);
+			  if( endpoint.indexOf('/upload') > -1 ) {
+				  api.post(endpoint)
+				  .set('Authorization', diffUserToken.id)
+				  .attach('file', path.join(__dirname, '../' + model.filename))
+				  .set('Accept', 'application/json')
+				  .expect('Content-Type', /json/)
+				  .expect(200)
+				  .end( handleResult);
+			  }
+			  else {
+				  api.post(endpoint)
+				  .send(model)
+				  .set('Authorization', diffUserToken.id)
+				  .expect(200)
+				  .end( handleResult);
+			  }
          }
       };
 
@@ -247,6 +269,7 @@ var testEndpoint = function(oldEndpoint, test, role, next) {
        */
       var prepEndpoint = function(ends, count, callback, diffUser) {
          //Ending condition
+
          var tempModel = {};
          if(count === ends.length) {
             callback();
@@ -261,18 +284,28 @@ var testEndpoint = function(oldEndpoint, test, role, next) {
                else if( tempModel.username ) {
                   endpoint += '/' + tempModel.username;
                }
+					else if( tempModel.result.files.file[0].name ) {
+					   endpoint += '/' + tempModel.result.files.file[0].name;
+					}
                else {
                   endpoint += '/{id}';
                   console.log('Warning: Model was found but has an invalid id');
                }
-
-               prepEndpoint(ends,count + 1,callback);
             }
+				else if( ends[2] === 'storages' ) {
+				  if( ends[count -1] === 'storages') {
+					 endpoint += '/instanews.test';
+				  }
+				  else {
+					 endpoint += '/file.txt';
+				  }
+				}
             else {
                //console.log('Warning: A model should be available for ' + ends[count-1]);
                endpoint += '/{id}';
-               prepEndpoint(ends,count + 1,callback);
             }
+
+				prepEndpoint(ends,count + 1,callback);
          }
          else {
             type = ends[count];
@@ -289,12 +322,17 @@ var testEndpoint = function(oldEndpoint, test, role, next) {
 
                if( !tempModel.noPreCreate ) {
 
+						var url = endpoint;
+						if(tempModel.customUrl) {
+						  url = tempModel.customUrl
+						}
+
                   //Check if the test is requesting for the
                   // models used to be created by a different
                   // user than the one logged in. This is always
                   // the case with a guest
                   if(diffUser || role === 'guest') {
-                     diffUserAddModel(tempModel, endpoint, function() {
+                     diffUserAddModel(tempModel, url, function() {
                         prepEndpoint(ends,count + 1,callback, true);
                      });
                   }
@@ -302,6 +340,10 @@ var testEndpoint = function(oldEndpoint, test, role, next) {
 
                      var handleResult =  function(err, res) {
                         //Save the model locally
+								if(err) {
+								  dump(err,res);
+								  return done(err);
+								}
                         var body = res.body;
                         if(!body) {
                            body = res;
@@ -324,10 +366,20 @@ var testEndpoint = function(oldEndpoint, test, role, next) {
                         Subarticles.create(tempModel, handleResult);
                      }
                      else {
-                        api.post(endpoint)
-                        .send(tempModel)
-                        .set('Authorization', token.id)
-                        .end( handleResult);
+							  if( url.indexOf('/upload') > -1 ) {
+								  api.post(url)
+								  .set('Authorization', token.id)
+								  .attach('file', path.join(__dirname, '../' + tempModel.filename))
+								  .set('Accept', 'application/json')
+								  .expect('Content-Type', /json/)
+								  .end( handleResult);
+							  }
+							  else {
+								  api.post(url)
+								  .send(tempModel)
+								  .set('Authorization', token.id)
+								  .end( handleResult);
+							  }
                      }
                      //Create a model for every time {id} shows up
                      //console.log('Creating a model: ' + JSON.stringify(tempModel));
@@ -459,6 +511,7 @@ var testModel = function(tests) {
 
       //Create the users that will be required in the testcases
       before( function(done) {
+		  this.timeout(5000);
          //Clear all existing things in the model
          Journalists.destroyAll( function(err) {
             if (err) return done(err);
@@ -592,9 +645,7 @@ var testModel = function(tests) {
 };
 
 exports.run = function() {
-   //TODO Deal with storages as a special case
-   //testModel(storages);
-
+  testModel(storages);
    testModel(apps);
    testModel(articles);
    testModel(comments);

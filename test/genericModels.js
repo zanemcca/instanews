@@ -52,6 +52,16 @@ module.exports = [
    deviceType: 'android'
 },
 {
+   type: 'upload',
+	filename: 'file.txt',
+	noPreCreate: true
+},
+{
+   type: 'download',
+	customUrl: '/api/storages/instanews.test/upload',
+	filename: 'file.txt',
+},
+{
    type: 'comments',
    content: 'Nuts!',
    commentableType: 'comment',

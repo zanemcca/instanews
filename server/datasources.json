@@ -45,6 +45,6 @@
     "name": "Storage",
     "connector": "loopback-component-storage",
     "provider": "filesystem",
-    "root": "./server/storage"
+    "root": "./test/.storage"
   }
 }
