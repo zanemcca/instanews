@@ -1,4 +1,6 @@
 
+var LIMIT = 10;
+
 module.exports = function(app) {
 
    var Journalist = app.models.journalist;
@@ -33,10 +35,15 @@ module.exports = function(app) {
 	});
 
    Journalist.observe('access', function(ctx, next) {
+	  //Reserved contents for the owner only
       ctx.query.fields = {
-         email: false,
-//         password: false
+         email: false
       };
+
+	   //Limit the queries to LIMIT per request
+	   if( !ctx.query.limit || ctx.query.limit > LIMIT) {
+		  ctx.query.limit = LIMIT;
+	   }
       next();
    });
 };

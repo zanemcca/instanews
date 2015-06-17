@@ -1,4 +1,6 @@
 
+var LIMIT = 20;
+
 module.exports = function(app) {
 
    var Notification = app.models.notif;
@@ -62,6 +64,14 @@ module.exports = function(app) {
       }
       next();
    });
+
+	Notification.observe('access' , function(ctx, next) {
+	   //Limit the queries to LIMIT per request
+	   if( !ctx.query.limit || ctx.query.limit > LIMIT) {
+		  ctx.query.limit = LIMIT;
+	   }
+		next();
+	});
 
    Notification.observe('before save', function(ctx, next) {
       var note = ctx.instance;

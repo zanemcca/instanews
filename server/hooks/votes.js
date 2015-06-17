@@ -1,4 +1,6 @@
 
+var LIMIT = 10;
+
 module.exports = function(app) {
 
    var Votes = app.models.votes;
@@ -6,6 +8,14 @@ module.exports = function(app) {
    var getRating = function(instance) {
       return  (instance.upVoteCount - instance.downVoteCount);
    };
+
+	Votes.observe('access', function(ctx, next) {
+	  //Limit the queries to LIMIT per request
+	  if( !ctx.query.limit || ctx.query.limit > LIMIT) {
+		 ctx.query.limit = LIMIT;
+	  }
+	  next();
+	});
 
    Votes.observe('before save', function(ctx, next) {
 
@@ -22,6 +32,7 @@ module.exports = function(app) {
          //Update the rating
          inst.rating = getRating(inst);
          //Update the modification date
+			//TODO Depricate lastUpdated and use only modified
          inst.lastUpdated = new Date();
          inst.modified = new Date();
       }
