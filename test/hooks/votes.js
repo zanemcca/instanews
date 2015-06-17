@@ -1,4 +1,6 @@
 
+var LIMIT = 10;
+
 /*jshint expr: true*/
 var chai = require('chai');
 chai.use(require('chai-datetime'));
@@ -32,34 +34,33 @@ exports.run = function() {
          });
       });
 
-      it('should update the rating and modified date but not the original date', function(done) {
-         Articles.create(article, function(err, art) {
-            if(err) return done(err);
-            expect(art).to.exist;
-            expect(art.upVoteCount).to.equal(0);
-            expect(art.downVoteCount).to.equal(0);
-            expect(art.date).to.equalDate(new Date());
+      it('should be limited to ' + LIMIT + ' votes objects returned' , function(done) {
 
-            UpVotes.create({
-               votableType: 'article',
-               votableId: art.id
-            }, function(err, res) {
-               if(err) return done(err);
+			var objects = 0;
+			var Objects = Articles;
+			var object = article;
 
-               expect(res).to.exist;
+			var createObject = function() {
+			  if(objects >= LIMIT + 5) {
+				 Objects.find(function(err, res) {
+					 if(err) return done(err);
 
-               Articles.findById(res.votableId, function(err, res) {
-                  if(err) return done(err);
+					 expect(res).to.exist;
+					 expect(res.length).to.equal(LIMIT);
+					 done();
+				 });
+			  }
+			  else {
+				 objects++;
 
-                  expect(res).to.exist;
-                  expect(res.rating).to.be.above(art.rating);
-                  expect(res.modified).to.be.above(art.modified);
-                  expect(res.date).to.equalTime(art.date);
-                  done();
-               });
+				 Objects.create(object, function(err, art) {
+					 if(err) return done(err);
+					 createObject();
+				 });
+			  }
+			};
 
-            });
-         });
-      });
+			createObject();
+		});
    });
 };

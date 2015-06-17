@@ -1,4 +1,6 @@
 
+var LIMIT = 20;
+
 /*jshint expr: true*/
 var chai = require('chai');
 chai.use(require('chai-datetime'));
@@ -50,6 +52,41 @@ exports.run = function() {
             }, 10);
          });
       });
+
+      it('should be limited to ' + LIMIT + ' notifications returned' , function(done) {
+
+         var notification = common.findModel('notifications', genericModels);
+         if(!notification) {
+            console.log('Error:  There was no notification model. The following test will likely fail');
+            expect(false).to.be.true;
+         }
+
+			var objects = 0;
+			var Objects = Notifications;
+			var object = notification;
+
+			var createObject = function() {
+			  if(objects >= LIMIT + 5) {
+				 Objects.find(function(err, res) {
+					 if(err) return done(err);
+
+					 expect(res).to.exist;
+					 expect(res.length).to.equal(LIMIT);
+					 done();
+				 });
+			  }
+			  else {
+				 objects++;
+
+				 Objects.create(object, function(err, art) {
+					 if(err) return done(err);
+					 createObject();
+				 });
+			  }
+			};
+
+			createObject();
+		});
 
       //TODO Test that the notification gets pushed to
             //TODO android

@@ -1,4 +1,6 @@
 
+var LIMIT = 10;
+
 /*jshint expr: true*/
 var chai = require('chai');
 var expect = chai.expect;
@@ -127,6 +129,41 @@ exports.run = function() {
 
          });
       });
+
+      it('should be limited to ' + LIMIT + ' journalists returned' , function(done) {
+
+		  this.timeout(10000);
+
+			var objects = 0;
+			var Objects = Journalists;
+			var object = journalist;
+
+
+			var createObject = function() {
+			  object.username = Math.floor(Math.random() * 100000).toString();
+			  object.email = object.username + '@instanews.com';
+
+			  if(objects >= LIMIT + 5) {
+				 Objects.find(function(err, res) {
+					 if(err) return done(err);
+
+					 expect(res).to.exist;
+					 expect(res.length).to.equal(LIMIT);
+					 done();
+				 });
+			  }
+			  else {
+				 objects++;
+
+				 Objects.create(object, function(err, art) {
+					 if(err) return done(err);
+					 createObject();
+				 });
+			  }
+			};
+
+			createObject();
+		});
 
       it('should not return duplicate articles when requesting articles of a journalist', function(done) {
 
