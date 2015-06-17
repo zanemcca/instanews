@@ -102,7 +102,7 @@ var testEndpoint = function(oldEndpoint, test, role, next) {
 				  func = api.post(endpoint)
 						.attach('file', path.join(__dirname, '../' + mod.filename))
 						.set('Accept', 'application/json')
-						.expect('Content-Type', /json/)
+						.expect('Content-Type', /json/);
 				}
 				else {
 				  func = api.post(endpoint).send(mod);
@@ -324,7 +324,7 @@ var testEndpoint = function(oldEndpoint, test, role, next) {
 
 						var url = endpoint;
 						if(tempModel.customUrl) {
-						  url = tempModel.customUrl
+						  url = tempModel.customUrl;
 						}
 
                   //Check if the test is requesting for the
