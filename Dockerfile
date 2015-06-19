@@ -15,10 +15,10 @@ RUN apt-get install -y openssl
 COPY . /src
 
 # Install our dependencies
-RUN cd /src; \
-  npm install; \
-  rm server/boot/explorer.js; \
-  rm -r client; \
+RUN cd /src && \
+  npm install && \
+  rm server/boot/explorer.js && \
+  rm -r client && \
   rm -r test
 
 # Install strongloop
