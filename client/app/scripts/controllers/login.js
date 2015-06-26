@@ -35,6 +35,7 @@ app.controller('LoginCtrl', [
       last: '',
       username: '',
       email: '',
+      remember: false,
       password: '',
       confirmPassword: ''
    };
@@ -53,7 +54,54 @@ app.controller('LoginCtrl', [
       $scope.login();
    };
 
+   $scope.validEmail = function() { 
+     var re = /^([\w-]+(?:\.[\w-]+)*)@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$/i;
+     return re.test($scope.newUser.email);
+    };
+
+    $scope.passwordStrength = function() {
+      return 0
+    };
+
    $scope.login = function () {
+
+     var successLogin = function(res) {
+        User.set(res);
+
+        if ($scope.cred.remember) {
+
+          var device = Platform.getDevice();
+          if(res && device.type) {
+            var session = {
+              user: res
+            };
+            LocalStorage.secureWrite($cordovaDevice.getUUID(), session);
+          }
+          else {
+          console.log('Error: Cannot save user!');
+          }
+        }
+
+        $scope.cred = {
+          username: '',
+          password: '',
+          email: '',
+          remember: true
+        };
+
+        $scope.invalidLogin = false;
+
+        Navigate.disableNextBack();
+        $state.go('app.feed');
+      }; 
+
+     var failedLogin = function (err) {
+        if(err) {
+          console.log(err);
+        }
+        $scope.invalidLogin = true;
+        $scope.cred.password = '';
+      };
 
       var credentials;
 
@@ -73,42 +121,9 @@ app.controller('LoginCtrl', [
       Journalist.login({
          include: 'user',
          rememberMe: $scope.cred.remember
-      }, credentials)
-      .$promise
-      .then( function(res) {
-            User.set(res);
-
-            if ($scope.cred.remember) {
-
-               var device = Platform.getDevice();
-               if(res && device.type) {
-                  var session = {
-                     user: res
-                  };
-                  LocalStorage.secureWrite($cordovaDevice.getUUID(), session);
-               }
-               else {
-                  console.log('Error: Cannot save user!');
-               }
-            }
-
-            $scope.cred = {
-               username: '',
-               password: '',
-               remember: true
-            };
-
-            $scope.invalidLogin = false;
-
-            Navigate.disableNextBack();
-            $state.go('app.feed');
-      }, function (err) {
-         if(err) {
-            console.log(err);
-         }
-         $scope.invalidLogin = true;
-         $scope.cred.password = '';
-      });
+      }, credentials,
+      successLogin,
+      failedLogin);
    };
 
    $scope.trashNewUser = function () {
@@ -117,6 +132,7 @@ app.controller('LoginCtrl', [
          last: '',
          username: '',
          email: '',
+         remember: false,
          password: '',
          confirmPassword: ''
       };
@@ -140,6 +156,12 @@ app.controller('LoginCtrl', [
       Journalist.create(user, function (res) {
          console.log(res);
          console.log('Signed up');
+         $scope.cred = {
+           username: user.username,
+           password: user.password,
+           remember: $scope.newUser.remember
+         };
+         $scope.login();
          $scope.trashNewUser();
       });
    };

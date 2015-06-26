@@ -323,7 +323,7 @@ module.exports = function (grunt) {
     karma: {
       options: {
         basePath: '',
-        frameworks: ['mocha', 'chai'],
+        frameworks: ['mocha', 'chai', 'sinon'],
         files: [
           '<%= yeoman.app %>/bower_components/angular/angular.js',
           '<%= yeoman.app %>/bower_components/angular-mocks/angular-mocks.js',
@@ -332,6 +332,8 @@ module.exports = function (grunt) {
           '<%= yeoman.app %>/bower_components/angular-ui-router/release/angular-ui-router.js',
           '<%= yeoman.app %>/bower_components/ionic/release/js/ionic.js',
           '<%= yeoman.app %>/bower_components/ionic/release/js/ionic-angular.js',
+          '<%= yeoman.app %>/bower_components/angular-resource/angular-resource.js',
+          '<%= yeoman.app %>/bower_components/ngCordova/dist/ng-cordova.js',
           '<%= yeoman.app %>/<%= yeoman.scripts %>/**/*.js',
           '<%= yeoman.test %>/mock/**/*.js',
           '<%= yeoman.test %>/spec/**/*.js'
