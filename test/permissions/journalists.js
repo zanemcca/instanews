@@ -184,7 +184,7 @@ module.exports = {
          theirResults: [
          {
             request: 'get',
-            all: 404
+            all: 404 
          }]
       },
       {
@@ -393,7 +393,7 @@ module.exports = {
       theirResults: [
       {
          request: 'get',
-         all: 404
+         all: 200 
       }]
    },
    {
@@ -402,7 +402,7 @@ module.exports = {
       theirResults: [
       {
          request: 'get',
-         all: 404
+         all: 404 
       }]
    },
    /*

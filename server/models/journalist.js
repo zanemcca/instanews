@@ -5,9 +5,8 @@ module.exports = function(Journalist) {
 
    var staticDisable = [
       'exists',
-      'count',
-      'findOne',
       'find',
+      'findOne',
       'upsert',
       'prototype.updateAttributes',
       'deleteById',

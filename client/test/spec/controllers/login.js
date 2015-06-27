@@ -3,6 +3,7 @@ describe('Login: ', function(){
 
   var deferred;
 
+  //Load the module and create mocks for all dependencies
   beforeEach( function() {
 
     module('instanews.login');
@@ -35,6 +36,15 @@ describe('Login: ', function(){
         };
       });
 
+      $provide.service('$ionicModal', function($q) {
+        return {
+          fromTemplateUrl: function(uri, obj) {
+            deferred = $q.defer()
+            return deferred.promise;
+          }
+        };
+      });
+
       $provide.service('$cordovaDevice', function() {
         return {
           getUUID: function() {
@@ -49,9 +59,16 @@ describe('Login: ', function(){
           cb(null, journ);
         };
 
+        var count = function( where, succ, fail) {
+          succ({
+            count: 0
+          });
+        };
+
         var login = function( obj, credentialsi, success, failed) {};
         return {
           create: create,
+          count: count,
           login: login
         };
       });
@@ -59,6 +76,7 @@ describe('Login: ', function(){
 
   });
 
+  // Inject the controller and initialize any dependencies we need
   beforeEach(inject(function(
     $q,
     $controller, 
@@ -91,17 +109,16 @@ describe('Login: ', function(){
       LocalStorage: LocalStorage,
       Journalist: Journalist
     });
+
+    scope.$digest();
   }));
 
-  //Inject the module
+  // Initialize some local variables
   beforeEach( function() {
     scope.newUser = {
-      first: 'Timmy',
-      last: 'Test',
       username: 'ttest',
-      email: 'timmy',
+      email: 'timmy@instanews.com',
       password: 'password',
-      confirmPassword: 'password',
       remember: true
     };
 
@@ -113,23 +130,50 @@ describe('Login: ', function(){
     };
   });
 
-  it('should signup a new user', function() {
+  describe('signup' , function() {
 
-    var login = sinon.stub(scope, 'login', function() {
-      console.log('Login stub');
+    beforeEach( function() {
+      sinon.stub(scope, 'login', function() {
+        console.log('Login stub');
+      });
+
+      sinon.stub(scope, 'trashNewUser', function() {
+        console.log('TrashNewUser stub');
+      });
+
+      scope.$digest();
     });
 
-    var trashNewUser = sinon.stub(scope, 'trashNewUser', function() {
-      console.log('TrashNewUser stub');
+    it('should signup a new user', function() {
+
+      scope.signup();
+      expect(scope.cred.username).to.equal('ttest'); 
+      expect(scope.cred.password).to.equal('password');
+      expect(scope.cred.remember).to.be.true;
+
+      expect(scope.login.calledOnce).to.be.true;
+      expect(scope.trashNewUser.calledOnce).to.be.true;
     });
 
-    scope.signup();
-    expect(scope.cred.username).to.equal('ttest'); 
-    expect(scope.cred.password).to.equal('password');
-    expect(scope.cred.remember).to.be.true;
+    it('should reject the signup because the username or email is taken', function() {
 
-    expect(login.calledOnce).to.be.true;
-    expect(trashNewUser.calledOnce).to.be.true;
+      sinon.stub(journalist, 'count', function(obj, succ, fail) {
+        succ({
+          count: 1 
+        });
+      });
+
+      scope.signup();
+
+      expect(journalist.count.calledOnce).to.be.true;
+
+      expect(scope.credUsed).to.be.true;
+
+      scope.newUser.username = ''
+      scope.$digest();
+
+      expect(scope.credUsed).to.be.false;
+    });
 
   });
 
@@ -236,13 +280,10 @@ describe('Login: ', function(){
 
     scope.trashNewUser();
 
-    expect(scope.newUser.remember).to.be.false;
-    expect(scope.newUser.first).to.be.equal('');
-    expect(scope.newUser.last).to.be.equal('');
+    expect(scope.newUser.remember).to.be.true;
     expect(scope.newUser.username).to.be.equal('');
     expect(scope.newUser.email).to.be.equal('');
     expect(scope.newUser.password).to.be.equal('');
-    expect(scope.newUser.confirmPassword).to.be.equal('');
 
     expect(hide.calledOnce).to.be.true;
   });
@@ -260,4 +301,71 @@ describe('Login: ', function(){
     scope.newUser.email = 'bobinstanews.com';
     expect(scope.validEmail()).to.be.false;
   });
+
+  describe('password strength', function() {
+    // < 8 char
+    it('should be an invalid password', function() {
+      scope.newUser.password = 'abc123';
+      scope.$digest();
+      expect(scope.passwordStrength).to.equal(-1);
+    });
+
+    // >= 8 char
+    it('should be a moderate password', function() {
+      scope.newUser.password = 'iamapass';
+      scope.$digest();
+      expect(scope.passwordStrength).to.equal(1);
+    });
+
+    // >= 8 char && (numbers || uppercase || special char)
+    // >= 12 char 
+    it('should be a strong password', function() {
+      scope.newUser.password = '1amapass';
+      scope.$digest();
+      expect(scope.passwordStrength).to.equal(2);
+
+      scope.newUser.password = '!amapass';
+      scope.$digest();
+      expect(scope.passwordStrength).to.equal(2);
+
+      scope.newUser.password = 'Iamapass';
+      scope.$digest();
+      expect(scope.passwordStrength).to.equal(2);
+
+      scope.newUser.password = 'carsgofaster';
+      scope.$digest();
+      expect(scope.passwordStrength).to.equal(2);
+    });
+
+    // >= 8 char && 2 of numbers || uppercase || special char
+    // >= 12 char && (numbers || uppercase || special char)
+    it('should be a very strong password', function() {
+
+      scope.newUser.password = '1amaPass';
+      scope.$digest();
+      expect(scope.passwordStrength).to.equal(3);
+
+      scope.newUser.password = '!amaPass';
+      scope.$digest();
+      expect(scope.passwordStrength).to.equal(3);
+
+      scope.newUser.password = '1amap@ss';
+      scope.$digest();
+      expect(scope.passwordStrength).to.equal(3);
+
+      scope.newUser.password = 'carsgof@ster';
+      scope.$digest();
+      expect(scope.passwordStrength).to.equal(3);
+
+      scope.newUser.password = 'carsgofa5ter';
+      scope.$digest();
+      expect(scope.passwordStrength).to.equal(3);
+
+      scope.newUser.password = 'carsgoFaster';
+      scope.$digest();
+      expect(scope.passwordStrength).to.equal(3);
+    });
+
+  });
+
 });
