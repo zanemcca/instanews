@@ -8,8 +8,8 @@ var urlBase = ('https:' === document.location.protocol ?
    'https://172.20.10.9:3443/api' :
    'http://172.20.10.9:3000/api');
 */
-   "https://192.168.1.2:3443/api" :
-   "http://192.168.1.2:3000/api");
+   'https://192.168.1.2:3443/api' :
+   'http://192.168.1.2:3000/api');
 
 
 //This directive will display data in a preview format

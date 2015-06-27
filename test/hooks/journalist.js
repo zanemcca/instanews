@@ -27,13 +27,13 @@ var purgeDB = function(cb) {
          Journalists.destroyAll( function(err) {
             if(err) return cb(err);
 
-			  app.bruteDB.collection('store').remove( {}, function(err) {
-				 if (err) {
-					console.log(err);
-					return cb(err);
-				 }
-				 cb();
-			  });
+            app.bruteDB.collection('store').remove( {}, function(err) {
+               if (err) {
+                  console.log(err);
+                  return cb(err);
+               }
+               cb();
+            });
          });
       });
    });
@@ -54,6 +54,94 @@ exports.run = function() {
       if(!journalist) {
          console.log('Error: No valid journalist was found. The following test cases will likely fail!');
       }
+
+      describe('before create', function() {
+
+        var user;
+        beforeEach( function() {
+          user = {
+            password: 'password',
+            username: 'toxxdd',
+            email: 'toxxdd@instanews.com'
+          };
+        });
+
+        before( function(done) {
+          user = {
+            password: 'password',
+            username: 'toxxdd',
+            email: 'toxxdd@instanews.com'
+          };
+          Journalists.create(user, function(err, res) {
+            expect(err).to.not.exist;
+            expect(res).to.exist;
+            done();
+          });
+        });
+
+        it('should complain about a weak password', function(done) {
+
+          user.password = 'toshort';
+          api.post('/api/journalists')
+          .send(user)
+          .expect(500)
+          .end( function(err, res) {
+
+            expect(err).to.not.exist;
+            expect(res).to.exist;
+            expect(res.text).to.exist;
+            var error = JSON.parse(res.text);
+            expect(error).to.exist;
+            expect(error.error).to.exist;
+            expect(error.error).to.exist;
+            expect(error.error.message).to.exist;
+            expect(error.error.message).to.equal('Password is too weak!');
+            done();
+          });
+        });
+
+        it('should complain about the email being used already', function(done) {
+
+          user.username = 'bababab';
+          api.post('/api/journalists')
+          .send(user)
+          .expect(500)
+          .end( function(err, res) {
+
+            expect(err).to.not.exist;
+            expect(res).to.exist;
+            expect(res.text).to.exist;
+            var error = JSON.parse(res.text);
+            expect(error).to.exist;
+            expect(error.error).to.exist;
+            expect(error.error).to.exist;
+            expect(error.error.message).to.exist;
+            expect(error.error.message).to.equal('Username or email is already used!');
+            done();
+          });
+        });
+
+        it('should complain about the username being used already', function(done) {
+
+          user.email = 'bababab@babab.com';
+          api.post('/api/journalists')
+          .send(user)
+          .expect(500)
+          .end( function(err, res) {
+
+            expect(err).to.not.exist;
+            expect(res).to.exist;
+            expect(res.text).to.exist;
+            var error = JSON.parse(res.text);
+            expect(error).to.exist;
+            expect(error.error).to.exist;
+            expect(error.error).to.exist;
+            expect(error.error.message).to.exist;
+            expect(error.error.message).to.equal('Username or email is already used!');
+            done();
+          });
+        });
+      });
 
 		it('should limit the login attempts for the user', function(done) {
 

@@ -203,8 +203,7 @@ angular.module('instanews', [
                order: 'date DESC',
             };
 
-            //Journalist.prototype$__get__notifications({
-            Journalist.notifications({
+            Journalist.prototype$__get__notifications({
                id: $scope.user.username,
                filter: filter
             }).$promise

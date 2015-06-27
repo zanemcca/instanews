@@ -182,6 +182,9 @@ var testEndpoint = function(oldEndpoint, test, role, next) {
             }
             else {
                body.type = type;
+               if( type === 'journalists' ) {
+                 body.password = model.password;
+               }
                models.push(body);
             }
 
@@ -235,7 +238,7 @@ var testEndpoint = function(oldEndpoint, test, role, next) {
                   id = token.id;
                }
 
-               //console.log('Deleting a model: ' + JSON.stringify(tempModel));
+               console.log('Deleting a model: ' + JSON.stringify(tempModel));
                if( tempModel.type === 'journalists') {
                   Journalists.deleteById(tempModel.username, function(err, res) {
                      dump(err, res);
@@ -284,9 +287,9 @@ var testEndpoint = function(oldEndpoint, test, role, next) {
                else if( tempModel.username ) {
                   endpoint += '/' + tempModel.username;
                }
-					else if( tempModel.result.files.file[0].name ) {
-					   endpoint += '/' + tempModel.result.files.file[0].name;
-					}
+                else if( tempModel.result.files.file[0].name ) {
+                   endpoint += '/' + tempModel.result.files.file[0].name;
+                }
                else {
                   endpoint += '/{id}';
                   console.log('Warning: Model was found but has an invalid id');
@@ -305,7 +308,7 @@ var testEndpoint = function(oldEndpoint, test, role, next) {
                endpoint += '/{id}';
             }
 
-				prepEndpoint(ends,count + 1,callback);
+            prepEndpoint(ends,count + 1,callback);
          }
          else {
             type = ends[count];
@@ -322,10 +325,10 @@ var testEndpoint = function(oldEndpoint, test, role, next) {
 
                if( !tempModel.noPreCreate ) {
 
-						var url = endpoint;
-						if(tempModel.customUrl) {
-						  url = tempModel.customUrl;
-						}
+                  var url = endpoint;
+                  if(tempModel.customUrl) {
+                    url = tempModel.customUrl;
+                  }
 
                   //Check if the test is requesting for the
                   // models used to be created by a different
@@ -340,10 +343,11 @@ var testEndpoint = function(oldEndpoint, test, role, next) {
 
                      var handleResult =  function(err, res) {
                         //Save the model locally
-								if(err) {
-								  dump(err,res);
-								  return done(err);
-								}
+                        if(err) {
+                          dump(err,res);
+                          return done(err);
+                        }
+
                         var body = res.body;
                         if(!body) {
                            body = res;
@@ -353,10 +357,13 @@ var testEndpoint = function(oldEndpoint, test, role, next) {
                         }
                         else {
                            body.type = type;
+                           if( type === 'journalists' ) {
+                             body.password = tempModel.password;
+                           }
                            models.push(body);
                         }
 
-                        //console.log('Created a model: ' + JSON.stringify(body));
+                        console.log('Created a model: ' + JSON.stringify(body));
                         dump(err, res);
                         prepEndpoint(ends,count + 1,callback);
                      };

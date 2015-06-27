@@ -9,42 +9,36 @@
    <ion-content>
       <div class="item item-divider" style="height: 100%">
          <div class="list item no-padding">
-            <div class="row">
-               <label class="item item-input item-floating-label" style="border:transparent">
-                  <span class="input-label" >First</span>
-                  <input type="text" placeholder="First Name" ng-model="newUser.first" required>
-               </label>
-               <label class="item item-input item-floating-label" style="border:transparent">
-                  <span class="input-label" >Last</span>
-                  <input type="text" placeholder="Last Name" ng-model="newUser.last" required>
-               </label>
-            </div>
-            <div class="item item-input item-floating-label">
+            <div class="item item-input item-floating-label"
+              ng-class="{'box-invalid' : credUsed }">
                <span class="input-label" >Username</span>
                <input type="text" placeholder="Username" ng-model="newUser.username" required>
             </div>
             <label class="item item-input item-floating-label"
-               ng-class="{'box-valid' : newUser.email.indexOf('@') > -1,
-               'box-invalid' : newUser.email.indexOf('@') <= -1}">
+               ng-class="{'box-invalid' : credUsed }">
                <span class="input-label" >Email</span>
                <input type="email" placeholder="Email" ng-model="newUser.email" validate required>
             </label>
             <label class="item item-input item-floating-label"
-               ng-class="{'box-invalid' : newUser.password.length < 8 ,
-               'box-valid' : newUser.password.length >= 8 }">
+              ng-class="{'box-invalid' : passwordStrength < 0 ,
+              'box-moderate' : passwordStrength === 1,
+              'box-strong' : passwordStrength === 2,
+              'box-excellent' : passwordStrength > 2 }">
                <span class="input-label" >Password</span>
                <input type="password" placeholder="Password" ng-model="newUser.password" required>
             </label>
-            <label class="item item-input item-floating-label"
-               ng-class="{'box-invalid' : newUser.password !== newUser.confirmPassword,
-               'box-valid' : newUser.password === newUser.confirmPassword &&
-               newUser.password.length > 0 }">
-               <span class="input-label" >Confirm Password</span>
-               <input type="password" placeholder="Confirm Password"
-               ng-model="newUser.confirmPassword" required>
-            </label>
          </div>
-         <button class="button button-positive button-full" ng-click="signup()">
+          <div class="item item-divider item-toggle"
+             style="border-bottom: 0px; border-left: 0px; border-right:0px; min-height:47px">
+             <p>Remember Me</p>
+             <label class="toggle toggle-calm">
+                <input type="checkbox" ng-model="newUser.remember">
+                <div class="track">
+                   <div class="handle"></div>
+                </div>
+             </label>
+          </div>
+         <button class="button button-positive button-full" ng-click="signup()" ng-disabled="passwordStrength <= 0">
             Signup
          </button>
       </div>
