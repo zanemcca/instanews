@@ -6,6 +6,15 @@
 module.exports = {
    //   #/journalists
    endpoint: 'journalists',
+   models: [
+    {
+       type: 'journalists',
+       noPreCreate: true,
+       email: 'tim@instanews.com',
+       username: 'tim',
+       password: 'password'
+    }
+   ],
    theirResults: [
    {
       request: 'get',
@@ -17,12 +26,9 @@ module.exports = {
    },
    {
       request: 'post',
-      all: 422
-         /*
       admin: 200,
-      guest: 401,
+      guest: 200,
       user: 200
-      */
    }],
    children: [
    {

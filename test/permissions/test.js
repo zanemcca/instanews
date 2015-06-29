@@ -238,7 +238,7 @@ var testEndpoint = function(oldEndpoint, test, role, next) {
                   id = token.id;
                }
 
-               console.log('Deleting a model: ' + JSON.stringify(tempModel));
+               //console.log('Deleting a model: ' + JSON.stringify(tempModel));
                if( tempModel.type === 'journalists') {
                   Journalists.deleteById(tempModel.username, function(err, res) {
                      dump(err, res);
@@ -363,7 +363,7 @@ var testEndpoint = function(oldEndpoint, test, role, next) {
                            models.push(body);
                         }
 
-                        console.log('Created a model: ' + JSON.stringify(body));
+                        //console.log('Created a model: ' + JSON.stringify(body));
                         dump(err, res);
                         prepEndpoint(ends,count + 1,callback);
                      };
