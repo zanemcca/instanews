@@ -1,18 +1,16 @@
 
 'use strict';
-var app = angular.module('instanews.feed', ['ionic', 'ngResource', 'underscore']);
+var app = angular.module('instanews.feed', ['ionic', 'ngResource']);
 
 app.controller('FeedCtrl', [
       '$scope',
       'Article',
-      '_',
       'Maps',
       'Position',
       'Articles',
       'Navigate',
       function($scope,
          Article,
-         _,
          Maps,
          Position,
          Articles,
@@ -102,15 +100,19 @@ app.controller('FeedCtrl', [
       }
    };
 
+   /*
    $scope.scroll = {
       buttonOn: false
    };
 
-   //TODO debounce this and get the scroll to top button disabling appropriately
+   //TODO get the scroll to top button disabling appropriately
    $scope.onScroll = function() {
       $scope.scroll.buttonOn = Navigate.onScroll();
       console.log('Scroll top on ? ' + $scope.scroll.buttonOn);
    };
+
+  //TODO Rewrite this use ionic on-swipe-down gesture
+  */
 
    $scope.itemsAvailable = true;
 

@@ -34,11 +34,11 @@ module.exports = function(app) {
 
     Journalist.beforeRemote('create', function(ctx, instance, next) {
       var user;
-      if( instance ) {
-        user = instance;
-      }
-      else if( ctx && ctx.req && ctx.req.body) {
+      if( ctx && ctx.req && ctx.req.body) {
         user = ctx.req.body;
+      }
+      else if( instance ) {
+        user = instance;
       }
       else {
         next(new Error('Bad user given for creation!'));
