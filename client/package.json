@@ -78,5 +78,8 @@
       "locator": "./engine/cordova-android-c0.6.1/"
     },
     "ios"
-  ]
+  ],
+  "dependencies": {
+    "karma-sinon": "~1.0.4"
+  }
 }
