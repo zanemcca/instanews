@@ -7,7 +7,7 @@ Local Citizen Journalism in an elegant simple platform
 - Encrypt your working directory
 - Install git
 - Install npm (node package manager)
-- ```npm install -g slc grunt grunt-cli mocha karma```
+- ```npm install -g slc grunt grunt-cli mocha karma ionic```
 - ```cd ~/working/directory```
 - ```cd instanews```
 - ```npm install```
@@ -29,3 +29,12 @@ Local Citizen Journalism in an elegant simple platform
 - ```cd ..```
 - ```slc run```
 - Visit localhost:3000 or localhost:3000/explorer
+
+### Debugging backend
+#### Logs
+- ```DEBUG=loopback:* slc run```
+ 
+#### Debugger
+- ```npm install -g node-inspector```
+- ```node-inspector```
+- In another shell ```mocha --debug-brk test```
