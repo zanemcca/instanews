@@ -21,7 +21,7 @@ Local Citizen Journalism in an elegant simple platform
 
 ### Running a headless frontend
 - ```cd client```
-- ```grunt serve```
+- ```ionic serve```
 
 ### Running the full site
 - ```cd client```
