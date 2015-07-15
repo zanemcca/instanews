@@ -178,7 +178,7 @@ module.exports = function (app, cb) {
       importData.bind(null,DownVotes, []),
       importData.bind(null,Comments, comments),
       createAdmin.bind(null),
-   //   importArticles.bind(null),
+      importArticles.bind(null),
       updateDB.bind(null)
    ], function(err,res) {
          if (err) {

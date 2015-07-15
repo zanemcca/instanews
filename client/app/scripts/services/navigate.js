@@ -45,6 +45,19 @@ app.service('Navigate', [
       }
    };
 
+   /*
+  //TODO Rewrite this use ionic on-swipe-down gesture
+   $scope.scroll = {
+      buttonOn: false
+   };
+
+   //TODO get the scroll to top button disabling appropriately
+   $scope.onScroll = function() {
+      $scope.scroll.buttonOn = Navigate.onScroll();
+      console.log('Scroll top on ? ' + $scope.scroll.buttonOn);
+   };
+  */
+
    return {
       toggleMenu: toggleMenu,
       scrollTop: scrollTop,
