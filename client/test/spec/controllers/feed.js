@@ -32,6 +32,7 @@ describe('Feed: ', function(){
           getFeedMap: function() {
             return {};
           },
+          updateHeatmap: function(articles) {},
           localize: function() {
           }
         };
@@ -57,9 +58,16 @@ describe('Feed: ', function(){
           get: function() {
             return [];
           },
-          set: function(articles) {
+          add: function(articles) {
           },
           getOne: function(articles) {
+          },
+          deleteAll: function() {},
+          areItemsAvailable: function() {
+            return true;
+          },
+          load: function(cb) {
+            cb();
           },
           registerObserver: function(cb) {
           }
@@ -119,33 +127,11 @@ describe('Feed: ', function(){
       expect(articles.registerObserver.calledOnce).to.be.true;
     });
 
-    it('should call Position.registerObserver', function() {
-      sinon.spy(position, 'registerObserver');
+    it('should call Articles.areItemsAvailable', function() {
+      sinon.spy(articles, 'areItemsAvailable');
       initController();
 
-      expect(position.registerObserver.calledOnce).to.be.true;
-    });
-
-    it('should call Position.registerBoundsObserver', function() {
-      sinon.spy(position, 'registerBoundsObserver');
-      initController();
-
-      expect(position.registerBoundsObserver.calledOnce).to.be.true;
-    });
-
-    /*
-    it('should initialize scope.scroll', function() {
-      initController();
-
-      expect(scope.scroll).to.exist;
-      expect(scope.scroll.buttonOn).to.be.false;
-    });
-   */
-
-    it('should initialize scope.itemsAvailable', function() {
-      initController();
-
-      expect(scope.itemsAvailable).to.be.true;
+      expect(articles.areItemsAvailable.calledOnce).to.be.true;
     });
 
     it('should set a local copy of toggleMenu and scrollTop', function() {
@@ -156,37 +142,31 @@ describe('Feed: ', function(){
     });
   });
 
-  /*
-  describe('reload', function() {
+  describe('updateArticles', function() {
 
     beforeEach( function() {
-      //CAUTION: This works under the assumption that Postion.registerBoundsObserver
-      //is being called only once during initialization with the reload function given
-      //as the callback function
-      sinon.stub(position, 'registerBoundsObserver', function(cb) {
-        //TODO This SOB will not call the private functions because the 
-        //stub is not within the same scope. So basically we have to make this an integration
-        //test
-        load = function(callback) {
-          callback()
-        };
+      //NOTE: I am forcing registerObserver to call the cb which should
+      //be updateArticles
+      sinon.stub(articles, 'registerObserver', function(cb) {
         cb();
       });
 
-    });
-
-    it('should call Position.getBounds', function() {
-      sinon.spy(position, 'getBounds');
+      sinon.spy(articles, 'get');
+      sinon.spy(articles, 'areItemsAvailable');
 
       initController();
+    });
 
-      expect(position.getBounds.calledOnce).to.be.true;
+    it('should call Articles.get', function() {
+      expect(articles.get.calledTwice).to.be.true;
+    });
+
+    it('should call Articles.areItemsAvailable', function() {
+      expect(articles.areItemsAvailable.calledTwice).to.be.true;
     });
   });
 
- //TODO For the same reason as the above we need to make the map updating an integration test
- */
-
+  
   describe('localize' , function() {
 
     beforeEach( function() {
@@ -208,34 +188,18 @@ describe('Feed: ', function(){
     });
   });
 
-  /*
-  describe('onScroll', function() {
-    beforeEach( function() {
-      sinon.stub(navigate, 'onScroll', function() {
-        return false;
-      });
-
-      controller = initController();
-    });
-
-    it('should set buttonOn to false and call Navigate.onScroll once', function() {
-      scope.scroll.buttonOn = true;
-      
-      scope.onScroll();
-
-      expect(navigate.onScroll.calledOnce).to.be.true;
-      expect(scope.scroll.buttonOn).to.be.false;
-    });
-  });
- */
-
   describe('load callers', function() {
 
     var arts = [];
     
     beforeEach( function() {
+      controller = initController();
 
-      sinon.stub(articles, 'set', function(arts) {
+      sinon.spy(articles, 'add');
+      sinon.spy(articles, 'deleteAll');
+      sinon.spy(articles, 'load');
+      sinon.spy(articles, 'areItemsAvailable');
+      sinon.stub(articles, 'get', function() {
       });
 
       sinon.stub(article, 'find', function(filter) {
@@ -248,7 +212,6 @@ describe('Feed: ', function(){
         }
       });
 
-      controller = initController();
     });
 
     describe('onRefresh', function() {
@@ -263,10 +226,10 @@ describe('Feed: ', function(){
         });
       });
 
-      it('should call Article.find', function() {
+      it('should call Articles.load', function() {
         scope.onRefresh();
 
-        expect(article.find.calledOnce).to.be.true;
+        expect(articles.load.calledOnce).to.be.true;
       });
 
       it('should send a broadcast', function() {
@@ -274,91 +237,14 @@ describe('Feed: ', function(){
         expect(scope.$broadcast.calledOnce).to.be.true;
       });
 
-      it('should set itemsAvailable to false', function() {
+      it('should call Articles.deleteAll once', function() {
         arts = [];
 
         scope.onRefresh();
-        
-        expect(scope.itemsAvailable).to.be.false;
+
+        expect(articles.deleteAll.calledOnce).to.be.true;
       });
 
-      it('should set scope.itemsAvailable to true', function() {
-        arts = [
-          {
-            id: '1',
-            subarticles: []
-          }
-        ];
-
-        scope.onRefresh();
-
-        expect(scope.itemsAvailable).to.be.true;
-      });
-
-      it('should call Articles.set twice', function() {
-        arts = [
-          {
-            id: '1',
-            subarticles: []
-          }
-        ];
-
-        scope.onRefresh();
-
-        expect(articles.set.calledTwice).to.be.true;
-      });
-
-      it('should get 5 articles', function() {
-        arts = [
-          {
-            id: '1',
-            subarticles: []
-          },
-          {
-            id: '2',
-            subarticles: []
-          },
-          {
-            id: '3',
-            subarticles: []
-          },
-          {
-            id: '4',
-            subarticles: []
-          },
-          {
-            id: '5',
-            subarticles: []
-          }
-        ];
-
-        scope.onRefresh();
-
-        expect(articles.getOne.callCount).to.equal(5);
-        expect(scope.articles.length).to.equal(5);
-      }); 
-
-      it('should set the topSub of the article', function() {
-        arts = [
-          {
-            id: '1',
-            subarticles: [
-              {
-                id: 's1'
-              },
-              {
-                id: 's2'
-              }
-            ]
-          }
-        ];
-
-        scope.onRefresh();
-
-        expect(scope.articles.length).to.equal(1);
-        expect(scope.articles[0].topSub).to.exist;
-        expect(scope.articles[0].topSub.id).to.equal('s1');
-      });
     });
 
     describe('loadMore', function() {
@@ -376,46 +262,6 @@ describe('Feed: ', function(){
         expect(scope.$broadcast.calledOnce).to.be.true;
       });
 
-      it('should remove the duplicate article', function() {
-
-        sinon.stub(articles, 'getOne', function(id) {
-          return true;
-        });
-
-        arts = [
-          {
-            id: '1',
-            subarticles: []
-          }
-        ];
-
-        scope.loadMore();
-
-        expect(articles.getOne.callCount).to.equal(1);
-        expect(scope.articles.length).to.equal(0);
-      }); 
-
-      it('should append the arts to scope.articles', function() {
-
-        scope.articles = [
-          {
-            id: '1',
-            subarticles: []
-          }
-        ];
-
-        arts = [
-          {
-            id: '2',
-            subarticles: []
-          }
-        ];
-
-        scope.loadMore();
-
-        expect(scope.articles.length).to.equal(2);
-        expect(scope.articles[1]).to.equal(arts[0]);
-      }); 
     });
   });
 

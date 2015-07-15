@@ -3,9 +3,12 @@
 var app = angular.module('instanews.maps', ['ionic', 'ngResource','ngCordova']);
 
 app.service('Maps', [
+      'Articles',
       'Position',
       function(
-         Position){
+         Articles,
+         Position
+      ){
 
    var feedMap, postMap, articleMap;
 
@@ -31,6 +34,62 @@ app.service('Maps', [
 
    var setFeedMap = function(map) {
       feedMap = map;
+   };
+
+   var heatmap;
+
+   var createGradient = function() {
+
+      var third = 8;
+      var subValue = 256/third;
+
+      //Transistion from baby blue to blue to red
+      var gradient = ['rgba(0, 255, 255, 0)'];
+      for(var i = 0; i < third; i++) {
+         var temp =  'rgba(0,' + (255-subValue*i) + ',255, 1)';
+         gradient.push(temp);
+      }
+      for(i = 0; i < third; i++) {
+         gradient.push( 'rgba(0,0,'+ (255 - subValue/2*i) +', 1)');
+      }
+      for(i = 0; i < third; i++) {
+         gradient.push( 'rgba('+ (subValue*i) +',0,'+ (128 - subValue/2*i) +', 1)');
+      }
+      gradient.push('rgba(255, 0, 0, 1)');
+
+      return gradient;
+   };
+
+   var updateHeatmap = function() {
+      var articles = Articles.get();
+
+      var articleHeatArray = [];
+
+      if( !Position.getBounds()) {
+         return;
+      }
+
+      for(var i = 0; i < articles.length; i++) {
+         var position = Position.posToLatLng(articles[i].location);
+         if (Position.withinBounds(position) && articles[i].rating > 0) {
+            articleHeatArray.push({
+               location: position,
+               weight: articles[i].rating
+            });
+         }
+      }
+
+      if (!heatmap) {
+
+         heatmap = new google.maps.visualization.HeatmapLayer({
+            map: getFeedMap(),
+            gradient: createGradient(),
+            data: articleHeatArray
+         });
+      }
+      else {
+         heatmap.setData(articleHeatArray);
+      }
    };
 
    var localize = function(map, cb) {
@@ -206,6 +265,8 @@ app.service('Maps', [
 
       */
 
+      Articles.registerObserver(updateHeatmap);
+
    return {
       localize: localize,
       setCenter: setCenter,
@@ -216,6 +277,7 @@ app.service('Maps', [
       setFeedMap: setFeedMap,
       getFeedMap: getFeedMap,
       getArticleMap: getArticleMap,
+      updateHeatmap: updateHeatmap,
       setArticleMap: setArticleMap
    };
 }]);

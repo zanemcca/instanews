@@ -116,7 +116,7 @@ app.service('Position', [
    }
    */
 
-   var withinRange = function (position) {
+   var withinBounds = function (position) {
 
       //Method for a square
       if ( bounds) {
@@ -263,7 +263,7 @@ app.service('Position', [
       getCurrent: getCurrent,
       getLast: getLast,
       set: set,
-      withinRange: withinRange,
+      withinBounds: withinBounds,
       registerObserver: registerObserver,
       registerBoundsObserver: registerBoundsObserver,
       unregisterObserver: unregisterObserver
