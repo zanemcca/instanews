@@ -1,125 +1,530 @@
-      /*
-      it('should call Articles.add once', function() {
-        arts = [
-          {
-            id: '1',
-            subarticles: []
-          }
-        ];
+      
+"use strict";
 
-        scope.onRefresh();
+describe('Articles', function() {
 
-        expect(articles.add.calledOnce).to.be.true;
+  beforeEach(function() {
+
+    var bounds = new google.maps.LatLngBounds(
+        new google.maps.LatLng(33.671068, -116.25128),
+        new google.maps.LatLng(33.685282, -116.233942));
+
+    module('instanews.articles');
+
+    module(function($provide) {
+      $provide.service('Article', function() {
+        return {
+          find: function(filter) {}
+        };
       });
 
-      it('should call Articles.get once', function() {
-        arts = [
-          {
-            id: '1',
-            subarticles: []
+      $provide.service('Position', function() {
+        return {
+          registerBoundsObserver: function(cb) {
+            cb();
+          },
+          getBounds : function() {
+            return bounds;
+          },
+          posToLatLng : function(location) {
+            return {}
+          },
+          withinBounds : function(position) {
+            return true;
           }
-        ];
-
-        scope.onRefresh();
-
-        expect(articles.get.calledOnce).to.be.true;
+        };
       });
-     */
+    });
 
-      /*
-      it('should get 5 articles', function() {
-        arts = [
-          {
-            id: '1',
-            subarticles: []
-          },
-          {
-            id: '2',
-            subarticles: []
-          },
-          {
-            id: '3',
-            subarticles: []
-          },
-          {
-            id: '4',
-            subarticles: []
-          },
-          {
-            id: '5',
-            subarticles: []
+  });
+
+  beforeEach(inject(function($filter, Article, Position, Articles) {
+    articles = Articles;
+    article = Article;
+    position = Position;
+  }));
+
+  describe('initialization', function() {
+    it('should initialize the filter', function() {
+      sinon.stub(article, 'find', function(f) {
+        expect(f.filter.limit).to.equal(50);
+        expect(f.filter.skip).to.equal(0);
+        expect(f.filter.include).to.deep.equal({
+          relation: 'subarticles',
+          scope: {
+            limit: 1,
+            order: 'rating DESC'
           }
-        ];
+        });
+        expect(f.filter.order).to.equal('rating DESC');
 
-        scope.onRefresh();
+        return {
+          $promise: {
+            then: function(cb) {
+              cb([]);
+            }
+          }
+        }
+      });
 
-        expect(scope.articles.length).to.equal(5);
-      }); 
-     */
+      articles.load(function() {});
+      expect(article.find.calledOnce).to.be.true;
+    });
+  });
 
-      /*
-      it('should set the topSub of the article', function() {
+
+  describe('updateBounds', function() {
+
+    it('should set the filter bounds', function() {
+      sinon.stub(article, 'find', function(f) {
+        expect(f.filter.where).to.exist;
+        expect(f.filter.where.location.geoWithin.$box).to.exist;
+        return {
+          $promise: {
+            then: function(cb) {
+              cb([]);
+            }
+          }
+        }
+      });
+
+      articles.load(function() {});
+      expect(article.find.calledOnce).to.be.true;
+    });
+
+  });
+
+  describe('add' , function() {
+    describe('addOne', function() {
+      var arts = [];
+      var date;
+      beforeEach(function() {
         arts = [
           {
             id: '1',
+            ranking: 0,
+            modified: Date.now(),
             subarticles: [
               {
-                id: 's1'
-              },
-              {
-                id: 's2'
+                id: 'a'
               }
             ]
           }
         ];
 
-        scope.onRefresh();
-
-        expect(scope.articles.length).to.equal(1);
-        expect(scope.articles[0].topSub).to.exist;
-        expect(scope.articles[0].topSub.id).to.equal('s1');
+        sinon.spy(position, 'withinBounds');
+        articles.add(arts);
       });
-     */
-      /*
-      it('should remove the duplicate article', function() {
 
-        sinon.stub(articles, 'getOne', function(id) {
-          return true;
-        });
+      it('should call withinBounds once', function() {
+          expect(position.withinBounds.calledOnce).to.be.true;
+      });
+          
+      it('should have saved one article in inViewArticles', function() {
+        var results = articles.get();
+        expect(results.length).to.equal(1);
+        expect(results[0].id).to.equal(arts[0].id);
+      });
+
+      it('should set the topSub', function() {
+        var results = articles.get();
+        expect(results[0].topSub.id).to.equal(arts[0].subarticles[0].id);
+      });
+
+      it('should not replace the article because the stored one is newer', function() {
+        var ranking = arts[0].ranking;
 
         arts = [
           {
             id: '1',
-            subarticles: []
+            ranking: 1,
+            modified: Date(2000,1,1),
+            subarticles: [
+              {
+                id: 'a'
+              }
+            ]
           }
         ];
 
-        scope.loadMore();
+        articles.add(arts);
+        var results = articles.get();
+        expect(results.length).to.equal(1);
+        expect(results[0].ranking).to.equal(ranking);
+      });
 
-        expect(articles.getOne.callCount).to.equal(1);
-        expect(scope.articles.length).to.equal(0);
-      }); 
-
-      it('should append the arts to scope.articles', function() {
-
-        scope.articles = [
+      it('should replace the article because it is newer', function() {
+        arts = [
           {
             id: '1',
-            subarticles: []
+            ranking: 1,
+            modified: Date.now(),
+            subarticles: [
+              {
+                id: 'a'
+              }
+            ]
           }
         ];
 
-        arts = [
+        articles.add(arts);
+        var results = articles.get();
+        expect(results.length).to.equal(1);
+        expect(results[0].ranking).to.equal(arts[0].ranking);
+      });
+
+      it('should add the article in order by ranking', function() {
+        var moreArticles = [
           {
             id: '2',
-            subarticles: []
+            ranking: 1000,
+            subarticles: [
+              {
+                id: 'a'
+              }
+            ]
           }
         ];
 
-        scope.loadMore();
+        articles.add(moreArticles);
 
-        expect(scope.articles.length).to.equal(2);
-        expect(scope.articles[1]).to.equal(arts[0]);
-      }); 
-     */
+        var results = articles.get();
+        expect(results.length).to.equal(2);
+        expect(results[0].id).to.equal(moreArticles[0].id);
+        expect(results[1].id).to.equal(arts[0].id);
+      });
+    });
 
+    it('should add more than one article', function() {
+      var arts = [
+        {
+          id: '1',
+          ranking: 0,
+          subarticles: []
+        },
+        {
+          id: '2',
+          ranking: 0,
+          subarticles: []
+        }
+      ];
+
+      articles.add(arts);
+
+      var results = articles.get();
+      expect(results.length).to.equal(2);
+      expect(results[0].id).to.equal(arts[0].id);
+      expect(results[1].id).to.equal(arts[1].id);
+    });
+
+    it('should add an article to outViewArticles', function() {
+      sinon.stub(position, 'withinBounds', function(position) {
+        return false;
+      });
+
+      var arts = [
+        {
+          id: '1',
+          ranking: 0,
+          subarticles: []
+        },
+        {
+          id: '2',
+          ranking: 0,
+          subarticles: []
+        }
+      ];
+
+      articles.add(arts);
+      var results = articles.get();
+      expect(results.length).to.equal(0);
+    });
+
+    it('should notify observers', function() {
+      var fake = {
+        func: function() {}
+      };
+      sinon.spy(fake, 'func');
+      articles.registerObserver(fake.func);
+
+      articles.add([])
+      expect(fake.func.calledOnce).to.be.true;
+    });
+
+    it('should update the filter.skip', function() {
+      var arts = [
+        {
+          id: '1',
+          ranking: 0,
+          subarticles: []
+        },
+        {
+          id: '2',
+          ranking: 0,
+          subarticles: []
+        }
+      ];
+
+      sinon.stub(article, 'find', function(f) {
+        expect(f.filter.skip).to.equal(arts.length);
+        return {
+          $promise: {
+            then: function(cb) {
+              cb([]);
+            }
+          }
+        }
+      });
+
+      articles.add(arts);
+      articles.load(function() {});
+      expect(article.find.calledOnce).to.be.true;
+    });
+  });
+
+  describe('get' , function() {
+    it('should return an empty array', function() {
+      var arts = articles.get();
+      expect(arts.length).to.equal(0);
+    });
+  });
+  
+  describe('load', function() {
+    var arts = [];
+    beforeEach(function() {
+      arts = [
+        {
+          id: '1',
+          ranking: 0,
+          subarticles: []
+        },
+        {
+          id: '2',
+          ranking: 0,
+          subarticles: []
+        }
+      ];
+
+      sinon.stub(article, 'find', function(f) {
+        return {
+          $promise: {
+            then: function(cb) {
+              cb(arts);
+            }
+          }
+        }
+      });
+    });
+
+    it('should add the articles', function() {
+
+      articles.load( function() {});
+      var results = articles.get(); 
+      expect(results.length).to.equal(2);
+    });
+
+    it('should set itemsAvailable to false', function() {
+      arts = [];
+
+      articles.load( function() {});
+
+      expect(articles.areItemsAvailable()).to.be.false;
+    });
+
+    it('should call the passed in callback', function() {
+      var fake = {
+        func: function () {}
+      };
+
+      sinon.spy(fake, 'func');
+
+      articles.load(fake.func);
+      expect(fake.func.calledOnce).to.be.true;
+    });
+  });
+
+  describe('deleteAll', function() {
+    var arts = [];
+    beforeEach( function() {
+      arts = [
+        {
+          id: '1',
+          ranking: 0,
+          subarticles: []
+        },
+        {
+          id: '2',
+          ranking: 0,
+          subarticles: []
+        }
+      ];
+
+      articles.add(arts);
+      var results = articles.get();
+      expect(results.length).to.equal(arts.length);
+    });
+
+    it('should delete all articles in inViewArticles', function() {
+      articles.deleteAll();
+      var results = articles.get();
+      expect(results.length).to.equal(0);
+    });
+
+    it('should notify observers', function() {
+      var fake = {
+        func: function() {}
+      };
+      sinon.spy(fake, 'func');
+      articles.registerObserver(fake.func);
+
+      articles.deleteAll();
+      expect(fake.func.calledOnce).to.be.true;
+    });
+  });
+
+  describe('areItemsAvailable', function() {
+    it('should return true', function() {
+      expect(articles.areItemsAvailable()).to.be.true;
+    });
+  });
+
+  describe('getOne', function() {
+    var arts = [];
+    beforeEach( function() {
+      arts = [
+        {
+          id: '1',
+          ranking: 0,
+          subarticles: []
+        },
+        {
+          id: '2',
+          ranking: 0,
+          subarticles: []
+        }
+      ];
+      articles.add(arts);
+
+      sinon.stub(position, 'withinBounds', function(pos) {
+        return false;
+      });
+
+      arts = [
+        {
+          id: '3',
+          subarticles: []
+        }
+      ];
+
+      articles.add(arts);
+    });
+
+    it('should return an article from inViewArticles', function() {
+      var art = articles.getOne('1');
+
+      expect(art).to.exist;
+      expect(art.id).to.equal('1');
+    });
+
+    it('should return an article from outViewArticles', function() {
+      var art = articles.getOne('3');
+
+      expect(art).to.exist;
+      expect(art.id).to.equal('3');
+    });
+  });
+
+  describe('registerObserver', function() {
+    it('should be notified', function() {
+      var fake = {
+        func: function() {}
+      };
+      sinon.spy(fake, 'func');
+      articles.registerObserver(fake.func);
+
+      articles.add([])
+      expect(fake.func.calledOnce).to.be.true;
+    });
+  });
+
+  describe('reorganize', function() {
+    var arts = [];
+    var withinBounds = true;
+
+    beforeEach( function() {
+      sinon.stub(position, 'withinBounds', function(pos) {
+        return withinBounds;
+      });
+
+      arts = [
+        {
+          id: '1',
+          ranking: 1,
+          subarticles: []
+        },
+        {
+          id: '2',
+          ranking: 2,
+          subarticles: []
+        }
+      ];
+      articles.add(arts);
+
+      withinBounds = false;
+      arts = [
+        {
+          id: '3',
+          ranking: 3,
+          subarticles: []
+        }
+      ];
+
+      articles.add(arts);
+    });
+
+    it('should move all articles into inViewArticles', function() {
+      withinBounds = true;
+      articles.reorganize();
+      var results = articles.get();
+      expect(results.length).to.equal(3);
+    }); 
+
+    it('should move all articles into outViewArticles', function() {
+      withinBounds = false;
+      articles.reorganize();
+      var results = articles.get();
+      expect(results.length).to.equal(0);
+    }); 
+
+    it('should call notifyObservers', function() {
+      var fake = {
+        func: function() {}
+      };
+      sinon.spy(fake, 'func');
+      articles.registerObserver(fake.func);
+
+      articles.reorganize();
+      expect(fake.func.calledOnce).to.be.true;
+    });
+
+    it('should update the filter.skip', function() {
+
+      sinon.stub(article, 'find', function(f) {
+        expect(f.filter.skip).to.equal(3);
+        return {
+          $promise: {
+            then: function(cb) {
+              cb([]);
+            }
+          }
+        }
+      });
+
+      withinBounds = true;
+      articles.reorganize();
+
+      articles.load(function() {});
+      expect(article.find.calledOnce).to.be.true;
+    });
+  });
+});

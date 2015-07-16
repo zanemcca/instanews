@@ -56,7 +56,6 @@ app.service('Articles', [
          console.log('Bounds not set yet!');
       }
 
-      reorganize();
       itemsAvailable = true;
    };
 
@@ -119,7 +118,9 @@ app.service('Articles', [
 
       var idx = getIndex(articles, article);
       if( idx >= 0 ) {
-        articles[idx] = article;
+        if( article.modified >= articles[idx].modified ) {
+          articles[idx] = article;
+        }
       }
       else {
         articles.push(article);
@@ -151,7 +152,6 @@ app.service('Articles', [
    // Deletes the local articles
    var deleteAll = function() {
      inViewArticles = [];
-     outViewArticles = [];
      notifyObservers();
    };
 
@@ -183,9 +183,6 @@ app.service('Articles', [
      notifyObservers();
    };
 
-   // Call reorganize every time the bounds change
-   Position.registerBoundsObserver(updateBounds);
-
    var observerCallbacks = [];
 
    var registerObserver = function(cb) {
@@ -198,11 +195,17 @@ app.service('Articles', [
       });
    };
 
+   // Call reorganize every time the bounds change
+   Position.registerBoundsObserver(reorganize);
+   Position.registerBoundsObserver(updateBounds);
+
    return {
       get: get,
       add: add,
       load: load,
       deleteAll: deleteAll,
+      reorganize: reorganize,
+      updateBounds: updateBounds,
       areItemsAvailable: areItemsAvailable,
       registerObserver: registerObserver,
       getOne: getOne
