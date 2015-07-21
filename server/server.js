@@ -72,6 +72,7 @@ app.start = function() {
     console.log('Web server listening at: %s', app.get('url'));
   });
 
+  /*
    //Create certificates
    //TODO Use a Certificate Authority such as Comodo.com
    pem.createCertificate({
@@ -95,7 +96,7 @@ app.start = function() {
       });
       return server;
    });
-
+  */
 };
 
 // start the server if `$ node server.js`
