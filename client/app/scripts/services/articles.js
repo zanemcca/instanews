@@ -17,7 +17,7 @@ app.service('Articles', [
    var outViewArticles = [];
    var itemsAvailable = true;
 
-   var filter = {
+   var defaultFilter = {
       limit: 50,
       skip: 0,
       include: {
@@ -29,6 +29,8 @@ app.service('Articles', [
       },
       order: 'rating DESC'
    };
+
+   var filter = defaultFilter;
 
    var areItemsAvailable = function() {
      return itemsAvailable;
@@ -152,6 +154,7 @@ app.service('Articles', [
    // Deletes the local articles
    var deleteAll = function() {
      inViewArticles = [];
+     filter.skip = 0;
      notifyObservers();
    };
 

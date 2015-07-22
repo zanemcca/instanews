@@ -59,7 +59,7 @@
          </ion-item>
       </ul>
       <ion-infinite-scroll
-         ng-if="itemsAvailable"
+         ng-if="itemsAvailable()"
          on-infinite="loadMore()"
          distance="1%">
       </ion-infinite-scroll>

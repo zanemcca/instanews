@@ -31,8 +31,14 @@ app.directive('indatapreview', [
 app.directive('indata',[
       '$compile',
       'Platform',
-      function ($compile, Platform) {
+      'Storage',
+      function (
+        $compile,
+        Platform,
+        Storage
+      ) {
 
+        //TODO Use the storage api
    var getSrc = function (data) {
       var name;
       if (data.name) {

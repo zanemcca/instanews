@@ -127,10 +127,11 @@ describe('Feed: ', function(){
       expect(articles.registerObserver.calledOnce).to.be.true;
     });
 
-    it('should call Articles.areItemsAvailable', function() {
+    it('should set a local copy of areItemsAvailable', function() {
       sinon.spy(articles, 'areItemsAvailable');
       initController();
 
+      scope.itemsAvailable();
       expect(articles.areItemsAvailable.calledOnce).to.be.true;
     });
 
@@ -152,17 +153,12 @@ describe('Feed: ', function(){
       });
 
       sinon.spy(articles, 'get');
-      sinon.spy(articles, 'areItemsAvailable');
 
       initController();
     });
 
     it('should call Articles.get', function() {
       expect(articles.get.calledTwice).to.be.true;
-    });
-
-    it('should call Articles.areItemsAvailable', function() {
-      expect(articles.areItemsAvailable.calledTwice).to.be.true;
     });
   });
 

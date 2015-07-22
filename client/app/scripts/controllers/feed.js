@@ -20,7 +20,7 @@ app.controller('FeedCtrl', [
    $scope.toggleMenu = Navigate.toggleMenu;
    $scope.scrollTop = Navigate.scrollTop;
 
-   $scope.itemsAvailable = Articles.areItemsAvailable();
+   $scope.itemsAvailable = Articles.areItemsAvailable;
 
    // Localize the map on the users position
    $scope.localize = function() {
@@ -37,7 +37,7 @@ app.controller('FeedCtrl', [
    var updateArticles = function() {
       $scope.articles = Articles.get();
 
-      $scope.itemsAvailable = Articles.areItemsAvailable();
+      //$scope.itemsAvailable = Articles.areItemsAvailable();
    };
 
    // Refresh the articles completely

@@ -15,18 +15,22 @@ app.controller('PostCtrl', [
       'Maps',
       'User',
       'Camera',
-      function($state,
-         $stateParams,
-         $scope,
-         $ionicModal,
-         $ionicHistory,
-         Article,
-         Articles,
-         Position,
-         Platform,
-         Maps,
-         User,
-         Camera) {
+      'Storage',
+      function(
+        $state,
+        $stateParams,
+        $scope,
+        $ionicModal,
+        $ionicHistory,
+        Article,
+        Articles,
+        Position,
+        Platform,
+        Maps,
+        User,
+        Camera,
+        Storage
+      ) {
 
    $scope.user = User.get();
 
