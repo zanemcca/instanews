@@ -12,6 +12,11 @@ var AccessToken = app.models.AccessToken;
 var Journalists = app.models.Journalist;
 var Installations = app.models.Installation;
 var Subarticles =  app.models.Subarticle;
+var Articles =  app.models.Article;
+var Comments = app.models.Comment;
+var UpVotes = app.models.UpVote;
+var DownVotes = app.models.DownVote;
+var Notifications = app.models.Notif;
 
 var users = require('./users.json');
 //Import the genericModels to be used by the testcases
@@ -295,14 +300,14 @@ var testEndpoint = function(oldEndpoint, test, role, next) {
                   console.log('Warning: Model was found but has an invalid id');
                }
             }
-				else if( ends[2] === 'storages' ) {
-				  if( ends[count -1] === 'storages') {
-					 endpoint += '/instanews.test';
-				  }
-				  else {
-					 endpoint += '/file.txt';
-				  }
-				}
+            else if( ends[2] === 'storages' ) {
+              if( ends[count -1] === 'storages') {
+                     endpoint += '/instanews.test';
+              }
+              else {
+                     endpoint += '/file.txt';
+              }
+            }
             else {
                //console.log('Warning: A model should be available for ' + ends[count-1]);
                endpoint += '/{id}';
@@ -565,7 +570,32 @@ var testModel = function(tests) {
          .expect(204)
          .end( function(err,res) {
             dump(err, res);
-            done(err,res);
+           var error = err;
+           Installations.destroyAll(function(err) {
+             if(!error && err) error = err;
+             Articles.destroyAll(function(err) {
+               if(!error && err) error = err;
+               Subarticles.destroyAll(function(err) {
+                 if(!error && err) error = err;
+                 Comments.destroyAll(function(err) {
+                   if(!error && err) error = err;
+                   Notifications.destroyAll(function(err) {
+                     if(!error && err) error = err;
+                     UpVotes.destroyAll(function(err) {
+                       if(!error && err) error = err;
+                       DownVotes.destroyAll(function(err) {
+                         if(!error && err) error = err;
+                         Journalists.destroyAll(function(err) {
+                           if(!error && err) error = err;
+                           done(error);
+                         });
+                       });
+                     });
+                   });
+                 });
+               });
+             });
+           });
          });
       });
 
