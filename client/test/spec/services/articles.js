@@ -370,6 +370,25 @@ describe('Articles', function() {
       expect(results.length).to.equal(0);
     });
 
+    it('should clear filter.skip', function() {
+
+      sinon.stub(article, 'find', function(f) {
+        expect(f.filter.skip).to.equal(0);
+        return {
+          $promise: {
+            then: function(cb) {
+              cb([]);
+            }
+          }
+        }
+      });
+
+      articles.deleteAll();
+
+      articles.load(function() {});
+      expect(article.find.calledOnce).to.be.true;
+    });
+
     it('should notify observers', function() {
       var fake = {
         func: function() {}
