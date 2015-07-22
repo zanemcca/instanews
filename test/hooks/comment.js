@@ -238,7 +238,7 @@ exports.run = function() {
                                  notifiableId: res.id
                               }
                            }, function(err, res) {
-                              if(!err && res && res.length > 0) {
+                              if(!err && res && res.length > 1) {
                                  expect(res.length).to.equal(2);
                                  if(res[0].username === 'jane') {
                                     expect(res[0].username).to.equal('jane');
