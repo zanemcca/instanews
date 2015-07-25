@@ -59,7 +59,7 @@
     "org.apache.cordova.geolocation",
     "org.apache.cordova.console",
     "com.ionic.keyboard",
-    "com.synconset.imagepicker",
+    "com.synconset.imagepicker"
   ],
   "cordovaPlatforms": [
     {
