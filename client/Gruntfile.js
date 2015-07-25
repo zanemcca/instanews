@@ -43,7 +43,7 @@ module.exports = function (grunt) {
         constants: {
           ENV: {
             name: 'development',
-            apiEndpoint: 'http://localhost:3000/api'
+            apiEndpoint: 'http://192.168.1.2:3000/api'
           }
         }
       },
@@ -334,6 +334,7 @@ module.exports = function (grunt) {
           '<%= yeoman.app %>/bower_components/ionic/release/js/ionic-angular.js',
           '<%= yeoman.app %>/bower_components/angular-resource/angular-resource.js',
           '<%= yeoman.app %>/bower_components/ngCordova/dist/ng-cordova.js',
+          '<%= yeoman.app %>/bower_components/angular-uuid-service/angular-uuid-service.js',
           'https://maps.googleapis.com/maps/api/js?libraries=places,visualization&key=AIzaSyCLYNTmynkgm6Pg8_efYqZUuTnjqGcwYkA&sensor=true',
           '<%= yeoman.app %>/<%= yeoman.scripts %>/**/*.js',
           '<%= yeoman.test %>/mock/**/*.js',

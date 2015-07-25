@@ -115,25 +115,42 @@ app.service('Maps', [
    };
 
    var setCenter = function(map, pos) {
-      if(pos && pos.coords) {
+      if(pos) {
          map.setCenter(Position.posToLatLng(pos));
          return true;
       }
       return false;
    };
 
+   var fitBounds = function(map, bounds) {
+       map.fitBounds(bounds);
+   };
+
+   var marker;
+
+   var getMarker = function() {
+     return marker;
+   };
+
    var setMarker = function(map, position) {
+
+     if(!marker) {
       var tempMarker = {
          map: map,
          animation: google.maps.Animation.DROP,
          position: Position.posToLatLng(position)
       };
 
-      var marker = new google.maps.Marker(tempMarker);
-      return marker;
+      marker = new google.maps.Marker(tempMarker);
+     }
+     else {
+       marker.setMap(map);
+       marker.setPosition(Position.posToLatLng(position));
+     }
+     marker.setVisible(true);
    };
 
-   var deleteMarker = function(marker) {
+   var deleteMarker = function() {
       if(marker) {
          marker.setVisible(false);
       }
@@ -271,7 +288,9 @@ app.service('Maps', [
       localize: localize,
       setCenter: setCenter,
       setMarker: setMarker,
+      getMarker: getMarker,
       deleteMarker: deleteMarker,
+      fitBounds: fitBounds,
       setPostMap: setPostMap,
       getPostMap: getPostMap,
       setFeedMap: setFeedMap,

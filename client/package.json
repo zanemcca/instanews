@@ -50,7 +50,6 @@
   },
   "cordovaPlugins": [
     "org.apache.cordova.camera",
-    "com.synconset.imagepicker",
     "org.apache.cordova.media-capture",
     "https://github.com/phonegap-build/PushPlugin.git",
     "org.apache.cordova.splashscreen",
@@ -60,17 +59,7 @@
     "org.apache.cordova.geolocation",
     "org.apache.cordova.console",
     "com.ionic.keyboard",
-    "org.apache.cordova.splashscreen",
-    "com.ionic.keyboard",
-    "org.apache.cordova.device",
-    "org.apache.cordova.console",
-    "org.apache.cordova.geolocation",
-    "org.apache.cordova.dialogs",
     "com.synconset.imagepicker",
-    "org.apache.cordova.file",
-    "org.apache.cordova.camera",
-    "org.apache.cordova.media-capture",
-    "https://github.com/phonegap-build/PushPlugin.git"
   ],
   "cordovaPlatforms": [
     {

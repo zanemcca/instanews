@@ -247,12 +247,15 @@ app.service('Position', [
          return new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
       }
       else if(position.lat && position.lng) {
-         //Position as read from the database
-         return new google.maps.LatLng(position.lat, position.lng);
-      }
-      //Position is already in Googles LatLng format
-      else {
-         return position;
+         var latLng =  new google.maps.LatLng(position.lat, position.lng);
+         if(!latLng.lat()) {
+            //Position is already in Googles LatLng format
+           return new google.maps.LatLng(position.lat(), position.lng());
+         }
+         else {
+           //Position as read from the database
+           return latLng;
+         }
       }
    };
 

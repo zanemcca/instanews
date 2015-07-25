@@ -8,6 +8,7 @@
 // 'starter.controllers' is found in controllers.js
 angular.module('instanews', [
       'ionic',
+      'config',
       'instanews.navigate',
       'instanews.localStorage',
       'instanews.article',
@@ -27,12 +28,17 @@ angular.module('instanews', [
       'instanews.user',
       'instanews.position',
       'instanews.notifications',
+      'instanews.autocomplete',
+      'instanews.fileTransfer',
       'lbServices',
       'ui.router',
       'ngCordova'])
 
-.run([function() {
-}])
+.config(['LoopBackResourceProvider','ENV',
+    function(LoopBackResourceProvider, ENV) {
+       LoopBackResourceProvider.setUrlBase(ENV.apiEndpoint);
+    }
+])
 
 .controller('AppCtrl', [
    '$scope',

@@ -15,7 +15,8 @@
     "sha256": "http://crypto-js.googlecode.com/svn/tags/3.1.2/build/rollups/sha256.js",
     "aes": "http://crypto-js.googlecode.com/svn/tags/3.1.2/build/rollups/aes.js",
     "angular-animate": "~1.4.1",
-    "angular-resource": "~1.4.1"
+    "angular-resource": "~1.4.1",
+    "angular-uuid-service": "~0.1.0"
   },
   "resolutions": {
     "angular": ">=1.4"

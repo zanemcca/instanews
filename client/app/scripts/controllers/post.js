@@ -1,38 +1,35 @@
 
 'use strict';
-var app = angular.module('instanews.post', ['ionic', 'ngResource','ngAutocomplete']);
+var app = angular.module('instanews.post', ['ionic', 'ngResource', 'uuid']);
 
 app.controller('PostCtrl', [
-      '$state',
       '$stateParams',
       '$scope',
       '$ionicModal',
       '$ionicHistory',
       'Article',
       'Articles',
-      'Position',
-      'Platform',
       'Maps',
       'User',
       'Camera',
-      'Storage',
+      'ENV',
+      'FileTransfer',
       function(
-        $state,
         $stateParams,
         $scope,
         $ionicModal,
         $ionicHistory,
         Article,
         Articles,
-        Position,
-        Platform,
         Maps,
         User,
         Camera,
-        Storage
+        ENV,
+        FileTransfer
       ) {
 
    $scope.user = User.get();
+   $scope.getMarker = Maps.getMarker;
 
    var updateUser = function() {
       $scope.user = User.get();
@@ -40,112 +37,26 @@ app.controller('PostCtrl', [
 
    User.registerObserver(updateUser);
 
-   var marker;
-   var map;
-
-   $scope.disableTap = function(){
-      console.log('Disabling tap');
-      var container = document.getElementsByClassName('pac-container');
-      // disable ionic data tab
-      angular.element(container).attr('data-tap-disabled', 'true');
-      // leave input field if google-address-entry is selected
-      angular.element(container).on('click', function(){
-        document.getElementById('search-input').blur();
+    //If we have an ID given then we know we are posting subarticles within an article
+    if( $stateParams.id ) {
+      $scope.article = Articles.getOne($stateParams.id);
+    }
+    else {
+      //Refresh the map everytime we enter the view
+      $scope.$on('$ionicView.afterEnter', function() {
+        $scope.localize();
       });
-   };
-
-   Platform.ready
-   .then( function() {
-      //If we have an ID given then we know we are posting subarticles within an article
-      if( $stateParams.id ) {
-         $scope.article = Articles.getOne($stateParams.id);
-      }
-      else {
-         //Refresh the map everytime we enter the view
-         $scope.$on('$ionicView.afterEnter', function() {
-            $scope.localize();
-         });
-
-         var element = document.getElementById('postMap');
-         if ( element && element.textContent.indexOf('Map') === -1) {
-
-            var position = Position.getLast();
-            var mPosition = {};
-
-            if(position && position.coords) {
-               mPosition = Position.posToLatLng(position);
-            }
-            else {
-               //Load Montreal for now
-               mPosition = new google.maps.LatLng(45.5017 , -73.5673);
-            }
-
-            var mapOptions = {
-               center: mPosition,
-               zoom: 8,
-               disableDefaultUI: true,
-               mapTypeId: google.maps.MapTypeId.ROADMAP
-            };
-
-            map = new google.maps.Map(element, mapOptions);
-
-            var input = document.getElementById('search-input');
-            var autocomplete = new google.maps.places.Autocomplete(input);
-
-            //Add a listener on the search box
-            google.maps.event.addListener(autocomplete, 'place_changed', function() {
-               var place = autocomplete.getPlace();
-
-               if(!place.geometry) {
-                  console.log('No geometry!');
-                  return;
-               }
-
-               $scope.newArticle.place = place;
-
-               if(place.geometry.viewport) {
-                  map.fitBounds(place.geometry.viewport);
-               }
-               else {
-                  Maps.setCenter(map, place.geometry.location);
-                  map.setZoom(17);
-               }
-
-               if(!marker) {
-                  Maps.setMarker(map, place.geometry.location);
-                  $scope.newArticle.markerSet = true;
-               }
-               else {
-                  marker.setPosition(place.geometry.location);
-               }
-            });
-
-            google.maps.event.addListener(map, 'click', function(event) {
-               if(!marker) {
-                  Maps.setMarker(map, event.latLng);
-                  $scope.newArticle.markerSet = true;
-               }
-               else {
-                  marker.setPosition(event.latLng);
-               }
-            });
-
-            Maps.setPostMap(map);
-         }
-
-      }
-   });
+    }
 
    $scope.localize = function() {
+     var map = Maps.getPostMap();
       if( map) {
          Maps.localize(map, function(err, pos) {
             if(err) {
                console.log('Error: ' + err);
             }
             else {
-               marker = Maps.deleteMarker(marker);
-               marker = Maps.setMarker(map,pos);
-               $scope.newArticle.markerSet = true;
+               Maps.setMarker(map,pos);
             }
          });
       }
@@ -156,21 +67,16 @@ app.controller('PostCtrl', [
 
    $scope.data = {
       text: '',
-      images: [],
-      videos: []
    };
 
    $scope.newArticle = {
       title: '',
-      markerSet: false,
-      place: {},
       data: []
    };
 
    $scope.trashArticle = function() {
       $scope.newArticle.title = '';
       $scope.newArticle.data = [];
-      $scope.newArticle.place = {};
       $ionicHistory.goBack();
    };
 
@@ -178,33 +84,16 @@ app.controller('PostCtrl', [
    //attached to it
    $scope.postArticle = function() {
 
-      var cb = function(err, position) {
-         if(err) {
-            console.log('Error getting users position: ' + err.message);
-         }
-
-         var loc = {
-            lat: 0,
-            lng: 0
+      var marker = Maps.getMarker();
+      if(marker) {
+         var position = {
+            lat: marker.getPosition().lat(),
+            lng: marker.getPosition().lng()
          };
 
-         if(position.coords) {
-            if(!err) {
-               Position.set(position);
-            }
-            loc = {
-               lat: position.coords.latitude,
-               lng: position.coords.longitude
-            };
-         }
-         else {
-            loc = position;
-         }
-
          Article.create({
-            date: Date.now(),
             isPrivate: false,
-            location: loc,
+            location: position,
             username: $scope.user.username,
             title: $scope.newArticle.title
          })
@@ -212,22 +101,16 @@ app.controller('PostCtrl', [
          .then( function(res) {
             if( $scope.newArticle.data.length > 0 ){
                postSubarticle(res.id, function(res) {
-                  console.log('Succesful sub creation: ' + res);
+                  console.log('Succesful sub creation: ' + JSON.stringify(res));
+                  $scope.trashArticle();
                });
             }
-            $scope.trashArticle();
+            else {
+              $scope.trashArticle();
+            }
          }, function(err) {
             console.log('Error posting article: ' + err);
-         });
-      };
-
-      if(marker) {
-         var position = {
-            lat: marker.getPosition().lat(),
-            lng: marker.getPosition().lng()
-         };
-         cb(null, position);
-         console.log('Using marker position!!!');
+         }); 
       }
       else {
          console.log('Cannot post article without position');
@@ -239,8 +122,6 @@ app.controller('PostCtrl', [
    //Clean up the subarticle and go back to the article view
    $scope.trashSubarticle = function() {
       $scope.data.text = '';
-      $scope.images = [];
-      $scope.videos = [];
       $ionicHistory.goBack();
    };
 
@@ -257,27 +138,33 @@ app.controller('PostCtrl', [
    var postSubarticle = function(id, cb) {
       var datas = $scope.newArticle.data;
 
-      var handle = function(res) {
-         subs.push(res);
-         if( subs.length === datas.length) {
-            cb(subs);
-         }
-      };
+      if(datas.length > 0) {
+        var handle = function(res) {
+           subs.push(res);
+           if( subs.length === datas.length) {
+              cb(subs);
+           }
+        };
 
-      var subs = [];
-      for( var i = 0; i < datas.length; i++) {
-         var data = datas[i];
-         var func;
-         if( data.text ) {
-            func = postText;
-         }
-         else if ( data.videos && data.videos.length > 0 ) {
-            func = postVideo;
-         }
-         else {
-            func = postPhoto;
-         }
-         func(id,data, handle);
+        var subs = [];
+        for( var i = 0; i < datas.length; i++) {
+           var data = datas[i];
+           var func;
+           if( data.text ) {
+              func = postText;
+           }
+           else if ( data.videos && data.videos.length > 0 ) {
+              func = postVideo;
+           }
+           else {
+              func = postPhoto;
+           }
+           func(id,data, handle);
+        }
+      }
+      else {
+        console.log('Warning: There was no data given for subarticle creation');
+        cb();
       }
    };
 
@@ -309,7 +196,6 @@ app.controller('PostCtrl', [
    var postText = function(id, data, cb) {
       Article.subarticles.create({
          id: id,
-         date: Date.now(),
          parentId: id,
          username: $scope.user.username,
          text: data.text
@@ -319,12 +205,6 @@ app.controller('PostCtrl', [
 
 
    /* Video posting */
-
-   //Clean up the video temp files
-   $scope.trashVideo = function() {
-      $scope.data.videos = [];
-   };
-
    //Capture video using the video camera
    $scope.captureVideo = function() {
       Camera.getVideo()
@@ -332,10 +212,13 @@ app.controller('PostCtrl', [
          $scope.newArticle.data.push({
             videos: video
          });
-         $scope.trashVideo();
       }, function(err) {
-         console.err(err);
+         console.log(err);
       });
+   };
+
+   var progress = function (progress) {
+         //console.log('Progress: ' + JSON.stringify(progress));
    };
 
    //Post video to the server within a specified article
@@ -349,82 +232,81 @@ app.controller('PostCtrl', [
          }
       };
 
-      for( var i = 0; i < data.videos.length; i++) {
-         var video = data.videos[i];
+      var container = 'instanews.videos.us.east';
+      var server = ENV.apiEndpoint + '/storages/' + container + '/upload';
+
+     var onVideoUploadSuccess = function(res) {
+       console.log('Succesful upload of video!');
+
+       options.fileName = poster; 
+       options.mimeType = 'image/jpeg'; 
+
+       FileTransfer.upload(server, video.thumbnailURI, options)
+       .then( function(res) {
+         console.log('Succesful upload of thumbnail!');
+         //console.log('Res: ' + JSON.stringify(res));
          Article.subarticles.create({
             id: id,
-            date: Date.now(),
             parentId: id,
             username: $scope.user.username,
             _file: {
                type: video.type,
-               name: video.fullPath, //TODO load to media service then change this to filename
+               container: container,
+               name: video.name,
                size: video.size,
-               poster: video.poster,
+               poster: poster,
+               lastModified: video.lastModified,
                caption: video.caption
             }
          })
          .$promise.then(handle);
+       }, function(err) {
+         console.log('Error: Failed to upload thumbnail: ' + JSON.stringify(err));
+       }, progress);
+     };
+
+     var error = function(err) {
+       //TODO Notify the user and retry
+       console.log('Error: Failed to upload a video: ' + JSON.stringify(err));
+     };
+
+      for( var i = 0; i < data.videos.length; i++) {
+         var video = data.videos[i];
+
+         var options = {
+           fileName: video.name,
+           mimeType: video.type,
+           headers: { 'Authorization': User.getToken()}
+         };
+
+         var poster = video.name.slice(0,video.name.lastIndexOf('.') + 1) + 'jpg';
+
+         FileTransfer.upload(server, video.nativeURL, options)
+         .then( onVideoUploadSuccess, error, progress);
       }
    };
 
-   /*
-   $scope.captureThumbnail = function() {
-      Camera.getPicture()
-      .then( function(imageURI) {
-         $scope.data.imageURI = imageURI;
-      }, function(err) {
-         console.log(err);
-      });
-   };
-   */
-
-
-
    /* Photo posting */
-
-   //Delete the temporary photos so that the form is empty
-   $scope.trashPhoto = function() {
-      $scope.data.images = [];
-   };
 
    //Get a photo(s) from the gallery
    $scope.getPhotos = function() {
-      window.imagePicker.getPictures( function(res) {
-         for ( var i = 0; i < res.length; i++) {
-            //console.log('ImageURI: ' + res[i]);
-            var image = {
-               URI: res[i],
-               caption: ''
-            };
-            $scope.data.images.push(image);
-         }
-         $scope.newArticle.data.push({
-            images: $scope.data.images
-         });
-         $scope.trashPhoto();
-         $state.go($state.current, {}, {reload: true});
-      }, function(err) {
-         console.log('Error: ', err);
-      });
+
+     Camera.getPictures( function(images) {
+       $scope.newArticle.data.push({
+          images: images
+       });
+     });
    };
 
    //Capture a photo using the camera and store it into the new article
    $scope.capturePhoto = function() {
       Camera.getPicture()
-      .then( function(imageURI) {
-         var image = {
-            URI: imageURI,
-            caption: ''
-         };
-
-         $scope.data.images.push(image);
+      .then( function(file) {
          $scope.newArticle.data.push({
-            images: $scope.data.images
+            images: [file] 
          });
-         $scope.trashPhoto();
       }, function(err) {
-         console.log(err);
+         console.log('Error: Failed to capture a new photo: ' + JSON.stringify(err));
       });
    };
 
@@ -439,24 +321,44 @@ app.controller('PostCtrl', [
          }
       };
 
+     var onPhotoUploadSuccess = function(res) {
+       //Success Callback
+       console.log('Successful image upload: ' + res);
+       Article.subarticles.create(subarticle)
+       .$promise.then(handle);
+     };
+     var error = function(err) {
+        console.log('Error: Failed to upload a photo!: ' + err);
+     };
+
       for( var i = 0; i < data.images.length; i++) {
-         var image = data.images[i];
+         var file = data.images[i];
 
          var subarticle = {
             id: id,
             parentId: id,
-            date: Date.now(),
             username: $scope.user.username,
             _file: {
-               type: 'image',
-               name: image.URI,
-               size: 5000,
-               caption: image.caption
+               type: file.type,
+               name: file.name,
+               size: file.size,
+               lastModified: file.lastModified,
+               caption: file.caption
             }
          };
 
-         Article.subarticles.create(subarticle)
-         .$promise.then(handle);
+         var container = 'instanews.photos.us.east';
+
+         var server = ENV.apiEndpoint + '/storages/' + container + '/upload';
+
+         var options = {
+           fileName: file.name,
+           mimeType: file.type,
+           headers: { 'Authorization': User.getToken()}
+         };
+
+         FileTransfer.upload(server, file.nativeURL, options)
+         .then( onPhotoUploadSuccess, error, progress);
       }
    };
 
