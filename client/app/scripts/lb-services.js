@@ -1,8 +1,6 @@
 (function(window, angular, undefined) {'use strict';
 
-/* jshint ignore:start */
-var urlBase = '';
-
+var urlBase = "/api";
 var authHeader = 'authorization';
 
 /**
@@ -15,7 +13,7 @@ var authHeader = 'authorization';
  * the models exposed by the LoopBack server via the REST API.
  *
  */
-var module = angular.module("lbServices", ['ngResource', 'config']);
+var module = angular.module("lbServices", ['ngResource']);
 
 /**
  * @ngdoc object
@@ -36,19 +34,7 @@ var module = angular.module("lbServices", ['ngResource', 'config']);
  */
 module.factory(
   "Subarticle",
-  ['LoopBackResource',
-    'LoopBackAuth',
-    '$injector',
-    'ENV',
-    function(
-      Resource,
-      LoopBackAuth,
-      $injector,
-      ENV
-    ) {
-
-    var urlBase = ENV.apiEndpoint;  
-
+  ['LoopBackResource', 'LoopBackAuth', '$injector', function(Resource, LoopBackAuth, $injector) {
     var R = Resource(
       urlBase + "/subarticles/:id",
       { 'id': '@id' },
@@ -140,18 +126,7 @@ module.factory(
  */
 module.factory(
   "Article",
-  ['LoopBackResource',
-    'LoopBackAuth',
-    '$injector',
-    'ENV',
-    function(
-      Resource,
-      LoopBackAuth,
-      $injector,
-      ENV
-    ) {
-
-    var urlBase = ENV.apiEndpoint;
+  ['LoopBackResource', 'LoopBackAuth', '$injector', function(Resource, LoopBackAuth, $injector) {
     var R = Resource(
       urlBase + "/articles/:id",
       { 'id': '@id' },
@@ -375,18 +350,7 @@ module.factory(
  */
 module.factory(
   "Journalist",
-  ['LoopBackResource',
-    'LoopBackAuth',
-    '$injector',
-    'ENV',
-    function(
-      Resource,
-      LoopBackAuth,
-      $injector,
-      ENV
-    ) {
-
-    var urlBase = ENV.apiEndpoint;  
+  ['LoopBackResource', 'LoopBackAuth', '$injector', function(Resource, LoopBackAuth, $injector) {
     var R = Resource(
       urlBase + "/journalists/:id",
       { 'id': '@id' },
@@ -868,18 +832,7 @@ module.factory(
  */
 module.factory(
   "Comment",
-  ['LoopBackResource',
-    'LoopBackAuth',
-    '$injector',
-    'ENV',
-    function(
-      Resource,
-      LoopBackAuth,
-      $injector,
-      ENV
-    ) {
-
-    var urlBase = ENV.apiEndpoint;  
+  ['LoopBackResource', 'LoopBackAuth', '$injector', function(Resource, LoopBackAuth, $injector) {
     var R = Resource(
       urlBase + "/comments/:id",
       { 'id': '@id' },
@@ -995,18 +948,7 @@ module.factory(
  */
 module.factory(
   "Storage",
-  ['LoopBackResource',
-    'LoopBackAuth',
-    '$injector',
-    'ENV',
-    function(
-      Resource,
-      LoopBackAuth,
-      $injector,
-      ENV
-    ) {
-
-    var urlBase = ENV.apiEndpoint;  
+  ['LoopBackResource', 'LoopBackAuth', '$injector', function(Resource, LoopBackAuth, $injector) {
     var R = Resource(
       urlBase + "/storages/:id",
       { 'id': '@id' },
@@ -1127,18 +1069,7 @@ module.factory(
  */
 module.factory(
   "UpVote",
-  ['LoopBackResource',
-    'LoopBackAuth',
-    '$injector',
-    'ENV',
-    function(
-      Resource,
-      LoopBackAuth,
-      $injector,
-      ENV
-    ) {
-
-    var urlBase = ENV.apiEndpoint;  
+  ['LoopBackResource', 'LoopBackAuth', '$injector', function(Resource, LoopBackAuth, $injector) {
     var R = Resource(
       urlBase + "/upVotes/:id",
       { 'id': '@id' },
@@ -1220,18 +1151,7 @@ module.factory(
  */
 module.factory(
   "DownVote",
-  ['LoopBackResource',
-    'LoopBackAuth',
-    '$injector',
-    'ENV',
-    function(
-      Resource,
-      LoopBackAuth,
-      $injector,
-      ENV
-    ) {
-
-    var urlBase = ENV.apiEndpoint;  
+  ['LoopBackResource', 'LoopBackAuth', '$injector', function(Resource, LoopBackAuth, $injector) {
     var R = Resource(
       urlBase + "/downVotes/:id",
       { 'id': '@id' },
@@ -1313,18 +1233,7 @@ module.factory(
  */
 module.factory(
   "Installation",
-  ['LoopBackResource',
-    'LoopBackAuth',
-    '$injector',
-    'ENV',
-    function(
-      Resource,
-      LoopBackAuth,
-      $injector,
-      ENV
-    ) {
-
-    var urlBase = ENV.apiEndpoint;  
+  ['LoopBackResource', 'LoopBackAuth', '$injector', function(Resource, LoopBackAuth, $injector) {
     var R = Resource(
       urlBase + "/installations/:id",
       { 'id': '@id' },
@@ -1447,9 +1356,8 @@ module
   .config(['$httpProvider', function($httpProvider) {
     $httpProvider.interceptors.push('LoopBackAuthRequestInterceptor');
   }])
-  .factory('LoopBackAuthRequestInterceptor', [ '$q', 'LoopBackAuth', 'ENV',
-    function($q, LoopBackAuth, ENV) {
-      var urlBase = ENV.apiEndpoint;  
+  .factory('LoopBackAuthRequestInterceptor', [ '$q', 'LoopBackAuth',
+    function($q, LoopBackAuth) {
       return {
         'request': function(config) {
 

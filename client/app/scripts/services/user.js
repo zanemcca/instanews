@@ -29,8 +29,13 @@ app.service('User', [
       return user.user;
    };
 
+   var getToken = function() {
+     return user.id;
+   };
+
    var set = function(usr) {
       user = usr;
+      console.log(user);
 
       notifyObservers();
       install();
@@ -98,6 +103,7 @@ app.service('User', [
       clearData: clearData,
       install: install,
       get: get,
+      getToken: getToken,
       set: set,
       registerObserver: registerObserver
    };

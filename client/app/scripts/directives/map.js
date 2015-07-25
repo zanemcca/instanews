@@ -44,7 +44,7 @@ app.directive('inmap', [
 
             var mapOptions = {
                center: mPosition,
-               zoom: 8,
+               zoom: 12,
                disableDefaultUI: true,
                mapTypeId: google.maps.MapTypeId.ROADMAP
             };
@@ -63,7 +63,6 @@ app.directive('inmap', [
 
                Maps.setFeedMap(map);
 
-               //TODO Remove this and set the map based on the bounds
                Position.getCurrent( function(err, position) {
                   //If we get a valid position then center the map
                   if(position && position.coords) {
@@ -96,6 +95,33 @@ app.directive('inmap', [
 
             }
 
+            var element = document.getElementById('postMap');
+            if ( element && element.textContent.indexOf('Map') === -1) {
+
+              mapOptions.zoom = 18;
+              //var marker;
+
+              map = new google.maps.Map(element, mapOptions);
+              Maps.setPostMap(map);
+
+              google.maps.event.addListener(map, 'click', function(event) {
+                Maps.setMarker(Maps.getPostMap(), event.latLng);
+              });
+
+               Position.getCurrent( function(err, position) {
+                  //If we get a valid position then center the map
+                  if(position && position.coords) {
+                     //Save the new position
+                     Position.set(position);
+                     Maps.setCenter(map, position);
+                     Maps.setMarker(map, position);
+                  }
+                  else { //If we do not get a good position then wait for the position and localize
+                     console.log('No position for map!: '+ err.message);
+                     Position.registerObserver(localizeOnceObserver);
+                  }
+               });
+            }
           };
 
       Platform.ready.then(initializeMap());
