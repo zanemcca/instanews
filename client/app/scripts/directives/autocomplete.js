@@ -55,5 +55,5 @@ app.directive('inautocomplete', [
         };
       },
       templateUrl: 'templates/directives/autocomplete.html'
-   }
+   };
 }]);

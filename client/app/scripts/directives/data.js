@@ -19,7 +19,7 @@ app.directive('indatapreview', [
    return {
       restrict: 'E',
       scope: {
-         data: '='
+         article: '='
       },
       controller: function() {
       },
@@ -31,11 +31,9 @@ app.directive('indatapreview', [
 app.directive('indata',[
       '$compile',
       'Platform',
-      'Storage',
       function (
         $compile,
-        Platform,
-        Storage
+        Platform
       ) {
 
         //TODO Use the storage api

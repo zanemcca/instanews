@@ -3,17 +3,17 @@
 var app = angular.module('instanews.platform', ['ionic', 'ngCordova']);
 
 app.factory('Platform', [
-      '$cordovaDevice',
-      '$q',
-      function($cordovaDevice,
-         $q) {
+  '$cordovaDevice',
+  '$ionicActionSheet',
+  '$q',
+  function(
+    $cordovaDevice,
+    $ionicActionSheet,
+    $q
+  ) {
 
 
    var ready = $q.defer();
-
-   ionic.Platform.ready( function( device ) {
-      ready.resolve( device);
-   });
 
    var device = {
       type: '',
@@ -43,8 +43,50 @@ app.factory('Platform', [
       return ionic.Platform.isIOS();
    };
 
+   var isBrowser = function() {
+     var ip = ionic.Platform;
+     if(ip.isIOS()) {
+       return false;
+     }
+     else if(ip.isAndroid()) {
+       return false;
+     }
+     else if(ip.isWindowsPhone()) {
+       return false;
+     }
+     else {
+       return true;
+     }
+   };
+
+   /* Initialization */
+   if(isBrowser()) {
+     console.log('App is running in the browser!');
+     ready.resolve();
+   }
+   else {
+     ionic.Platform.ready( function( device ) {
+        ready.resolve( device);
+     });
+   }
+
+  var showToast = function(message) {
+    if(!isBrowser()) {
+      setTimeout( function() {
+        window.plugins.toast.showShortCenter(message);
+      }, 250);
+    }
+    console.log(message);
+  };
+
+  var showSheet = function(sheet) {
+    $ionicActionSheet.show(sheet);
+  };
+
    return {
       getUUID: getUUID,
+      showSheet: showSheet,
+      showToast: showToast,
       isIOS: isIOS,
       getDevice: getDevice,
       setDevice: setDevice,

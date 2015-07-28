@@ -95,13 +95,13 @@ app.directive('inmap', [
 
             }
 
-            var element = document.getElementById('postMap');
-            if ( element && element.textContent.indexOf('Map') === -1) {
+            var postElem = document.getElementById('postMap');
+            if ( postElem && postElem.textContent.indexOf('Map') === -1) {
 
               mapOptions.zoom = 18;
               //var marker;
 
-              map = new google.maps.Map(element, mapOptions);
+              map = new google.maps.Map(postElem, mapOptions);
               Maps.setPostMap(map);
 
               google.maps.event.addListener(map, 'click', function(event) {

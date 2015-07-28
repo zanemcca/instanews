@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<div ng-if="data.text" class="item">
-   <p>{{data.text}}</p>
+<div ng-repeat="text in article.text" class="item">
+   <p>{{text}}</p>
 </div>
-<div ng-repeat="video in data.videos">
+<div ng-repeat="video in article.videos">
    <div class="item">
       <div class="item item-image">
          <img ng-src="{{video.thumbnailURI}}">
@@ -10,11 +10,11 @@
       </div>
    </div>
 </div>
-<div ng-repeat="image in data.images">
+<div ng-repeat="photo in article.photos">
    <div class="item">
       <div class="item item-image">
-         <img ng-src="{{image.nativeURL}}">
-         <textarea type="text" style="width:100%;" ng-model="image.caption" placeholder=" Caption"></textarea>
+         <img ng-src="{{photo.nativeURL}}">
+         <textarea type="text" style="width:100%;" ng-model="photo.caption" placeholder=" Caption"></textarea>
       </div>
    </div>
 </div>

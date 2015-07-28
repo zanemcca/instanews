@@ -17,6 +17,8 @@ if(mongo.replicaSet) {
   mongoReplica = '?replicaSet=' + mongo.replicaSet;
 }
 
+var maxFileSize = 1024*1024*1024; //1Gb
+
 module.exports = {
   db: {
     name: 'db',
@@ -60,6 +62,7 @@ module.exports = {
     name: 'Storage',
     connector: 'loopback-component-storage',
     provider: 'amazon',
+    maxFileSize: maxFileSize,
     key: aws.key ,
     keyId: aws.keyId
   }
