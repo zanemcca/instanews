@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <ion-view view-title="{{newArticle.title}}">
    <ion-nav-buttons side="primary">
-      <button class="button button-clear icon ion-trash-a" ng-click="trashArticle()"></button>
+      <button class="button button-clear icon ion-trash-a" ng-click="goBack()"></button>
    </ion-nav-buttons>
    <ion-nav-buttons side="secondary">
       <button class="button button-clear col icon ion-android-locate" ng-click="localize()"></button>
@@ -25,8 +25,8 @@
          <label class="item item-input">
             <input type="text" placeholder="Title" ng-model="newArticle.title" required>
          </label>
-         <div ng-repeat="data in newArticle.data">
-            <inDataPreview data="data"></inDataPreview>
+         <div>
+            <inDataPreview article="newArticle"></inDataPreview>
          </div>
       </div>
    </ion-content>

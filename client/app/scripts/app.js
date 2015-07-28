@@ -1,5 +1,6 @@
 // Ionic Starter App
 'use strict';
+/*jshint camelcase: false */
 
 // angular.module is a global place for creating, registering and retrieving Angular modules
 // 'starter' is the name of this angular module example (also set in a <body> attribute in index.html)
@@ -23,13 +24,14 @@ angular.module('instanews', [
       'instanews.data',
       'instanews.camera',
       'instanews.post',
+      'instanews.service.post',
       'instanews.profile',
-      'instanews.platform',
       'instanews.user',
       'instanews.position',
       'instanews.notifications',
       'instanews.autocomplete',
       'instanews.fileTransfer',
+      'instanews.platform',
       'lbServices',
       'ui.router',
       'ngCordova'])
@@ -64,7 +66,6 @@ angular.module('instanews', [
 
       Platform.ready
       .then(function() {
-
          // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
          // for form inputs)
          /*
@@ -109,8 +110,8 @@ angular.module('instanews', [
 
             if(session) {
                //Request a new token that expires in 2 weeks
-               //Journalist.prototype$__create__accessTokens({
-               Journalist.accessTokens.create({
+               //Journalist.accessTokens.create({
+               Journalist.prototype$__create__accessTokens({
                   id: session.user.user.username,
                   ttl: 1209600
                }, null, function(user) {

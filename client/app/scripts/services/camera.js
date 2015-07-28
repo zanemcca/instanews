@@ -25,6 +25,7 @@ app.factory('Camera', [
            fileEntry.copyTo(filesystem2, newName, function(entry) {
              entry.size = fileObj.size;
              entry.lastModified = fileObj.lastModified;
+             entry.type = fileObj.type;
              cb(entry);
            }, function(err) {
              console.log('Error: Failed to move the file: ' + err);

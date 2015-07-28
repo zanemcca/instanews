@@ -35,7 +35,6 @@ app.service('User', [
 
    var set = function(usr) {
       user = usr;
-      console.log(user);
 
       notifyObservers();
       install();

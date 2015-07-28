@@ -123,7 +123,6 @@ app.service('Position', [
          return bounds.contains(position);
       }
       else {
-         console.log('Bounds not loaded yet');
          return false;
       }
 
@@ -159,10 +158,10 @@ app.service('Position', [
          if(UUID) {
             LocalStorage.secureRead('position' + UUID, function(err, res) {
                if (err) {
-                  console.log('Error reading position: ' + err);
+                  console.log('Error reading position: ' + JSON.stringify(err));
                }
                else {
-                  console.log('Read position from storage: ' + res.toString());
+                  console.log('Read position from storage: ' + JSON.stringify(res));
                   mPosition = res;
                   notifyObservers();
                }
