@@ -3,107 +3,92 @@
 var app = angular.module('instanews.service.user', ['ionic', 'ngResource','ngCordova']);
 
 app.service('User', [
-      'LocalStorage',
-      'Platform',
-      'Installation',
-      function(
-         LocalStorage,
-         Platform,
-         Installation){
+  'Installation',
+  'LocalStorage',
+  'Platform',
+  function(
+    Installation,
+    LocalStorage,
+    Platform
+  ){
 
-   var user = {};
+  var user = {};
 
-   var observerCallbacks = [];
+  var observers = [];
 
-   var registerObserver = function(cb) {
-      observerCallbacks.push(cb);
-   };
+  var registerObserver = function(cb) {
+    observers.push(cb);
+  };
 
-   var notifyObservers = function() {
-      angular.forEach(observerCallbacks, function(cb) {
-         cb();
-      });
-   };
+  var notifyObservers = function() {
+    angular.forEach(observers, function(cb) {
+      cb();
+    });
+  };
 
-   var get = function() {
+  var get = function() {
+    if( user && user.user) {
       return user.user;
-   };
+    }
+  };
 
-   var getToken = function() {
-     return user.id;
-   };
+  var getToken = function() {
+    if(user && user.id) {
+      return user.id;
+    }
+  };
 
-   var set = function(usr) {
-      user = usr;
+  var set = function(usr) {
+    user = usr;
 
-      notifyObservers();
-      install();
-   };
+    notifyObservers();
+    install();
+  };
 
-   var install = function() {
+  var clearData = function() {
+    set({});
+    if(!Platform.isBrowser()) {
+      LocalStorage.secureDelete(Platform.getUUID());
+    }
+  };
 
-      var device = Platform.getDevice();
+  var install = function() {
 
-      if ( user &&
-            user.user &&
-            user.user.username &&
-            device &&
-            device.type &&
-            device.token &&
-            device.token !== 'OK') {
-         console.log('Attempting to install device on the server');
+    var device = Platform.getDevice();
 
-         var appConfig = {
-            appId: 'instanews',
-            userId: user.user.username,
-            deviceType: device.type,
-            deviceToken: device.token,
-            created: new Date(),
-            modified: new Date(),
-            status: 'Active'
-         };
+    //TODO check if device is already installed
+    if ( user &&
+      user.user &&
+      user.user.username &&
+      device &&
+      device.type &&
+      device.token &&
+      device.token !== 'OK'
+    ) {
+      console.log('Attempting to install device on the server');
 
-         /*
-         if( device.type === 'ios') {
-            appConfig.deviceToken =  device.token;
-         }
-         else if( device.type === 'android') {
-            appConfig.deviceToken = $cordovaDevice.getUUID();
-         }
-         */
+      var appConfig = {
+        appId: 'instanews',
+        userId: user.user.username,
+        deviceType: device.type,
+        deviceToken: device.token,
+        status: 'Active'
+      };
 
-         Installation.create(appConfig, function (err, result) {
-            if (err) {
-               console.log('Error trying to install device', err);
-            }
-            else {
-               console.log('Created a new device installation : ' , result);
-            }
-         });
-      }
-      /*
-      else {
-         console.log('Could not register for notification because of invalid parameters'
-               + '\nUser: ' + user
-               + '\ndevice.type: ' + device.type
-               + '\ndevice.token: ' + device.token);
-      }
-      */
-   };
+      Installation.create(appConfig, function (result, header) {
+        console.log('Created a new device installation : ' , header);
+      }, function(err) {
+        console.log('Error trying to install device', JSON.stringify(err));
+      });
+    }
+  };
 
-   var clearData = function() {
-      set({});
-      if( ionic.Platform.isIOS() || ionic.Platform.isAndroid()) {
-         LocalStorage.secureDelete(Platform.getUUID());
-      }
-   };
-
-   return {
-      clearData: clearData,
-      install: install,
-      get: get,
-      getToken: getToken,
-      set: set,
-      registerObserver: registerObserver
-   };
+  return {
+    clearData: clearData,
+    install: install,
+    get: get,
+    getToken: getToken,
+    set: set,
+    registerObserver: registerObserver
+  };
 }]);

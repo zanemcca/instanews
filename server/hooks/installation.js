@@ -9,6 +9,8 @@ module.exports = function(app) {
 
       if( inst && ctx.isNewInstance) {
 
+        inst.created = new Date();
+
          Installation.find({
             where: {
                deviceType: inst.__data.deviceType,
