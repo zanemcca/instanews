@@ -25,6 +25,7 @@ describe('Article controller: ', function(){
           registerObserver: function(cb) {
             cb();
           },
+          unregisterObserver: function() {},
           deleteAll: function() {},
           get: function(id) {
             return [1,2,3];
@@ -174,6 +175,18 @@ describe('Article controller: ', function(){
       sinon.spy(maps, 'deleteMarker');
       scope.$broadcast('$ionicView.afterLeave');
       expect(maps.deleteMarker.calledOnce).to.be.true;
+    });
+
+    it('should call Subarticles.unregisterObserver', function() {
+      sinon.spy(subarticles, 'unregisterObserver');
+      scope.$broadcast('$ionicView.afterLeave');
+      expect(subarticles.unregisterObserver.calledOnce).to.be.true;
+    });
+
+    it('should call Subarticles.deleteAll', function() {
+      sinon.spy(subarticles, 'deleteAll');
+      scope.$broadcast('$ionicView.afterLeave');
+      expect(subarticles.deleteAll.calledOnce).to.be.true;
     });
   });
 
