@@ -126,6 +126,7 @@ describe('Post service', function() {
   var user;
   var platform;
   var RFC4122;
+
   beforeEach(inject(function(
     Post,
     Article,

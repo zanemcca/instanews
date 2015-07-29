@@ -25,6 +25,7 @@ angular.module('instanews', [
       'instanews.camera',
       'instanews.post',
       'instanews.service.post',
+      'instanews.service.subarticles',
       'instanews.profile',
       'instanews.user',
       'instanews.position',

@@ -6,10 +6,8 @@
       </a>
    </ion-nav-buttons>
    <ion-content>
-      <!--
       <ion-refresher pulling-text="Fresh Stuff" on-refresh="onRefresh()">
       </ion-refresher>
-      -->
       <div class="item no-padding" style="width:100%;height:38%">
          <inMap>
             <div style="width:100%;height:100%" id="articleMap"></div>
@@ -50,7 +48,7 @@
          </ion-item>
       </ul>
       <ion-infinite-scroll
-         ng-if="itemsAvailable"
+         ng-if="areItemsAvailable()"
          on-infinite="loadMore()"
          distance="10%">
       </ion-infinite-scroll>
