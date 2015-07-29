@@ -1,7 +1,7 @@
 
 'use strict';
 
-var app = angular.module('instanews.articles', ['ionic', 'ngResource','ngCordova']);
+var app = angular.module('instanews.service.articles', ['ionic', 'ngResource','ngCordova']);
 
 app.service('Articles', [
       '$filter',

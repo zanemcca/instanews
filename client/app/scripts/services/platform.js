@@ -1,6 +1,6 @@
 
 'use strict';
-var app = angular.module('instanews.platform', ['ionic', 'ngCordova']);
+var app = angular.module('instanews.service.platform', ['ionic', 'ngCordova']);
 
 app.factory('Platform', [
   '$cordovaDevice',

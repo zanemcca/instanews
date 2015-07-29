@@ -1,7 +1,7 @@
 
 'use strict';
 
-var app = angular.module('instanews.fileTransfer', ['ionic', 'ngResource']);
+var app = angular.module('instanews.service.fileTransfer', ['ionic', 'ngResource']);
 
 app.factory('FileTransfer', [
       '$cordovaFileTransfer',

@@ -1,7 +1,7 @@
 
 'use strict';
 
-var app = angular.module('instanews.camera', ['ionic', 'ngResource', 'uuid']);
+var app = angular.module('instanews.service.camera', ['ionic', 'ngResource', 'uuid']);
 
 app.factory('Camera', [
       'rfc4122',

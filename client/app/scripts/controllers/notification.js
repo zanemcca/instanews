@@ -1,6 +1,6 @@
 
 'use strict';
-var app = angular.module('instanews.notif', ['ionic', 'ngResource', 'underscore']);
+var app = angular.module('instanews.controller.notification', ['ionic', 'ngResource', 'underscore']);
 
 app.controller('NotificationCtrl', [
       '$scope',

@@ -1,6 +1,6 @@
 
 'use strict';
-var app = angular.module('instanews.login', ['ionic', 'ngResource', 'ngCordova']);
+var app = angular.module('instanews.controller.login', ['ionic', 'ngResource', 'ngCordova']);
 
 app.controller('LoginCtrl', [
       '$scope',

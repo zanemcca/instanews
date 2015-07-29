@@ -1,6 +1,6 @@
 'use strict';
 
-var app = angular.module('instanews.autocomplete', ['ionic', 'ngResource']);
+var app = angular.module('instanews.directive.autocomplete', ['ionic', 'ngResource']);
 
 app.directive('inautocomplete', [
   'Platform',

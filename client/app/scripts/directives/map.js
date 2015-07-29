@@ -1,6 +1,6 @@
 
 'use strict';
-var app = angular.module('instanews.map', ['ionic', 'ngResource', 'underscore']);
+var app = angular.module('instanews.directive.map', ['ionic', 'ngResource', 'underscore']);
 
 app.directive('inmap', [
       '_',
