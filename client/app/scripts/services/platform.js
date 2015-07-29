@@ -88,6 +88,7 @@ app.factory('Platform', [
       showSheet: showSheet,
       showToast: showToast,
       isIOS: isIOS,
+      isBrowser: isBrowser,
       getDevice: getDevice,
       setDevice: setDevice,
       setDeviceToken: setDeviceToken,

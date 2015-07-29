@@ -12,17 +12,6 @@ app.service('Navigate', [
          $ionicHistory){
 
    var toggleMenu = function() {
-      /*
-      console.log('Toggling menu');
-
-      if( $ionicSideMenuDelegate.isOpenLeft()) {
-         console.log('Open already');
-      }
-      else {
-         console.log('Not Opened');
-      }
-
-      */
       $ionicSideMenuDelegate.toggleLeft();
    };
 
@@ -36,6 +25,7 @@ app.service('Navigate', [
       $ionicScrollDelegate.scrollTop(true);
    };
 
+   /*
    var onScroll = function() {
       if($ionicScrollDelegate.getScrollPosition().top > 0) {
          return true;
@@ -45,7 +35,6 @@ app.service('Navigate', [
       }
    };
 
-   /*
   //TODO Rewrite this use ionic on-swipe-down gesture
    $scope.scroll = {
       buttonOn: false
@@ -61,7 +50,7 @@ app.service('Navigate', [
    return {
       toggleMenu: toggleMenu,
       scrollTop: scrollTop,
-      onScroll: onScroll,
+   //   onScroll: onScroll,
       disableNextBack: disableNextBack
    };
 }]);

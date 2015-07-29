@@ -1,21 +1,49 @@
-/*
-describe('onScroll', function() {
-  beforeEach( function() {
-    sinon.stub(navigate, 'onScroll', function() {
-      return false;
-    });
+"use strict";
 
-    controller = initController();
+describe('instanews.service.navigate', function() {
+
+  var navigate, ionicSideMenuDelegate, ionicScrollDelegate, ionicHistory;
+
+  beforeEach(function() {
+
+    module('instanews.service.navigate');
   });
 
-  it('should set buttonOn to false and call Navigate.onScroll once', function() {
-    scope.scroll.buttonOn = true;
-    
-    scope.onScroll();
+  beforeEach(inject(function(
+    $ionicSideMenuDelegate,
+    $ionicScrollDelegate,
+    $ionicHistory,
+    Navigate
+  ) {
+    navigate = Navigate;
+    ionicSideMenuDelegate = $ionicSideMenuDelegate;
+    ionicScrollDelegate = $ionicScrollDelegate;
+    ionicHistory = $ionicHistory;
+  }));
 
-    expect(navigate.onScroll.calledOnce).to.be.true;
-    expect(scope.scroll.buttonOn).to.be.false;
+  describe('toggleMenu', function() {
+    it('should call $ionicSideMenuDelegate.toggleLeft', function() {
+      sinon.spy(ionicSideMenuDelegate, 'toggleLeft');
+      navigate.toggleMenu();
+      expect(ionicSideMenuDelegate.toggleLeft.calledOnce).to.be.true;
+    });
+  });
+
+  describe('disableNextBack', function() {
+    it('should call $ionicHistory.nextViewOptions', function() {
+      sinon.stub(ionicHistory, 'nextViewOptions', function(arg) {
+        expect(arg.disableBack).to.be.true;
+      });
+      navigate.disableNextBack();
+      expect(ionicHistory.nextViewOptions.calledOnce).to.be.true;
+    });
+  });
+
+  describe('scrollTop', function() {
+    it('should call $ionicScrollDelegate.scrollTop', function() {
+      sinon.spy(ionicScrollDelegate, 'scrollTop');
+      navigate.scrollTop();
+      expect(ionicScrollDelegate.scrollTop.calledOnce).to.be.true;
+    });
   });
 });
-*/
-
