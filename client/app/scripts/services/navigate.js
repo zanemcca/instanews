@@ -1,6 +1,6 @@
 
 'use strict';
-var app = angular.module('instanews.navigate', ['ionic', 'ngResource','ngCordova']);
+var app = angular.module('instanews.service.navigate', ['ionic', 'ngResource','ngCordova']);
 
 app.service('Navigate', [
       '$ionicSideMenuDelegate',

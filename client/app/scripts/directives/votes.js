@@ -1,6 +1,6 @@
 
 'use strict';
-var app = angular.module('instanews.votes', ['ionic', 'ngResource']);
+var app = angular.module('instanews.directive.votes', ['ionic', 'ngResource']);
 
 app.directive('invotes', [
       'Comment',

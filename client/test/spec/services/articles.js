@@ -9,7 +9,7 @@ describe('Articles', function() {
         new google.maps.LatLng(33.671068, -116.25128),
         new google.maps.LatLng(33.685282, -116.233942));
 
-    module('instanews.articles');
+    module('instanews.service.articles');
 
     module(function($provide) {
       $provide.service('Article', function() {

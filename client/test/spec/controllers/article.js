@@ -6,7 +6,7 @@ describe('Article controller: ', function(){
   //Load the module and create mocks for all dependencies
   beforeEach( function() {
 
-    module('instanews.article');
+    module('instanews.controller.article');
 
     module(function($provide) {
 

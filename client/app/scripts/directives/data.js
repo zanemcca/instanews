@@ -1,6 +1,6 @@
 
 'use strict';
-var app = angular.module('instanews.data', ['ionic', 'ngResource']);
+var app = angular.module('instanews.directive.data', ['ionic', 'ngResource']);
 
 //TODO move this into a JSON or something
 var urlBase = ('https:' === document.location.protocol ?

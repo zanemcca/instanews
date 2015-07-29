@@ -6,7 +6,7 @@ describe('Feed: ', function(){
   //Load the module and create mocks for all dependencies
   beforeEach( function() {
 
-    module('instanews.feed');
+    module('instanews.controller.feed');
 
     module(function($provide) {
       $provide.service('Navigate', function() {

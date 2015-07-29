@@ -1,6 +1,6 @@
 'use strict';
 
-var app = angular.module('instanews.article', ['ionic', 'ngResource']);
+var app = angular.module('instanews.controller.article', ['ionic', 'ngResource']);
 
 app.controller('ArticleCtrl', [
   '$scope',

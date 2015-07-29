@@ -1,6 +1,6 @@
 
 'use strict';
-var app = angular.module('instanews.maps', ['ionic', 'ngResource','ngCordova']);
+var app = angular.module('instanews.service.maps', ['ionic', 'ngResource','ngCordova']);
 
 app.service('Maps', [
       'Articles',

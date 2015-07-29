@@ -1,6 +1,6 @@
 
 'use strict';
-var app = angular.module('instanews.post', ['ionic', 'ngResource', 'uuid']);
+var app = angular.module('instanews.controller.post', ['ionic', 'ngResource', 'uuid']);
 
 app.controller('PostCtrl', [
       '$stateParams',

@@ -1,6 +1,6 @@
 'use strict';
 
-var app = angular.module('instanews.user', ['ionic', 'ngResource','ngCordova']);
+var app = angular.module('instanews.service.user', ['ionic', 'ngResource','ngCordova']);
 
 app.service('User', [
       'LocalStorage',

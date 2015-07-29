@@ -1,6 +1,6 @@
 
 'use strict';
-var app = angular.module('instanews.position', ['ionic', 'ngResource','ngCordova']);
+var app = angular.module('instanews.service.position', ['ionic', 'ngResource','ngCordova']);
 
 app.service('Position', [
       '$rootScope',
