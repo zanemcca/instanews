@@ -54,6 +54,85 @@ describe('Post: ', function(){
         };
       });
 
+      $provide.service('Post', function() {
+        return {
+          saveParentId: function(id, tempId) {
+            return {
+              tempId: 'uuid',
+              parentId: id,
+              title: '',
+              videos: [],
+              photos: [],
+              text: []
+            };
+          },
+          getArticle: function(tempId) {
+            return {
+              tempId: tempId,
+              parentId: '',
+              title: '',
+              videos: [],
+              photos: [],
+              text: []
+            };
+          },
+          deleteArticle: function(tempId) {},
+          isPosting: function() { return false; },
+          savePosition: function(pos, tempId) {},
+          saveTitle: function(title, tempId) {},
+          saveText: function(text, tempId) {
+            txt = text;
+            if( typeof text === 'string') {
+              txt = [text];
+            }
+            return {
+              tempId: tempId,
+              parentId: '',
+              title: '',
+              videos: [],
+              photos: [],
+              text: txt
+            };
+          },
+          saveVideos: function(videos, tempId) {
+            vids = videos;
+            if( typeof videos === 'string') {
+              vids = [vidoes];
+            }
+            return {
+              tempId: tempId,
+              parentId: '',
+              title: '',
+              videos: vids,
+              photos: [],
+              text: [] 
+            };
+          },
+          savePhotos: function(photos, tempId) {
+            images = photos;
+            if( typeof photos === 'string') {
+              images = [photos];
+            }
+            return {
+              tempId: tempId,
+              parentId: '',
+              title: '',
+              videos: [],
+              photos: images,
+              text: []
+            };
+          },
+          post: function(tempId) {}
+        }
+      });
+
+      $provide.service('Platform', function() {
+        return {
+          showSheet: function(sheet) {},
+          showToast: function(message) {}
+        }
+      });
+
       $provide.service('User', function() {
         return {
           get: function() {},
@@ -161,33 +240,27 @@ describe('Post: ', function(){
   beforeEach(inject(function(
     $controller, 
     $rootScope,
-    $state,
     $stateParams,
     $ionicModal,
     $ionicHistory,
     Article,
     Articles,
-    Position,
+    Post,
+    Platform,
     Maps,
     User,
-    Camera,
-    rfc4122,
-    FileTransfer,
-    Storage
+    Camera
   ){
     ionicModal = $ionicModal;
     ionicHistory = $ionicHistory;
-    state = $state;
     stateParams = $stateParams;
     article = Article;
     articles = Articles;
-    position = Position;
+    post = Post;
+    platform = Platform;
     maps = Maps;
     user = User;
     camera = Camera;
-    storage = Storage;
-    Rfc4122 = rfc4122;
-    fileTransfer = FileTransfer;
     ctrl = $controller;
 
   }));
@@ -202,13 +275,11 @@ describe('Post: ', function(){
       $ionicHistory: ionicHistory,
       Article: article,
       Articles: articles,
-      Position: position,
+      Post: post,
+      Platform: platform,
       Maps: maps,
       User: user,
-      Camera: camera,
-      rfc4122: Rfc4122,
-      FileTransfer: fileTransfer,
-      Storage: storage
+      Camera: camera
     });
 
     scope.$digest();
@@ -353,27 +424,73 @@ describe('Post: ', function(){
       });
     });
 
-    describe('trashArticle', function() {
+    describe('goBack', function() {
 
-      it('should reset newArticle', function() {
-        scope.newArticle = {
-          title: 'title',
-          data: [1,2,3]
-        };
-
-        scope.trashArticle();
-
-        expect(scope.newArticle).to.deep.equal({
-          title: '',
-          data: []
+      it('should pass in a single button titled "<b>Save</b>"', function() {
+        sinon.stub(platform, 'showSheet', function(sheet) {
+          expect(sheet.buttons.length).to.equal(1);
+          expect(sheet.buttons[0].text).to.equal('<b>Save</b>');
         });
+
+        scope.goBack();
+
+        expect(platform.showSheet.calledOnce).to.be.true;
       });
 
-      it('should call $ionicHistory.goBack()', function() {
+      it('should pass in destructiveText = "Delete"', function() {
+        sinon.stub(platform, 'showSheet', function(sheet) {
+          expect(sheet.destructiveText).to.equal('Delete');
+        });
+
+        scope.goBack();
+
+        expect(platform.showSheet.calledOnce).to.be.true;
+      });
+
+      it('should pass in titleText = "What would you like done with your unpublished content?"', function() {
+        sinon.stub(platform, 'showSheet', function(sheet) {
+          expect(sheet.titleText).to.equal('What would you like done with your unpublished content?');
+        });
+
+        scope.goBack();
+
+        expect(platform.showSheet.calledOnce).to.be.true;
+      });
+
+      it('should pass in cancelText = "Cancel"', function() {
+        sinon.stub(platform, 'showSheet', function(sheet) {
+          expect(sheet.cancelText).to.equal('Cancel');
+        });
+
+        scope.goBack();
+
+        expect(platform.showSheet.calledOnce).to.be.true;
+      });
+
+
+      it('should call $ionicHistory.goBack() when save is called', function() {
         sinon.spy(ionicHistory, 'goBack');
+        sinon.stub(platform, 'showSheet', function(sheet) {
+          sheet.buttonClicked();
+        });
 
-        scope.trashArticle();
+        scope.goBack();
 
+        expect(platform.showSheet.calledOnce).to.be.true;
+        expect(ionicHistory.goBack.calledOnce).to.be.true;
+      });
+
+      it('should call Post.deleteArticle then $ionicHistory.goBack() when delete is clicked', function() {
+        sinon.spy(ionicHistory, 'goBack');
+        sinon.spy(post, 'deleteArticle');
+        sinon.stub(platform, 'showSheet', function(sheet) {
+          sheet.destructiveButtonClicked();
+        });
+
+        scope.goBack();
+
+        expect(platform.showSheet.calledOnce).to.be.true;
+        expect(post.deleteArticle.calledOnce).to.be.true;
         expect(ionicHistory.goBack.calledOnce).to.be.true;
       });
     });
@@ -403,130 +520,28 @@ describe('Post: ', function(){
         expect(maps.getMarker.calledOnce).to.be.true;
       });
 
-      it('should call Article.create', function() {
-        sinon.spy(article, 'create');
+      it('should call Post.savePosition', function() {
+        sinon.spy(post, 'savePosition');
 
         scope.postArticle();
 
-        expect(article.create.calledOnce).to.be.true;
+        expect(post.savePosition.calledOnce).to.be.true;
       });
 
-      it('should pass in the correct object to Article.create', function() {
-        sinon.stub(article, 'create', function(obj) {
-          expect(obj).to.deep.equal({
-            isPrivate: false,
-            location: {
-              lat: 1,
-              lng: 2
-            },
-            username: scope.user.username,
-            title: scope.newArticle.title
-          });
-
-          return {
-            $promise: {
-              then: function(cb, errCb) {}
-            }
-          }
-        });
+      it('should call Post.saveTitle', function() {
+        sinon.spy(post, 'saveTitle');
 
         scope.postArticle();
 
-        expect(article.create.calledOnce).to.be.true;
+        expect(post.saveTitle.calledOnce).to.be.true;
       });
 
-      it('should call postSubarticle then trashArticle', function() {
-
-        scope.newArticle.data = [{
-          title: 'title',
-          images: [1,2,3],
-          videos: [{
-            type: '',
-            name: 'name.mp4'
-          }]
-        }];
-
-        sinon.stub(article, 'create', function(obj) {
-          expect(obj).to.deep.equal({
-            isPrivate: false,
-            location: {
-              lat: 1,
-              lng: 2
-            },
-            username: scope.user.username,
-            title: scope.newArticle.title
-          });
-
-          return {
-            $promise: {
-              then: function(cb, errCb) {
-                obj.id = 'id';
-                cb(obj);
-              }
-            }
-          }
-        });
-
-        sinon.spy(scope, 'trashArticle');
+      it('should call Post.post', function() {
+        sinon.spy(post, 'post');
 
         scope.postArticle();
 
-        expect(scope.trashArticle.calledOnce).to.be.true;
-      });
-
-      it('should call trashArticle', function() {
-
-        scope.newArticle.data = [];
-
-        sinon.stub(article, 'create', function(obj) {
-          expect(obj).to.deep.equal({
-            isPrivate: false,
-            location: {
-              lat: 1,
-              lng: 2
-            },
-            username: scope.user.username,
-            title: scope.newArticle.title
-          });
-
-          return {
-            $promise: {
-              then: function(cb, errCb) {
-                obj.id = 'id';
-                cb(obj);
-              }
-            }
-          }
-        });
-
-        sinon.spy(scope, 'trashArticle');
-
-        scope.postArticle();
-
-        expect(scope.trashArticle.calledOnce).to.be.true;
-      });
-    });
-
-    describe('trashSubarticle', function() {
-
-      it('should reset data', function() {
-        scope.data = {
-          text: 'text',
-        };
-
-        scope.trashSubarticle();
-
-        expect(scope.data).to.deep.equal({
-          text: ''
-        });
-      });
-
-      it('should call $ionicHistory.goBack()', function() {
-        sinon.spy(ionicHistory, 'goBack');
-
-        scope.trashSubarticle();
-
-        expect(ionicHistory.goBack.calledOnce).to.be.true;
+        expect(post.post.calledOnce).to.be.true;
       });
     });
 
@@ -538,227 +553,46 @@ describe('Post: ', function(){
           stateParams.id = 'parent id';
       });
 
-      it('should call postSubarticle then scope.trashSubarticle', function() {
-        sinon.spy(scope, 'trashSubarticle');
-        scope.postSubarticle();
-        
-        expect(scope.trashSubarticle.calledOnce).to.be.true;
-      });
-
-      it('should post multiple subarticles', function() {
-        scope.newArticle.data = [{
-          text: 'hey'
-        },
-        {
-          text: 'bye'
-        }];
-
-        sinon.spy(article.subarticles, 'create');
+      it('should call Post.post', function() {
+        sinon.spy(post, 'post');
 
         scope.postSubarticle();
 
-        expect(article.subarticles.create.calledTwice).to.be.true;
+        expect(post.post.calledOnce).to.be.true;
       });
 
-      describe('postText', function() {
-        beforeEach(function() {
-          scope.newArticle.data = [{
-            text: 'Some text for a subarticle'
-          }];
-
-          sinon.stub(article.subarticles, 'create', function(obj) {
-            expect(obj).to.deep.equal({
-              id: stateParams.id,
-              parentId: stateParams.id,
-              username: scope.user.username,
-              text: scope.newArticle.data[0].text
-            });
-
-            return {
-              $promise: {
-                then: function(cb) {
-                  cb();
-                }
-              }
-            }
-          });
-        });
-
-        it('should call Article.subarticles.create', function() {
+      describe('exit', function() {
+        it('should call Post.isPosting', function() {
+          sinon.spy(post, 'isPosting');
           scope.postSubarticle();
-
-          expect(article.subarticles.create.calledOnce).to.be.true;
-        });
-      });
-
-      describe('postVideo', function() {
-        beforeEach(function() {
-          scope.newArticle.data = [{
-            videos: [{
-              type: 'video/mp4',
-              nativeURL: '/a/fake/url/filename.mp4',
-              thumbnailURI: '/a/fake/uri/image.jpg',
-              name: 'video.mp4',
-              size: 5000,
-              lastModified: Date.now(),
-              caption: 'A video caption'
-            }]
-          }];
+          expect(post.isPosting.calledOnce).to.be.true;
         });
 
-        it('should post the videos', function() {
-          scope.newArticle.data[0].videos.push({
-              type: 'video/mp4',
-              nativeURL: '/a/fake/uri/filename',
-              name: 'video2.mp4',
-              size: 5000,
-              lastModified: Date.now(),
-              caption: 'A video caption'
+        it('should call Platform.showToast', function() {
+          sinon.stub(post, 'isPosting', function() {
+            return true;
           });
-
-          sinon.spy(article.subarticles, 'create');
-
+          sinon.spy(platform, 'showToast');
           scope.postSubarticle();
-
-          expect(article.subarticles.create.calledTwice).to.be.true;
+          expect(post.isPosting.calledOnce).to.be.true;
+          expect(platform.showToast.calledOnce).to.be.true;
         });
 
-        it('should call FileTransfer.upload twice', function() {
-          var call = 0
-          sinon.stub(fileTransfer, 'upload', function(server, uri, options) {
-            call++;
-            if(call === 1) {
-              expect(uri).to.equal(scope.newArticle.data[0].videos[0].nativeURL);
-            }
-            if(call === 2) {
-              expect(uri).to.equal(scope.newArticle.data[0].videos[0].thumbnailURI);
-            }
-
-            return {
-              then: function(succ,err,progr) {
-                succ();
-              }
-            }
+        it('should call Platform.showToast with the correct message', function() {
+          sinon.stub(post, 'isPosting', function() {
+            return true;
           });
-
-          scope.postSubarticle();
-          expect(fileTransfer.upload.calledTwice).to.be.true;
-        });
-
-        it('should pass the proper object to Articles.subarticle.create', function() {
-
-          var video = scope.newArticle.data[0].videos[0];
-          sinon.stub(article.subarticles, 'create', function(obj) {
-            expect(obj).to.deep.equal({
-              id: stateParams.id,
-              parentId: stateParams.id,
-              username: scope.user.username,
-              _file: {
-                type: video.type,
-                container: 'instanews.videos.us.east',
-                name: video.name,
-                size: video.size,
-                poster: video.name.slice(0, video.name.lastIndexOf('.') + 1 ) + 'jpg',
-                lastModified: video.lastModified,
-                caption: video.caption
-              }
-            });
-            return {
-              $promise: {
-                then: function(cb) {
-                  cb();
-                }
-              }
-            }
+          sinon.stub(platform, 'showToast', function(message) {
+            expect(message).to.equal('We\'ll let you know when your content is uploaded');
           });
-
           scope.postSubarticle();
-          expect(article.subarticles.create.calledOnce).to.be.true;
+          expect(platform.showToast.calledOnce).to.be.true;
         });
 
-        //TODO
-        it('should notify the user and retry when it fails to upload', function() {
-        });
-        it('should let the user know about the progress of the uploads', function() {
-        });
-      });
-
-      describe('postPhoto', function() {
-        beforeEach(function() {
-          var file = {
-            type: 'image/jpeg',
-            nativeURL: '/a/fake/url/name.jpg',
-            name: 'name.jpg',
-            size: 5000,
-            lastModified: Date.now(),
-            caption: 'Photo caption'
-          };
-
-          scope.newArticle.data = [{
-            images: [file]
-          }];
-        });
-
-        it('should add the photos', function() {
-          scope.newArticle.data[0].images.push({
-            URI: '/a/fake/uri/image2',
-            caption: 'Another caption'
-          });
-
-          sinon.spy(article.subarticles, 'create');
+        it('should call $ionicHistory.goBack()', function() {
+          sinon.spy(ionicHistory, 'goBack');
           scope.postSubarticle();
-
-          expect(article.subarticles.create.calledTwice).to.be.true;
-        });
-
-        it('should call FileTransfer.upload once with the proper options', function() {
-          var file = scope.newArticle.data[0].images[0];
-          sinon.stub(fileTransfer, 'upload', function(server, url, options) {
-            expect(url).to.equal(file.nativeURL);
-            expect(options.fileName).to.equal(file.name);
-            expect(options.mimeType).to.equal(file.type);
-
-            return { 
-              then: function(cb){
-                cb();
-              }
-            }
-          });
-
-          scope.postSubarticle();
-
-          expect(fileTransfer.upload.calledOnce).to.be.true;
-        });
-
-
-        it('should call Article.subarticles.create with the correct argument', function() {
-          var file = scope.newArticle.data[0].images[0];
-          sinon.stub(article.subarticles, 'create', function(sub) {
-            expect(sub).to.deep.equal({
-              id: stateParams.id,
-              parentId: stateParams.id,
-              username: scope.user.username,
-              _file: {
-                type: file.type,
-                name: file.name,
-                size: file.size,
-                lastModified: file.lastModified,
-                caption: file.caption
-              }
-            });
-
-            return {
-              $promise: {
-                then: function(cb) {
-                  cb()
-                }
-              }
-            }
-          });
-
-          scope.postSubarticle();
-
-          expect(article.subarticles.create.calledOnce).to.be.true;
+          expect(ionicHistory.goBack.calledOnce).to.be.true;
         });
       });
     });
@@ -802,8 +636,8 @@ describe('Post: ', function(){
         
         scope.saveText();
 
-        expect(scope.newArticle.data.length).to.equal(1);
-        expect(scope.newArticle.data[0].text).to.equal('text');
+        expect(scope.newArticle.text.length).to.equal(1);
+        expect(scope.newArticle.text[0]).to.equal('text');
       });
 
       it('should call trashText after', function() {
@@ -825,9 +659,8 @@ describe('Post: ', function(){
       it('should add the video to the videos on newArticle', function() {
         scope.captureVideo();
 
-        expect(scope.newArticle.data.length).to.equal(1);
-        expect(scope.newArticle.data[0].videos.length).to.equal(1);
-        expect(scope.newArticle.data[0].videos[0]).to.equal(1);
+        expect(scope.newArticle.videos.length).to.equal(1);
+        expect(scope.newArticle.videos[0]).to.equal(1);
       });
 
     });
@@ -841,13 +674,12 @@ describe('Post: ', function(){
         expect(camera.getPictures.calledOnce).to.be.true;
       });
 
-      it('should add the images to newArticle.data', function() {
+      it('should add the photos to newArticle.photos', function() {
         scope.getPhotos();
 
-        expect(scope.newArticle.data.length).to.equal(1);
-        expect(scope.newArticle.data[0].images.length).to.equal(2);
-        expect(scope.newArticle.data[0].images[0]).to.equal(1);
-        expect(scope.newArticle.data[0].images[1]).to.equal(2);
+        expect(scope.newArticle.photos.length).to.equal(2);
+        expect(scope.newArticle.photos[0]).to.equal(1);
+        expect(scope.newArticle.photos[1]).to.equal(2);
       });
     });
 
@@ -860,12 +692,11 @@ describe('Post: ', function(){
         expect(camera.getPicture.calledOnce).to.be.true;
       });
 
-      it('should add the image to newArticle.data', function() {
+      it('should add the photo to newArticle.photos', function() {
         scope.capturePhoto();
 
-        expect(scope.newArticle.data.length).to.equal(1);
-        expect(scope.newArticle.data[0].images.length).to.equal(1);
-        expect(scope.newArticle.data[0].images[0]).to.equal('url');
+        expect(scope.newArticle.photos.length).to.equal(1);
+        expect(scope.newArticle.photos[0]).to.equal('url');
       });
     });
   });

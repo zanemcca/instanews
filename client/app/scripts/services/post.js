@@ -42,12 +42,33 @@ app.factory('Post', [
        tempId: '',
        videos: [],
        photos: [],
-       text: []
+       text: [],
+       isValidArticle: function() {
+         if( this.title && typeof this.title === 'string' && this.title.length > 0 &&
+            this.position && this.position.lat && this.position.lng &&
+            typeof this.position.lat === 'number' && typeof this.position.lng === 'number' &&
+            this.text.length + this.videos.length + this.photos.length > 0
+         ) {
+           return true;
+         }
+         else {
+           return false;
+         }
+       },
+       isValidSubarticle: function() {
+         if( this.parentId && typeof this.parentId === 'string' && this.parentId.length > 0 &&
+            this.text.length + this.videos.length + this.photos.length > 0
+         ) {
+           return true;
+         }
+         else { 
+           return false;
+         }
+       }
      };
      art.tempId = rfc4122.v4();
       
-     saveArticle(art);
-     return art;
+     return saveArticle(art);
    };
 
    var getArticle = function(tempId) {
@@ -82,53 +103,49 @@ app.factory('Post', [
      }
 
      LocalStorage.writeFile('pending', article.tempId + '.json', article);
+     return article;
    };
 
    var saveTitle = function(title, tempId) {
      var article = getArticle(tempId);
      article.title = title;
-     saveArticle(article);
-     return article;
+     return saveArticle(article);
    };
 
    var savePosition = function(position, tempId) {
+     var article = getArticle(tempId);
      if( position.lat && position.lng ) {
-       var article = getArticle(tempId);
        article.position = position;
-       saveArticle(article);
-       return article;
+       return saveArticle(article);
      }
      else {
        console.log('Error: Bad position given! Will not save the position!');
+       return article;
      }
    };
 
    var saveParentId = function(parentId, tempId) {
      var article = getArticle(tempId);
      article.parentId = parentId;
-     saveArticle(article);
-     return article;
+     return saveArticle(article);
    };
 
    var saveVideos = function(videos, tempId) {
      var article = getArticle(tempId);
      article.videos = article.videos.concat(videos);
-     saveArticle(article);
-     return article;
+     return saveArticle(article);
    };
 
    var savePhotos = function(photos, tempId) {
      var article = getArticle(tempId);
      article.photos = article.photos.concat(photos);
-     saveArticle(article);
-     return article;
+     return saveArticle(article);
    };
 
    var saveText = function(text, tempId) {
      var article = getArticle(tempId);
      article.text = article.text.concat(text);
-     saveArticle(article);
-     return article;
+     return saveArticle(article);
    };
 
    /* Deletion functions */
@@ -140,7 +157,7 @@ app.factory('Post', [
          break;
        }
      }
-     saveArticle(article);
+     return saveArticle(article);
    };
 
    var deletePhoto = function(photo, tempId) {
@@ -151,7 +168,7 @@ app.factory('Post', [
          break;
        }
      }
-     saveArticle(article);
+     return saveArticle(article);
    };
 
    var deleteText = function(text, tempId) {
@@ -162,7 +179,7 @@ app.factory('Post', [
          break;
        }
      }
-     saveArticle(article);
+     return saveArticle(article);
    };
 
    var deleteArticle = function(article) {
@@ -184,32 +201,25 @@ app.factory('Post', [
 
      posting = true;
      var article = getArticle(tempId);
-     var total = article.text.length + article.videos.length + article.photos.length;
      
-     if(total > 0) {
-       if( article.title && article.position ) {
-         Article.create({
-            isPrivate: false,
-            location: article.position,
-            username: User.get().username,
-            title: article.title
-         })
-         .$promise
-         .then( function(res) {
-           article.parentId = res.id;
-           article.title = null;
-           article.position = null;
-           saveArticle(article);
-           postSubarticle(article);
-         });
-       }
-       else if(article.parentId) {
+     if(article.isValidArticle()){
+       Article.create({
+          isPrivate: false,
+          location: article.position,
+          username: User.get().username,
+          title: article.title
+       })
+       .$promise
+       .then( function(res) {
+         article.parentId = res.id;
+         article.title = null;
+         article.position = null;
+         saveArticle(article);
          postSubarticle(article);
-       }
-       else {
-         console.log('Error: Cannot post the given content because there are missing parts');
-         posting = false;
-       }
+       });
+     }
+     else if(article.isValidSubarticle()) {
+       postSubarticle(article);
      }
      else {
        console.log('There were no subarticles given so the article will not be saved');
@@ -277,8 +287,8 @@ app.factory('Post', [
     };
 
     //Called after the text has been posted
-    var onTextPostSuccess = function() {
-      deleteText(text, art.tempId);
+    var onTextPostSuccess = function(res) {
+      deleteText(res.text, art.tempId);
       onSuccess();
       console.log('Successful subarticle creation!');
     };
@@ -289,8 +299,9 @@ app.factory('Post', [
     };
 
      //Upload all videos
-    for(var i = 0; i < art.videos.length; i++) {
-      var video = art.videos[i];
+    var videos = art.videos.slice(0);
+    for(var i = 0; i < videos.length; i++) {
+      var video = videos[i];
 
       var sub = createVideo(art.parentId, video);
       var server = ENV.apiEndpoint + '/storages/' + sub._file.container + '/upload';
@@ -306,9 +317,10 @@ app.factory('Post', [
     }
 
     //Upload all photos
-    for(var j = 0; j < art.photos.length; j++) {
+    var photos = art.photos.slice(0);
+    for(var j = 0; j < photos.length; j++) {
 
-      var photo =  art.photos[j];
+      var photo =  photos[j];
       var subarticle = createPhoto(art.parentId, photo);
       var photoServer = ENV.apiEndpoint + '/storages/' + subarticle._file.container + '/upload';
 
@@ -323,12 +335,11 @@ app.factory('Post', [
     }
 
     //Upload all text
-    for(var k = 0; k < art.text.length; k++) {
-      var text = art.text[k];
+    art.text.forEach( function(text) {
       Article.subarticles.create(createText(art.parentId, text))
       .$promise
       .then(onTextPostSuccess, error);
-    }
+    });
   };
 
   //Create a text subarticle for the given parentId
@@ -341,7 +352,7 @@ app.factory('Post', [
       };
    };
 
-  //Create a video subarticle for the given parentID
+  //Create a video subarticle for the given parentId
   var createVideo = function(id, video) {
     var container = 'instanews.videos.us.east';
     var poster = video.name.slice(0,video.name.lastIndexOf('.') + 1) + 'jpg';
@@ -384,6 +395,7 @@ app.factory('Post', [
 
   return {
     getArticle: getArticle,
+    saveArticle: saveArticle,
     saveVideos: saveVideos,
     savePhotos: savePhotos,
     saveText: saveText,

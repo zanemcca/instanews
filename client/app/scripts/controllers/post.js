@@ -79,6 +79,7 @@ app.controller('PostCtrl', [
         destructiveText: 'Delete',
         titleText: 'What would you like done with your unpublished content?',
         cancelText: 'Cancel',
+        cancel:  function() {},
         buttonClicked: function() {
           $ionicHistory.goBack();
         },
@@ -177,5 +178,4 @@ app.controller('PostCtrl', [
          console.log('Error: Failed to capture a new photo: ' + JSON.stringify(err));
       });
    };
-
 }]);
