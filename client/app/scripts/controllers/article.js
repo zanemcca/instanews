@@ -1,31 +1,26 @@
 'use strict';
 
-var app = angular.module('instanews.article', ['ionic', 'ngResource', 'underscore']);
+var app = angular.module('instanews.article', ['ionic', 'ngResource']);
 
 app.controller('ArticleCtrl', [
-      '$scope',
-      '$stateParams',
-      'Article',
-      'Articles',
-      'Maps',
-      '_',
-      function($scope,
-         $stateParams,
-         Article,
-         Articles,
-         Maps,
-         _) {
+  '$scope',
+  '$stateParams',
+  'Article',
+  'Articles',
+  'Subarticles',
+  'Maps',
+  function(
+    $scope,
+    $stateParams,
+    Article,
+    Articles,
+    Subarticles,
+    Maps
+  ) {
 
    //Scope variables
-   $scope.subarticles = [];
    $scope.article = Articles.getOne($stateParams.id);
-   $scope.itemsAvailable = true;
-
-   var filter = {
-      limit: 10,
-      skip: 0,
-      order: 'rating DESC'
-   };
+   $scope.areItemsAvailable = Subarticles.areItemsAvailable;
 
    var marker;
 
@@ -34,7 +29,6 @@ app.controller('ArticleCtrl', [
       var map = Maps.getArticleMap();
       if(map) {
          marker = Maps.setMarker(map,$scope.article.location);
-         google.maps.event.trigger(map, 'resize');
       }
    });
 
@@ -42,58 +36,25 @@ app.controller('ArticleCtrl', [
       marker = Maps.deleteMarker(marker);
    });
 
-   var load = function(cb) {
-      Article.subarticles({id: $stateParams.id, filter: filter })
-      .$promise
-      .then( function (subarticles) {
-         if ( subarticles.length <= 0 ) {
-            $scope.itemsAvailable = false;
-         }
-         else {
-            //Update our skip amount
-            filter.skip += subarticles.length;
+  $scope.onRefresh = function () {
+    console.log('Refresh');
+    Subarticles.deleteAll($stateParams.id);
+    Subarticles.load($stateParams.id, function() {
+      $scope.$broadcast('scroll.refreshComplete');
+    });
+  };
 
-            //Set the top article and remove duplicates
-            for( var i = 0; i < subarticles.length; i++) {
-               var subarticle = subarticles[i];
+  $scope.loadMore = function() {
+    Subarticles.load($stateParams.id, function() {
+      console.log('Loading more');
+      $scope.$broadcast('scroll.infiniteScrollComplete');
+    });
+  };
 
-               //Remove duplicates
-               for(var j = 0; j < $scope.subarticles.length; j++ ) {
-                  var sub = $scope.subarticles[j];
-                  if( sub.id === subarticle.id) {
-                     subarticles.splice(i,1);
-                     break;
-                  }
-               }
-            }
-
-            //Update our local subarticles
-            $scope.subarticles = $scope.subarticles.concat(subarticles);
-         }
-
-         cb();
-      });
+   var updateSubarticles = function() {
+     $scope.subarticles = Subarticles.get($stateParams.id);
    };
 
-   $scope.onRefresh = function () {
-      console.log('Refresh');
-
-      //Reset all necessary values
-      $scope.itemsAvailable = true;
-      filter.skip = 0;
-      $scope.subarticles = [];
-
-      //Load the initial articles
-      load( function() {
-         $scope.$broadcast('scroll.refreshComplete');
-      });
-   };
-
-   $scope.loadMore = function() {
-      _.debounce( load( function() {
-         console.log('Loading more');
-         $scope.$broadcast('scroll.infiniteScrollComplete');
-      }), 500);
-   };
+   Subarticles.registerObserver(updateSubarticles);
 }]);
 
