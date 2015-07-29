@@ -34,6 +34,8 @@ app.controller('ArticleCtrl', [
 
    $scope.$on('$ionicView.afterLeave', function() {
       marker = Maps.deleteMarker(marker);
+      Subarticles.deleteAll();
+      Subarticles.unregisterObserver(updateSubarticles);
    });
 
   $scope.onRefresh = function () {

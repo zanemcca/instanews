@@ -10,14 +10,14 @@ app.service('Subarticles', [
   ){
 
    var filter = {
-      limit: 10,
+      limit: 50,
       skip: 0,
       order: 'rating DESC'
    };
 
    var subarticles = [];
    var itemsAvailable = true;
-   var observerCallbacks = [];
+   var observers = [];
 
    var load = function(id, cb) {
       Article.subarticles({id: id, filter: filter })
@@ -31,14 +31,14 @@ app.service('Subarticles', [
             filter.skip += subs.length;
 
             //Set the top article and remove duplicates
-            for( var i = 0; i < subs.length; i++) {
-               var subarticle = subs[i];
+            for( var i = 0; i < subarticles.length; i++) {
+               var subarticle = subarticles[i];
 
                //Remove duplicates
-               for(var j = 0; j < subarticles.length; j++ ) {
-                  var sub = subarticles[j];
+               for(var j = 0; j < subs.length; j++ ) {
+                  var sub = subs[j];
                   if( sub.id === subarticle.id) {
-                     subs.splice(i,1);
+                     subs.splice(j,1);
                      break;
                   }
                }
@@ -64,20 +64,20 @@ app.service('Subarticles', [
    };
 
    var registerObserver = function(cb) {
-     observerCallbacks.push(cb);
+     observers.push(cb);
    };
 
    var unregisterObserver = function(cb) {
-     for(var i = 0; i < observerCallbacks.length; i++) {
-       if(observerCallbacks[i] === cb) {
-         observerCallbacks.splice(i,1);
+     for(var i = 0; i < observers.length; i++) {
+       if(observers[i] === cb) {
+         observers.splice(i,1);
          break;
        }
      }
    };
 
    var notifyObservers = function() {
-     observerCallbacks.forEach(function(cb) {
+     observers.forEach(function(cb) {
        cb();
      });
    };
