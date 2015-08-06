@@ -6,16 +6,24 @@ module.exports = function(app) {
    var Votes = app.models.votes;
 
    var getRating = function(instance) {
-      return  (instance.upVoteCount - instance.downVoteCount);
+      var rating =  instance.upVoteCount - instance.downVoteCount;
+      return rating;
    };
 
-	Votes.observe('access', function(ctx, next) {
-	  //Limit the queries to LIMIT per request
-	  if( !ctx.query.limit || ctx.query.limit > LIMIT) {
-		 ctx.query.limit = LIMIT;
-	  }
-	  next();
-	});
+  Votes.observe('access', function(ctx, next) {
+    //Limit the queries to LIMIT per request
+    if( !ctx.query.limit || ctx.query.limit > LIMIT) {
+           ctx.query.limit = LIMIT;
+    }
+    next();
+  });
+
+  Votes.observe('loaded', function(ctx, next) {
+    if(ctx.instance) {
+      ctx.instance.rating = getRating(ctx.instance);
+    }
+    next();
+  });
 
    Votes.observe('before save', function(ctx, next) {
 
@@ -27,6 +35,7 @@ module.exports = function(app) {
             inst.upVoteCount = 0;
             inst.downVoteCount = 0;
             inst.date = new Date();
+            inst.verified = false;
          }
 
          //Update the rating

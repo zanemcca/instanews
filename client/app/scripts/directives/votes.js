@@ -47,6 +47,7 @@ app.directive('invotes', [
 
 
          $scope.upvote = function (instance) {
+             instance.upVoteCount++;
             var user = User.get();
 
             Position.getCurrent( function(err,position) {
@@ -70,16 +71,15 @@ app.directive('invotes', [
                UpVote.create(vote)
                .$promise
                .then( function(res) {
-                  instance.upVoteCount = res.upVoteCount;
-                  instance.rating = res.rating;
-                  if(res.verified) {
-                     instance.verified = res.verified;
-                  }
+                  console.log('Successfully upvoted');
+               }, function(err) {
+                  console.log('Error: Failed to create an upvote');
                });
             });
          };
 
          $scope.downvote = function (instance) {
+           instance.downVoteCount++;
             var user = User.get();
 
             Position.getCurrent( function(err,position) {
@@ -103,8 +103,9 @@ app.directive('invotes', [
                DownVote.create(vote)
                .$promise
                .then( function(res) {
-                  instance.downVoteCount = res.downVoteCount;
-                  instance.rating = res.rating;
+                  console.log('Successfully downVoted');
+               }, function(err) {
+                  console.log('Error: Failed to create an downVote');
                });
             });
          };

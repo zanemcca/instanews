@@ -4,11 +4,16 @@
 var app = angular.module('instanews.service.camera', ['ionic', 'ngResource', 'uuid']);
 
 app.factory('Camera', [
-      'rfc4122',
-      '$q',
-      function(
-        rfc4122,
-        $q) {
+  'rfc4122',
+  '$cordovaCapture',
+  'Platform',
+  '$q',
+  function(
+    rfc4122,
+    $cordovaCapture,
+    Platform,
+    $q
+  ) {
 
    var options = {
       correctOrientation: true
@@ -21,7 +26,7 @@ app.factory('Camera', [
          var type  = fileObj.name.split('.');
          var newName = rfc4122.v4() + '.' + type[type.length - 1];
 
-         window.resolveLocalFileSystemURL(cordova.file.dataDirectory, function(filesystem2) {
+         window.resolveLocalFileSystemURL(Platform.getDataDir(), function(filesystem2) {
            fileEntry.copyTo(filesystem2, newName, function(entry) {
              entry.size = fileObj.size;
              entry.lastModified = fileObj.lastModified;
@@ -40,12 +45,17 @@ app.factory('Camera', [
    var captureVideo = function() {
       var q = $q.defer();
 
-      if (!navigator.device.capture) {
+      if (!$cordovaCapture) {
          q.resolve(null);
          return q.promise;
       }
 
-      navigator.device.capture.captureVideo( function (videoData) {
+      var options = {
+        limit: 3
+      };
+
+      $cordovaCapture.captureVideo(options)
+      .then(function (videoData) {
         
         var finished = 0;
         var files = [];
@@ -53,7 +63,6 @@ app.factory('Camera', [
         var afterCopy = function(fileEntry) {
 
           fileEntry.thumbnailURI = fileEntry.nativeURL.slice(0, fileEntry.nativeURL.lastIndexOf('.') + 1) + 'jpg';
-          console.log(JSON.stringify(fileEntry));
 
            window.PKVideoThumbnail.createThumbnail(fileEntry.nativeURL, fileEntry.thumbnailURI, 
            function(uri) {

@@ -73,5 +73,43 @@ exports.run = function() {
          });
       });
 
+      it('should be able to add multiple votes simultaneously', function(done) {
+
+        var total = 20;
+        var count = 0;
+
+        var next = function(article, cb) {
+          if( count === total) {
+             Articles.findById(article.id, function(err,res) {
+                if(err) return done(err);
+                expect(res).to.exist;
+                expect(res.upVoteCount).to.equal(20);
+                cb();
+             });
+          }
+        };
+
+        Articles.create(article, function(err, res) {
+          if(err) return done(err);
+          expect(res).to.exist;
+
+          var cb = function(err, vote) {
+             if(err) return done(err);
+             expect(vote).to.exist;
+             count++;
+             next(res, done);
+          };
+
+          for( var i = 0; i < total; i++) {
+            UpVotes.create({
+               votableType: 'article',
+               votableId: res.id,
+               location: res.location
+            }, cb);
+          }
+
+          next(res, done);
+        });
+      });
    });
 };
