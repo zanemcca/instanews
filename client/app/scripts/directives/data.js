@@ -53,8 +53,9 @@ app.directive('indata',[
          return name;
       }
       else {
+        console.log('Data: ' + data);
          //TODO get rid of this method the URL should be in the data
-         return '"' + urlBase + '/storages/1/download/' +
+         return '"' + urlBase + '/storages/instanews.photos.us.east/download/' +
             name + '"';
       }
    };

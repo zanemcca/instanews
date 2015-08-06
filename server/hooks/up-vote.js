@@ -1,5 +1,6 @@
 module.exports = function(app) {
 
+  var mongo = app.dataSources.Articles.connector;
    // Conversion functions
    Number.prototype.toRad = function() {
       return this * Math.PI / 180;
@@ -29,16 +30,65 @@ module.exports = function(app) {
    };
 
    var UpVote = app.models.upVote;
+   var Article = app.models.Article;
 
    UpVote.observe('after save', function(ctx, next) {
 
+     var update = {
+       $inc: { upVoteCount: 1 }
+     };
+
+     mongo.collection(ctx.instance.votableType).findAndModify({
+       _id: ctx.instance.votableId
+     },
+     [['_id', 'asc']],
+     update,
+     {
+       new: true
+     },
+     function(err, object){
+       if (err) {
+          console.log('Error: ' + err);
+          next(err);
+       }
+       else if(object && object.value) {
+         var instance = object.value;
+          if(instance.modelName === 'article' &&
+             !instance.verified &&
+             nearBy(ctx.instance.location, instance.location)
+          ) {
+            Article.update({
+              id: instance.id,
+              verified: true
+            }, function(err, res) {
+               if (err) {
+                  console.log('Error: ' + err);
+                  next(err);
+               }
+               else {
+                 next();
+               }
+            });
+          }
+          else {
+            next();
+          }
+       }
+       else {
+         console.log('The ' + ctx.instance.votableType +
+                     ' ' + ctx.instance.votableId +
+                     ' cannot be voted on because it was not found!');
+         next();
+       }
+     });
+     /*
       ctx.instance.votable( function(err, instance) {
          if(err) {
             console.log('Error: ' + err);
             next(err);
          }
          else if(instance) {
-            if(instance.modelName === 'article') {
+            if(instance.modelName === 'article' && !instance.verified) {
                instance.verified = nearBy(
                   ctx.instance.location,
                   instance.location);
@@ -65,6 +115,7 @@ module.exports = function(app) {
             next();
          }
       });
+  */
 
    });
 

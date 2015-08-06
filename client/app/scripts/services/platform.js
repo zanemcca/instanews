@@ -83,8 +83,13 @@ app.factory('Platform', [
     $ionicActionSheet.show(sheet);
   };
 
+  var getDataDir = function() {
+    return cordova.file.dataDirectory;
+  };
+
    return {
       getUUID: getUUID,
+      getDataDir: getDataDir,
       showSheet: showSheet,
       showToast: showToast,
       isIOS: isIOS,

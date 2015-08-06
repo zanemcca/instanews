@@ -7,14 +7,14 @@ var UpVotes = app.models.upVote;
 var DownVotes = app.models.downVote;
 
 function randomLat() {
-   max = 46;
-   min = 45;
+   max = 45.52;
+   min = 45.51;
    return Math.random()*(max - min) + min;
 }
 
 function randomLng() {
-   max = -74;
-   min = -73;
+   max = -73.56;
+   min = -73.57;
    return Math.random()*(max - min) + min;
 }
 
@@ -28,59 +28,84 @@ function callback(err, res) {
       console.log('Erorr: ' + err);
    }
    //console.log(res);
+   cbCount++;
+   if(cbCount === totalCB) {
+     next();
+   }
 }
 
-var fillCount = 0;
-var total = 0;
+function purge(cb) {
+  var error;
+  Articles.destroyAll(function(err) {
+    if(!error && err) error = err;
+    Subarticles.destroyAll(function(err) {
+      if(!error && err) error = err;
+      UpVotes.destroyAll(function(err) {
+        if(!error && err) error = err;
+        DownVotes.destroyAll(function(err) {
+          if(!error && err) error = err;
+          cb(error);
+        });
+      });
+    });
+  });
+}
+
 var limit = 200;
+var count = 0;
+var cbCount = 0;
+var totalCB = 0;
 
 function fillArticle(err, res) {
-   fillCount++;
-   total++;
+   upMax = Math.floor(Math.random()*50);
+   downMax = Math.floor(Math.random()*50);
+   totalCB = upMax + downMax + 1;
+   cbCount = 0;
+
    Subarticles.create({
       parentId: res.id,
       username: 'bob',
-      _file: {
-         type: 'image',
-         size: 2000,
-         name: '123456.jpg',
-         caption: 'Nuts photo!!'
-      }
+      text: 'This is a subarticle for ' + res.title,
    }, callback);
 
-
-   //console.log('Voting on ' + res.id);
-   var max = Math.floor(Math.random()*100);
-   for( var i =0; i < max; i++) {
+   console.log('Created: ' + res.title + ', up: ' + upMax + ', down: ' + downMax);
+   for( var i =0; i < downMax; i++) {
       DownVotes.create({
          votableId: res.id,
          votableType: 'article'
       }, callback);
    }
 
-   max = Math.floor(Math.random()*20);
-   for(i =0; i < max; i++) {
+   for(i =0; i < upMax; i++) {
       UpVotes.create({
          votableId: res.id,
          votableType: 'article'
       }, callback);
    }
-   fillCount--;
-   if(total === limit) {
-     process.exit(1);
-   }
 }
 
-console.log('Starting Import');
-for( var i = 0; i < limit ; i++ ) {
+var next = function() {
+  count++;
+  if( count <= limit) {
    Articles.create({
-      title: i,
+      title: count,
       location: {
          lat: randomLat(),
          lng: randomLng()
       },
       isPrivate: false
    }, fillArticle);
-}
+  }
+  else {
+    console.log('Finished import');
+    process.exit(1);
+  }
+};
 
-console.log('Done Importing!');
+console.log('Starting Import');
+purge( function(err) {
+  if(err) {
+    console.log('Error: Failed to purge DB: ' + JSON.stringify(err));
+  }
+  next();
+});
