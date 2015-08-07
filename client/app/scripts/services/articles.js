@@ -37,6 +37,7 @@ app.service('Articles', [
    };
 
    //Update the filter bounds 
+   //TODO I think we should probably be loading articles automatically when they change the map
    var updateBounds = function() {
      var bounds = Position.getBounds();
 

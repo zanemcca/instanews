@@ -38,27 +38,126 @@ app.service('Maps', [
 
    var heatmap;
 
-   var createGradient = function() {
+  var createGradient = function() {
+    var start = {
+      h: 0.5,
+      s: 1,
+      l: 0.5,
+      a: 0
+    };
 
-      var third = 8;
-      var subValue = 256/third;
+    var end = {
+      h: 1,
+      s: 1,
+      l: 0.5,
+      a: 1
+    };
 
-      //Transistion from baby blue to blue to red
-      var gradient = ['rgba(0, 255, 255, 0)'];
-      for(var i = 0; i < third; i++) {
-         var temp =  'rgba(0,' + (255-subValue*i) + ',255, 1)';
-         gradient.push(temp);
-      }
-      for(i = 0; i < third; i++) {
-         gradient.push( 'rgba(0,0,'+ (255 - subValue/2*i) +', 1)');
-      }
-      for(i = 0; i < third; i++) {
-         gradient.push( 'rgba('+ (subValue*i) +',0,'+ (128 - subValue/2*i) +', 1)');
-      }
-      gradient.push('rgba(255, 0, 0, 1)');
+    var length = 100;
 
-      return gradient;
-   };
+    var gradient = [];
+    var rgba = hsla2rgba(start);
+    gradient.push(rgbaToString(rgba));
+    for(var i = 1; i < length; i++) {
+      var weight = i/length;
+      var hsla = {
+        h: start.h + weight*(end.h -start.h),
+        s: start.s + weight*(end.s -start.s),
+        l: start.l + weight*(end.l -start.l),
+        a: end.a
+      };
+      rgba = hsla2rgba(hsla);
+      gradient.push(rgbaToString(rgba));
+    }
+
+    console.log(gradient);
+    return gradient;
+  };
+
+  var rgbaToString = function(rgba) {
+    return ('rgba(' + rgba.r + ', ' + rgba.g + ', ' + rgba.b + ', ' + rgba.a + ')');
+  };
+
+  var hsla2rgba = function(hsl) {
+    if( hsl.s === 0) {
+      return {
+        r: hsl.l*255,
+        g: hsl.l*255,
+        b: hsl.l*255,
+        a: hsl.a
+      };
+    }
+    else {
+      var temp1,temp2;
+
+      if( hsl.l < 0.5) {
+        temp2 = hsl.l * (1 + hsl.s);
+      }
+      else {
+        temp2 = (hsl.l + hsl.s) - ( hsl.s * hsl.l);
+      }
+
+      temp1 = 2 * hsl.l - temp2;
+
+      return {
+        r: Math.ceil(255 * hue2rgb(temp1, temp2, hsl.h + (1/3))),
+        g: Math.ceil(255 * hue2rgb(temp1, temp2, hsl.h)),
+        b: Math.ceil(255 * hue2rgb(temp1, temp2, hsl.h - (1/3))),
+        a: hsl.a
+      };
+    }
+  };
+
+  var hue2rgb = function( t1, t2, hue) {
+    if( hue < 0 ) {
+      hue++;
+    }
+    else if( hue > 1 ) {
+      hue--;
+    }
+
+    if((6 * hue) < 1) {
+      return (t1 + (t2 - t1) * 6 * hue);
+    }
+    else if((2 * hue) < 1) {
+      return t2;
+    }
+    else if((3 * hue) < 2) {
+      return (t1 + (t2 - t1) * 6 * (2/3 - hue));
+    }
+    else {
+      return t1;
+    }
+  };
+
+  /*
+  var createLinearGradient = function() {
+    var start = {
+      r: 0,
+      g: 0,
+      b: 255
+    };
+
+    var end = {
+      r: 255,
+      g: 0,
+      b: 0
+    };
+
+    var length = 14;
+
+    var gradient = [];
+    gradient.push('rgba(' + start.r + ', ' + start.g + ', ' + start.b + ', 0)');
+    for(var i = 1; i < length; i++) {
+      var weight = i/length;
+      var r = Math.floor(start.r + weight*(end.r -start.r));
+      var b = Math.floor(start.b + weight*(end.b -start.b));
+      var g = Math.floor(start.g + weight*(end.g -start.g));
+      gradient.push('rgba(' + r + ', ' + g + ', ' + b + ', 1)');
+    }
+    return gradient;
+  };
+ */
 
    var updateHeatmap = function() {
       var articles = Articles.get();
@@ -69,12 +168,26 @@ app.service('Maps', [
          return;
       }
 
+      var total = 0;
+      var avg = 0;
+      for(var i = 0; i < articles.length; i++) {
+        if( articles[i].rating > 0) {
+          total += articles[i].rating;
+          avg += articles[i].rating/articles.length;
+        }
+      }
+
       for(var i = 0; i < articles.length; i++) {
          var position = Position.posToLatLng(articles[i].location);
-         if (Position.withinBounds(position) && articles[i].rating > 0) {
+         var rating = articles[i].rating;
+         if(rating < 0) {
+           rating = 0.1;
+         }
+
+         if (Position.withinBounds(position)) {
             articleHeatArray.push({
                location: position,
-               weight: articles[i].rating
+               weight: 1 - Math.exp(-rating/(2*avg))
             });
          }
       }
