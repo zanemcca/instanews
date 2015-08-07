@@ -84,7 +84,8 @@ app.directive('inmap', [
                if ( $stateParams.id) {
                   $scope.article = Articles.getOne($stateParams.id);
                   mapOptions.center = new google.maps.LatLng($scope.article.location.lat, $scope.article.location.lng);
-                  mapOptions.zoom = 15;
+                  mapOptions.zoom = 18;
+                  mapOptions.mapTypeId = google.maps.MapTypeId.HYBRID;
                }
                else {
                   console.log('Not id given! The article map is dependent on knowing the article location!');
@@ -99,6 +100,7 @@ app.directive('inmap', [
             if ( postElem && postElem.textContent.indexOf('Map') === -1) {
 
               mapOptions.zoom = 18;
+              mapOptions.mapTypeId = google.maps.MapTypeId.HYBRID;
               //var marker;
 
               map = new google.maps.Map(postElem, mapOptions);
