@@ -4,6 +4,10 @@ module.exports = function(Comment) {
 
    common.initVotes(Comment);
 
+   Comment.readModifyWrite = function(query, modify, cb, retry) {
+     common.readModifyWrite(Comment, query, modify, cb, retry);
+   };
+
    var staticDisable = [
       'exists',
       'count',

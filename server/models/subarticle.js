@@ -2,8 +2,11 @@ var common = require('./common');
 
 module.exports = function(Subarticle) {
 
-
    common.initVotes(Subarticle);
+
+   Subarticle.readModifyWrite = function(query, modify, cb, retry) {
+     common.readModifyWrite(Subarticle, query, modify, cb, retry);
+   };
 
    var staticDisable = [
       'exists',

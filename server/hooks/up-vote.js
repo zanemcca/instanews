@@ -1,5 +1,7 @@
 module.exports = function(app) {
 
+  var UpVote = app.models.upVote;
+  var Stat = app.models.Stat;
   var mongo = app.dataSources.Articles.connector;
    // Conversion functions
    Number.prototype.toRad = function() {
@@ -29,94 +31,61 @@ module.exports = function(app) {
       }
    };
 
-   var UpVote = app.models.upVote;
-   var Article = app.models.Article;
+  //TODO replicate this for downvotes
+  UpVote.observe('after save', function(ctx, next) {
+    var inst = ctx.instance;
 
-   UpVote.observe('after save', function(ctx, next) {
+    if(inst) {
+      //The modify function will be done before the rating is calculated
+      var modify =  function(instance) {
+        instance.upVoteCount++;
+        instance.views++;
+        instance.clicks++;
 
-     var update = {
-       $inc: { upVoteCount: 1 }
-     };
+        if(instance.modelName === 'article' && !instance.verified &&
+          nearBy(inst.location, instance.location)
+        ) {
+          instance.verified = true;
+        }
 
-     mongo.collection(ctx.instance.votableType).findAndModify({
-       _id: ctx.instance.votableId
-     },
-     [['_id', 'asc']],
-     update,
-     {
-       new: true
-     },
-     function(err, object){
-       if (err) {
-          console.log('Error: ' + err);
-          next(err);
-       }
-       else if(object && object.value) {
-         var instance = object.value;
-          if(instance.modelName === 'article' &&
-             !instance.verified &&
-             nearBy(ctx.instance.location, instance.location)
-          ) {
-            Article.update({
-              id: instance.id,
-              verified: true
-            }, function(err, res) {
-               if (err) {
-                  console.log('Error: ' + err);
-                  next(err);
-               }
-               else {
-                 next();
-               }
-            });
+        var age = Date.now() - instance.date;
+        
+        //Trigger the user model to update their 
+        Stat.addSample(inst.username, 'upVote', 'age', age, function(err, res) {
+          if(err) {
+            console.log('Error: Failed to add interaction age for upVote');
+            console.log(err);
           }
           else {
-            next();
-          }
-       }
-       else {
-         console.log('The ' + ctx.instance.votableType +
-                     ' ' + ctx.instance.votableId +
-                     ' cannot be voted on because it was not found!');
-         next();
-       }
-     });
-     /*
-      ctx.instance.votable( function(err, instance) {
-         if(err) {
-            console.log('Error: ' + err);
-            next(err);
-         }
-         else if(instance) {
-            if(instance.modelName === 'article' && !instance.verified) {
-               instance.verified = nearBy(
-                  ctx.instance.location,
-                  instance.location);
-            }
-
-            instance.upVoteCount += 1;
-            instance.save( function(err, res) {
-               if (err) {
-                  console.log('Error: ' + err);
-                  next(err);
-               }
-               else {
-                  ctx.instance.upVoteCount = instance.upVoteCount;
-                  ctx.instance.rating = res.rating;
-                  if(instance.modelName === 'article') {
-                     ctx.instance.verified = instance.verified;
-                  }
-                  next();
-               }
+            Stat.addSample(inst.username, inst.votableType, 'age', age, function(err, res) {
+              if(err) {
+                console.log('Error: Failed to add interaction age for ' + inst.votableType);
+                console.log(err);
+              }
             });
-         }
-         else {
-            console.log('Warning: Votable instance was not found');
-            next();
-         }
-      });
-  */
+          }
+        });
 
-   });
+        return instance;
+      };
 
+      Stat.updateRating(inst.votableId, inst.votableType, modify, function(err, res) {
+        if(err) { 
+          console.log('Error: Failed to update the rating for ' + inst.votableType + ' - ' +
+                      inst.votableId + ' from upvote ' + inst.id);
+          next(err);
+        }
+        else {
+          if(res != 1) {
+            console.log('Warning: ' + res + ' ' + inst.votableType + ' were updated for id:' +
+                       inst.votableId + ' when there should have been one');
+          }
+          next();
+        }
+      }); 
+    }
+    else {
+      console.log('Warning: Invalid instance for upvote!');
+    }
+  });
 };

@@ -11,6 +11,7 @@ var app = common.app;
 var api = common.api;
 
 var Journalists = app.models.journalist;
+var Stats = app.models.stat;
 var Articles = app.models.Article;
 var Subarticles = app.models.Subarticle;
 
@@ -27,13 +28,17 @@ var purgeDB = function(cb) {
          Journalists.destroyAll( function(err) {
             if(err) return cb(err);
 
-            app.bruteDB.collection('store').remove( {}, function(err) {
-               if (err) {
-                  console.log(err);
-                  return cb(err);
-               }
-               cb();
-            });
+           Stats.destroyAll( function(err) {
+              if(err) return cb(err);
+
+              app.bruteDB.collection('store').remove( {}, function(err) {
+                 if (err) {
+                    console.log(err);
+                    return cb(err);
+                 }
+                 cb();
+              });
+           });
          });
       });
    });

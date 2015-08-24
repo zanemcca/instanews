@@ -4,7 +4,7 @@ module.exports = function(app) {
    var Notification = app.models.notif;
    var Installation = app.models.installation;
    var Vote = app.models.vote;
-
+   
    Vote.observe('before save', function(ctx, next) {
       var inst = ctx.instance;
       if (inst && ctx.isNewInstance) {

@@ -4,6 +4,7 @@ var LIMIT = 10;
 module.exports = function(app) {
 
    var Journalist = app.models.journalist;
+   var Stat = app.models.stat;
 
    Journalist.afterRemote('prototype.__get__articles',
    function(ctx, instance, next) {
@@ -44,8 +45,7 @@ module.exports = function(app) {
         next(new Error('Bad user given for creation!'));
       }
 
-      console.log('User: ' + JSON.stringify(user));
-
+      //TODO make this the same as front end password check
       if( !user.password || user.password.length < 8) {
         console.log('Password is too weak!');
         next(new Error('Password is too weak!'));
@@ -73,10 +73,44 @@ module.exports = function(app) {
       }
     });
 
+  Journalist.afterRemote('create', function(ctx, instance, next) {
+    Stat.findById(Stat.averageId, function(err, res) {
+      if( err ) {
+        console.log('Error: Failed to find ' + Stat.averageId);
+        console.log(err);
+        next(err);
+      }
+      else {
+        var stat = {
+          id: instance.username,
+          subarticle: res.subarticle,
+          article: res.article,
+          comment: res.comment,
+          upVote: res.upVote,
+          version: 0
+        }
+
+        //TODO Modify the count on the stats so that the user has a predictable number of 
+        //interactions before they can througoughly modify the statistics
+        stat.id = instance.username;
+        Stat.create(stat, function(err, res) {
+          if( err) {
+            console.log('Error: Failed to create stat object for user ' + instance.username);
+            console.log(err);
+            next(err);
+          }
+          else {
+            next();
+          }
+        });
+      }
+    });
+  });
+
    Journalist.observe('access', function(ctx, next) {
       //Reserved contents for the owner only
       ctx.query.fields = {
-         email: false
+         email: false,
       };
 
      //Limit the queries to LIMIT per request
