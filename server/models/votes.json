@@ -4,9 +4,6 @@
   "strict": false,
   "idInjection": true,
   "properties": {
-    "rate": {
-      "type": "number"
-    },
     "modelName": {
       "type": "string",
       "required": true
@@ -14,10 +11,22 @@
     "rating": {
       "type": "number"
     },
+    "Pcomment": {
+      "type": "number"
+    },
+    "clicks": {
+      "type": "number"
+    },
+    "views": {
+      "type": "number"
+    },
+    "version": {
+      "type": "number"
+    },
     "date": {
       "type": "date"
     },
-    "lastUpdated": {
+    "modified": {
       "type": "date"
     }
   },

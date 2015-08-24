@@ -6,6 +6,7 @@ var https = require('https');
 var pem = require('pem');
 var helmet = require('helmet');
 var app = loopback();
+app.loopback = loopback;
 
 var ExpressBrute = require('express-brute');
 var MongoStore = require('express-brute-mongo');
@@ -46,6 +47,29 @@ var store = new MongoStore(function (ready) {
 });
 
 app.brute =  new ExpressBrute(store);
+
+//context for use in hooks
+app.use(loopback.context());
+app.use(loopback.token());
+app.use(function setCurrentUser(req, res, next) {
+  if (!req.accessToken) {
+    return next();
+  }
+  app.models.Journalist.findById(req.accessToken.userId, function(err, user) {
+    if (err) {
+      return next(err);
+    }
+    if (!user) {
+      return next(new Error('No user with this access token was found.'));
+    }
+    var loopbackContext = loopback.getCurrentContext();
+    if (loopbackContext) {
+      loopbackContext.set('currentUser', user);
+      console.log('Current user is set to ' + user.username);
+    }
+    next();
+  });
+});
 
 //Security module
 app.use(helmet());

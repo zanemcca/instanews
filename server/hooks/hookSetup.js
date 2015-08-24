@@ -11,4 +11,5 @@ module.exports = function(app) {
    require('./article.js')(app);
    require('./journalist.js')(app);
    require('./comment.js')(app);
+   require('./stat.js')(app);
 };

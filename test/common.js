@@ -98,6 +98,10 @@ var runTillDone = function(func, cb, interval, timeout) {
    };
 };
 
+var serverDir = __dirname + '/../server/';
+console.log(serverDir);
+
+exports.serverDir = serverDir; 
 exports.assert = assert;
 exports.app = app;
 exports.api = api;

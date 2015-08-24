@@ -2,6 +2,7 @@
 module.exports = function(app) {
 
    var Subarticle = app.models.subarticle;
+   var Stat = app.models.stat;
    var Notification = app.models.notif;
 
    Subarticle.observe('before save', function(ctx, next) {
@@ -25,7 +26,55 @@ module.exports = function(app) {
       next();
    });
 
+   //TODO before create - initialize its rating
+  //TODO on loaded - update the rating of the subarticle for the user loading it
+
+  Subarticle.updateRating = function(id, rawStats, rate, cb, staticChange) {
+    var commentView;
+    var ageQ = Stat.getAgeQFunction(rawStats.subarticle.age);
+
+    var query = {
+      where: {
+        id: id 
+      },
+      include: []
+    }
+
+    if(staticChange) {
+      commentView = Stat.getGeometricStats(rawStats.comment.views);
+      query.include.push({
+        relation: 'comments',
+        scope: {
+          limit: commentView.mean,
+          order: 'rating DESC'
+        } 
+      });
+    }
+
+    var total = rawStats.comment.age.count +
+                rawStats.upVote.age.count;
+
+    var stats = {
+      age: ageQ,
+      views: {
+        comments: commentView
+      },
+      Pcomments: rawStats.comment.age.count/total,
+      Pvotes: rawStats.upVote.age.count/total
+    };
+
+    Subarticle.readModifyWrite(query, rate(stats), function(err, res) {
+      if(err) {
+        console.log('Error: Failed to modify subarticle');
+        console.log(err);
+        cb(err, res);
+      }
+      cb(null, res);
+    });
+  };
+
    Subarticle.observe('after save', function(ctx, next) {
+     
       var inst = ctx.instance;
 
       if (inst && ctx.isNewInstance) {

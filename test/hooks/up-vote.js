@@ -101,11 +101,14 @@ exports.run = function() {
           };
 
           for( var i = 0; i < total; i++) {
-            UpVotes.create({
-               votableType: 'article',
-               votableId: res.id,
-               location: res.location
-            }, cb);
+            //Rate of 200 upvotes/sec
+            setTimeout(function() {
+              UpVotes.create({
+                 votableType: 'article',
+                 votableId: res.id,
+                 location: res.location
+              }, cb);
+            }, 100*i);
           }
 
           next(res, done);

@@ -3,6 +3,7 @@ module.exports = function(app) {
 
    var Comment = app.models.comment;
    var Notification = app.models.notif;
+   var Stat = app.models.stat;
 
    var report = function(err,res) {
       if (err) console.log('Error: ' + err);
@@ -10,6 +11,8 @@ module.exports = function(app) {
          //console.log('Created a notification!');
       }
    };
+
+   //TODO before create - initialize its rating
 
    Comment.observe('after save', function(ctx, next) {
       var inst = ctx.instance;
@@ -149,4 +152,48 @@ module.exports = function(app) {
 
       next();
    });
+
+  Comment.updateRating = function(id, rawStats, rate, cb, staticChange) {
+    var commentView;
+    var ageQ = Stat.getAgeQFunction(rawStats.subarticle.age);
+
+    var query = {
+      where: {
+        id: id 
+      },
+      include: []
+    }
+
+    if(staticChange) {
+      commentView = Stat.getGeometricStats(rawStats.comment.views);
+      query.include.push({
+        relation: 'comments',
+        scope: {
+          limit: commentView.mean,
+          order: 'rating DESC'
+        } 
+      });
+    }
+
+    var total = rawStats.comment.age.count +
+                rawStats.upVote.age.count;
+
+    var stats = {
+      age: ageQ,
+      views: {
+        comments: commentView
+      },
+      Pcomments: rawStats.comment.age.count/total,
+      Pvotes: rawStats.upVote.age.count/total
+    };
+
+    Comment.readModifyWrite(query, rate(stats), function(err, res) {
+      if(err) {
+        console.log('Error: Failed to modify comment');
+        console.log(err);
+        cb(err, res);
+      }
+      cb(null, res);
+    });
+  };
 };
