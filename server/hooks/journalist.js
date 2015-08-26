@@ -73,38 +73,48 @@ module.exports = function(app) {
       }
     });
 
-  Journalist.afterRemote('create', function(ctx, instance, next) {
-    Stat.findById(Stat.averageId, function(err, res) {
-      if( err ) {
-        console.log('Error: Failed to find ' + Stat.averageId);
-        console.log(err);
-        next(err);
-      }
-      else {
-        var stat = {
-          id: instance.username,
-          subarticle: res.subarticle,
-          article: res.article,
-          comment: res.comment,
-          upVote: res.upVote,
-          version: 0
+//  Journalist.afterRemote('create', function(ctx, instance, next) {
+  Journalist.observe('after save', function(ctx, next) {
+    var instance = ctx.instance;
+    if(instance && ctx.isNewInstance) {
+      Stat.findById(Stat.averageId, function(err, res) {
+        if( err ) {
+          console.log('Error: Failed to find ' + Stat.averageId);
+          console.log(err);
+          next(err);
         }
+        else {
+          var stat = {
+            id: instance.username,
+            subarticle: res.subarticle,
+            article: res.article,
+            comment: res.comment,
+            upVote: res.upVote,
+            version: 0
+          };
 
-        //TODO Modify the count on the stats so that the user has a predictable number of 
-        //interactions before they can througoughly modify the statistics
-        stat.id = instance.username;
-        Stat.create(stat, function(err, res) {
-          if( err) {
-            console.log('Error: Failed to create stat object for user ' + instance.username);
-            console.log(err);
-            next(err);
-          }
-          else {
-            next();
-          }
-        });
-      }
-    });
+          //TODO Modify the count on the stats so that the user has a
+          // predictable number of interactions before they can
+          // througoughly modify the statistics
+          Stat.create(stat, function(err, res) {
+            if( err) {
+              console.log('Error: Failed to create stat object for user ' +
+                          instance.username);
+              console.log(err);
+              next(err);
+            }
+            else {
+              next();
+            }
+          });
+        }
+      });
+    }
+    else {
+      console.log('Warning: There is no instance attached to' +
+                  ' Journalist after save observer');
+      next();
+    }
   });
 
    Journalist.observe('access', function(ctx, next) {

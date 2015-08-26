@@ -11,11 +11,13 @@ module.exports = function(Stat) {
        }
      }, function(err, res) {
        if(err) {
-         console.log('Error: Failed to load ' + Stat.averageId + ': ' + JSON.stringify(err));
+         console.log('Error: Failed to load ' + Stat.averageId +
+                     ': ' + JSON.stringify(err));
        }
        if(res.length === 0) {
          //Create the average user
          var hour = 60*60*1000;
+         var day = hour*24;
          var average = {
            id: Stat.averageId,
            version: 0,
@@ -24,52 +26,54 @@ module.exports = function(Stat) {
            //Includes voting on or creating subcontent on that content
            subarticle: {
              age: {
-               mean: hour,
-               variance: hour*hour,
-               count: 30
+               mean: 2*day,
+               variance: 13*hour*13*hour,
+               count: 3000 
              },
              views: {
                mean: 20,
                variance: 1,
-               count: 5
+               count: 5000 
              }
            },
            comment: {
              age: {
-               mean: hour,
+               mean: 20*hour,
                variance: hour*hour,
-               count: 30
+               count: 3000
              },
              views: {
                mean: 20,
                variance: 1,
-               count: 5
+               count: 5000 
              }
            },
            upVote: {
              age: {
-               mean: hour,
-               variance: hour*hour,
-               count: 100 
+               mean: day,
+               variance: 5*hour*5*hour,
+               count: 10000 
              }
            },
            article: {
              age: {
-               mean: hour,
-               variance: hour*hour,
-               count: 40 
+               mean: day,
+               variance: 10*hour*10*hour,
+               count: 4000 
              },
              views: {
                mean: 20,
                variance: 1,
-               count: 5
+               count: 5000
              }
            }
          };
 
+         //TODO We need to disable averageId as a value for a username
          Stat.create(average, function(err, res) {
            if(err) {
-             console.log('Error: Failed to create '+ Stat.averageID +': ' + JSON.stringify(err));
+             console.log('Error: Failed to create '+ Stat.averageID +
+                         ': ' + JSON.stringify(err));
              process.Exit(1);
            }
            console.log('Created ' + Stat.averageId);
@@ -96,10 +100,12 @@ module.exports = function(Stat) {
     var q = function(stats, norm) {
       return function(age) {
         var res = (1 - common.math.cdf(age, stats.mean, stats.variance))/norm;
+        /*
         console.log(
           'Age: ' + age +
           '  Decay: ' + res
         );
+       */
         return res;
       };
     };
@@ -124,52 +130,50 @@ module.exports = function(Stat) {
       console.log(stats);
     }
 
-    //Comments
-    if(stats.Pcomments) {
-      total += stats.Pcomments;
-      if(res.__cachedRelations.comments && stats.views.comment) {
-        res.Pcomment = common.math.geometricDecay(
-          res.__cachedRelations.comments,
-          stats.views.comment.decay
-        ); 
+    if(res.__cachedRelations) {
+      //Comments
+      if(stats.Pcomments) {
+        total += stats.Pcomments;
+        if(res.__cachedRelations.comments && stats.views.comment) {
+          res.Pcomment = common.math.geometricDecay(
+            res.__cachedRelations.comments,
+            stats.views.comment.decay
+          ); 
+        }
+        if(res.Pcomment === undefined) {
+          res.Pcomment = 0;
+        }
+  //      console.log('Pcomment: ' + res.Pcomment);
+        ppi += stats.Pcomments * res.Pcomment;
       }
-      if(res.Pcomment === undefined) {
-        res.Pcomment = 0;
+
+      res.staticRating = ppi;
+
+      //Subarticles 
+      //TODO add the static subarticles too for the static rating
+      if(stats.Psubarticles) {
+        total += stats.Psubarticles;
+        if(res.__cachedRelations.subarticles && stats.views.subarticle) {
+          ppi += stats.Psubarticles * common.math.geometricDecay(
+            res.__cachedRelations.subarticles,
+            stats.views.subarticle.decay
+          );
+        }
       }
-//      console.log('Pcomment: ' + res.Pcomment);
-      ppi += stats.Pcomments * res.Pcomment;
     }
-
-    res.staticRating = ppi;
-
-    //Subarticles 
-    //TODO add the static subarticles too for the static rating
-    if(stats.Psubarticles) {
-      total += stats.Psubarticles;
-      if(res.subarticles && stats.views.subarticle) {
-        ppi += stats.Psubarticles * common.math.geometricDecay(
-          res.__cachedRelations.subarticles,
-          stats.views.subarticle.decay
-        );
-      }
+    else {
+      console.log('Warning: There were no comments or subarticles' +
+                  ' attached to the article being ranked');
     }
 
     if( total > 1 || total < 0.999999) {
-      console.log('Error: The probability of interest in all children ' + total + ' does not equal 1');
+      console.log('Error: The probability of interest in all children ' +
+                  total + ' does not equal 1');
       console.log(stats);
     }
     if( ppi > 1 || ppi < 0) {
       console.log('Error: The static probability is not unitary!: ' + ppi);
       return res;
-    }
-
-    console.log('Static Ranking: ' + ppi);
-
-    //Time Decay
-    if(stats.age) {
-      var timeDecay =  stats.age(Date.now() - res.date);
-//      console.log('Timedecay: ' + timeDecay);
-      ppi *= timeDecay;
     }
 
     // Click Thru
@@ -182,13 +186,29 @@ module.exports = function(Stat) {
     // User affinity
     // TODO
 
+    var rnd = function(num, precision) {
+      var scale = Math.pow(10,precision);
+      return Math.round(num * scale)/scale;
+    };
+    //Time Decay
+    if(stats.age) {
+      var timeDecay =  stats.age(Date.now() - res.date);
+      console.log(
+        'Score: ' + rnd((ppi*timeDecay),4) +
+        '\tStatic: ' + rnd(ppi,4) + 
+        '\tPc: ' + rnd(stats.Pcomments,3) +
+        '\tPs: ' + rnd(stats.Psubarticles,3) +
+        '\tPv: ' + rnd(stats.Pvotes,3) +
+        '\tDecay: ' + rnd(timeDecay,3));
+      ppi *= timeDecay;
+    }
+
     if( ppi > 1 || ppi < 0) {
       console.log('Error: The probability is not unitary!: ' + ppi);
       return res;
     }
 
     res.rating = ppi;
-    console.log('Id: ' + res.id + '  Rating: ' + ppi);
     return res;
   };
 
@@ -209,11 +229,12 @@ module.exports = function(Stat) {
        }
        var stat = model[statName];
        if(!stat) {
-         console.log('Warning: No stat found for "' + modelName + '.' + statName + '"');
+         console.log('Warning: No stat found for "' + modelName +
+                     '.' + statName + '"');
          stat = {
            mean: 0,
            count: 0
-         }
+         };
        }
 
        stat.count++;
@@ -248,7 +269,8 @@ module.exports = function(Stat) {
            console.log(err);
          }
          if(res !== 1) {
-           console.log('Warning: More than one stat object was updated for id: ' + id);
+           console.log(
+             'Warning: More than one stat object was updated for id: ' + id);
          }
          cb(err, res);
        }

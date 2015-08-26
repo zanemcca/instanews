@@ -7,16 +7,35 @@ var app = common.app;
 
 var Articles = app.models.Article;
 var UpVotes = app.models.UpVote;
+var Journalists = app.models.Journalist;
 
 var genericModels = require('../genericModels');
 
 exports.run = function() {
    describe('UpVote', function() {
 
-      var article = common.findModel('articles', genericModels);
-      if(!article) {
-         console.log('Error: Article model is invalid so the following tests will likely fail!');
-      }
+     var article; 
+     var user;
+
+     beforeEach(function(done) {
+
+      article = common.findModel('articles', genericModels);
+      user = {
+        username: 'bob',
+        email: 'b@b.ca',
+        password: 'password'
+      };
+
+      expect(article).to.exist;
+      Journalists.destroyAll(function(err) {
+        if(err) done(err);
+        else {
+          Journalists.create(user, function(err, res) {
+            done(err);
+          });
+        }
+      });
+     });
 
       it('should update the upVoteCount of the artcle voted on and not verify the article', function(done) {
          Articles.create(article, function(err, res) {
@@ -27,6 +46,7 @@ exports.run = function() {
             UpVotes.create({
                votableType: 'article',
                votableId: res.id,
+               username: user.username,
                location: {
                   lat: res.location.lat + 1,
                   lng: res.location.lng
@@ -56,6 +76,7 @@ exports.run = function() {
             UpVotes.create({
                votableType: 'article',
                votableId: res.id,
+               username: user.username,
                location: res.location
             }, function(err, vote) {
 
@@ -100,15 +121,18 @@ exports.run = function() {
              next(res, done);
           };
 
+          var create  = function() {
+            UpVotes.create({
+               votableType: 'article',
+               votableId: res.id,
+               username: user.username,
+               location: res.location
+            }, cb);
+          };
+
           for( var i = 0; i < total; i++) {
-            //Rate of 200 upvotes/sec
-            setTimeout(function() {
-              UpVotes.create({
-                 votableType: 'article',
-                 votableId: res.id,
-                 location: res.location
-              }, cb);
-            }, 100*i);
+            //Rate of 50 upvotes/sec
+            setTimeout(create, 20*i);
           }
 
           next(res, done);
