@@ -57,32 +57,46 @@ module.exports = function(app) {
             console.log(err);
           }
           else {
-            Stat.addSample(inst.username, inst.votableType, 'age', age, function(err, res) {
-              if(err) {
-                console.log('Error: Failed to add interaction age for ' + inst.votableType);
-                console.log(err);
+            Stat.addSample(
+              inst.username,
+              inst.votableType,
+              'age',
+              age,
+              function(err, res) {
+                if(err) {
+                  console.log('Error: Failed to add interaction age for ' +
+                              inst.votableType);
+                  console.log(err);
+                }
               }
-            });
+            );
           }
         });
 
         return instance;
       };
 
-      Stat.updateRating(inst.votableId, inst.votableType, modify, function(err, res) {
-        if(err) { 
-          console.log('Error: Failed to update the rating for ' + inst.votableType + ' - ' +
-                      inst.votableId + ' from upvote ' + inst.id);
-          next(err);
-        }
-        else {
-          if(res != 1) {
-            console.log('Warning: ' + res + ' ' + inst.votableType + ' were updated for id:' +
-                       inst.votableId + ' when there should have been one');
+      Stat.updateRating(
+        inst.votableId,
+        inst.votableType,
+        modify,
+        function(err, res) {
+          if(err) { 
+            console.log('Error: Failed to update the rating for ' +
+                        inst.votableType + ' - ' + inst.votableId +
+                        ' from upvote ' + inst.id);
+            next(err);
           }
-          next();
+          else {
+            if(res !== 1) {
+              console.log('Warning: ' + res + ' ' + inst.votableType +
+                          ' were updated for id:' + inst.votableId +
+                          ' when there should have been one');
+            }
+            next();
+          }
         }
-      }); 
+      ); 
     }
     else {
       console.log('Warning: Invalid instance for upvote!');

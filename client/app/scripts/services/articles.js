@@ -27,6 +27,7 @@ app.service('Articles', [
             order: 'rating DESC'
          }
       },
+      rate: true,
       order: 'rating DESC'
    };
 
@@ -115,20 +116,23 @@ app.service('Articles', [
    // Update or add a new article
    var addOne = function(articles, article) {
      //Set the top subarticle
-      if( article.subarticles.length > 0 ) {
+      if( article.subarticles && article.subarticles.length > 0 ) {
         article.topSub = article.subarticles[0];
-      }
 
-      var idx = getIndex(articles, article);
-      if( idx >= 0 ) {
-        if( article.modified >= articles[idx].modified ) {
-          articles[idx] = article;
+        var idx = getIndex(articles, article);
+        if( idx >= 0 ) {
+          if( article.modified >= articles[idx].modified ) {
+            articles[idx] = article;
+          }
         }
+        else {
+          articles.push(article);
+        }
+        articles.sort(compareFunction);
       }
       else {
-        articles.push(article);
+        console.log('Warning: An Article without any subarticles has been ignored: ' + article.id);
       }
-      articles.sort(compareFunction);
    };
 
    var get = function() {

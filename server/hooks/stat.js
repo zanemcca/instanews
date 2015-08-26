@@ -6,12 +6,14 @@ module.exports = function(app) {
 
    //StaticChange is a boolean that will cause non-timedecayed components
    // to be refreshed as well as the time decayed.
-   // An example of its use would be if the rating of a comment on an article changed
-   // then we would want the article to update the contribution from comments as well
+   // An example of its use would be if the rating of a comment on an 
+  // article changed then we would want the article to update the 
+  // contribution from comments as well
    // In that situation staticChange = true
   Stat.updateRating = function(id, type, modify, cb, staticChange) {
     if(!id || !type) {
-      console.log('Error: Either id or type is missing for Article.updateRating');
+      console.log(
+        'Error: Either id or type is missing for Article.updateRating');
       cb(new Error('Either id or type is missing for Article.updateRating'));
       return;
     }
@@ -51,9 +53,9 @@ module.exports = function(app) {
           Model.updateRating(id, res, rate(modify), cb, staticChange);
         }
         else {
-          var err = Stat.averageId + ' was not found!';
-          console.log('Error:' + err);
-          cb(new Error(err));
+          var message = Stat.averageId + ' was not found!';
+          console.log('Error:' + message);
+          cb(new Error(message));
         }
       }
     });

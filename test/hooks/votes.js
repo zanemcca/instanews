@@ -34,33 +34,33 @@ exports.run = function() {
          });
       });
 
-      it('should be limited to ' + LIMIT + ' votes objects returned' , function(done) {
+    it('should be limited to ' + LIMIT + ' votes objects returned' , function(done) {
 
-			var objects = 0;
-			var Objects = Articles;
-			var object = article;
+      var objects = 0;
+      var Objects = Articles;
+      var object = article;
 
-			var createObject = function() {
-			  if(objects >= LIMIT + 5) {
-				 Objects.find(function(err, res) {
-					 if(err) return done(err);
+      var createObject = function() {
+        if(objects >= LIMIT + 5) {
+          Objects.find(function(err, res) {
+            if(err) return done(err);
 
-					 expect(res).to.exist;
-					 expect(res.length).to.equal(LIMIT);
-					 done();
-				 });
-			  }
-			  else {
-				 objects++;
+            expect(res).to.exist;
+            expect(res.length).to.equal(LIMIT);
+            done();
+          });
+        }
+        else {
+          objects++;
 
-				 Objects.create(object, function(err, art) {
-					 if(err) return done(err);
-					 createObject();
-				 });
-			  }
-			};
+          Objects.create(object, function(err, art) {
+            if(err) return done(err);
+            createObject();
+          });
+        }
+      };
 
-			createObject();
-		});
-   });
+      createObject();
+    });
+  });
 };

@@ -11,11 +11,44 @@ var Subarticles = app.models.Subarticle;
 var Comments = app.models.Comment;
 var Notifications = app.models.notif;
 var UpVotes = app.models.UpVote;
+var Journalists = app.models.Journalist;
+var Stats = app.models.Stat;
 
 var genericModels = require('../genericModels');
 
 exports.run = function() {
    describe('vote', function() {
+
+     //Create Journalists
+     beforeEach(function(done) {
+       Journalists.destroyAll( function(err) {
+         if(err) done(err); 
+         else {
+           Journalists.create({
+             username: 'jane',
+             email: 'j@ma.ca',
+             password: 'password'
+           }, function(err, res) {
+             if( err) done(err);
+             else {
+               Journalists.create({
+                 username: 'bob',
+                 email: 'b@ma.ca',
+                 password: 'password'
+               }, function(err, res) {
+                 done(err);
+               });
+             }
+           });
+         }
+       });
+     });
+
+     after(function(done) {
+       Journalists.destroyAll( function(err) {
+         done(err);
+       });
+     });
 
       it('should create a notification for the top contributor for voting on an article', function(done) {
          var article = common.findModel('articles', genericModels);

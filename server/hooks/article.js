@@ -5,14 +5,56 @@ module.exports = function(app) {
    var Article = app.models.Article;
    var Stat = app.models.Stat;
 
-   Article.observe('loaded', function(res, next) {
-    var ctx = loopback.getCurrentContext();
-    if(ctx) {
-      var user = ctx.get('currentUser');
-      //TODO Rank the users articles for them 
-      //TODO Check if ranking are in cache first
+  Article.observe('access', function(ctx, next) {
+    ctx.options.rate = ctx.query.rate;
+    if(ctx.query.rate) {
+      var context = loopback.getCurrentContext();
+      if(context) {
+        var stat = context.get('currentStat');
+        if(stat) {
+          ctx.query.include = [{      
+            relation: 'subarticles',
+            scope: {
+              limit: stat.subarticle.views.mean,
+              order: 'rating DESC'
+            } 
+          },
+          {
+            relation: 'comments',
+            scope: {
+              limit: stat.comment.views.mean,
+              order: 'rating DESC'
+            } 
+          }];
+        }
+      }
     }
+
     next();
+  });
+
+   Article.observe('loaded', function(res, next) {
+     var instance = res.instance;
+     if(!instance) {
+       instance = res.data;
+     }
+     if(instance && res.options.rate) {
+       Article.getCustomRating(instance, function(err, inst) {
+        if(err) {
+          console.log('Error: Failed to getCustomRating for article ' +
+                      res.instance.id);
+          console.log(err);
+          next(err);
+        }
+        else {
+          res.instance = inst;
+          next();
+        }
+       });
+     }
+     else {
+       next();
+     }
    });
 
    Article.observe('before save', function(ctx, next) {
@@ -27,10 +69,53 @@ module.exports = function(app) {
 
    //TODO before create - initialize its rating
 
-  Article.updateRating = function(id, rawStats, rate, cb, staticChange) {
+   Article.getCustomRating = function(instance, cb) {
+     //TODO Check if rating for instance is in cache first
+    var ctx = loopback.getCurrentContext();
+    if(ctx) {
+      var stat = ctx.get('currentStat');
+
+      if(stat) {
+        var inst = Stat.getRating(instance, convertRawStats(stat));
+        cb(null, inst);
+      }
+      else {
+        console.log('Warning: Could not find stat object for user.' +
+                    'Using global rank instead.');
+        cb(null, instance);
+      }
+    }
+   };
+
+  var convertRawStats = function(raw, staticChange) {
     var commentView;
-    var subView = Stat.getGeometricStats(rawStats.subarticle.views);
-    var ageQ = Stat.getAgeQFunction(rawStats.article.age);
+    var subView = Stat.getGeometricStats(raw.subarticle.views);
+    var ageQ = Stat.getAgeQFunction(raw.article.age);
+
+    if(staticChange) {
+      commentView = Stat.getGeometricStats(raw.comment.views);
+    }
+
+    var total = raw.subarticle.age.count +
+                raw.comment.age.count +
+                raw.upVote.age.count;
+
+    var stats = {
+      age: ageQ,
+      views: {
+        comment: commentView,
+        subarticle: subView
+      },
+      Pcomments: raw.comment.age.count/total,
+      Psubarticles: raw.subarticle.age.count/total,
+      Pvotes: raw.upVote.age.count/total
+    };
+
+    return stats;
+  };
+
+  Article.updateRating = function(id, rawStats, rate, cb, staticChange) {
+    var stats = convertRawStats(rawStats, staticChange);
 
     var query = {
       where: {
@@ -39,37 +124,21 @@ module.exports = function(app) {
       include: [{      
         relation: 'subarticles',
         scope: {
-          limit: subView.mean,
+          limit: stats.views.subarticle.mean,
           order: 'rating DESC'
         } 
       }]
-    }
+    };
 
     if(staticChange) {
-      commentView = Stat.getGeometricStats(rawStats.comment.views);
       query.include.push({
         relation: 'comments',
         scope: {
-          limit: commentView.mean,
+          limit: stats.views.comment.mean,
           order: 'rating DESC'
         } 
       });
     }
-
-    var total = rawStats.subarticle.age.count +
-                rawStats.comment.age.count +
-                rawStats.upVote.age.count;
-
-    var stats = {
-      age: ageQ,
-      views: {
-        comment: commentView,
-        subarticle: subView
-      },
-      Pcomments: rawStats.comment.age.count/total,
-      Psubarticles: rawStats.subarticle.age.count/total,
-      Pvotes: rawStats.upVote.age.count/total
-    };
 
     Article.readModifyWrite(query, rate(stats), function(err, res) {
       if(err) {

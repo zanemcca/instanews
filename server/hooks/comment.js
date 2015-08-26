@@ -162,7 +162,7 @@ module.exports = function(app) {
         id: id 
       },
       include: []
-    }
+    };
 
     if(staticChange) {
       commentView = Stat.getGeometricStats(rawStats.comment.views);

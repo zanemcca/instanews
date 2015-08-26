@@ -21,6 +21,38 @@ app.directive('invotes', [
       },
       controller: function($scope) {
 
+        var date = Date.parse($scope.votable.date);
+        var age = Date.now() - date; 
+        age /= 1000;
+        var unit = 'sec';
+        if(age > 60) {
+          age /= 60;
+          unit = 'min';
+          if(age > 60) {
+            age /= 60;
+            unit = 'hr'
+            if(age > 24) {
+              age /= 24;
+              unit = 'day';
+              if(age > 7) {
+                age /= 7;
+                unit = 'week';
+                if(age > 52) {
+                  age /= 52;
+                  unit = 'year';
+                }
+              }
+            }
+          }
+        }
+
+        $scope.age = {
+          age: Math.round(age),
+          unit: unit
+        };
+
+        $scope.score = Math.round($scope.votable.rating*10000)/10000;
+
          $scope.toggleComments = function(instance) {
             if(!instance.showComments) {
 

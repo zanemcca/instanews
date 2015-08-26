@@ -41,7 +41,8 @@ exports.readModifyWrite = function(Model, query, modify, cb, retry) {
       cb(err);
     }
     else if(res.length === 0 ){
-      var message = 'Failed to readModifyWrite The content was not found in the database';
+      var message = 
+        'Failed to readModifyWrite The content was not found in the database';
       console.log('Warning: ' + message);
       cb(new Error(message));
     }
@@ -143,7 +144,8 @@ exports.math = {
   //Performs a geometric decay of the given array
   geometricDecay: function(votables, decay) {
     if(decay <= 0 || decay >= 1) {
-      console.log('Error: Decay factor must be less than 1 and greater than 0: ' + decay);
+      console.log(
+        'Error: Decay factor must be less than 1 and greater than 0: ' + decay);
       return 0;
     }
 
@@ -171,7 +173,7 @@ exports.math = {
 
     //Convert first, second and third moments to mean, std, and skew 
     var mean = moments.first/moments.count;
-    var std = undefined;
+    var std;
     if(moments.second && mean !== undefined) {
       var variance = moments.second/moments.count - mean*mean;
       if(variance < 0) {
@@ -181,9 +183,10 @@ exports.math = {
         std = Math.pow(variance, 1/2);
       }
     }
-    var skew = undefined;
-    if(moments.third && mean != undefined && std != undefined) {
-      skew = (moments.third/moments.count - mean * (3*std*std - mean*mean))/(Math.pow(std,3));
+    var skew;
+    if(moments.third && mean !== undefined && std !== undefined) {
+      skew = (moments.third/moments.count - mean * (3*std*std - mean*mean));
+      skew /= (Math.pow(std,3));
     }
 
     return {
