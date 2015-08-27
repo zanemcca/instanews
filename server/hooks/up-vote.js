@@ -76,27 +76,27 @@ module.exports = function(app) {
         return instance;
       };
 
-      Stat.updateRating(
-        inst.votableId,
-        inst.votableType,
-        modify,
-        function(err, res) {
-          if(err) { 
-            console.log('Error: Failed to update the rating for ' +
-                        inst.votableType + ' - ' + inst.votableId +
-                        ' from upvote ' + inst.id);
-            next(err);
-          }
-          else {
-            if(res !== 1) {
-              console.log('Warning: ' + res + ' ' + inst.votableType +
-                          ' were updated for id:' + inst.votableId +
-                          ' when there should have been one');
-            }
-            next();
-          }
+      Stat.triggerRating({
+        id: inst.votableId
+      },
+      inst.votableType,
+      modify,
+      function(err, res) {
+        if(err) { 
+          console.log('Error: Failed to update the rating for ' +
+                      inst.votableType + ' - ' + inst.votableId +
+                      ' from upvote ' + inst.id);
+          next(err);
         }
-      ); 
+        else {
+          if(res !== 1) {
+            console.log('Warning: ' + res + ' ' + inst.votableType +
+                        ' were updated for id:' + inst.votableId +
+                        ' when there should have been one');
+          }
+          next();
+        }
+      }); 
     }
     else {
       console.log('Warning: Invalid instance for upvote!');

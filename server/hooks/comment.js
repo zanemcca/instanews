@@ -143,8 +143,8 @@ module.exports = function(app) {
 
    });
 
+   /*
    Comment.observe('before save', function(ctx, next) {
-
       var inst = ctx.instance;
       if(inst && ctx.isNewInstance) {
          inst.modelName = 'comment';
@@ -152,48 +152,35 @@ module.exports = function(app) {
 
       next();
    });
+  */
 
-  Comment.updateRating = function(id, rawStats, rate, cb, staticChange) {
-    var commentView;
-    var ageQ = Stat.getAgeQFunction(rawStats.subarticle.age);
-
-    var query = {
-      where: {
-        id: id 
-      },
-      include: []
-    };
-
-    if(staticChange) {
-      commentView = Stat.getGeometricStats(rawStats.comment.views);
-      query.include.push({
-        relation: 'comments',
-        scope: {
-          limit: commentView.mean,
-          order: 'rating DESC'
-        } 
-      });
-    }
-
-    var total = rawStats.comment.age.count +
-                rawStats.upVote.age.count;
-
-    var stats = {
-      age: ageQ,
-      views: {
-        comments: commentView
-      },
-      Pcomments: rawStats.comment.age.count/total,
-      Pvotes: rawStats.upVote.age.count/total
-    };
-
-    Comment.readModifyWrite(query, rate(stats), function(err, res) {
+  Comment.triggerRating = function(where, modify, cb, staticChange) {
+    Stat.updateRating(where, Comment.modelName, modify, function(err, res) {
       if(err) {
-        console.log('Error: Failed to modify comment');
-        console.log(err);
-        cb(err, res);
+        console.log('Warning: Failed to update a comment');
+        cb(err);
       }
-      cb(null, res);
-    });
+      else {
+        var query = {
+          where: where,
+          limit: 1
+        };
+
+        Comment.find(query, function(err, res) {
+          if(err) {
+            console.log('Warning: Failed to find comment');
+            cb(err);
+          }
+          else if(res.length > 0) {
+            Stat.triggerRating({
+              id: res[0].commentableId
+            }, res[0].commentableType, null, cb, true);
+          }
+          else {
+            console.log('Warning: No Comments were found. Cannot trigger commentable rating');
+          }
+        });
+      }
+    }, staticChange);
   };
 };
