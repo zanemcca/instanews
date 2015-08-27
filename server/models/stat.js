@@ -114,48 +114,74 @@ module.exports = function(Stat) {
 
   Stat.getRating = function(res, stats) {
     var ppi = 0;
+    var commentRating;
+    var staticRating;
 
     var total = 0;
     //Votes
-    if(stats.Pvotes) {
-      total += stats.Pvotes;
+    if(stats.Wvote) {
+      total += stats.Wvote;
       if(res.upVoteCount > res.views) {
         console.log('Error: There are more upVotes then views');
         return res;
       }
-      ppi += stats.Pvotes * (res.upVoteCount / res.views);
+      ppi += stats.Wvote * (res.upVoteCount / res.views);
     }
     else {
-      console.log('Warning: getRating has been called without Pvotes');
+      console.log('Warning: getRating has been called without Wvote');
       console.log(stats);
     }
 
     if(res.__cachedRelations) {
       //Comments
-      if(stats.Pcomments) {
-        total += stats.Pcomments;
+      if(stats.Wcomment) {
+        total += stats.Wcomment;
         if(res.__cachedRelations.comments && stats.views.comment) {
-          res.Pcomment = common.math.geometricDecay(
+          commentRating = common.math.geometricDecay(
             res.__cachedRelations.comments,
             stats.views.comment.decay
           ); 
         }
-        if(res.Pcomment === undefined) {
-          res.Pcomment = 0;
+        else {
+          commentRating = res.commentRating;
+        }
+        if(commentRating === undefined) {
+          //TODO Initialize properly
+          commentRating = 0;
         }
   //      console.log('Pcomment: ' + res.Pcomment);
-        ppi += stats.Pcomments * res.Pcomment;
+        ppi += stats.Wcomment * commentRating;
       }
 
-      res.staticRating = ppi;
+      if( res.modelName !== 'comment') {
+        staticRating = ppi;
+      }
 
       //Subarticles 
-      //TODO add the static subarticles too for the static rating
-      if(stats.Psubarticles) {
-        total += stats.Psubarticles;
-        if(res.__cachedRelations.subarticles && stats.views.subarticle) {
-          ppi += stats.Psubarticles * common.math.geometricDecay(
-            res.__cachedRelations.subarticles,
+      if(stats.Wsubarticle) {
+        total += stats.Wsubarticle;
+        var subs = res.__cachedRelations.subarticles;
+        if(subs && stats.views.subarticle) {
+          ppi += stats.Wsubarticle * common.math.geometricDecay(
+            subs,
+            stats.views.subarticle.decay
+          );
+
+          var staticRatings = [];
+          for(var i = 0; i < subs.length; i++) {
+            if(subs[i].staticRating) {
+              staticRatings.push(subs[i].staticRating);
+            }
+            else {
+              console.log('Warning: The subarticle should have a staticRating but it does not');
+              staticRatings.push(subs[i].rating);
+            }
+          };
+
+          staticRatings.sort(function(a, b){return b-a});
+
+          staticRating += stats.Wsubarticle * common.math.geometricDecay(
+            staticRatings,
             stats.views.subarticle.decay
           );
         }
@@ -181,6 +207,7 @@ module.exports = function(Stat) {
       var clickThru  = res.clicks/res.views;
 //      console.log('Click-Thru Ratio: ' + clickThru);
       ppi *= clickThru;
+      staticRating *= clickThru;
     }
 
     // User affinity
@@ -193,21 +220,25 @@ module.exports = function(Stat) {
     //Time Decay
     if(stats.age) {
       var timeDecay =  stats.age(Date.now() - res.date);
-      console.log(
-        'Score: ' + rnd((ppi*timeDecay),4) +
-        '\tStatic: ' + rnd(ppi,4) + 
-        '\tPc: ' + rnd(stats.Pcomments,3) +
-        '\tPs: ' + rnd(stats.Psubarticles,3) +
-        '\tPv: ' + rnd(stats.Pvotes,3) +
-        '\tDecay: ' + rnd(timeDecay,3));
       ppi *= timeDecay;
     }
+
+    console.log(
+      'Score: ' + rnd(ppi,4) +
+      '\tStatic: ' + rnd(staticRating,4) + 
+      '\tTyp: ' + res.modelName +
+      '\tWv: ' + rnd(stats.Wvote,3) +
+      '\tWc: ' + rnd(stats.Wcomment,3) +
+      '\tWs: ' + rnd(stats.Wsubarticle,3)
+    );
 
     if( ppi > 1 || ppi < 0) {
       console.log('Error: The probability is not unitary!: ' + ppi);
       return res;
     }
 
+    res.staticRating = staticRating;
+    res.commentRating = commentRating;
     res.rating = ppi;
     return res;
   };

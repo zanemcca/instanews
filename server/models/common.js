@@ -41,10 +41,7 @@ exports.readModifyWrite = function(Model, query, modify, cb, retry) {
       cb(err);
     }
     else if(res.length === 0 ){
-      var message = 
-        'Failed to readModifyWrite The content was not found in the database';
-      console.log('Warning: ' + message);
-      cb(new Error(message));
+      cb(null, 0);
     }
     else {
       var update = function(instance, cb) {
@@ -153,10 +150,20 @@ exports.math = {
     if( votables.length > 0) {
       var total = 1;
       for(var i = 0; i < votables.length; i++) {
-        p += total*votables[i].rating;
+        var r = votables[i];
+        if(typeof r.rating === 'number') {
+          r = r.rating;
+        }
+        p += total*r;
         total *= decay;
       }
-      p *= (1- decay)/(1- total);
+      if(total < 1) {
+        p *= (1- decay)/(1- total);
+      }
+      else {
+        console.log('Warning: Geometric decay total > 1'); 
+        p = 0;
+      }
     }
 
     return p;
@@ -194,5 +201,14 @@ exports.math = {
       std: std,
       skew: skew
     };
+  }
+};
+
+//Date functions
+exports.date = {
+  minutesAgo: function(minutes) {
+    var now = (new Date()).getTime();
+    var minutesAgo = new Date(now - minutes*60000);
+    return minutesAgo;
   }
 };

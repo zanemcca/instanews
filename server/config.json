@@ -24,7 +24,7 @@
       "credentials": true
     },
     "errorHandler": {
-      "disableStackTrace":  true 
+      "disableStackTrace": true 
     }
   }
 }

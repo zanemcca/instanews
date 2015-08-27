@@ -2,8 +2,15 @@
 module.exports = function(app) {
 
    var Subarticle = app.models.subarticle;
+   var Article = app.models.Article;
    var Stat = app.models.stat;
    var Notification = app.models.notif;
+
+  var minutesAgo =  function(minutes) {
+    var now = (new Date()).getTime();
+    var minutesAgo = new Date(now - minutes*60000);
+    return minutesAgo;
+  };
 
    Subarticle.observe('before save', function(ctx, next) {
       var inst = ctx.instance;
@@ -27,50 +34,40 @@ module.exports = function(app) {
    });
 
    //TODO before create - initialize its rating
-  //TODO on loaded - update the rating of the subarticle for the user loading it
-
-  Subarticle.updateRating = function(id, rawStats, rate, cb, staticChange) {
-    var commentView;
-    var ageQ = Stat.getAgeQFunction(rawStats.subarticle.age);
-
-    var query = {
-      where: {
-        id: id 
-      },
-      include: []
-    };
-
-    if(staticChange) {
-      commentView = Stat.getGeometricStats(rawStats.comment.views);
-      query.include.push({
-        relation: 'comments',
-        scope: {
-          limit: commentView.mean,
-          order: 'rating DESC'
-        } 
-      });
-    }
-
-    var total = rawStats.comment.age.count +
-                rawStats.upVote.age.count;
-
-    var stats = {
-      age: ageQ,
-      views: {
-        comments: commentView
-      },
-      Pcomments: rawStats.comment.age.count/total,
-      Pvotes: rawStats.upVote.age.count/total
-    };
-
-    Subarticle.readModifyWrite(query, rate(stats), function(err, res) {
+  
+  Subarticle.triggerRating = function(where, modify, cb, staticChange) {
+    Stat.updateRating(where, Subarticle.modelName, modify, function(err, count) {
       if(err) {
-        console.log('Error: Failed to modify subarticle');
-        console.log(err);
-        cb(err, res);
+        console.log('Warning: Failed to update a subarticle');
+        cb(err);
       }
-      cb(null, res);
-    });
+      else {
+        var query = {
+          where: where,
+          limit: 1
+        };
+        Subarticle.find(query, function(err, res) {
+          if(err) {
+            console.log('Warning: Failed to find subarticle');
+            cb(err);
+          }
+          else if(res.length > 0) {
+            Article.triggerRating({
+              id: res[0].parentId,
+              modified: {
+                lt: minutesAgo(1)
+              }
+            }, null, function(err, res) {
+              cb(err, count);
+            }, false);
+          }
+          else {
+            console.log('Warning: Failed to find subarticles. Cannot trigger article rating');
+            cb();
+          }
+        });
+      }
+    }, staticChange);
   };
 
    Subarticle.observe('after save', function(ctx, next) {
