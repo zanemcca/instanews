@@ -1,0 +1,30 @@
+{
+  "name": "click",
+  "base": "PersistedModel",
+  "idInjection": true,
+  "options": {
+    "validateUpsert": true
+  },
+  "properties": {
+    "created": {
+      "type": "date"
+    },
+    "location": {
+      "type": "geopoint"
+    }
+  },
+  "validations": [],
+  "relations": {
+    "stat": {
+      "type": "belongsTo",
+      "model": "stat"
+    },
+    "view": {
+      "type": "belongsTo",
+      "model": "view",
+      "foreignKey": ""
+    }
+  },
+  "acls": [],
+  "methods": []
+}

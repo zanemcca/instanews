@@ -1,5 +1,5 @@
 
-var LIMIT = 20;
+var LIMIT = 50;
 
 module.exports = function(app) {
 
@@ -29,8 +29,8 @@ module.exports = function(app) {
             inst.modelName = ctx.Model.modelName;
             inst.id = null;
             inst.version = 0;
-            inst.clicks = 1;
-            inst.views = 1;
+            inst.clicksCount = 100;
+            inst.viewsCount = 100;
             inst.upVoteCount = 0;
             inst.downVoteCount = 0;
             inst.rating = 0;

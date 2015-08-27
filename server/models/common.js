@@ -32,7 +32,6 @@ exports.initVotes = function(Model) {
 
 //readModifyWrite
 // with an Optimistic Locking Strategy
-// Example modify function:
 exports.readModifyWrite = function(Model, query, modify, cb, retry) {
   Model.find(query, function(err,res) {
     if(err) {
@@ -53,6 +52,7 @@ exports.readModifyWrite = function(Model, query, modify, cb, retry) {
         if(instance.version === null || instance.version === undefined) {
           console.log('Warning: This instance is not versioned. ' +
                       'There is no conflictless write guarantee without it');
+          console.log(instance);
         }
 
         Model.updateAll(where, instance, function(err, res) {

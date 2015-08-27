@@ -1,5 +1,5 @@
 
-var LIMIT = 10;
+var LIMIT = 50;
 
 /*jshint expr: true*/
 var chai = require('chai');

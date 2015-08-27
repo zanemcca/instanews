@@ -1,28 +1,32 @@
 {
-  "name": "stat",
+  "name": "view",
   "base": "PersistedModel",
   "idInjection": true,
   "options": {
     "validateUpsert": true
   },
-  "properties": {},
+  "properties": {
+    "created": {
+      "type": "date"
+    },
+    "location": {
+      "type": "geopoint"
+    }
+  },
   "validations": [],
   "relations": {
-    "journalist": {
+    "viewable": {
       "type": "belongsTo",
-      "model": "journalist",
-      "foreignKey": "userId",
-      "index": true
+      "polymorphic": true
     },
-    "views": {
-      "type": "hasMany",
-      "model": "view",
-      "foreignKey": "statId"
+    "stat": {
+      "type": "belongsTo",
+      "model": "stat"
     },
     "clicks": {
       "type": "hasMany",
       "model": "click",
-      "foreignKey": "statId"
+      "foreignKey": ""
     }
   },
   "acls": [],

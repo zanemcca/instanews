@@ -27,6 +27,11 @@
       "foreignKey": "parentId",
       "through": "subarticle"
     },
+    "views": {
+      "type": "hasMany",
+      "model": "view",
+      "polymorphic": "viewable"
+    },
     "comments": {
       "type": "hasMany",
       "model": "comment",
