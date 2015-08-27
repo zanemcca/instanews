@@ -27,6 +27,11 @@
       "type": "hasMany",
       "model": "comment",
       "polymorphic": "commentable"
+    },
+    "views": {
+      "type": "hasMany",
+      "model": "view",
+      "polymorphic": "viewable"
     }
   },
   "acls": [

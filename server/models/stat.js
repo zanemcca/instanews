@@ -121,11 +121,11 @@ module.exports = function(Stat) {
     //Votes
     if(stats.Wvote) {
       total += stats.Wvote;
-      if(res.upVoteCount > res.views) {
+      if(res.upVoteCount > res.viewsCount) {
         console.log('Error: There are more upVotes then views');
         return res;
       }
-      ppi += stats.Wvote * (res.upVoteCount / res.views);
+      ppi += stats.Wvote * (res.upVoteCount / res.viewsCount);
     }
     else {
       console.log('Warning: getRating has been called without Wvote');
@@ -169,7 +169,7 @@ module.exports = function(Stat) {
 
           var staticRatings = [];
           for(var i = 0; i < subs.length; i++) {
-            if(subs[i].staticRating) {
+            if(typeof(subs[i].staticRating) === 'number') {
               staticRatings.push(subs[i].staticRating);
             }
             else {
@@ -203,9 +203,11 @@ module.exports = function(Stat) {
     }
 
     // Click Thru
-    if(res.clicks && res.views) {
-      var clickThru  = res.clicks/res.views;
-//      console.log('Click-Thru Ratio: ' + clickThru);
+    // TODO Change clicks and views to clicksCount and viewsCount
+    if(res.clicksCount && res.viewsCount) {
+      //Q function of geometric distribution for #clicks > 0
+      var clickThru  = res.clicksCount/(res.clicksCount + res.viewsCount);
+      console.log('Click-Thru: ' + clickThru);
       ppi *= clickThru;
       staticRating *= clickThru;
     }
@@ -223,6 +225,7 @@ module.exports = function(Stat) {
       ppi *= timeDecay;
     }
 
+    /*
     console.log(
       'Score: ' + rnd(ppi,4) +
       '\tStatic: ' + rnd(staticRating,4) + 
@@ -231,6 +234,7 @@ module.exports = function(Stat) {
       '\tWc: ' + rnd(stats.Wcomment,3) +
       '\tWs: ' + rnd(stats.Wsubarticle,3)
     );
+   */
 
     if( ppi > 1 || ppi < 0) {
       console.log('Error: The probability is not unitary!: ' + ppi);
@@ -243,9 +247,9 @@ module.exports = function(Stat) {
     return res;
   };
 
-   Stat.addSample = function(id, modelName, statName , value, cb) {
-     if(!id) {
-       var message = 'An invalid id was given for sample updating!';
+   Stat.addSample = function(where, modelName, statName , value, cb) {
+     if(!where) {
+       var message = 'An invalid where filter was given for sample updating!';
        console.log('Error: ' + message);
        cb(new Error(message));
        return;
@@ -289,19 +293,21 @@ module.exports = function(Stat) {
      common.readModifyWrite(
        Stat,
        {
-         where: {
-           id: id
-         }
+         where: where
        }, 
        modify,
        function(err, res) {
          if(err) {
-           console.log('Error: Failed to add sample to stat object: ' + id);
+           console.log('Error: Failed to add sample to stat object');
            console.log(err);
          }
-         if(res !== 1) {
+         if(res > 1) {
            console.log(
-             'Warning: More than one stat object was updated for id: ' + id);
+             'Warning: More than one stat object was updated: ' + res);
+         }
+         else if(res === 0) {
+           console.log(
+             'Warning: No stat object was updated');
          }
          cb(err, res);
        }

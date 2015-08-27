@@ -35,7 +35,14 @@ exports.run = function() {
           });
         }
       });
+
+     after(function(done) {
+       Journalists.destroyAll( function(err) {
+         done(err);
+       });
      });
+
+    });
 
       it('should update the upVoteCount of the artcle voted on and not verify the article', function(done) {
          Articles.create(article, function(err, res) {
@@ -132,7 +139,7 @@ exports.run = function() {
 
           for( var i = 0; i < total; i++) {
             //Rate of 50 upvotes/sec
-            setTimeout(create, 20*i);
+            setTimeout(create, 25*i);
           }
 
           next(res, done);

@@ -11,19 +11,14 @@ var common = require(c.serverDir + 'models/common');
 
 exports.run = function() {
   describe('Common', function() {
-    describe('findAndModify', function() {
+    describe('readModifyWrite', function() {
       var modify = {};
       var article = {};
 
       beforeEach(function(done) {
-        modify = function(res, extra) {
-          var ret = [];
-          for(var i = 0; i < res.length; i++) {
-            var temp = res[i];
-            temp.rating += extra;
-            ret.push(temp);
-          }
-          return ret;
+        modify = function(res) {
+          res.rating += 5;
+          return res;
         };
 
         Article.create({
@@ -45,13 +40,14 @@ exports.run = function() {
       });
 
       it('should find and modify the value appropriately', function(done) {
-        common.findAndModify(Article, {
+        common.readModifyWrite(Article, {
           where: {
             id: article.id 
           }
         }, modify,function(err, res) {
-          expect(err.length).to.equal(0);
+
           expect(res).to.equal(1);
+          expect(err).to.be.null;
           Article.find({
             where: {
               id: article.id
@@ -84,12 +80,14 @@ exports.run = function() {
           }
         };
 
-       common.findAndModify(
+       common.readModifyWrite(
          Model,
          {},
          modify,
          function(err, res) {
-           expect(err.length).to.equal(1);
+           expect(err).to.exist;
+           expect(err.message).to.
+             equal('Transaction failed to update likely due to version number');
            expect(res).to.equal(0);
            done();
        },

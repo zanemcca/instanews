@@ -55,6 +55,11 @@ module.exports = function(Journalist) {
       '__create__subarticles',
       '__updateById__subarticles',
       '__count__subarticles',
+      //disable all stat REST endpoints
+      '__get__stats',
+      '__destroy__stats',
+      '__create__stats',
+      '__update__stats',
       //disable all upvote REST endpoints
       '__get__upVotes',
       '__delete__upVotes',

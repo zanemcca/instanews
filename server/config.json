@@ -5,7 +5,7 @@
   "legacyExplorer": false,
   "remoting": {
     "context": {
-      "enableHttpContext": true 
+      "enableHttpContext": true
     },
     "rest": {
       "normalizeHttpPath": false,
@@ -24,7 +24,7 @@
       "credentials": true
     },
     "errorHandler": {
-      "disableStackTrace": true 
+      "disableStackTrace": true
     }
   }
 }

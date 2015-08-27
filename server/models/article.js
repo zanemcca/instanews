@@ -29,6 +29,15 @@ module.exports = function(Article) {
       '__create__comments',
       '__updateById__comments',
       '__count__comments',
+      '__count__clicks',
+      //disable all views REST endpoints
+      '__get__views',
+      '__delete__views',
+      '__destroyById__views',
+      '__findById__views',
+      '__create__views',
+      '__updateById__views',
+      '__count__views',
       //disable all upvote REST endpoints
       '__get__upVotes',
       '__delete__upVotes',

@@ -156,46 +156,55 @@ exports.run = function() {
 
       it('should create a notification for voting on a comment', function(done) {
          var comment = common.findModel('comments', genericModels);
+         var article = common.findModel('articles', genericModels);
+
          if(!comment) {
             console.log('Error: Invalid comment!');
             expect(false).to.be.true;
             return done();
          }
 
+         article.username = 'ted';
          comment.username = 'jane';
-         comment.commentableId = 287929520349346563576536;
 
          //Create a comment so that the owner will recieve
          //the notification
-         Comments.create(comment, function(err, res) {
+         Articles.create(article, function(err,res) {
             if(err) return done(err);
 
-            UpVotes.create({
-               votableType: 'comment',
-               votableId: res.id,
-               username: 'bob'
-            }, function(err, res) {
-               if(err) return done(err);
+            comment.commentableType = 'article';
+            comment.commentableId = res.id;
+           Comments.create(comment, function(err, res) {
+              if(err) return done(err);
 
-               //Wait until the notification appears and ensure it
-               //is properly formated
-               runTillDone( function(stop) {
-                  Notifications.find({
-                     where: {
-                        notifiableType: res.votableType,
-                        notifiableId: res.votableId
-                     }
-                  },function(err, res) {
-                     if(!err && res && res.length > 0) {
-                        expect(res.length).to.equal(1);
-                        expect(res[0].username).to.equal('jane');
-                        expect(res[0].message).to
-                     .equal('bob voted on your comment');
-                        stop();
-                     }
-                  });
-               }, done);
-            });
+              UpVotes.create({
+                 votableType: 'comment',
+                 votableId: res.id,
+                 username: 'bob'
+              }, function(err, res) {
+                 if(err) return done(err);
+
+                 //Wait until the notification appears and ensure it
+                 //is properly formated
+                 runTillDone( function(stop) {
+                    Notifications.find({
+                       where: {
+                          notifiableType: res.votableType,
+                          username: 'jane',
+                          notifiableId: res.votableId
+                       }
+                    },function(err, res) {
+                       if(!err && res && res.length > 0) {
+                          expect(res.length).to.equal(1);
+                          expect(res[0].username).to.equal('jane');
+                          expect(res[0].message).to
+                       .equal('bob voted on your comment');
+                          stop();
+                       }
+                    });
+                 }, done);
+              });
+           });
          });
       });
    });

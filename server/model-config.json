@@ -90,5 +90,13 @@
   "stat": {
     "dataSource": "Users",
     "public": false
+  },
+  "click": {
+    "dataSource": "Articles",
+    "public": false
+  },
+  "view": {
+    "dataSource": "Articles",
+    "public": false
   }
 }

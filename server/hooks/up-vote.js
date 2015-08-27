@@ -39,8 +39,11 @@ module.exports = function(app) {
       //The modify function will be done before the rating is calculated
       var modify =  function(instance) {
         instance.upVoteCount++;
-        instance.views++;
-        instance.clicks++;
+
+        //TODO Create clicks model
+        //TODO Move views creation to client
+        instance.viewsCount++;
+        instance.clicksCount++;
 
         if(instance.modelName === 'article' && !instance.verified &&
           nearBy(inst.location, instance.location)
@@ -51,28 +54,29 @@ module.exports = function(app) {
         var age = Date.now() - instance.date;
         
         //Trigger the user model to update their 
-        Stat.addSample(inst.username, 'upVote', 'age', age, function(err, res) {
+        Stat.addSample({
+          userId: inst.username
+        }, 'upVote', 'age', age, function(err, res) {
           if(err) {
             console.log('Error: Failed to add interaction age for upVote');
             console.log(err);
           }
           else {
-            Stat.addSample(
-              inst.username,
-              inst.votableType,
-              'age',
-              age,
-              function(err, res) {
-                if(err) {
-                  console.log('Error: Failed to add interaction age for ' +
-                              inst.votableType);
-                  console.log(err);
-                }
+            Stat.addSample({
+              userId: inst.username
+            },
+            inst.votableType,
+            'age',
+            age,
+            function(err, res) {
+              if(err) {
+                console.log('Error: Failed to add interaction age for ' +
+                            inst.votableType);
+                console.log(err);
               }
-            );
+            });
           }
         });
-
         return instance;
       };
 

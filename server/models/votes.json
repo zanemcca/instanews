@@ -11,19 +11,19 @@
     "rating": {
       "type": "number"
     },
-    "Pcomment": {
+    "commentRating": {
       "type": "number"
     },
-    "clicks": {
+    "clicksCount": {
       "type": "number"
     },
-    "views": {
+    "viewsCount": {
       "type": "number"
     },
     "version": {
       "type": "number"
     },
-    "date": {
+    "created": {
       "type": "date"
     },
     "modified": {
