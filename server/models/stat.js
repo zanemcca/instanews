@@ -173,12 +173,13 @@ module.exports = function(Stat) {
               staticRatings.push(subs[i].staticRating);
             }
             else {
-              console.log('Warning: The subarticle should have a staticRating but it does not');
+              console.log('Warning: The subarticle should have a ' +
+                          'staticRating but it does not');
               staticRatings.push(subs[i].rating);
             }
-          };
+          }
 
-          staticRatings.sort(function(a, b){return b-a});
+          staticRatings.sort(function(a, b){return b-a;});
 
           staticRating += stats.Wsubarticle * common.math.geometricDecay(
             staticRatings,
@@ -225,7 +226,6 @@ module.exports = function(Stat) {
       ppi *= timeDecay;
     }
 
-    /*
     console.log(
       'Score: ' + rnd(ppi,4) +
       '\tStatic: ' + rnd(staticRating,4) + 
@@ -234,7 +234,6 @@ module.exports = function(Stat) {
       '\tWc: ' + rnd(stats.Wcomment,3) +
       '\tWs: ' + rnd(stats.Wsubarticle,3)
     );
-   */
 
     if( ppi > 1 || ppi < 0) {
       console.log('Error: The probability is not unitary!: ' + ppi);

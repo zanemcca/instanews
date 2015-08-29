@@ -25,6 +25,7 @@
     "database": "articles",
     "name": "Articles",
     "connector": "mongodb",
+    "allowExtendedOperators": true,
     "debug": true
   },
   "Users": {
@@ -32,6 +33,7 @@
     "port": 27017,
     "database": "users",
     "name": "Users",
+    "allowExtendedOperators": true,
     "connector": "mongodb"
   },
   "push": {

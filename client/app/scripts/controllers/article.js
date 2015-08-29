@@ -18,6 +18,10 @@ app.controller('ArticleCtrl', [
     Maps
   ) {
 
+   //TODO Create a click for the article $stateParams.id
+
+   //TODO OnScroll create new view for items scrolled past
+
    //Scope variables
    $scope.article = Articles.getOne($stateParams.id);
    $scope.areItemsAvailable = Subarticles.areItemsAvailable;

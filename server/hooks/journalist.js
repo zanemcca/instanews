@@ -85,7 +85,7 @@ module.exports = function(app) {
         }
         else {
           var stat = {
-            userId: instance.username,
+            username: instance.username,
             subarticle: res.subarticle,
             article: res.article,
             comment: res.comment,

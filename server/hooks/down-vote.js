@@ -1,27 +1,25 @@
 module.exports = function(app) {
 
-  var mongo = app.dataSources.Articles.connector;
+  var DownVote = app.models.downVote;
+  var Click = app.models.click;
+   
+  DownVote.observe('after save', function(ctx, next) {
+    var inst = ctx.instance;
 
-   var DownVote = app.models.downVote;
+    if(inst && ctx.isNewInstance) {
 
-   DownVote.observe('after save', function(ctx, next) {
-
-     mongo.collection(ctx.instance.votableType).findAndModify({
-       _id: ctx.instance.votableId
-     },
-     [['_id', 'asc']],
-     { $inc: { downVoteCount: 1 }},
-     {
-       new: true
-     },
-     function(err, object){
-       if (err) {
-          console.log('Error: ' + err);
-          next(err);
-       }
-       else {
-          next();
-       }
-     });
-   });
+      if(ctx.inc && typeof(ctx.inc) === 'object') {
+        ctx.inc.downVoteCount = 1;
+        Click.updateClickableAttributes(ctx, { '$inc': ctx.inc }, next);
+      }
+      else {
+        var error = new Error('Upvote expected there to be ctx.inc!');
+        console.log(error);
+        next(error);
+      }
+    }
+    else {
+      console.log('Warning: Invalid instance for upvote!');
+    }
+  });
 };

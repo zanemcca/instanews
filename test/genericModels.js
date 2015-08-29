@@ -65,5 +65,6 @@ module.exports = [
    type: 'comments',
    content: 'Nuts!',
    commentableType: 'comment',
+   commentableId: 'id',
    date: '2015-02-06T12:48:43.511Z'
 }];

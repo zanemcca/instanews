@@ -5,7 +5,7 @@
       ng-repeat="comment in owner.comments | orderBy: '-(rating)'">
          <div class="item item-avatar item-text-wrap item-divider"
             style="padding-bottom: 0px; border-bottom-color: transparent">
-            <img src="img/ionic.png">
+            <img src="images/ionic.png">
             <a class="button button-clear button-small"
                ui-sref="app.profile({username: comment.username})" >
                {{comment.username}}

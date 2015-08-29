@@ -63,10 +63,6 @@
     "dataSource": "Articles",
     "public": true
   },
-  "vote": {
-    "dataSource": null,
-    "public": false
-  },
   "voteUser": {
     "dataSource": null,
     "public": false
@@ -93,10 +89,10 @@
   },
   "click": {
     "dataSource": "Articles",
-    "public": false
+    "public": false 
   },
   "view": {
     "dataSource": "Articles",
-    "public": false
+    "public": true
   }
 }

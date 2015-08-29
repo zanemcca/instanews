@@ -19,14 +19,15 @@
       "type": "belongsTo",
       "polymorphic": true
     },
-    "stat": {
-      "type": "belongsTo",
-      "model": "stat"
-    },
     "clicks": {
       "type": "hasMany",
       "model": "click",
       "foreignKey": ""
+    },
+    "journalist": {
+      "type": "belongsTo",
+      "model": "journalist",
+      "foreignKey": "username"
     }
   },
   "acls": [],

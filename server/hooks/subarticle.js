@@ -2,9 +2,11 @@
 module.exports = function(app) {
 
    var Subarticle = app.models.subarticle;
+   var Click = app.models.click;
    var Article = app.models.Article;
    var Stat = app.models.stat;
    var Notification = app.models.notif;
+  var Votes = app.models.votes;
 
   var minutesAgo =  function(minutes) {
     var now = (new Date()).getTime();
@@ -12,9 +14,12 @@ module.exports = function(app) {
     return minutesAgo;
   };
 
+  Subarticle.afterRemote('prototype.__get__comments', function(ctx, inst,next){
+    Votes.createClickAfterRemote(ctx, next);
+  });
+
    Subarticle.observe('before save', function(ctx, next) {
       var inst = ctx.instance;
-
       if (inst && ctx.isNewInstance) {
          inst.modelName = 'subarticle';
          if ( inst._file ) {
@@ -29,14 +34,14 @@ module.exports = function(app) {
             }
          }
       }
-
       next();
    });
 
    //TODO before create - initialize its rating
   
   Subarticle.triggerRating = function(where, modify, cb, staticChange) {
-    Stat.updateRating(where, Subarticle.modelName, modify, function(err, count) {
+    Stat.updateRating(where, Subarticle.modelName, modify,
+    function(err, count) {
       if(err) {
         console.log('Warning: Failed to update a subarticle');
         cb(err);
@@ -62,13 +67,41 @@ module.exports = function(app) {
             }, false);
           }
           else {
-            console.log('Warning: Failed to find subarticles. Cannot trigger article rating');
+            console.log('Warning: Failed to find subarticles.' +
+                        ' Cannot trigger article rating');
             cb();
           }
         });
       }
     }, staticChange);
   };
+
+  Subarticle.observe('after save', function(ctx, next) {
+    var inst = ctx.instance;
+    if(!inst) {
+      inst = ctx.data;
+    }
+
+    if(inst && ctx.isNewInstance) {
+      Click.create({
+        username: inst.username,
+        clickableType: 'article',
+        clickableId: inst.parentId
+      }, function(err, res) {
+        if(err) {
+          console.log(
+            'Error: Failed to create a click for subarticle creation');
+        }
+        next(err);
+      });
+    }
+    else {
+      if(!inst) {
+        console.log('Warning: Instance is not valid for subarticle after save');
+      }
+      next();
+    }
+  });
 
    Subarticle.observe('after save', function(ctx, next) {
      

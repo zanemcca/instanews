@@ -13,7 +13,8 @@ module.exports = function(app) {
    // In that situation staticChange = true
   Stat.updateRating = function(where, type, modify, cb, staticChange) {
     if(!where || !type) {
-      var message = 'Error: Either id or type is missing for Stat.updateRating. Id: ' +
+      var message =
+        'Error: Either id or type is missing for Stat.updateRating. Id: ' +
         where + ' Type: ' + type;
       console.log(message);
       cb(new Error(message));
@@ -95,8 +96,9 @@ module.exports = function(app) {
   };
 
   Stat.triggerRating = function(where, modelName, modify, cb, staticChange) {
+    var message;
     if(!app.models.hasOwnProperty(modelName)) {
-      var message = 'Unrecognized modelName: ' + modelName;
+      message = 'Unrecognized modelName: ' + modelName;
       console.log('Warning: ' + message);
       cb(new Error(message));
     }

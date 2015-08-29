@@ -5,24 +5,30 @@
   "options": {
     "validateUpsert": true
   },
-  "properties": {},
+  "properties": {
+    "version": {
+      "type" : "number"
+    },
+    "comments": {
+      "type": "object"
+    },
+    "subarticles": {
+      "type": "object"
+    },
+    "upVotes": {
+      "type": "object"
+    },
+    "article": {
+      "type": "object"
+    }
+  },
   "validations": [],
   "relations": {
     "journalist": {
       "type": "belongsTo",
       "model": "journalist",
-      "foreignKey": "userId",
+      "foreignKey": "username",
       "index": true
-    },
-    "views": {
-      "type": "hasMany",
-      "model": "view",
-      "foreignKey": "statId"
-    },
-    "clicks": {
-      "type": "hasMany",
-      "model": "click",
-      "foreignKey": "statId"
     }
   },
   "acls": [],

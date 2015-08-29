@@ -22,6 +22,8 @@ app.controller('FeedCtrl', [
 
    $scope.itemsAvailable = Articles.areItemsAvailable;
 
+   //TODO OnScroll create new view for items scrolled past
+
    // Localize the map on the users position
    $scope.localize = function() {
       var map = Maps.getFeedMap();

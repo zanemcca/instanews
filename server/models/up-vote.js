@@ -12,14 +12,18 @@ module.exports = function(UpVote) {
       'find',
       'prototype.updateAttributes',
       'deleteById',
+      'createChangeStream',
+      'createChangeStream_0',
       'updateAll'
    ];
 
    var nonStaticDisable = [
       //disable journalist REST endpoint
       '__get__journalist',
-      //disable votable relation finding
-      '__get__votable'
+      //disable clickable relation finding
+      '__get__clickable',
+      //disable view relation finding
+      '__get__view'
    ];
 
    common.disableRemotes(UpVote,staticDisable,true);

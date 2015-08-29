@@ -2,7 +2,6 @@
 module.exports = function(app) {
    //Setup all server side hooks that we need
    require('./votes.js')(app);
-   require('./vote.js')(app);
    require('./installation.js')(app);
    require('./notification.js')(app);
    require('./up-vote.js')(app);
@@ -12,4 +11,5 @@ module.exports = function(app) {
    require('./journalist.js')(app);
    require('./comment.js')(app);
    require('./stat.js')(app);
+   require('./click.js')(app);
 };

@@ -2,8 +2,10 @@
 module.exports = function(app) {
 
    var Comment = app.models.comment;
+   var Click = app.models.click;
    var Notification = app.models.notif;
    var Stat = app.models.stat;
+  var Votes = app.models.votes;
 
    var report = function(err,res) {
       if (err) console.log('Error: ' + err);
@@ -14,7 +16,47 @@ module.exports = function(app) {
 
    //TODO before create - initialize its rating
 
+   /*
+  Comment.observe('before save', function(ctx, next) {
+    //TODO It should make sure the comment has 
+    //a commentableType and id and username
+    console.log('Made it');
+    next();
+  });
+  */
+
+  Comment.afterRemote('prototype.__get__comments', function(ctx, instance,next){
+    Votes.createClickAfterRemote(ctx, next);
+  });
+
+  Comment.observe('after save', function(ctx, next) {
+    var inst = ctx.instance;
+    if(!inst) {
+      inst = ctx.data;
+    }
+
+    if(inst && ctx.isNewInstance) {
+      Click.create({
+        username: inst.username,
+        clickableType: inst.commentableType,
+        clickableId: inst.commentableId
+      }, function(err, res) {
+        if(err) {
+          console.log('Error: Failed to create a click for comment creation');
+        }
+        next(err);
+      });
+    }
+    else {
+      if(!inst) {
+        console.log('Warning: Instance is not valid for comment after save');
+      }
+      next();
+    }
+  });
+
    Comment.observe('after save', function(ctx, next) {
+       //TODO Rewrite notifications
       var inst = ctx.instance;
 
       //List of already notified users
@@ -143,17 +185,6 @@ module.exports = function(app) {
 
    });
 
-   /*
-   Comment.observe('before save', function(ctx, next) {
-      var inst = ctx.instance;
-      if(inst && ctx.isNewInstance) {
-         inst.modelName = 'comment';
-      }
-
-      next();
-   });
-  */
-
   Comment.triggerRating = function(where, modify, cb, staticChange) {
     Stat.updateRating(where, Comment.modelName, modify, function(err, res) {
       if(err) {
@@ -177,7 +208,9 @@ module.exports = function(app) {
             }, res[0].commentableType, null, cb, true);
           }
           else {
-            console.log('Warning: No Comments were found. Cannot trigger commentable rating');
+            console.log(
+              'Warning: No Comments were found.' +
+              'Cannot trigger commentable rating');
           }
         });
       }

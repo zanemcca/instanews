@@ -51,8 +51,8 @@ exports.run = function() {
             expect(res).to.exist;
 
             UpVotes.create({
-               votableType: 'article',
-               votableId: res.id,
+               clickableType: 'article',
+               clickableId: res.id,
                username: user.username,
                location: {
                   lat: res.location.lat + 1,
@@ -81,8 +81,8 @@ exports.run = function() {
             expect(res).to.exist;
 
             UpVotes.create({
-               votableType: 'article',
-               votableId: res.id,
+               clickableType: 'article',
+               clickableId: res.id,
                username: user.username,
                location: res.location
             }, function(err, vote) {
@@ -130,8 +130,8 @@ exports.run = function() {
 
           var create  = function() {
             UpVotes.create({
-               votableType: 'article',
-               votableId: res.id,
+               clickableType: 'article',
+               clickableId: res.id,
                username: user.username,
                location: res.location
             }, cb);
