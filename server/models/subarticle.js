@@ -17,12 +17,14 @@ module.exports = function(Subarticle) {
       'upsert',
       'prototype.updateAttributes',
       'deleteById',
+      'createChangeStream',
+      'createChangeStream_0',
       'updateAll'
    ];
 
    var nonStaticDisable = [
       //disable all comment REST endpoints
-      '__get__comments',
+//      '__get__comments',
       '__delete__comments',
       '__destroyById__comments',
       '__findById__comments',

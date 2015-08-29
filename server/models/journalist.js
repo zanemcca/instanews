@@ -12,6 +12,8 @@ module.exports = function(Journalist) {
       'deleteById',
       'confirm',
       'resetPassword',
+      'createChangeStream',
+      'createChangeStream_0',
       'updateAll'
    ];
 
@@ -60,23 +62,22 @@ module.exports = function(Journalist) {
       '__destroy__stats',
       '__create__stats',
       '__update__stats',
-      //disable all upvote REST endpoints
-      '__get__upVotes',
-      '__delete__upVotes',
-      '__destroyById__upVotes',
-      '__findById__upVotes',
-      '__create__upVotes',
-      '__updateById__upVotes',
-      '__count__upVotes',
-      //disable all downvote REST endpoints
-      '__get__downVotes',
-      '__delete__downVotes',
-      '__destroyById__downVotes',
-      '__findById__downVotes',
-      '__create__downVotes',
-      '__updateById__downVotes',
-      '__count__downVotes',
-
+      //disable all clicks REST endpoints
+      '__get__clicks',
+      '__delete__clicks',
+      '__destroyById__clicks',
+      '__findById__clicks',
+      '__create__clicks',
+      '__updateById__clicks',
+      '__count__clicks',
+      //disable all views REST endpoints
+      '__get__views',
+      '__delete__views',
+      '__destroyById__views',
+      '__findById__views',
+      '__create__views',
+      '__updateById__views',
+      '__count__views'
    ];
 
    common.disableRemotes(Journalist,staticDisable,true);

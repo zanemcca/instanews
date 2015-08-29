@@ -15,6 +15,8 @@ module.exports = function(Installation) {
       'findByApp',
       'findBySubscriptions',
       'findByUser',
+      'createChangeStream',
+      'createChangeStream_0',
       'updateAll'
    ];
 

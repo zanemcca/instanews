@@ -15,9 +15,14 @@
   },
   "validations": [],
   "relations": {
-    "stat": {
+    "journalist": {
       "type": "belongsTo",
-      "model": "stat"
+      "model": "journalist",
+      "foreignKey": "username"
+    },
+    "clickable": {
+      "type": "belongsTo",
+      "polymorphic": true
     },
     "view": {
       "type": "belongsTo",

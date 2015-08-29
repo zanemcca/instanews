@@ -1,6 +1,6 @@
 {
   "name": "upVote",
-  "base": "vote",
+  "base": "click",
   "idInjection": true,
   "properties": {},
   "validations": [],

@@ -1,4 +1,3 @@
-/* istanbul ignore next */
 (function(window, angular, undefined) {'use strict';
 
 var urlBase = "/api";
@@ -40,6 +39,13 @@ module.factory(
       urlBase + "/subarticles/:id",
       { 'id': '@id' },
       {
+
+        // INTERNAL. Use Subarticle.comments() instead.
+        "prototype$__get__comments": {
+          isArray: true,
+          url: urlBase + "/subarticles/:id/comments",
+          method: "GET"
+        },
 
         /**
          * @ngdoc method
@@ -105,6 +111,42 @@ module.factory(
     R.modelName = "Subarticle";
 
 
+        /**
+         * @ngdoc method
+         * @name lbServices.Subarticle#comments
+         * @methodOf lbServices.Subarticle
+         *
+         * @description
+         *
+         * Queries comments of subarticle.
+         *
+         * @param {Object=} parameters Request parameters.
+         *
+         *  - `id` – `{*}` - votes id
+         *
+         *  - `filter` – `{object=}` - 
+         *
+         * @param {function(Array.<Object>,Object)=} successCb
+         *   Success callback with two arguments: `value`, `responseHeaders`.
+         *
+         * @param {function(Object)=} errorCb Error callback with one argument:
+         *   `httpResponse`.
+         *
+         * @returns {Array.<Object>} An empty reference that will be
+         *   populated with the actual data once the response is returned
+         *   from the server.
+         *
+         * <em>
+         * (The remote method definition does not provide any description.
+         * This usually means the response is a `Comment` object.)
+         * </em>
+         */
+        R.comments = function() {
+          var TargetResource = $injector.get("Comment");
+          var action = TargetResource["::get::subarticle::comments"];
+          return action.apply(R, arguments);
+        };
+
     return R;
   }]);
 
@@ -144,6 +186,13 @@ module.factory(
         "prototype$__create__subarticles": {
           url: urlBase + "/articles/:id/subarticles",
           method: "POST"
+        },
+
+        // INTERNAL. Use Article.comments() instead.
+        "prototype$__get__comments": {
+          isArray: true,
+          url: urlBase + "/articles/:id/comments",
+          method: "GET"
         },
 
         /**
@@ -326,6 +375,42 @@ module.factory(
         R.subarticles.create = function() {
           var TargetResource = $injector.get("Subarticle");
           var action = TargetResource["::create::article::subarticles"];
+          return action.apply(R, arguments);
+        };
+
+        /**
+         * @ngdoc method
+         * @name lbServices.Article#comments
+         * @methodOf lbServices.Article
+         *
+         * @description
+         *
+         * Queries comments of article.
+         *
+         * @param {Object=} parameters Request parameters.
+         *
+         *  - `id` – `{*}` - votes id
+         *
+         *  - `filter` – `{object=}` - 
+         *
+         * @param {function(Array.<Object>,Object)=} successCb
+         *   Success callback with two arguments: `value`, `responseHeaders`.
+         *
+         * @param {function(Object)=} errorCb Error callback with one argument:
+         *   `httpResponse`.
+         *
+         * @returns {Array.<Object>} An empty reference that will be
+         *   populated with the actual data once the response is returned
+         *   from the server.
+         *
+         * <em>
+         * (The remote method definition does not provide any description.
+         * This usually means the response is a `Comment` object.)
+         * </em>
+         */
+        R.comments = function() {
+          var TargetResource = $injector.get("Comment");
+          var action = TargetResource["::get::article::comments"];
           return action.apply(R, arguments);
         };
 
@@ -644,7 +729,7 @@ module.factory(
          *
          * @description
          *
-         * Logout a user with access token
+         * Logout a user with access token.
          *
          * @param {Object=} parameters Request parameters.
          *
@@ -839,6 +924,13 @@ module.factory(
       { 'id': '@id' },
       {
 
+        // INTERNAL. Use Comment.comments() instead.
+        "prototype$__get__comments": {
+          isArray: true,
+          url: urlBase + "/comments/:id/comments",
+          method: "GET"
+        },
+
         /**
          * @ngdoc method
          * @name lbServices.Comment#create
@@ -877,37 +969,24 @@ module.factory(
           method: "POST"
         },
 
-        /**
-         * @ngdoc method
-         * @name lbServices.Comment#find
-         * @methodOf lbServices.Comment
-         *
-         * @description
-         *
-         * Find all instances of the model matched by filter from the data source.
-         *
-         * @param {Object=} parameters Request parameters.
-         *
-         *  - `filter` – `{object=}` - Filter defining fields, where, include, order, offset, and limit
-         *
-         * @param {function(Array.<Object>,Object)=} successCb
-         *   Success callback with two arguments: `value`, `responseHeaders`.
-         *
-         * @param {function(Object)=} errorCb Error callback with one argument:
-         *   `httpResponse`.
-         *
-         * @returns {Array.<Object>} An empty reference that will be
-         *   populated with the actual data once the response is returned
-         *   from the server.
-         *
-         * <em>
-         * (The remote method definition does not provide any description.
-         * This usually means the response is a `Comment` object.)
-         * </em>
-         */
-        "find": {
+        // INTERNAL. Use Subarticle.comments() instead.
+        "::get::subarticle::comments": {
           isArray: true,
-          url: urlBase + "/comments",
+          url: urlBase + "/subarticles/:id/comments",
+          method: "GET"
+        },
+
+        // INTERNAL. Use Article.comments() instead.
+        "::get::article::comments": {
+          isArray: true,
+          url: urlBase + "/articles/:id/comments",
+          method: "GET"
+        },
+
+        // INTERNAL. Use Comment.comments() instead.
+        "::get::comment::comments": {
+          isArray: true,
+          url: urlBase + "/comments/:id/comments",
           method: "GET"
         },
       }
@@ -926,6 +1005,42 @@ module.factory(
     */
     R.modelName = "Comment";
 
+
+        /**
+         * @ngdoc method
+         * @name lbServices.Comment#comments
+         * @methodOf lbServices.Comment
+         *
+         * @description
+         *
+         * Queries comments of comment.
+         *
+         * @param {Object=} parameters Request parameters.
+         *
+         *  - `id` – `{*}` - votes id
+         *
+         *  - `filter` – `{object=}` - 
+         *
+         * @param {function(Array.<Object>,Object)=} successCb
+         *   Success callback with two arguments: `value`, `responseHeaders`.
+         *
+         * @param {function(Object)=} errorCb Error callback with one argument:
+         *   `httpResponse`.
+         *
+         * @returns {Array.<Object>} An empty reference that will be
+         *   populated with the actual data once the response is returned
+         *   from the server.
+         *
+         * <em>
+         * (The remote method definition does not provide any description.
+         * This usually means the response is a `Comment` object.)
+         * </em>
+         */
+        R.comments = function() {
+          var TargetResource = $injector.get("Comment");
+          var action = TargetResource["::get::comment::comments"];
+          return action.apply(R, arguments);
+        };
 
     return R;
   }]);
@@ -1046,6 +1161,88 @@ module.factory(
     * i.e. `Storage`.
     */
     R.modelName = "Storage";
+
+
+    return R;
+  }]);
+
+/**
+ * @ngdoc object
+ * @name lbServices.Click
+ * @header lbServices.Click
+ * @object
+ *
+ * @description
+ *
+ * A $resource object for interacting with the `Click` model.
+ *
+ * ## Example
+ *
+ * See
+ * {@link http://docs.angularjs.org/api/ngResource.$resource#example $resource}
+ * for an example of using this object.
+ *
+ */
+module.factory(
+  "Click",
+  ['LoopBackResource', 'LoopBackAuth', '$injector', function(Resource, LoopBackAuth, $injector) {
+    var R = Resource(
+      urlBase + "/clicks/:id",
+      { 'id': '@id' },
+      {
+
+        /**
+         * @ngdoc method
+         * @name lbServices.Click#create
+         * @methodOf lbServices.Click
+         *
+         * @description
+         *
+         * Create a new instance of the model and persist it into the data source.
+         *
+         * @param {Object=} parameters Request parameters.
+         *
+         *   This method does not accept any parameters.
+         *   Supply an empty object or omit this argument altogether.
+         *
+         * @param {Object} postData Request data.
+         *
+         * This method expects a subset of model properties as request parameters.
+         *
+         * @param {function(Object,Object)=} successCb
+         *   Success callback with two arguments: `value`, `responseHeaders`.
+         *
+         * @param {function(Object)=} errorCb Error callback with one argument:
+         *   `httpResponse`.
+         *
+         * @returns {Object} An empty reference that will be
+         *   populated with the actual data once the response is returned
+         *   from the server.
+         *
+         * <em>
+         * (The remote method definition does not provide any description.
+         * This usually means the response is a `Click` object.)
+         * </em>
+         */
+        "create": {
+          url: urlBase + "/clicks",
+          method: "POST"
+        },
+      }
+    );
+
+
+
+
+    /**
+    * @ngdoc property
+    * @name lbServices.Click#modelName
+    * @propertyOf lbServices.Click
+    * @description
+    * The name of the model represented by this $resource,
+    * i.e. `Click`.
+    */
+    R.modelName = "Click";
 
 
     return R;
@@ -1292,6 +1489,88 @@ module.factory(
     * i.e. `Installation`.
     */
     R.modelName = "Installation";
+
+
+    return R;
+  }]);
+
+/**
+ * @ngdoc object
+ * @name lbServices.View
+ * @header lbServices.View
+ * @object
+ *
+ * @description
+ *
+ * A $resource object for interacting with the `View` model.
+ *
+ * ## Example
+ *
+ * See
+ * {@link http://docs.angularjs.org/api/ngResource.$resource#example $resource}
+ * for an example of using this object.
+ *
+ */
+module.factory(
+  "View",
+  ['LoopBackResource', 'LoopBackAuth', '$injector', function(Resource, LoopBackAuth, $injector) {
+    var R = Resource(
+      urlBase + "/views/:id",
+      { 'id': '@id' },
+      {
+
+        /**
+         * @ngdoc method
+         * @name lbServices.View#create
+         * @methodOf lbServices.View
+         *
+         * @description
+         *
+         * Create a new instance of the model and persist it into the data source.
+         *
+         * @param {Object=} parameters Request parameters.
+         *
+         *   This method does not accept any parameters.
+         *   Supply an empty object or omit this argument altogether.
+         *
+         * @param {Object} postData Request data.
+         *
+         * This method expects a subset of model properties as request parameters.
+         *
+         * @param {function(Object,Object)=} successCb
+         *   Success callback with two arguments: `value`, `responseHeaders`.
+         *
+         * @param {function(Object)=} errorCb Error callback with one argument:
+         *   `httpResponse`.
+         *
+         * @returns {Object} An empty reference that will be
+         *   populated with the actual data once the response is returned
+         *   from the server.
+         *
+         * <em>
+         * (The remote method definition does not provide any description.
+         * This usually means the response is a `View` object.)
+         * </em>
+         */
+        "create": {
+          url: urlBase + "/views",
+          method: "POST"
+        },
+      }
+    );
+
+
+
+
+    /**
+    * @ngdoc property
+    * @name lbServices.View#modelName
+    * @propertyOf lbServices.View
+    * @description
+    * The name of the model represented by this $resource,
+    * i.e. `View`.
+    */
+    R.modelName = "View";
 
 
     return R;

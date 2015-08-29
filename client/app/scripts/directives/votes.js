@@ -4,11 +4,15 @@ var app = angular.module('instanews.directive.votes', ['ionic', 'ngResource']);
 
 app.directive('invotes', [
       'Comment',
+      'Article',
+      'Subarticle',
       'UpVote',
       'DownVote',
       'Position',
       'User',
       function (Comment,
+        Article,
+        Subarticle,
          UpVote,
          DownVote,
          Position,
@@ -21,7 +25,13 @@ app.directive('invotes', [
       },
       controller: function($scope) {
 
-        var date = Date.parse($scope.votable.date);
+        var Models = {
+          article: Article,
+          comment: Comment,
+          subarticle: Subarticle
+        };
+
+        var date = Date.parse($scope.votable.created);
         var age = Date.now() - date; 
         age /= 1000;
         var unit = 'sec';
@@ -56,21 +66,30 @@ app.directive('invotes', [
          $scope.toggleComments = function(instance) {
             if(!instance.showComments) {
 
-               Comment.find({
-                  filter: {
-                     where: {
-                        commentableId: instance.id,
-                        commentableType: instance.modelName
-                     },
-                     limit: 10,
-                     order: 'rating DESC'
-                  }
-               }).$promise
-               .then( function (res) {
-                  instance.comments = res;
-                  instance.showComments = true;
-               });
-
+              if(Models.hasOwnProperty(instance.modelName)) {
+                Models[instance.modelName].comments({
+                   id: instance.id,
+                   filter: {
+                   /*
+                    where: {
+                       commentableId: instance.id,
+                       commentableType: instance.modelName
+                    },
+                   */
+                    limit: 10,
+                    order: 'rating DESC'
+                   }
+                 }).$promise
+                 .then( function (res) {
+                    instance.comments = res;
+                    instance.showComments = true;
+                 }, function(err) {
+                    console.log(err);
+                 });
+              }
+              else {
+                console.log('Warning: Unknown modelname!');
+              }
             }
             else {
                instance.showComments = false;
@@ -86,8 +105,8 @@ app.directive('invotes', [
                var vote = {
                   id: instance.id,
                   username: user.username,
-                  votableId: instance.id,
-                  votableType: instance.modelName
+                  clickableId: instance.id,
+                  clickableType: instance.modelName
                };
 
                if(err) {
@@ -118,8 +137,8 @@ app.directive('invotes', [
                var vote = {
                   id: instance.id,
                   username: user.username,
-                  votableId: instance.id,
-                  votableType: instance.modelName
+                  clickableId: instance.id,
+                  clickableType: instance.modelName
                };
 
                if(err) {

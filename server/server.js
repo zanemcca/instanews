@@ -56,7 +56,9 @@ app.use(function setCurrentUser(req, res, next) {
     return next();
   }
   app.models.Stat.findOne({
-    userId: req.accessToken.userId
+    where: {
+      username: req.accessToken.userId
+    }
   }, function(err, stat) {
     if (err) {
       return next(err);

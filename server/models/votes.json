@@ -14,10 +14,10 @@
     "commentRating": {
       "type": "number"
     },
-    "clicksCount": {
+    "clickCount": {
       "type": "number"
     },
-    "viewsCount": {
+    "viewCount": {
       "type": "number"
     },
     "version": {
@@ -30,17 +30,18 @@
       "type": "date"
     }
   },
+  "hidden": ["commentRating", "clickCount", "viewCount"],
   "validations": [],
   "relations": {
     "upVotes": {
       "type": "hasMany",
       "model": "upVote",
-      "polymorphic": "votable"
+      "polymorphic": "clickable"
     },
     "downVotes": {
       "type": "hasMany",
       "model": "downVote",
-      "polymorphic": "votable"
+      "polymorphic": "clickable"
     }
   },
   "acls": [

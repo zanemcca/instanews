@@ -35,18 +35,6 @@
       "model": "subarticle",
       "foreignKey": "username"
     },
-    "votes": {
-      "type": "embedsOne",
-      "model": "votes"
-    },
-    "upVotes": {
-      "type": "hasMany",
-      "model": "upVote"
-    },
-    "downVotes": {
-      "type": "hasMany",
-      "model": "downVote"
-    },
     "installations": {
       "type": "hasMany",
       "model": "installation",
@@ -56,6 +44,16 @@
       "type": "hasOne",
       "model": "stat",
       "foreignKey": ""
+    },
+    "clicks": {
+      "type": "hasMany",
+      "model": "click",
+      "polymorphic": "clickable"
+    },
+    "views": {
+      "type": "hasMany",
+      "model": "view",
+      "foreignKey": "username"
     }
   },
   "acls": [

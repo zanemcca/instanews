@@ -81,8 +81,8 @@ exports.run = function() {
                if(err) return done(err);
 
                UpVotes.create({
-                  votableType: 'article',
-                  votableId: res.parentId,
+                  clickableType: 'article',
+                  clickableId: res.parentId,
                   username: 'bob'
                }, function(err, res) {
                   if(err) return done(err);
@@ -92,8 +92,8 @@ exports.run = function() {
                   runTillDone( function(stop) {
                      Notifications.find({
                         where: {
-                           notifiableType: res.votableType,
-                           notifiableId: res.votableId
+                           notifiableType: res.clickableType,
+                           notifiableId: res.clickableId
                         }
                      },function(err, res) {
                         if(!err && res && res.length > 0) {
@@ -126,8 +126,8 @@ exports.run = function() {
             if(err) return done(err);
 
             UpVotes.create({
-               votableType: 'subarticle',
-               votableId: res.id,
+               clickableType: 'subarticle',
+               clickableId: res.id,
                username: 'bob'
             }, function(err, res) {
                if(err) return done(err);
@@ -137,8 +137,8 @@ exports.run = function() {
                runTillDone( function(stop) {
                   Notifications.find({
                      where: {
-                        notifiableType: res.votableType,
-                        notifiableId: res.votableId
+                        notifiableType: res.clickableType,
+                        notifiableId: res.clickableId
                      }
                   },function(err, res) {
                      if(!err && res && res.length > 0) {
@@ -178,8 +178,8 @@ exports.run = function() {
               if(err) return done(err);
 
               UpVotes.create({
-                 votableType: 'comment',
-                 votableId: res.id,
+                 clickableType: 'comment',
+                 clickableId: res.id,
                  username: 'bob'
               }, function(err, res) {
                  if(err) return done(err);
@@ -189,9 +189,9 @@ exports.run = function() {
                  runTillDone( function(stop) {
                     Notifications.find({
                        where: {
-                          notifiableType: res.votableType,
+                          notifiableType: res.clickableType,
                           username: 'jane',
-                          notifiableId: res.votableId
+                          notifiableId: res.clickableId
                        }
                     },function(err, res) {
                        if(!err && res && res.length > 0) {

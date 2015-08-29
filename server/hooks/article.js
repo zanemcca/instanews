@@ -3,8 +3,17 @@ var loopback = require('loopback');
 module.exports = function(app) {
 
    var Article = app.models.Article;
+  var Votes = app.models.votes;
    var Subarticle = app.models.Subarticle;
    var Stat = app.models.Stat;
+
+  Article.afterRemote('prototype.__get__comments', function(ctx, instance,next){
+    Votes.createClickAfterRemote(ctx, next);
+  });
+
+  Article.afterRemote('prototype.__get__subarticles', function(ctx, inst, next){
+    Votes.createClickAfterRemote(ctx, next);
+  });
 
   Article.observe('access', function(ctx, next) {
     if(ctx.options.rate) {
