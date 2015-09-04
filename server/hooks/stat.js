@@ -117,6 +117,7 @@ module.exports = function(app) {
 
    Stat.getCustomRating = function(Model, instance, cb) {
      //TODO Check if rating for instance is in cache first
+
     var ctx = loopback.getCurrentContext();
     if(ctx) {
       var stat = ctx.get('currentStat');

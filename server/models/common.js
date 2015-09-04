@@ -55,6 +55,26 @@ exports.readModifyWrite = function(Model, query, modify, cb, retry) {
           console.log(instance);
         }
 
+        //Remove all related models before saving the instance
+        if(query.include) {
+          var relation = '';
+          if(Object.prototype.toString.call(query.include) ===
+             '[object Array]') {
+            for(var idx in query.include) {
+              relation = query.include[idx].relation;
+              if(instance.hasOwnProperty(relation)) {
+                delete instance[relation];
+              }
+            }
+          }
+          else {
+            relation = query.include.relation;
+            if(instance.hasOwnProperty(relation)) {
+              delete instance[relation];
+            }
+          }
+        }
+
         Model.updateAll(where, instance, function(err, res) {
           if(err) {
             console.log('Warning: Transaction failed to update: ' +
@@ -103,7 +123,7 @@ exports.readModifyWrite = function(Model, query, modify, cb, retry) {
       };
 
       for(var i = 0; i < res.length; i++) {
-        update(modify(res[i]), callback);
+        update(modify(res[i].toObject()), callback);
       }
     }
   });

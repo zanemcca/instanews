@@ -118,6 +118,12 @@ module.exports = function(Stat) {
     var staticRating;
 
     var total = 0;
+
+    //Convert the result to an object if it is not already
+    if(res.toObject !== undefined && typeof res.toObject === 'function') {
+      res = res.toObject();
+    }
+
     //Votes
     if(stats.Wvote) {
       total += stats.Wvote;
@@ -132,68 +138,62 @@ module.exports = function(Stat) {
       console.log(stats);
     }
 
-    if(res.__cachedRelations) {
-      //Comments
-      if(stats.Wcomment) {
-        total += stats.Wcomment;
-        if(res.__cachedRelations.comments && stats.views.comment) {
-          commentRating = common.math.geometricDecay(
-            res.__cachedRelations.comments,
-            stats.views.comment.decay
-          ); 
-        }
-        else {
-          commentRating = res.commentRating;
-        }
-        if(commentRating === undefined) {
-          //TODO Initialize properly
-          commentRating = 0;
-        }
-  //      console.log('Pcomment: ' + res.Pcomment);
-        ppi += stats.Wcomment * commentRating;
+    //Comments
+    if(stats.Wcomment) {
+      total += stats.Wcomment;
+      if(res.comments && stats.views.comment) {
+        commentRating = common.math.geometricDecay(
+          res.comments,
+          stats.views.comment.decay
+        ); 
       }
-
-      if( res.modelName !== 'comment') {
-        staticRating = ppi;
+      else {
+        commentRating = res.commentRating;
       }
-      
-      //Subarticles 
-      if(stats.Wsubarticle) {
-        total += stats.Wsubarticle;
-        var subs = res.__cachedRelations.subarticles;
-        if(subs && stats.views.subarticle) {
-          ppi += stats.Wsubarticle * common.math.geometricDecay(
-            subs,
-            stats.views.subarticle.decay
-          );
+      if(commentRating === undefined) {
+        //TODO Initialize properly
+        commentRating = 0;
+      }
+//      console.log('Pcomment: ' + res.Pcomment);
+      ppi += stats.Wcomment * commentRating;
+    }
 
-          var staticRatings = [];
-          for(var i = 0; i < subs.length; i++) {
-            if(typeof(subs[i].staticRating) === 'number') {
-              staticRatings.push(subs[i].staticRating);
-            }
-            else {
-              console.log('Warning: The subarticle should have a ' +
-                          'staticRating but it does not');
-              staticRatings.push(subs[i].rating);
-            }
+    if( res.modelName !== 'comment') {
+      staticRating = ppi;
+    }
+    
+    //Subarticles 
+    if(stats.Wsubarticle) {
+      total += stats.Wsubarticle;
+      var subs = res.subarticles;
+      if(subs && stats.views.subarticle) {
+        ppi += stats.Wsubarticle * common.math.geometricDecay(
+          subs,
+          stats.views.subarticle.decay
+        );
+
+        var staticRatings = [];
+        for(var i = 0; i < subs.length; i++) {
+          if(typeof(subs[i].staticRating) === 'number') {
+            staticRatings.push(subs[i].staticRating);
           }
-
-          staticRatings.sort(function(a, b){return b-a;});
-
-          staticRating += stats.Wsubarticle * common.math.geometricDecay(
-            staticRatings,
-            stats.views.subarticle.decay
-          );
+          else {
+            console.log('Warning: The subarticle should have a ' +
+                        'staticRating but it does not');
+            staticRatings.push(subs[i].rating);
+          }
         }
+
+        staticRatings.sort(function(a, b){return b-a;});
+
+        staticRating += stats.Wsubarticle * common.math.geometricDecay(
+          staticRatings,
+          stats.views.subarticle.decay
+        );
       }
     }
-    else {
-      console.log('Warning: There were no comments or subarticles' +
-                  ' attached to the article being ranked');
-    }
 
-    if( total > 1 || total < 0.999999) {
+    if( total > 1 || total < 0.999999999) {
       console.log('Error: The probability of interest in all children ' +
                   total + ' does not equal 1');
       console.log(stats);

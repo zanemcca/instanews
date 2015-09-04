@@ -69,7 +69,7 @@ app.use(function setCurrentUser(req, res, next) {
     var loopbackContext = loopback.getCurrentContext();
     if (loopbackContext) {
       loopbackContext.set('currentStat', stat);
-      console.log('Current user stat is set to ' + stat.id);
+//      console.log('Current user stat is set to ' + stat.id);
     }
     next();
   });

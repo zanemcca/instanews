@@ -31,6 +31,13 @@ module.exports = {
     connector: 'mongodb',
     debug: true
   },
+  Interactions: {
+    url: mongodb + 'interactions' + mongoReplica,
+    database: 'interactions',
+    name: 'Interactions',
+    connector: 'mongodb',
+    debug: true
+  },
   Notifications: {
     url: mongodb + 'notifications' + mongoReplica,
     database: 'notifications',

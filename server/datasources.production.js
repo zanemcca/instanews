@@ -29,27 +29,35 @@ module.exports = {
     database: 'installations',
     name: 'Installations',
     connector: 'mongodb',
-    debug: true
+    debug: false 
+  },
+  Interactions: {
+    url: mongodb + 'interactions' + mongoReplica,
+    database: 'interactions',
+    name: 'Interactions',
+    connector: 'mongodb',
+    debug: false
   },
   Notifications: {
     url: mongodb + 'notifications' + mongoReplica,
     database: 'notifications',
     name: 'Notifications',
     connector: 'mongodb',
-    debug: true
+    debug: false
   },
   Articles: {
     url: mongodb + 'articles' + mongoReplica,
     database: 'articles',
     name: 'Articles',
     connector: 'mongodb',
-    debug: true
+    debug: false
   },
   Users: {
     url: mongodb + 'users' + mongoReplica,
     database: 'users',
     name: 'Users',
-    connector: 'mongodb'
+    connector: 'mongodb',
+    debug: false
   },
   push: {
     name: 'push',
