@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<div class="item item-avatar item-text-wrap item-divider"
+  style="padding-bottom: 0px; border-bottom-color: transparent">
+  <img src="images/ionic.png">
+  <a class="button button-clear button-small"
+     ui-sref="app.profile({username: item.username})" >
+     {{item.username}}
+  </a>
+  <p>{{item.content}}</p>
+
+  <inVotes class="item item-divider no-padding"
+     style="border: transparent"
+     votable="item">
+  </inVotes>
+  <inComments owner="item"></inComments>
+</div>

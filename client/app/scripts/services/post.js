@@ -206,11 +206,11 @@ app.factory('Post', [
        Article.create({
           isPrivate: false,
           location: article.position,
-          username: User.get().username,
           title: article.title
        })
        .$promise
        .then( function(res) {
+         console.log(res);
          article.parentId = res.id;
          article.title = null;
          article.position = null;
@@ -347,7 +347,6 @@ app.factory('Post', [
       return {
          id: id,
          parentId: id,
-         username: User.get().username,
          text: text
       };
    };
@@ -359,7 +358,6 @@ app.factory('Post', [
     return {
       id: id,
       parentId: id,
-      username: User.get().username,
       _file: {
         type: video.type,
         container: container,
@@ -379,7 +377,6 @@ app.factory('Post', [
     var subarticle = {
       id: id,
       parentId: id,
-      username: User.get().username,
       _file: {
         container: container,
         type: photo.type,

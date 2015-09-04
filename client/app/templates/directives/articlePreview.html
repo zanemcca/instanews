@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<a class="item no-padding item-text-wrap"
+   style="border:transparent"
+   ui-sref="app.article({id: item.id})">
+   <div class="item item-icon-right"
+      style="border-bottom:0px;">
+      {{item.title}}
+      <div class="icon ion-checkmark balanced button-small"
+         ng-if="item.verified">
+      </div>
+      <p>{{item.topSub.text}}</p>
+   </div>
+   <div class="item"
+      style="border-top:0px;padding-right:0px;padding-left:0px;padding-top:0px;padding-bottom:1px">
+
+      <inData ng-if="item.topSub._file"
+         data="item.topSub._file" id="item.topSub.id">
+      </inData>
+      <div class="item item-icon-right"
+         style="padding-top:0px;border-top:0px">
+         <div class="icon">
+            <a class="button button-clear no-padding button-small"
+               style="border:transparent"
+               ui-sref="app.profile({username: item.topSub.username})">
+               {{item.topSub.username}}
+            </a>
+         </div>
+      </div>
+   </div>
+</a>
+
+<div class="item" style="border:0px;padding-top:0px;padding-bottom:0px">
+   <inVotes style="border: transparent"
+      votable="item">
+   </inVotes>
+   <inComments owner="item"></inComments>
+</div>

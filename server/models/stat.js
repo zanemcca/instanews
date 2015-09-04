@@ -121,11 +121,11 @@ module.exports = function(Stat) {
     //Votes
     if(stats.Wvote) {
       total += stats.Wvote;
-      if(res.upVoteCount > res.viewsCount) {
+      if(res.upVoteCount > res.viewCount) {
         console.log('Error: There are more upVotes then views');
         return res;
       }
-      ppi += stats.Wvote * (res.upVoteCount / res.viewsCount);
+      ppi += stats.Wvote * (res.upVoteCount / res.viewCount);
     }
     else {
       console.log('Warning: getRating has been called without Wvote');
@@ -156,7 +156,7 @@ module.exports = function(Stat) {
       if( res.modelName !== 'comment') {
         staticRating = ppi;
       }
-
+      
       //Subarticles 
       if(stats.Wsubarticle) {
         total += stats.Wsubarticle;
@@ -204,11 +204,9 @@ module.exports = function(Stat) {
     }
 
     // Click Thru
-    // TODO Change clicks and views to clicksCount and viewsCount
-    if(res.clicksCount && res.viewsCount) {
+    if(res.clickCount && res.viewCount) {
       //Q function of geometric distribution for #clicks > 0
-      var clickThru  = res.clicksCount/(res.clicksCount + res.viewsCount);
-      console.log('Click-Thru: ' + clickThru);
+      var clickThru  = res.clickCount/(res.clickCount + res.viewCount);
       ppi *= clickThru;
       staticRating *= clickThru;
     }
@@ -222,7 +220,7 @@ module.exports = function(Stat) {
     };
     //Time Decay
     if(stats.age) {
-      var timeDecay =  stats.age(Date.now() - res.date);
+      var timeDecay =  stats.age(Date.now() - res.created);
       ppi *= timeDecay;
     }
 

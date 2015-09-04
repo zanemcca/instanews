@@ -20,32 +20,10 @@
          <inComments owner="article"></inComments>
       </div>
       <ul class="list">
-         <ion-item class="no-padding card"
-         ng-repeat="subarticle in subarticles | orderBy: '-(rating)'">
-            <div class="item item-avatar item-text-wrap" style="min-height:65px" >
-               <img src="images/ionic.png">
-               <a class="button button-clear no-padding button-small"
-                  ui-sref="app.profile({username: subarticle.username})">
-                  {{subarticle.username}}
-               </a>
-               <p>{{subarticle.text}}</p>
-
-            </div>
-
-            <div class="item item-body"
-               style="padding-right:0px;padding-left:0px;padding-top:0px;padding-bottom:1px"
-               ng-if="subarticle._file">
-               <inData data="subarticle._file" id="subarticle.id"></inData>
-            </div>
-
-            <div class="item" style="border:0px;padding-top:0px;padding-bottom:0px">
-               <inVotes style="border: transparent"
-                  votable="subarticle">
-               </inVotes>
-               <inComments owner="subarticle"></inComments>
-            </div>
-
-         </ion-item>
+        <ion-item ng-repeat="subarticle in subarticles track by subarticle.id"
+          class="no-padding card">
+          <in-list-item item="subarticle"></in-list-item>
+        </ion-item>
       </ul>
       <ion-infinite-scroll
          ng-if="areItemsAvailable()"

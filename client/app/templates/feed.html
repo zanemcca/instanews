@@ -17,46 +17,10 @@
          </inMap>
       </div>
       <ul class="list">
-         <ion-item class="no-padding card"
-            ng-repeat="article in articles | orderBy: '-(rating)'">
-            <a class="item no-padding item-text-wrap"
-               style="border:transparent"
-               ui-sref="app.article({id: article.id})">
-               <div class="item item-icon-right"
-                  style="border-bottom:0px;">
-                  {{article.title}}
-                  <div class="icon ion-checkmark balanced button-small"
-                     ng-if="article.verified">
-                  </div>
-                  <p>{{article.topSub.text}}</p>
-               </div>
-               <div class="item"
-                  style="border-top:0px;padding-right:0px;padding-left:0px;padding-top:0px;padding-bottom:1px">
-
-                  <inData ng-if="article.topSub._file"
-                     data="article.topSub._file" id="article.topSub.id">
-                  </inData>
-                  <div class="item item-icon-right"
-                     style="padding-top:0px;border-top:0px">
-                     <div class="icon">
-                        <a class="button button-clear no-padding button-small"
-                           style="border:transparent"
-                           ui-sref="app.profile({username: article.topSub.username})">
-                           {{article.topSub.username}}
-                        </a>
-                     </div>
-                  </div>
-               </div>
-            </a>
-
-            <div class="item" style="border:0px;padding-top:0px;padding-bottom:0px">
-               <inVotes style="border: transparent"
-                  votable="article">
-               </inVotes>
-               <inComments owner="article"></inComments>
-            </div>
-
-         </ion-item>
+        <ion-item ng-repeat="article in articles track by article.id"
+          class="no-padding card">
+          <in-list-item item="article"></in-list-item>
+        </ion-item>
       </ul>
       <ion-infinite-scroll
          ng-if="itemsAvailable()"

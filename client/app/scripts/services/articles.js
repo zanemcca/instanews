@@ -110,7 +110,7 @@ app.service('Articles', [
 
    //Compare function for sorting the articles
   var compareFunction = function(a,b) {
-    return b.ranking - a.ranking;
+    return b.rating - a.rating;
   };
 
    // Update or add a new article
