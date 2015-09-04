@@ -56,16 +56,12 @@
     "public": false
   },
   "upVote": {
-    "dataSource": "Articles",
+    "dataSource": "Interactions",
     "public": true
   },
   "downVote": {
-    "dataSource": "Articles",
+    "dataSource": "Interactions",
     "public": true
-  },
-  "voteUser": {
-    "dataSource": null,
-    "public": false
   },
   "notif": {
     "dataSource": "Notifications",
@@ -88,11 +84,11 @@
     "public": false
   },
   "click": {
-    "dataSource": "Articles",
+    "dataSource": "Interactions",
     "public": false
   },
   "view": {
-    "dataSource": "Articles",
+    "dataSource": "Interactions",
     "public": true
   }
 }

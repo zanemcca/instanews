@@ -85,7 +85,8 @@ module.exports = function(app) {
             }
 
             if(!inst.username) {
-              console.log('Error: There should be a valid user logged in for votes creation');
+              console.log('Error: ' +
+                'There should be a valid user logged in for votes creation');
             }
 
             //TODO add this on loaded and remove on before save
@@ -110,8 +111,6 @@ module.exports = function(app) {
                 inst.verified = false;
               }
             }
-
-           console.log(inst);
          }
 
          //TODO use a mixin for this 
@@ -138,7 +137,9 @@ module.exports = function(app) {
           next(err);
         }
         else {
-          ctx.instance = inst;
+          ctx.instance.rating = inst.rating;
+          ctx.instance.staticRating = inst.staticRating;
+          ctx.instance.commentRating = inst.commentRating;
           next();
         }
        });

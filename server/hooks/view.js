@@ -17,7 +17,8 @@ module.exports = function(app) {
           return next();
         }
       }
-      var error = new Error('Cannot create a view because there is no user logged in.');
+      var error = new Error(
+        'Cannot create a view because there is no user logged in.');
       error.code = 400;
       console.log(error);
       next(error);

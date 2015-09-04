@@ -11,6 +11,14 @@
     "connector": "mongodb",
     "debug": true
   },
+  "Interactions": {
+    "host": "localhost",
+    "port": 27017,
+    "database": "interactions",
+    "name": "Interactions",
+    "connector": "mongodb",
+    "debug": true
+  },
   "Notifications": {
     "host": "localhost",
     "port": 27017,
