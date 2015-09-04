@@ -3,7 +3,8 @@ var loopback = require('loopback');
 module.exports = function(app) {
 
    var Article = app.models.Article;
-  var Votes = app.models.votes;
+   var Votes = app.models.votes;
+   var View = app.models.view;
    var Subarticle = app.models.Subarticle;
    var Stat = app.models.Stat;
 
@@ -13,6 +14,33 @@ module.exports = function(app) {
 
   Article.afterRemote('prototype.__get__subarticles', function(ctx, inst, next){
     Votes.createClickAfterRemote(ctx, next);
+  });
+
+  Article.observe('after save', function(ctx, next) {
+    var inst = ctx.instance;
+    if(!inst) {
+      inst = ctx.data;
+    }
+
+    if(inst && ctx.isNewInstance) {
+      View.create({
+        username: inst.username,
+        viewableType: 'article',
+        viewableId: inst.id
+      }, function(err, res) {
+        if(err) {
+          console.log(
+            'Error: Failed to create a view for article creation');
+        }
+        next(err);
+      });
+    }
+    else {
+      if(!inst) {
+        console.log('Warning: Instance is not valid for article after save');
+      }
+      next();
+    }
   });
 
   Article.observe('access', function(ctx, next) {
