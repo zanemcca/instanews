@@ -70,12 +70,6 @@ app.directive('invotes', [
                 Models[instance.modelName].comments({
                    id: instance.id,
                    filter: {
-                   /*
-                    where: {
-                       commentableId: instance.id,
-                       commentableType: instance.modelName
-                    },
-                   */
                     limit: 10,
                     order: 'rating DESC'
                    }
@@ -99,12 +93,9 @@ app.directive('invotes', [
 
          $scope.upvote = function (instance) {
              instance.upVoteCount++;
-            var user = User.get();
 
             Position.getCurrent( function(err,position) {
                var vote = {
-                  id: instance.id,
-                  username: user.username,
                   clickableId: instance.id,
                   clickableType: instance.modelName
                };
@@ -131,12 +122,9 @@ app.directive('invotes', [
 
          $scope.downvote = function (instance) {
            instance.downVoteCount++;
-            var user = User.get();
 
             Position.getCurrent( function(err,position) {
                var vote = {
-                  id: instance.id,
-                  username: user.username,
                   clickableId: instance.id,
                   clickableType: instance.modelName
                };

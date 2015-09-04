@@ -7,7 +7,7 @@
   },
   "properties": {
     "version": {
-      "type" : "number"
+      "type": "number"
     },
     "comments": {
       "type": "object"

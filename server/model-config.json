@@ -89,7 +89,7 @@
   },
   "click": {
     "dataSource": "Articles",
-    "public": false 
+    "public": false
   },
   "view": {
     "dataSource": "Articles",

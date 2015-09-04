@@ -4,6 +4,7 @@ module.exports = function(app) {
   var Click = app.models.click;
   var Stat = app.models.stat;
   var View = app.models.view;
+  var loopback = require('loopback');
 
   // Conversion functions
   Number.prototype.toRad = function() {
@@ -86,7 +87,7 @@ module.exports = function(app) {
     if(ctx.instance) {
       var inst = ctx.instance;
       //Only new clicks can add sample ages
-      if(!ctx.isNewInstance) {
+      if(ctx.isNewInstance) {
         Stat.addSample({
           username: inst.username
         }, ctx.Model.modelName, 'age', age, function(err, res) {
@@ -159,53 +160,66 @@ module.exports = function(app) {
     if(inst && ctx.isNewInstance) {
       inst.id = null;
 
-      var where;
-      if(inst.viewId) {
-        where = {
-          username: inst.username,
-          id: inst.viewId
-        };
-      }
-      else if( inst.clickableId && inst.clickableType) {
-        where = {
-          username: inst.username,
-          viewableId: inst.clickableId,
-          viewableType: inst.clickableType
-        };
-      }
-      else {
-        var error = new Error('Missing key information for new click!');
-        error.code = 400;
-        console.log(inst);
-        return next(error);
-      }
+      var error = new Error('Missing key information for new click!');
+      error.code = 400;
 
-      View.findOne({
-        where: where, 
-        order: 'created DESC'
-      }, function(err, res) {
-        if(err) {
-          console.log('Warning: Failed to find a view for id: ' +
-                      inst.viewId + '\tType: ' +
-                      inst.clickableType + '\tTypeId: ' +
-                      inst.clickableId);
-          next(err);
-        }
-        else if(res) {
-          console.log('View found!');
-          console.log(res);
-          inst.viewId = res.id;
-          inst.clickableType = res.viewableType;
-          inst.clickableId = res.viewableId;
-          next();
+      var context = loopback.getCurrentContext();
+      if(context) {
+        var token = context.get('accessToken');
+        if(token) {
+          inst.username = token.userId;
+
+          var where;
+          if(inst.viewId) {
+            where = {
+              username: inst.username,
+              id: inst.viewId
+            };
+          }
+          else if( inst.clickableId && inst.clickableType) {
+            where = {
+              username: inst.username,
+              viewableId: inst.clickableId,
+              viewableType: inst.clickableType
+            };
+          }
+          else {
+            console.log(inst);
+            return next(error);
+          }
+
+          View.findOne({
+            where: where, 
+            order: 'created DESC'
+          }, function(err, res) {
+            if(err) {
+              console.log('Warning: Failed to find a view for id: ' +
+                          inst.viewId + '\tType: ' +
+                          inst.clickableType + '\tTypeId: ' +
+                          inst.clickableId);
+              next(err);
+            }
+            else if(res) {
+              inst.viewId = res.id;
+              inst.clickableType = res.viewableType;
+              inst.clickableId = res.viewableId;
+              next();
+            }
+            else {
+              err = new Error('Failed to find view for click');
+              console.log(err);
+              next(err);
+            }
+          });
         }
         else {
-          err = new Error('Failed to find view for click');
-          console.log(err);
-          console.log('TODO Change this to fail!');
-          next();
+          console.log(context);
+          next(error);
         }
-      });
+      }
+      else {
+        next(error);
+      }
     }
     else {
       console.log('Warning: Invalid instance for clicks before save');

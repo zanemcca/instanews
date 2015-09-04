@@ -12,6 +12,7 @@ app.service('Subarticles', [
    var filter = {
       limit: 50,
       skip: 0,
+      rate: true,
       order: 'rating DESC'
    };
 

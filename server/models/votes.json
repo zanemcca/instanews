@@ -3,6 +3,11 @@
   "base": "PersistedModel",
   "strict": false,
   "idInjection": true,
+  "hidden": [
+    "commentRating",
+    "clickCount",
+    "viewCount"
+  ],
   "properties": {
     "modelName": {
       "type": "string",
@@ -30,7 +35,6 @@
       "type": "date"
     }
   },
-  "hidden": ["commentRating", "clickCount", "viewCount"],
   "validations": [],
   "relations": {
     "upVotes": {

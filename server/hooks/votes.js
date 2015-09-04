@@ -74,7 +74,23 @@ module.exports = function(app) {
       if(inst) {
          //TODO before create - initialize its rating
          if(ctx.isNewInstance) {
+            inst.username = undefined;
+
+            var context = loopback.getCurrentContext();
+            if(context) {
+              var token = context.get('accessToken');
+              if(token) {
+                inst.username = token.userId;
+              }
+            }
+
+            if(!inst.username) {
+              console.log('Error: There should be a valid user logged in for votes creation');
+            }
+
+            //TODO add this on loaded and remove on before save
             inst.modelName = ctx.Model.modelName;
+
             inst.id = null;
             inst.version = 0;
             inst.created = new Date();
@@ -94,6 +110,8 @@ module.exports = function(app) {
                 inst.verified = false;
               }
             }
+
+           console.log(inst);
          }
 
          //TODO use a mixin for this 

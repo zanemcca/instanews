@@ -28,10 +28,7 @@ app.directive('incomments', [
         };
 
          $scope.createComment = function (instance, content) {
-            var user = User.get();
-
             Comment.create({
-               username: user.username,
                content: content,
                commentableId: instance.id,
                commentableType: instance.modelName
@@ -56,12 +53,6 @@ app.directive('incomments', [
               Models[instance.modelName].comments({
                  id: instance.id,
                  filter: {
-                   /*
-                    where: {
-                       commentableType: instance.modelName,
-                       commentableId: instance.id
-                    },
-                   */
                     limit: 10,
                     skip: instance.comments.length,
                     order: order
@@ -80,6 +71,7 @@ app.directive('incomments', [
                  }
                  //Concatinate the new comments
                  instance.comments = instance.comments.concat(comments);
+                 //TODO Ensure the comments are in their proper order
               });
             }
             else {

@@ -19,6 +19,7 @@ angular.module('instanews', [
       'instanews.directive.autocomplete',
       'instanews.directive.comments',
       'instanews.directive.data',
+      'instanews.directive.list',
       'instanews.directive.map',
       'instanews.directive.votes',
       'instanews.service.articles',
