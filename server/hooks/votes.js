@@ -72,7 +72,6 @@ module.exports = function(app) {
         inst = ctx.data;
       }
       if(inst) {
-         //TODO before create - initialize its rating
          if(ctx.isNewInstance) {
             inst.username = undefined;
 
@@ -97,12 +96,10 @@ module.exports = function(app) {
             inst.ratingVersion = 0;
             inst.created = new Date();
             //Counts for rating
-            inst.clickCount = 100;
-            inst.viewCount = 100;
+            inst.clickCount = 0;
+            inst.viewCount = 0;
             inst.upVoteCount = 0;
             inst.downVoteCount = 0;
-            //Stored copy of the static commentRating
-            inst.commentRating = 0;
             //Rating
             inst.rating = 0;
 

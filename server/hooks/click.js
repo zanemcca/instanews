@@ -207,7 +207,6 @@ module.exports = function(app) {
           OppositeModel = UpVote;
           break;
         default:
-          console.log('Warning: PreVoteChecker can only be called on vote models');
           return next();
       }
 

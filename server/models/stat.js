@@ -112,26 +112,46 @@ module.exports = function(Stat) {
     return q(stats, normalization);
   };
 
-  Stat.getRating = function(res, stats) {
-    var ppi = 0;
+  Stat.getRating = function(rateable, stats) {
+    var upVoteBonus = 25;
+    var clickBonus = 100;
+    var viewBonus = 100;
+
+    var upVoteCount, viewCount, clickCount;
+
+    if(typeof(rateable.upVoteCount) === 'number' &&
+     typeof(rateable.viewCount) === 'number' &&
+     typeof(rateable.clickCount) === 'number'
+    ) {
+      upVoteCount = rateable.upVoteCount + upVoteBonus;
+      viewCount = rateable.viewCount + viewBonus;
+      clickCount = rateable.clickCount + clickBonus;
+    }
+    else {
+      console.log('Error: Critical information is missing from the rateable model');
+      console.log(rateable);
+      return rateable;
+    }
+
+    var rating = 0;
     var commentRating;
     var staticRating;
 
     var total = 0;
 
     //Convert the result to an object if it is not already
-    if(res.toObject !== undefined && typeof res.toObject === 'function') {
-      res = res.toObject();
+    if(rateable.toObject !== undefined && typeof rateable.toObject === 'function') {
+      rateable = rateable.toObject();
     }
 
     //Votes
     if(stats.Wvote) {
       total += stats.Wvote;
-      if(res.upVoteCount > res.viewCount) {
+      if(upVoteCount > viewCount) {
         console.log('Error: There are more upVotes then views');
-        return res;
+        return rateable;
       }
-      ppi += stats.Wvote * (res.upVoteCount / res.viewCount);
+      rating += stats.Wvote * (upVoteCount / viewCount);
     }
     else {
       console.log('Warning: getRating has been called without Wvote');
@@ -141,33 +161,25 @@ module.exports = function(Stat) {
     //Comments
     if(stats.Wcomment) {
       total += stats.Wcomment;
-      if(res.comments && stats.views.comment) {
+      if(rateable.comments && stats.views.comment) {
         commentRating = common.math.geometricDecay(
-          res.comments,
+          rateable.comments,
           stats.views.comment.decay
         ); 
+        rating += stats.Wcomment * commentRating;
       }
-      else {
-        commentRating = res.commentRating;
-      }
-      if(commentRating === undefined) {
-        //TODO Initialize properly
-        commentRating = 0;
-      }
-//      console.log('Pcomment: ' + res.Pcomment);
-      ppi += stats.Wcomment * commentRating;
     }
 
-    if( res.modelName !== 'comment') {
-      staticRating = ppi;
+    if( rateable.modelName !== 'comment') {
+      staticRating = rating;
     }
     
     //Subarticles 
     if(stats.Wsubarticle) {
       total += stats.Wsubarticle;
-      var subs = res.subarticles;
+      var subs = rateable.subarticles;
       if(subs && stats.views.subarticle) {
-        ppi += stats.Wsubarticle * common.math.geometricDecay(
+        rating += stats.Wsubarticle * common.math.geometricDecay(
           subs,
           stats.views.subarticle.decay
         );
@@ -198,18 +210,16 @@ module.exports = function(Stat) {
                   total + ' does not equal 1');
       console.log(stats);
     }
-    if( ppi > 1 || ppi < 0) {
-      console.log('Error: The static probability is not unitary!: ' + ppi);
-      return res;
+    if( rating > 1 || rating < 0) {
+      console.log('Error: The static probability is not unitary!: ' + rating);
+      return rateable;
     }
 
     // Click Thru
-    if(res.clickCount && res.viewCount) {
-      //Q function of geometric distribution for #clicks > 0
-      var clickThru  = res.clickCount/(res.clickCount + res.viewCount);
-      ppi *= clickThru;
-      staticRating *= clickThru;
-    }
+    //Q function of geometric distribution for #clicks > 0
+    var clickThru  = clickCount/(clickCount + viewCount);
+    rating *= clickThru;
+    staticRating *= clickThru;
 
     // User affinity
     // TODO
@@ -220,28 +230,27 @@ module.exports = function(Stat) {
     };
     //Time Decay
     if(stats.age) {
-      var timeDecay =  stats.age(Date.now() - res.created);
-      ppi *= timeDecay;
+      var timeDecay =  stats.age(Date.now() - rateable.created);
+      rating *= timeDecay;
     }
 
     console.log(
-      'Score: ' + rnd(ppi,4) +
+      'Score: ' + rnd(rating,4) +
       '\tStatic: ' + rnd(staticRating,4) + 
-      '\tTyp: ' + res.modelName +
+      '\tTyp: ' + rateable.modelName +
       '\tWv: ' + rnd(stats.Wvote,3) +
       '\tWc: ' + rnd(stats.Wcomment,3) +
       '\tWs: ' + rnd(stats.Wsubarticle,3)
     );
 
-    if( ppi > 1 || ppi < 0) {
-      console.log('Error: The probability is not unitary!: ' + ppi);
-      return res;
+    if( rating > 1 || rating < 0) {
+      console.log('Error: The probability is not unitary!: ' + rating);
+      return rateable;
     }
 
-    res.staticRating = staticRating;
-    res.commentRating = commentRating;
-    res.rating = ppi;
-    return res;
+    rateable.staticRating = staticRating;
+    rateable.rating = rating;
+    return rateable;
   };
 
    Stat.addSample = function(where, modelName, statName , value, cb) {
