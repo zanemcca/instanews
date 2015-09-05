@@ -72,26 +72,19 @@ module.exports = function(app) {
     next();
   });
 
-  var minutesAgo =  function(minutes) {
-    var now = (new Date()).getTime();
-    var minutesAgo = new Date(now - minutes*60000);
-    return minutesAgo;
-  };
-
-  Article.triggerRating = function(where, modify, cb, staticChange) {
+  Article.triggerRating = function(where, modify, cb) {
     if(where.id) {
+      //Update the subarticles
       Stat.updateRating({
-        parentId: where.id,
-        modified: {
-          lt: minutesAgo(5)
-        }
+        parentId: where.id
       }, Subarticle.modelName, null, function(err, res) {
+        //Update the article
         Stat.updateRating(where, Article.modelName, modify, function(err, res) {
           if(err) {
             console.log('Warning: Failed to update an article');
           }
           cb(err, res);
-        }, staticChange);
+        });
       }, false);
     }
     else {

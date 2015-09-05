@@ -4,6 +4,8 @@ module.exports = function(app) {
   var Click = app.models.click;
   var Stat = app.models.stat;
   var View = app.models.view;
+  var UpVote = app.models.upVote;
+  var DownVote = app.models.downVote;
   var loopback = require('loopback');
 
   // Conversion functions
@@ -34,47 +36,85 @@ module.exports = function(app) {
     }
   };
 
+  Click.updateVoteParent = function(ctx, next) {
+    var inst = ctx.instance;
+
+    if(inst) {
+      Click.updateClickableAttributes(ctx, { 
+        '$inc': ctx.inc 
+      }, function(err) {
+        if(err) {
+          next(err);
+        }
+        else {
+          //Possibly move this to clicks
+          Stat.triggerRating({
+            id: inst.clickableId
+          },
+          inst.clickableType,
+          null,
+          function(err, res) {
+            if(err) { 
+              console.log('Error: Failed to update the rating for ' +
+                          inst.clickableType + ' - ' + inst.clickableId +
+                          ' from upvote ' + inst.id);
+              next(err);
+            }
+            else {
+              /*
+              if(res !== 1) {
+                console.log('Warning: ' + res + ' ' + inst.clickableType +
+                            ' were updated for id:' + inst.clickableId +
+                            ' when there should have been one');
+              }
+             */
+              next();
+            }
+          }); 
+        }
+      });
+    }
+    else {
+      console.log('Warning: Invalid instance for vote!');
+      console.log(inst);
+      next();
+    }
+  };
 
   Click.updateClickableAttributes = function(ctx, data, next) {
     if(ctx.instance) {
-      //Only new instances can update the attributes of the parent
-      if(ctx.isNewInstance) {
-        ctx.instance.clickable(function(err, res) {
+      ctx.instance.clickable(function(err, res) {
+        if(err) {
+          console.log('Warning: Failed to fetch clickable');
+          return next(err);
+        }
+
+        //Upvotes verfiy articles if they are near by
+        //TODO Move this to upvote without incuring an
+        //extra read
+        if(ctx.Model.modelName === 'upVote' &&
+           res.modelName === 'article' && !res.verified &&
+           nearBy(res.location, ctx.instance.location)
+        ) {
+          if(!data['$set']) {
+            data.$set = {
+              verified: true
+            };
+          }
+          else {
+            data.$set.verified = true;
+          }
+        }
+
+        res.updateAttributes(data, function(err,res) {
           if(err) {
-            console.log('Warning: Failed to fetch clickable');
-            return next(err);
+            console.log('Warning: Failed to save clickable');
+            next(err);
           }
-
-          //Upvotes verfiy articles if they are near by
-          //TODO Move this to upvote without incuring an
-          //extra read
-          if(ctx.Model.modelName === 'upVote' &&
-             res.modelName === 'article' && !res.verified &&
-             nearBy(res.location, ctx.instance.location)
-          ) {
-            if(!data['$set']) {
-              data.$set = {
-                verified: true
-              };
-            }
-            else {
-              data.$set.verified = true;
-            }
-          }
-
-          res.updateAttributes(data, function(err,res) {
-            if(err) {
-              console.log('Warning: Failed to save clickable');
-              next(err);
-            }
-            var age = Date.now() - res.created;
-            Click.addAgeSample(ctx, age, next);
-          });
+          var age = Date.now() - res.created;
+          Click.addAgeSample(ctx, age, next);
         });
-      }
-      else {
-        next();
-      }
+      });
     }
     else {
       var error = new Error('Invalid instance for updateClickableAttributes');
@@ -133,16 +173,14 @@ module.exports = function(app) {
       //Delegate the count updating to the inherited model 
       if(ctx.Model.modelName !== 'click') {
         ctx.inc = {
-          clickCount: 1,
-          version: 1
+          clickCount: 1
         };
         next();
       }
       else {
         Click.updateClickableAttributes(ctx, {
           '$inc': {
-            clickCount: 1,
-            version: 1
+            clickCount: 1
           }
         },
         next);
@@ -154,11 +192,78 @@ module.exports = function(app) {
     }
   });
 
+  var preVoteChecker = function(ctx, next) {
+    var inst = ctx.instance;
+    if(inst && ctx.isNewInstance) {
+      var name = ctx.Model.modelName;
+      var Model, OppositeModel;
+      switch(name) {
+        case 'upVote':
+          Model = UpVote;
+          OppositeModel = DownVote;
+          break;
+        case 'downVote':
+          Model = DownVote;
+          OppositeModel = UpVote;
+          break;
+        default:
+          console.log('Warning: PreVoteChecker can only be called on vote models');
+          return next();
+      }
+
+      var filter = {
+        where: {
+          username: inst.username,
+          clickableId: inst.clickableId,
+          clickableType: inst.clickableType
+        }
+      };
+
+      Model.findOne(filter, function(err, res) {
+        if(err) {
+          console.log('Error: Failed to complete preVoteChecker');
+          next(err);
+        }
+        else if(res) {
+          var error = new Error('A user can only ' + name + ' once per item');
+          console.log(error);
+          next(error);
+        } 
+        else {
+          OppositeModel.findOne(filter, function(err, res) {
+            if(err) {
+              console.log('Error: Failed to complete preVoteChecker');
+              next(err);
+            }
+            else if(res) {
+              res.destroy(function(err) {
+                if(err) {
+                  console.log('Error: Failed to complete preVoteChecker');
+                  next(err);
+                }
+                else {
+                  next();
+                }
+              });
+            }
+            else {
+              next();
+            }
+          });
+        }
+      });
+    }
+    else {
+      console.log('PreVoteChecker should only be called on new votes');
+      next();
+    }
+  };
+
   Click.observe('before save', function(ctx, next) {
     var inst = ctx.instance;
 
     if(inst && ctx.isNewInstance) {
-      inst.id = null;
+      delete inst.id;
 
       var error = new Error('Missing key information for new click!');
       error.code = 400;
@@ -168,58 +273,70 @@ module.exports = function(app) {
         var token = context.get('accessToken');
         if(token) {
           inst.username = token.userId;
-
-          var where;
-          if(inst.viewId) {
-            where = {
-              username: inst.username,
-              id: inst.viewId
-            };
-          }
-          else if( inst.clickableId && inst.clickableType) {
-            where = {
-              username: inst.username,
-              viewableId: inst.clickableId,
-              viewableType: inst.clickableType
-            };
+          if(inst.clickableId && inst.clickableType) {
+            preVoteChecker(ctx, next);
           }
           else {
             console.log(inst);
             return next(error);
           }
-
-          View.findOne({
-            where: where, 
-            order: 'created DESC'
-          }, function(err, res) {
-            if(err) {
-              console.log('Warning: Failed to find a view for id: ' +
-                          inst.viewId + '\tType: ' +
-                          inst.clickableType + '\tTypeId: ' +
-                          inst.clickableId);
-              next(err);
-            }
-            else if(res) {
-              inst.viewId = res.id;
-              inst.clickableType = res.viewableType;
-              inst.clickableId = res.viewableId;
-              next();
-            }
-            else {
-              err = new Error('Failed to find view for click');
-              console.log(err);
-              next(err);
-            }
-          });
         }
         else {
-          console.log(context);
-          next(error);
+          console.log(inst);
+          return next(error);
         }
       }
       else {
-        next(error);
+        console.log(inst);
+        return next(error);
       }
+    }
+    else {
+      console.log('Warning: Invalid instance for clicks before save');
+      next();
+    }
+  });
+
+  Click.observe('before save', function(ctx, next) {
+    var inst = ctx.instance;
+    if(inst && ctx.isNewInstance) {
+      var where;
+      if( inst.clickableId && inst.clickableType) {
+        where = {
+          username: inst.username,
+          viewableId: inst.clickableId,
+          viewableType: inst.clickableType
+        };
+      }
+      else {
+        var error = new Error('Missing key information for new click!');
+        error.code = 400;
+        console.log(inst);
+        return next(error);
+      }
+
+      View.findOne({
+        where: where, 
+        order: 'created DESC'
+      }, function(err, res) {
+        if(err) {
+          console.log('Warning: Failed to find a view for Type: ' +
+                      inst.clickableType + '\tTypeId: ' +
+                      inst.clickableId);
+          next(err);
+        }
+        else if(res) {
+          inst.viewId = res.id;
+          inst.clickableType = res.viewableType;
+          inst.clickableId = res.viewableId;
+          next();
+        }
+        else {
+          err = new Error('Failed to find view for click');
+          console.log(err);
+          next(err);
+        }
+      });
     }
     else {
       console.log('Warning: Invalid instance for clicks before save');

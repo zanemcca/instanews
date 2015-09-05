@@ -185,7 +185,7 @@ module.exports = function(app) {
 
    });
 
-  Comment.triggerRating = function(where, modify, cb, staticChange) {
+  Comment.triggerRating = function(where, modify, cb) {
     Stat.updateRating(where, Comment.modelName, modify, function(err, res) {
       if(err) {
         console.log('Warning: Failed to update a comment');
@@ -205,7 +205,7 @@ module.exports = function(app) {
           else if(res.length > 0) {
             Stat.triggerRating({
               id: res[0].commentableId
-            }, res[0].commentableType, null, cb, true);
+            }, res[0].commentableType, null, cb);
           }
           else {
             console.log(
@@ -214,6 +214,6 @@ module.exports = function(app) {
           }
         });
       }
-    }, staticChange);
+    });
   };
 };

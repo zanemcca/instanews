@@ -3,15 +3,16 @@ module.exports = function(app) {
   var Stat = app.models.Stat;
   var loopback = require('loopback');
 
+  var secondsAgo =  function(seconds) {
+    var now = (new Date()).getTime();
+    var secondsAgo = new Date(now - seconds*1000);
+    return secondsAgo;
+  };
+
+
    //TODO Periodically update the stats object for averageJoe 
 
-   //StaticChange is a boolean that will cause non-timedecayed components
-   // to be refreshed as well as the time decayed.
-   // An example of its use would be if the rating of a comment on an 
-  // article changed then we would want the article to update the 
-  // contribution from comments as well
-   // In that situation staticChange = true
-  Stat.updateRating = function(where, type, modify, cb, staticChange) {
+  Stat.updateRating = function(where, type, modify, cb) {
     if(!where || !type) {
       var message =
         'Error: Either id or type is missing for Stat.updateRating. Id: ' +
@@ -29,6 +30,12 @@ module.exports = function(app) {
       else {
         if(res) {
           var Model;
+
+          //Ratings can only be updated once every ten seconds
+          where.ratingModified = {
+            lt: secondsAgo(10)
+          };
+
           var query = {
             where: where, 
             include: []
@@ -61,22 +68,23 @@ module.exports = function(app) {
               if( typeof(mod) === 'function') {
                 res = mod(res);
               }
-              return Stat.getRating(res, stats);
+              res = Stat.getRating(res, stats);
+              res.ratingModified = new Date();
+              return res;
             };
           };
 
-          if(staticChange) {
-            query.include.push({
-              relation: 'comments',
-              scope: {
-                limit: res.comment.views.mean,
-                order: 'rating DESC'
-              } 
-            });
-          }
+          query.include.push({
+            relation: 'comments',
+            scope: {
+              limit: res.comment.views.mean,
+              order: 'rating DESC'
+            } 
+          });
 
           var stats = Stat.convertRawStats(Model, res);
 
+          //console.log(query);
           Model.readModifyWrite(query, rate(modify, stats), function(err, res) {
             if(err) {
               console.log('Error: Failed to modify '+ Model.modelName);
@@ -84,6 +92,9 @@ module.exports = function(app) {
               cb(err, res);
             }
             cb(null, res);
+          }, {
+            customVersionName: 'ratingVersion',
+            retryCount: 0
           });
         }
         else {
@@ -95,7 +106,7 @@ module.exports = function(app) {
     });
   };
 
-  Stat.triggerRating = function(where, modelName, modify, cb, staticChange) {
+  Stat.triggerRating = function(where, modelName, modify, cb) {
     var message;
     if(!app.models.hasOwnProperty(modelName)) {
       message = 'Unrecognized modelName: ' + modelName;
@@ -105,7 +116,7 @@ module.exports = function(app) {
     else {
       var Model = app.models[modelName];
       if(Model.triggerRating) {
-        Model.triggerRating(where, modify, cb, staticChange);
+        Model.triggerRating(where, modify, cb);
       }
       else {
         message = 'No triggerRating function attached to the model';

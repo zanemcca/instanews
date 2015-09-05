@@ -4,8 +4,8 @@ module.exports = function(Subarticle) {
 
    common.initVotes(Subarticle);
 
-   Subarticle.readModifyWrite = function(query, modify, cb, retry) {
-     common.readModifyWrite(Subarticle, query, modify, cb, retry);
+   Subarticle.readModifyWrite = function(query, modify, cb, options) {
+     common.readModifyWrite(Subarticle, query, modify, cb, options);
    };
 
    var staticDisable = [
