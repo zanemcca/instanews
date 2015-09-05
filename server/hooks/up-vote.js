@@ -6,44 +6,23 @@ module.exports = function(app) {
   var Notification = app.models.notif;
   var Installation = app.models.installation;
    
+  UpVote.observe('after delete', function(ctx, next) {
+    ctx.inc = {
+      upVoteCount: -1
+    };
+
+    Click.updateVoteParent(ctx, next);
+  });
+
   UpVote.observe('after save', function(ctx, next) {
     var inst = ctx.instance;
 
     if(inst && ctx.isNewInstance) {
 
+      //The click after save should have added an incrementation parameter
       if(ctx.inc && typeof(ctx.inc) === 'object') {
         ctx.inc.upVoteCount = 1;
-        Click.updateClickableAttributes(ctx, { 
-          '$inc': ctx.inc 
-        }, function(err) {
-          if(err) {
-            next(err);
-          }
-          else {
-            //Possibly move this to clicks
-            Stat.triggerRating({
-              id: inst.clickableId
-            },
-            inst.clickableType,
-            null,
-            function(err, res) {
-              if(err) { 
-                console.log('Error: Failed to update the rating for ' +
-                            inst.clickableType + ' - ' + inst.clickableId +
-                            ' from upvote ' + inst.id);
-                next(err);
-              }
-              else {
-                if(res !== 1) {
-                  console.log('Warning: ' + res + ' ' + inst.clickableType +
-                              ' were updated for id:' + inst.clickableId +
-                              ' when there should have been one');
-                }
-                next();
-              }
-            }); 
-          }
-        });
+        Click.updateVoteParent(ctx, next);
       }
       else {
         var error = new Error('Upvote expected there to be ctx.inc!');
@@ -53,6 +32,7 @@ module.exports = function(app) {
     }
     else {
       console.log('Warning: Invalid instance for upvote!');
+      next();
     }
   });
 

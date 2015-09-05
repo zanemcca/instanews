@@ -94,6 +94,7 @@ module.exports = function(app) {
 
             inst.id = null;
             inst.version = 0;
+            inst.ratingVersion = 0;
             inst.created = new Date();
             //Counts for rating
             inst.clickCount = 100;
@@ -112,10 +113,31 @@ module.exports = function(app) {
               }
             }
          }
+         else {
+           //TODO move versioning into a mixin for everyone
+           //The version cannot be set explicitly
+           if(ctx.data.hasOwnProperty('version')) {
+             delete ctx.data.version;
+           }
+
+           //Ensure that the version number is incremented
+           if(!ctx.data.hasOwnProperty('$inc')) {
+             ctx.data = {
+               $set: ctx.data,
+               $inc: {
+                 version: 1
+               }
+             }
+           }
+           else {
+             ctx.data['$inc'].version = 1;
+           }
+         }
 
          //TODO use a mixin for this 
          //Update the modification date
          inst.modified = new Date();
+         inst.ratingModified = new Date();
       }
       else {
         console.log('Warning: There does not seem to be an instance present!');

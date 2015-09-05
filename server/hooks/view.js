@@ -67,8 +67,7 @@ module.exports = function(app) {
     if(inst && ctx.isNewInstance) {
       View.updateViewableAttributes(ctx, {
         '$inc': {
-          viewCount: 1,
-          version: 1
+          viewCount: 1
         }
       },
       next);

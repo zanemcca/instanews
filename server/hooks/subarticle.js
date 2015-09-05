@@ -8,10 +8,10 @@ module.exports = function(app) {
    var Notification = app.models.notif;
   var Votes = app.models.votes;
 
-  var minutesAgo =  function(minutes) {
+  var secondsAgo =  function(seconds) {
     var now = (new Date()).getTime();
-    var minutesAgo = new Date(now - minutes*60000);
-    return minutesAgo;
+    var secondsAgo = new Date(now - seconds*1000);
+    return secondsAgo;
   };
 
   Subarticle.afterRemote('prototype.__get__comments', function(ctx, inst,next){
@@ -39,7 +39,7 @@ module.exports = function(app) {
 
    //TODO before create - initialize its rating
   
-  Subarticle.triggerRating = function(where, modify, cb, staticChange) {
+  Subarticle.triggerRating = function(where, modify, cb) {
     Stat.updateRating(where, Subarticle.modelName, modify,
     function(err, count) {
       if(err) {
@@ -58,10 +58,7 @@ module.exports = function(app) {
           }
           else if(res.length > 0) {
             Article.triggerRating({
-              id: res[0].parentId,
-              modified: {
-                lt: minutesAgo(1)
-              }
+              id: res[0].parentId
             }, null, function(err, res) {
               cb(err, count);
             }, false);
@@ -73,7 +70,7 @@ module.exports = function(app) {
           }
         });
       }
-    }, staticChange);
+    });
   };
 
   Subarticle.observe('after save', function(ctx, next) {

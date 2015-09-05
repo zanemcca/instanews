@@ -32,7 +32,25 @@ exports.initVotes = function(Model) {
 
 //readModifyWrite
 // with an Optimistic Locking Strategy
-exports.readModifyWrite = function(Model, query, modify, cb, retry) {
+exports.readModifyWrite = function(Model, query, modify, cb, options) {
+  var MAXRETRYS = 20;
+  var versionName = 'version';
+  var retryCount = MAXRETRYS;
+
+  if(options) {
+    if(options.customVersionName) {
+      versionName = options.customVersionName;
+    }
+    if(typeof(options.retryCount) === 'number') {
+      retryCount = options.retryCount;
+      if(retryCount > MAXRETRYS) {
+        console.log('Warning: Only ' + MAXRETRYS + ' retrys are allowed but ' +
+                    retryCount + ' were requested');
+        retryCount = MAXRETRYS;
+      }
+    }
+  }
+
   Model.find(query, function(err,res) {
     if(err) {
       console.log('Warning: Transaction failed to read: ' +
@@ -46,13 +64,26 @@ exports.readModifyWrite = function(Model, query, modify, cb, retry) {
       var update = function(instance, cb) {
         var where = {
           id: instance.id,
-          version: instance.version
         };
 
-        if(instance.version === null || instance.version === undefined) {
-          console.log('Warning: This instance is not versioned. ' +
-                      'There is no conflictless write guarantee without it');
-          console.log(instance);
+        if(versionName) {
+          if(instance.hasOwnProperty(versionName)) {
+            where[versionName] = instance[versionName];
+            //If a custom version name is used then ensure it is incremented
+            if(options && options.customVersionName) {
+              instance[versionName]++;
+            }
+          }
+          else {
+            console.log('Log: The instance did not have the version name ' + versionName +
+                        '. Adding a new one initialized at zero');
+            instance[versionName] = 0;
+          }
+        }
+        else {
+          var err = new Error('The given versionName is invalid.' +
+                              'Cannot complete readModifyWrite');
+          return cb(err);
         }
 
         //Remove all related models before saving the instance
@@ -83,14 +114,31 @@ exports.readModifyWrite = function(Model, query, modify, cb, retry) {
           }
           else{
             if(res.count === 0) {
-              /*
-              console.log('Warning: Transaction failed to update.' +
-                          ' Likely due to version number');
-                         */
-              cb(new Error(
-                'Transaction failed to update likely due to version number'
-              ));
-              //TODO implement retrying
+              if(retryCount > 0) {
+                console.log('Retrying!!!');
+                var opt = {
+                  retryCount: retryCount - 1
+                };
+
+                if(options) {
+                  opt.customVersionName = options.customVersionName;
+                }
+
+                //Only retry for this insance specifically
+                query.where = {
+                  id: instance.id
+                };
+                exports.readModifyWrite(Model, query, modify, cb, opt); 
+              }
+              else {
+                /*
+                console.log('Warning: Transaction failed to update.' +
+                            ' Likely due to version number');
+                           */
+                cb(new Error(
+                  'Transaction failed to update too many times likely due to version number'
+                ));
+              }
             }
             else if(res.count > 1) {
               console.log('Warning: More than one instance was updated: ' +
