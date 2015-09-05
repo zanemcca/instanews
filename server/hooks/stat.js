@@ -86,6 +86,8 @@ module.exports = function(app) {
 
           //console.log(query);
           Model.readModifyWrite(query, rate(modify, stats), function(err, res) {
+            delete where.ratingModified;
+
             if(err) {
               console.log('Error: Failed to modify '+ Model.modelName);
               console.log(err);
