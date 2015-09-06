@@ -44,13 +44,13 @@ app.directive('inListItem', [
         var date = Date.parse($scope.item.created);
         var age = Date.now() - date; 
         age /= 1000;
-        var unit = 'secs';
+        var unit = 'seconds';
         if(age > 60) {
           age /= 60;
-          unit = 'mins';
+          unit = 'minutes';
           if(age > 60) {
               age /= 60;
-              unit = 'hrs'
+              unit = 'hours'
             if(age > 24) {
               age /= 24;
               unit = 'days';

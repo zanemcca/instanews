@@ -185,9 +185,11 @@ app.service('Maps', [
          }
 
          if (Position.withinBounds(position)) {
+           console.log(rating*10);
             articleHeatArray.push({
                location: position,
-               weight: 1 - Math.exp(-rating/(2*avg))
+               //weight: 1 - Math.exp(-rating/(2*avg))
+               weight: rating*10
             });
          }
       }
