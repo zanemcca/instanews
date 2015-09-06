@@ -96,16 +96,19 @@ module.exports = function(Stat) {
   };
 
   Stat.getAgeQFunction = function(stats) {
-    var normalization  = (1 - common.math.cdf(0, stats.mean, stats.variance));
+    var std = Math.sqrt(stats.variance);
+    var mean = stats.mean + 2.5*std;
+
+    var normalization  = (1 - common.math.cdf(0, mean, stats.variance));
     var q = function(stats, norm) {
       return function(age) {
-        var res = (1 - common.math.cdf(age, stats.mean, stats.variance))/norm;
-        /*
+        var res = (1 - common.math.cdf(age, mean, stats.variance))/norm;
         console.log(
           'Age: ' + age +
-          '  Decay: ' + res
+          '\tMean: ' + mean + 
+          '\tVar: ' + stats.variance + 
+          '\tDecay: ' + res
         );
-       */
         return res;
       };
     };
@@ -229,8 +232,9 @@ module.exports = function(Stat) {
       return Math.round(num * scale)/scale;
     };
     //Time Decay
+    var timeDecay;
     if(stats.age) {
-      var timeDecay =  stats.age(Date.now() - rateable.created);
+      timeDecay =  stats.age(Date.now() - rateable.created);
       rating *= timeDecay;
     }
 
@@ -238,10 +242,13 @@ module.exports = function(Stat) {
       'Score: ' + rnd(rating,4) +
       '\tStatic: ' + rnd(staticRating,4) + 
       '\tclick: ' + rnd(clickThru, 4) +
-      '\tTyp: ' + rateable.modelName +
+      '\tType: ' + rateable.modelName +
+      '\tDecay: ' + timeDecay
+      /*
       '\tWv: ' + rnd(stats.Wvote,3) +
       '\tWc: ' + rnd(stats.Wcomment,3) +
       '\tWs: ' + rnd(stats.Wsubarticle,3)
+     */
     );
 
     if( rating > 1 || rating < 0) {

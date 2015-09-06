@@ -2,21 +2,25 @@
 <div ng-if="owner.showComments">
   <ul class="list">
     <li ng-repeat="comment in owner.comments track by comment.id"
-      class="no-padding card">
+      class="no-padding item">
       <in-list-item item="comment"></in-list-item>
     </li>
+    <div class="button-bar"
+      style="padding-top: 0px;">
+      <button class="button icon ion-more button-clear"
+        align:"center"
+        ng-click="loadMore(owner)">
+      </button>
+    </div>
   </ul>
-   <button class="button button-full button-stable" ng-click="loadMore(owner)">
-      More
-   </button>
-   <form name="form" class="item" style="border-color: transparent">
-      <div style="padding-right:60px">
-         <textarea style="width:100%" type="text" ng-model="newComment" placeholder="Comment" required></textarea>
-      </div>
-      <div class="item-icon-right">
-         <button type="reset" class="button button-clear icon ion-forward"
-            ng-click="createComment(owner, newComment)" ng-disabled="!newComment">
-         </button>
-      </div>
-   </form>
+  <form name="form" class="item" style="border-color: transparent">
+    <div style="padding-right:60px">
+      <textarea style="width:100%" type="text" ng-model="newComment" placeholder="Comment" required></textarea>
+    </div>
+    <div class="item-icon-right">
+      <button type="reset" class="button button-clear icon ion-forward"
+        ng-click="createComment(owner, newComment)" ng-disabled="!newComment">
+      </button>
+    </div>
+  </form>
 </div>
