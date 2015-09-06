@@ -4,7 +4,6 @@
   "strict": false,
   "idInjection": true,
   "hidden": [
-    "commentRating",
     "clickCount",
     "viewCount"
   ],
@@ -14,9 +13,6 @@
       "required": true
     },
     "rating": {
-      "type": "number"
-    },
-    "commentRating": {
       "type": "number"
     },
     "clickCount": {

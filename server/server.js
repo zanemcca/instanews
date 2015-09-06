@@ -52,13 +52,19 @@ app.brute =  new ExpressBrute(store);
 app.use(loopback.context());
 app.use(loopback.token());
 app.use(function setCurrentUser(req, res, next) {
+  var where;
   if (!req.accessToken) {
-    return next();
+    where = {
+      id: 'averageJoe'
+    };
   }
-  app.models.Stat.findOne({
-    where: {
+  else {
+    where = {
       username: req.accessToken.userId
     }
+  }
+  app.models.Stat.findOne({
+    where: where
   }, function(err, stat) {
     if (err) {
       return next(err);

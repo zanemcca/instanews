@@ -14,8 +14,6 @@ module.exports = function(app) {
       }
    };
 
-   //TODO before create - initialize its rating
-
    /*
   Comment.observe('before save', function(ctx, next) {
     //TODO It should make sure the comment has 

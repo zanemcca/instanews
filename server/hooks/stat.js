@@ -33,7 +33,7 @@ module.exports = function(app) {
 
           //Ratings can only be updated once every ten seconds
           where.ratingModified = {
-            lt: secondsAgo(10)
+            lt: secondsAgo(1)
           };
 
           var query = {
