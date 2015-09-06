@@ -20,13 +20,13 @@ app.service('Articles', [
    var defaultFilter = {
       limit: 50,
       skip: 0,
-      include: {
+      include: [{
          relation: 'subarticles',
          scope: {
             limit: 1,
             order: 'rating DESC'
          }
-      },
+      }],
       rate: true,
       order: 'rating DESC'
    };
@@ -76,6 +76,7 @@ app.service('Articles', [
          }
          else {
             //Update the global articles list
+           //TODO save the subarticlen memory
             add(articles);
          }
          cb();

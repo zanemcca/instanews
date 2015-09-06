@@ -37,8 +37,6 @@ module.exports = function(app) {
       next();
    });
 
-   //TODO before create - initialize its rating
-  
   Subarticle.triggerRating = function(where, modify, cb) {
     Stat.updateRating(where, Subarticle.modelName, modify,
     function(err, count) {

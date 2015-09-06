@@ -40,6 +40,37 @@ app.directive('inListItem', [
       controller: function() {},
       templateUrl: 'templates/directives/list.html',
       link: function($scope,element, attributes) {
+
+        var date = Date.parse($scope.item.created);
+        var age = Date.now() - date; 
+        age /= 1000;
+        var unit = 'secs';
+        if(age > 60) {
+          age /= 60;
+          unit = 'mins';
+          if(age > 60) {
+              age /= 60;
+              unit = 'hrs'
+            if(age > 24) {
+              age /= 24;
+              unit = 'days';
+              if(age > 7) {
+                age /= 7;
+                unit = 'weeks';
+                if(age > 52) {
+                  age /= 52;
+                  unit = 'years';
+                }
+              }
+            }
+          }
+        }
+
+        $scope.age = {
+          age: Math.round(age),
+          unit: unit
+        };
+
         $scope.getItemTemplate = getItemTemplate;
 
         var position = Position.getLast();

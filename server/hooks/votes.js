@@ -5,6 +5,9 @@ module.exports = function(app) {
 
   var loopback = require('loopback');
   var Votes = app.models.votes;
+  var Article = app.models.article;
+  var Subarticle = app.models.subarticle;
+  var Comment = app.models.comment;
   var Stat = app.models.Stat;
   var Click = app.models.Click;
 
@@ -61,6 +64,37 @@ module.exports = function(app) {
     if( !ctx.query.limit || ctx.query.limit > LIMIT) {
        ctx.query.limit = LIMIT;
     }
+    //Include any upvotes or downvotes on the object
+    var context = loopback.getCurrentContext();
+    if(context) {
+      var token = context.get('accessToken');
+      if(token) {
+        if(ctx.query.include) {
+          if(typeof(ctx.query.include) === 'object') {
+            ctx.query.include = [ctx.query.include];
+          }
+        }
+        else {
+         ctx.query.include = [];
+        } 
+        ctx.query.include.push({
+          relation: 'upVotes',
+          scope: {
+            where: {
+              username: token.userId
+            }
+          }
+        });
+        ctx.query.include.push({
+          relation: 'downVotes',
+          scope: {
+            where: {
+              username: token.userId
+            }
+          }
+        });
+      }
+    }
     ctx.options.rate = ctx.query.rate;
     next();
   });
@@ -76,10 +110,11 @@ module.exports = function(app) {
             inst.username = undefined;
 
             var context = loopback.getCurrentContext();
+            var rawStat;
             if(context) {
-              var token = context.get('accessToken');
-              if(token) {
-                inst.username = token.userId;
+              rawStat = context.get('currentStat');
+              if(rawStat) {
+                inst.username = rawStat.username;
               }
             }
 
@@ -103,12 +138,24 @@ module.exports = function(app) {
             //Rating
             inst.rating = 0;
 
-            if(ctx.Model.modelName !== 'comment') {
+            var stats;
+            if(ctx.Model.modelName === 'comment') {
+              stats = Stat.convertRawStats(Comment, rawStat);
+            }
+            else {
               inst.staticRating = 0;
               if(ctx.Model.modelName === 'article') {
                 inst.verified = false;
+                stats = Stat.convertRawStats(Article, rawStat);
+              }
+              else {
+                stats = Stat.convertRawStats(Subarticle, rawStat);
               }
             }
+
+            var res = Stat.getRating(inst,stats);
+            inst.rating = res.rating;
+            inst.staticRating = res.staticRating;
          }
          else {
            //TODO move versioning into a mixin for everyone

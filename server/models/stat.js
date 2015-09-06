@@ -237,6 +237,7 @@ module.exports = function(Stat) {
     console.log(
       'Score: ' + rnd(rating,4) +
       '\tStatic: ' + rnd(staticRating,4) + 
+      '\tclick: ' + rnd(clickThru, 4) +
       '\tTyp: ' + rateable.modelName +
       '\tWv: ' + rnd(stats.Wvote,3) +
       '\tWc: ' + rnd(stats.Wcomment,3) +

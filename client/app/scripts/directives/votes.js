@@ -31,52 +31,29 @@ app.directive('invotes', [
           subarticle: Subarticle
         };
 
-        var date = Date.parse($scope.votable.created);
-        var age = Date.now() - date; 
-        age /= 1000;
-        var unit = 'sec';
-        if(age > 60) {
-          age /= 60;
-          unit = 'min';
-          if(age > 60) {
-            age /= 60;
-            unit = 'hr'
-            if(age > 24) {
-              age /= 24;
-              unit = 'day';
-              if(age > 7) {
-                age /= 7;
-                unit = 'week';
-                if(age > 52) {
-                  age /= 52;
-                  unit = 'year';
-                }
-              }
-            }
-          }
-        }
-
-        $scope.age = {
-          age: Math.round(age),
-          unit: unit
-        };
-
         $scope.score = Math.round($scope.votable.rating*10000)/10000;
 
-         $scope.toggleComments = function(instance) {
-            if(!instance.showComments) {
+        if($scope.votable.upVotes && $scope.votable.upVotes.length > 0) {
+          $scope.votable.upVoted = true;
+        }
+        else if($scope.votable.downVotes && $scope.votable.downVotes.length > 0) {
+          $scope.votable.downVoted = true;
+        }
 
-              if(Models.hasOwnProperty(instance.modelName)) {
-                Models[instance.modelName].comments({
-                   id: instance.id,
+         $scope.toggleComments = function() {
+            if(!$scope.votable.showComments) {
+
+              if(Models.hasOwnProperty($scope.votable.modelName)) {
+                Models[$scope.votable.modelName].comments({
+                   id: $scope.votable.id,
                    filter: {
                     limit: 10,
                     order: 'rating DESC'
                    }
                  }).$promise
                  .then( function (res) {
-                    instance.comments = res;
-                    instance.showComments = true;
+                    $scope.votable.comments = res;
+                    $scope.votable.showComments = true;
                  }, function(err) {
                     console.log(err);
                  });
@@ -86,18 +63,20 @@ app.directive('invotes', [
               }
             }
             else {
-               instance.showComments = false;
+               $scope.votable.showComments = false;
             }
          };
 
 
-         $scope.upvote = function (instance) {
-             instance.upVoteCount++;
+         $scope.upvote = function () {
+           //TODO Delete the vote if it already exists
+           $scope.votable.upVoted = true;
+           $scope.votable.downVoted = false;
 
             Position.getCurrent( function(err,position) {
                var vote = {
-                  clickableId: instance.id,
-                  clickableType: instance.modelName
+                  clickableId: $scope.votable.id,
+                  clickableType: $scope.votable.modelName
                };
 
                if(err) {
@@ -120,13 +99,15 @@ app.directive('invotes', [
             });
          };
 
-         $scope.downvote = function (instance) {
-           instance.downVoteCount++;
+         $scope.downvote = function () {
+           //TODO Delete the vote if it already exists
+           $scope.votable.upVoted = false;
+           $scope.votable.downVoted = true;
 
             Position.getCurrent( function(err,position) {
                var vote = {
-                  clickableId: instance.id,
-                  clickableType: instance.modelName
+                  clickableId: $scope.votable.id,
+                  clickableType: $scope.votable.modelName
                };
 
                if(err) {
