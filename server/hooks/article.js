@@ -50,7 +50,7 @@ module.exports = function(app) {
         var stat = context.get('currentStat');
         if(stat) {
           if(ctx.query.include) {
-            if(typeof(ctx.query.include) === 'object') {
+            if(!Array.isArray(ctx.query.include)) {
               ctx.query.include = [ctx.query.include];
             }
           }
@@ -62,7 +62,6 @@ module.exports = function(app) {
             relation: 'subarticles',
             scope: {
               limit: stat.subarticle.views.mean,
-              rate: true,
               order: 'rating DESC'
             } 
           });
@@ -73,7 +72,15 @@ module.exports = function(app) {
   });
 
   Article.triggerRating = function(where, modify, cb) {
-    if(where.id) {
+    if(where && where.id) {
+      //Update the article
+      Stat.updateRating(where, Article.modelName, modify, function(err, res) {
+        if(err) {
+          console.log('Warning: Failed to update an article');
+        }
+        cb(err, res);
+      });
+      /* without time decay we do not need to trigger the subarticles
       //Update the subarticles
       Stat.updateRating({
         parentId: where.id
@@ -85,7 +92,8 @@ module.exports = function(app) {
           }
           cb(err, res);
         });
-      }, false);
+      });
+     */
     }
     else {
       var message = 'Invalid filter for article.triggerRating: ' + where;

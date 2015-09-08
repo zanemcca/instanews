@@ -64,24 +64,25 @@ module.exports = function(app) {
     if( !ctx.query.limit || ctx.query.limit > LIMIT) {
        ctx.query.limit = LIMIT;
     }
+
+    if(ctx.query.include) {
+      if(!Array.isArray(ctx.query.include)) {
+        ctx.query.include = [ctx.query.include];
+      }
+    }
+    else {
+     ctx.query.include = [];
+    } 
     //Include any upvotes or downvotes on the object
     var context = loopback.getCurrentContext();
     if(context) {
-      var token = context.get('accessToken');
-      if(token) {
-        if(ctx.query.include) {
-          if(typeof(ctx.query.include) === 'object') {
-            ctx.query.include = [ctx.query.include];
-          }
-        }
-        else {
-         ctx.query.include = [];
-        } 
+      var stat = context.get('currentStat');
+      if(stat) {
         ctx.query.include.push({
           relation: 'upVotes',
           scope: {
             where: {
-              username: token.userId
+              username: stat.username 
             }
           }
         });
@@ -89,13 +90,28 @@ module.exports = function(app) {
           relation: 'downVotes',
           scope: {
             where: {
-              username: token.userId
+              username: stat.username 
             }
           }
         });
+
+        //If we want to rerate the content then we need to load
+        //the top comments
+        if(ctx.query.rate) {
+          ctx.query.include.push({
+            relation: 'comments',
+            scope: {
+              limit: stat.comment.views.mean,
+              order: 'rating DESC'
+            }
+          });
+        }
       }
     }
-    ctx.options.rate = ctx.query.rate;
+    if(ctx.query.rate) {
+      ctx.options.rate = true;
+    }
+
     next();
   });
 
@@ -143,7 +159,6 @@ module.exports = function(app) {
               stats = Stat.convertRawStats(Comment, rawStat);
             }
             else {
-              inst.staticRating = 0;
               if(ctx.Model.modelName === 'article') {
                 inst.verified = false;
                 stats = Stat.convertRawStats(Article, rawStat);
@@ -155,7 +170,6 @@ module.exports = function(app) {
 
             var res = Stat.getRating(inst,stats);
             inst.rating = res.rating;
-            inst.staticRating = res.staticRating;
          }
          else {
            //TODO move versioning into a mixin for everyone
@@ -171,7 +185,7 @@ module.exports = function(app) {
                $inc: {
                  version: 1
                }
-             }
+             };
            }
            else {
              ctx.data['$inc'].version = 1;
@@ -182,10 +196,14 @@ module.exports = function(app) {
          //Update the modification date
          inst.modified = new Date();
          inst.ratingModified = new Date();
+
+         delete inst.comments;
+         delete inst.subarticles;
       }
       else {
         console.log('Warning: There does not seem to be an instance present!');
       }
+
       next();
    });
 
@@ -204,8 +222,6 @@ module.exports = function(app) {
         }
         else {
           ctx.instance.rating = inst.rating;
-          ctx.instance.staticRating = inst.staticRating;
-          ctx.instance.commentRating = inst.commentRating;
           next();
         }
        });
@@ -214,5 +230,4 @@ module.exports = function(app) {
        next();
      }
    });
-
 };

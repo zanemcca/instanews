@@ -59,7 +59,7 @@ module.exports = function(app) {
               id: res[0].parentId
             }, null, function(err, res) {
               cb(err, count);
-            }, false);
+            });
           }
           else {
             console.log('Warning: Failed to find subarticles.' +

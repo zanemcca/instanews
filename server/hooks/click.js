@@ -43,35 +43,7 @@ module.exports = function(app) {
       Click.updateClickableAttributes(ctx, { 
         '$inc': ctx.inc 
       }, function(err) {
-        if(err) {
-          next(err);
-        }
-        else {
-          //Possibly move this to clicks
-          Stat.triggerRating({
-            id: inst.clickableId
-          },
-          inst.clickableType,
-          null,
-          function(err, res) {
-            if(err) { 
-              console.log('Error: Failed to update the rating for ' +
-                          inst.clickableType + ' - ' + inst.clickableId +
-                          ' from upvote ' + inst.id);
-              next(err);
-            }
-            else {
-              /*
-              if(res !== 1) {
-                console.log('Warning: ' + res + ' ' + inst.clickableType +
-                            ' were updated for id:' + inst.clickableId +
-                            ' when there should have been one');
-              }
-             */
-              next();
-            }
-          }); 
-        }
+        next(err);
       });
     }
     else {
@@ -82,8 +54,9 @@ module.exports = function(app) {
   };
 
   Click.updateClickableAttributes = function(ctx, data, next) {
-    if(ctx.instance) {
-      ctx.instance.clickable(function(err, res) {
+    var inst = ctx.instance;
+    if(inst) {
+      inst.clickable(function(err, res) {
         if(err) {
           console.log('Warning: Failed to fetch clickable');
           return next(err);
@@ -94,7 +67,7 @@ module.exports = function(app) {
         //extra read
         if(ctx.Model.modelName === 'upVote' &&
            res.modelName === 'article' && !res.verified &&
-           nearBy(res.location, ctx.instance.location)
+           nearBy(res.location, inst.location)
         ) {
           if(!data['$set']) {
             data.$set = {
@@ -111,8 +84,37 @@ module.exports = function(app) {
             console.log('Warning: Failed to save clickable');
             next(err);
           }
+          else {
+            Stat.triggerRating({
+              id: inst.clickableId
+            },
+            inst.clickableType,
+            null,
+            function(err, res) {
+              if(err) { 
+                console.log('Error: Failed to update the rating for ' +
+                            inst.clickableType + ' - ' + inst.clickableId +
+                            ' from click ' + inst.id);
+                next(err);
+              }
+              else {
+                /*
+                if(res !== 1) {
+                  console.log('Warning: ' + res + ' ' + inst.clickableType +
+                              ' were updated for id:' + inst.clickableId +
+                              ' when there should have been one');
+                }
+               */
+                next();
+              }
+            }); 
+          }
+          /*
+          //TODO Remove this.
+          //Age statistics are not needed when we do not use timedecay
           var age = Date.now() - res.created;
           Click.addAgeSample(ctx, age, next);
+         */
         });
       });
     }

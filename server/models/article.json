@@ -8,6 +8,10 @@
       "type": "boolean",
       "required": true
     },
+    "title": {
+      "type": "string",
+      "required": true
+    },
     "location": {
       "type": "geopoint",
       "required": true,

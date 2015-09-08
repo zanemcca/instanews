@@ -177,7 +177,7 @@ app.service('Maps', [
         }
       }
 
-      for(var i = 0; i < articles.length; i++) {
+      for(i = 0; i < articles.length; i++) {
          var position = Position.posToLatLng(articles[i].location);
          var rating = articles[i].rating;
          if(rating < 0) {
