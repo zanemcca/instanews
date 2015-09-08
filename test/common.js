@@ -20,6 +20,15 @@ function importTest(name, path) {
    });
 }
 
+function getBaseDir() {
+  return __dirname + '/../server/';
+}
+
+function req(file) {
+  return require(getBaseDir() + file);
+}
+
+
 var dump = function(err, res) {
   /*
    if (err) {
@@ -98,10 +107,7 @@ var runTillDone = function(func, cb, interval, timeout) {
    };
 };
 
-var serverDir = __dirname + '/../server/';
-console.log(serverDir);
-
-exports.serverDir = serverDir; 
+exports.serverDir = getBaseDir(); 
 exports.assert = assert;
 exports.app = app;
 exports.api = api;
@@ -110,3 +116,4 @@ exports.dump = dump;
 exports.findModel = findModel;
 exports.removeModel = removeModel;
 exports.runTillDone = runTillDone;
+exports.req = req;

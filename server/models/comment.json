@@ -30,6 +30,11 @@
       "foreignKey": "username"
     }
   },
+  "indexes": {
+    "commentable_index": {
+      "commentableId": 1
+    }
+  },
   "acls": [
     {
       "accessType": "*",

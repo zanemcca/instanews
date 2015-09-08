@@ -21,6 +21,9 @@ module.exports = function(Stat) {
          var average = {
            id: Stat.averageId,
            version: 0,
+           //TODO depricate age
+           //and replace it with clicks counts
+
            //Represents the distribution of the age of an article and the users
            //given interest at that age
            //Includes voting on or creating subcontent on that content
@@ -95,6 +98,7 @@ module.exports = function(Stat) {
     };
   };
 
+  /*
   Stat.getAgeQFunction = function(stats) {
     var std = Math.sqrt(stats.variance);
     var mean = stats.mean + 2.5*std;
@@ -114,6 +118,7 @@ module.exports = function(Stat) {
     };
     return q(stats, normalization);
   };
+ */
 
   Stat.getRating = function(rateable, stats) {
     var upVoteBonus = 25;
@@ -131,19 +136,20 @@ module.exports = function(Stat) {
       clickCount = rateable.clickCount + clickBonus;
     }
     else {
-      console.log('Error: Critical information is missing from the rateable model');
+      console.log('Error: Critical information is missing' + 
+                  ' from the rateable model');
       console.log(rateable);
       return rateable;
     }
 
     var rating = 0;
     var commentRating;
-    var staticRating;
 
     var total = 0;
 
     //Convert the result to an object if it is not already
-    if(rateable.toObject !== undefined && typeof rateable.toObject === 'function') {
+    if(rateable.toObject !== undefined &&
+       typeof rateable.toObject === 'function') {
       rateable = rateable.toObject();
     }
 
@@ -173,10 +179,6 @@ module.exports = function(Stat) {
       }
     }
 
-    if( rateable.modelName !== 'comment') {
-      staticRating = rating;
-    }
-    
     //Subarticles 
     if(stats.Wsubarticle) {
       total += stats.Wsubarticle;
@@ -184,25 +186,6 @@ module.exports = function(Stat) {
       if(subs && stats.views.subarticle) {
         rating += stats.Wsubarticle * common.math.geometricDecay(
           subs,
-          stats.views.subarticle.decay
-        );
-
-        var staticRatings = [];
-        for(var i = 0; i < subs.length; i++) {
-          if(typeof(subs[i].staticRating) === 'number') {
-            staticRatings.push(subs[i].staticRating);
-          }
-          else {
-            console.log('Warning: The subarticle should have a ' +
-                        'staticRating but it does not');
-            staticRatings.push(subs[i].rating);
-          }
-        }
-
-        staticRatings.sort(function(a, b){return b-a;});
-
-        staticRating += stats.Wsubarticle * common.math.geometricDecay(
-          staticRatings,
           stats.views.subarticle.decay
         );
       }
@@ -222,7 +205,6 @@ module.exports = function(Stat) {
     //Q function of geometric distribution for #clicks > 0
     var clickThru  = clickCount/(clickCount + viewCount);
     rating *= clickThru;
-    staticRating *= clickThru;
 
     // User affinity
     // TODO
@@ -231,24 +213,15 @@ module.exports = function(Stat) {
       var scale = Math.pow(10,precision);
       return Math.round(num * scale)/scale;
     };
-    //Time Decay
-    var timeDecay;
-    if(stats.age) {
-      timeDecay =  stats.age(Date.now() - rateable.created);
-      rating *= timeDecay;
-    }
 
     console.log(
       'Score: ' + rnd(rating,4) +
-      '\tStatic: ' + rnd(staticRating,4) + 
+      '\tStatic: ' + rnd(rating/clickThru, 4) +
       '\tclick: ' + rnd(clickThru, 4) +
-      '\tType: ' + rateable.modelName +
-      '\tDecay: ' + timeDecay
-      /*
+      '\tType: ' + rateable.modelName + '   ' +
       '\tWv: ' + rnd(stats.Wvote,3) +
       '\tWc: ' + rnd(stats.Wcomment,3) +
       '\tWs: ' + rnd(stats.Wsubarticle,3)
-     */
     );
 
     if( rating > 1 || rating < 0) {
@@ -256,7 +229,6 @@ module.exports = function(Stat) {
       return rateable;
     }
 
-    rateable.staticRating = staticRating;
     rateable.rating = rating;
     return rateable;
   };

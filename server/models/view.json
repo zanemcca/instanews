@@ -30,6 +30,12 @@
       "foreignKey": "username"
     }
   },
+  "indexes": {
+    "parent_index": {
+      "viewableId": 1,
+      "viewableType": 1
+    }
+  },
   "acls": [
     {
       "accessType": "*",

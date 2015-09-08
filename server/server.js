@@ -61,7 +61,7 @@ app.use(function setCurrentUser(req, res, next) {
   else {
     where = {
       username: req.accessToken.userId
-    }
+    };
   }
   app.models.Stat.findOne({
     where: where
@@ -91,12 +91,32 @@ app.use(loopback.static(path.resolve(__dirname, '../client/www/')));
 
 // Bootstrap the application, configure models, datasources and middleware.
 // Sub-apps like REST API are mounted via boot scripts.
+console.log('Dir: ' + __dirname);
 boot(app, __dirname);
 
 //Setup the push server
 setupPush(app);
 //Setup all the back end hooks
 require('./hooks/hookSetup.js')(app);
+
+var dataSource;
+
+var onConnected = function() {
+  dataSource.autoupdate(function(err) {
+    if (err) {
+      console.error('Database could not be autoupdated', err);
+//      dataSource.disconnect();
+      return;
+    }
+    console.log('Database autoupdated');
+//    dataSource.disconnect();
+  });
+};
+
+for(var name in app.dataSources) {
+  dataSource = app.dataSources[name];
+  dataSource.on('connected', onConnected); 
+}
 
 app.start = function() {
 

@@ -153,6 +153,7 @@ module.exports = function(app) {
 
     var commentView, subView, ageQ, Wcomment, Wsubarticle, Wvote;
 
+    //TODO Use clicks instead of age
     var total = raw.comment.age.count + raw.upVote.age.count;
 
     if(Model.modelName === 'article') {
@@ -160,19 +161,22 @@ module.exports = function(app) {
       Wsubarticle = raw.subarticle.age.count/total;
 
       subView = Stat.getGeometricStats(raw.subarticle.views);
-      ageQ = Stat.getAgeQFunction(raw.article.age);
+      //ageQ = Stat.getAgeQFunction(raw.article.age);
     }
+    /*
     else if(Model.modelName === 'subarticle') {
       ageQ = Stat.getAgeQFunction(raw.subarticle.age);
     }
+   */
 
     Wcomment = raw.comment.age.count/total;
     Wvote =  raw.upVote.age.count/total;
 
     commentView = Stat.getGeometricStats(raw.comment.views);
 
+    //TODO Remove the ageQFunction
     var stats = {
-      age: ageQ,
+    //  age: ageQ,
       views: {
         comment: commentView,
         subarticle: subView

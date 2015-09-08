@@ -75,8 +75,8 @@ exports.readModifyWrite = function(Model, query, modify, cb, options) {
             }
           }
           else {
-            console.log('Log: The instance did not have the version name ' + versionName +
-                        '. Adding a new one initialized at zero');
+            console.log('Log: The instance did not have the version name ' + 
+                        versionName + '. Adding a new one initialized at zero');
             instance[versionName] = 0;
           }
         }
@@ -135,9 +135,10 @@ exports.readModifyWrite = function(Model, query, modify, cb, options) {
                 console.log('Warning: Transaction failed to update.' +
                             ' Likely due to version number');
                            */
-                cb(new Error(
-                  'Transaction failed to update too many times likely due to version number'
-                ));
+                cb(
+                  new Error('Transaction failed to update too many times.' +
+                             'likely due to version number')
+                );
               }
             }
             else if(res.count > 1) {

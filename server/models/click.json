@@ -30,6 +30,12 @@
       "foreignKey": ""
     }
   },
+  "indexes": {
+    "parent_index": {
+      "clickableId": 1,
+      "clickableType": 1
+    }
+  },
   "acls": [],
   "methods": []
 }

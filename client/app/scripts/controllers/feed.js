@@ -33,10 +33,12 @@ app.controller('FeedCtrl', [
       }
    };
 
+   //TODO Only keep a subset of the articles and load them one at a time from articles
+   //we need this so that all of the articles do not render at the same time
+
    //Update our local articles
    var updateArticles = function() {
       $scope.articles = Articles.get();
-
       //$scope.itemsAvailable = Articles.areItemsAvailable();
    };
 

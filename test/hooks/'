@@ -73,11 +73,11 @@ exports.run = function () {
         var err = 'error';
         var res = 'res';
 
-        sandbox.stub(app.models.stat, 'updateRating', function(Where, name, Modify, cb) {
+        sandbox.stub(app.models.stat, 'updateRating', function(Where, null, null, cb) {
           cb(err, res);
         });
 
-        Article.triggerRating(where, null, function(Err, Res) {
+        Article.triggerRating(where, modify, function(Err, Res) {
             expect(Err).to.equal(err);
             expect(Res).to.equal(res);
             done();
@@ -86,13 +86,6 @@ exports.run = function () {
 
       it('should create a new error and pass it to the callback', function(done) {
         Article.triggerRating(null, null, function(err, res) {
-          expect(err).to.exist;
-          done();
-        });
-      });
-
-      it('should also create a new error and pass it to the callback', function(done) {
-        Article.triggerRating({}, null, function(err, res) {
           expect(err).to.exist;
           done();
         });
