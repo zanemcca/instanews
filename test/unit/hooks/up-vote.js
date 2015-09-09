@@ -7,14 +7,14 @@ var sinon = require('sinon');
 var common =  require('../../common');
 var app = common.app;
 
-var DownVote = app.models.DownVote;
+var UpVote = app.models.UpVote;
 
 function run() {
-  return common.req('hooks/down-vote')(app);
+  return common.req('hooks/up-vote')(app);
 }
 
 exports.run = function() {
-  describe('DownVote', function() {
+  describe('UpVote', function() {
     describe('Observe', function() {
 
       //Use sandbox for any beforeEach stubbing
@@ -61,7 +61,7 @@ exports.run = function() {
 
         next = sandbox.spy(ne, 'xt');
 
-        sandbox.stub(DownVote, 'observe', function(hook, cb) {
+        sandbox.stub(UpVote, 'observe', function(hook, cb) {
           if(hook === hookName) {
             cb(ctx, next);
           }
@@ -74,14 +74,14 @@ exports.run = function() {
 
           sandbox.stub(app.models.click, 'updateVoteParent', function(ctx, next) {
             expect(ctx.inc).to.deep.equal({
-              downVoteCount: -1,
+              upVoteCount: -1,
               clickCount: -1
             });
             next();
           });
         });
 
-        it('should call Click.updateVoteParent with a downVoteCount decrement', function(done) {
+        it('should call Click.updateVoteParent with a upVoteCount decrement', function(done) {
           ctx.inc = {
             clickCount: -1
           };
@@ -104,37 +104,46 @@ exports.run = function() {
 
           sandbox.stub(app.models.click, 'updateVoteParent', function(ctx, next) {
             expect(ctx.inc).to.deep.equal({
-              downVoteCount: 1,
+              upVoteCount: 1,
               clickCount: 1
             });
             next();
           });
         });
 
-        it('should call Click.updateVoteParent with the proper arguments', function(done) {
+        afterEach(function() {
+          expect(next.calledTwice).to.be.true;
+        });
+
+        it('should call Click.updateVoteParent with the proper arguments', function() {
           ctx.inc = {
             clickCount: 1
           };
-          Next = done;
           run();
         });
 
-        it('should return a 400 error code because ctx.inc was not set before the call', function(done) {
+        it('should return a 400 error code because ctx.inc was not set before the call', function() {
           Next = function(err) {
-            expect(err.http_code).to.equal(400);
-            done();
+            if(next.calledOnce) {
+              expect(err.http_code).to.equal(400);
+            }
           };
           run();
         });
 
-        it('should return without calling Click.updateVoteParent', function(done) {
+        it('should return without calling Click.updateVoteParent', function() {
           ctx.isNewInstance = false;
           Next = function(err) {
-            expect(err).not.to.exist;
-            done();
+            if(next.calledOnce) {
+              expect(err).not.to.exist;
+            }
           };
 
           run();
+        });
+
+        describe('notifications', function() {
+          //TODO Notification unit testing
         });
       });
     });

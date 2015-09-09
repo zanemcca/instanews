@@ -1,3 +1,6 @@
+
+/* jshint camelcase: false */
+
 module.exports = function(app) {
 
   var UpVote = app.models.upVote;
@@ -7,11 +10,17 @@ module.exports = function(app) {
   var Installation = app.models.installation;
    
   UpVote.observe('after delete', function(ctx, next) {
-    ctx.inc = {
-      upVoteCount: -1
-    };
-
-    Click.updateVoteParent(ctx, next);
+    //The click after save should have added an incrementation parameter
+    if(ctx.inc && typeof(ctx.inc) === 'object') {
+      ctx.inc.upVoteCount = -1;
+      Click.updateVoteParent(ctx, next);
+    }
+    else {
+      var error = new Error('Upvote  deletion expected there to be ctx.inc!');
+      error.http_code = 400;
+      console.log(error);
+      next(error);
+    }
   });
 
   UpVote.observe('after save', function(ctx, next) {
@@ -26,6 +35,7 @@ module.exports = function(app) {
       }
       else {
         var error = new Error('Upvote expected there to be ctx.inc!');
+        error.http_code = 400;
         console.log(error);
         next(error);
       }

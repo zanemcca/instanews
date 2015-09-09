@@ -404,6 +404,43 @@ exports.run = function () {
         });
       });
 
+      describe('after delete', function() {
+        beforeEach(function () {
+          hookName = 'after delete';
+        });
+
+        afterEach(function() {
+          expect(next.calledOnce).to.be.true;
+        });
+
+        it('should update the parents clickCount', function() {
+          var click = sandbox.stub(Click, 'updateClickableAttributes', function(ctx, query, Next) {
+            expect(query).to.deep.equal({
+              '$inc': {
+                clickCount: -1
+              }
+            });
+
+            expect(Next).to.equal(next);
+            Next();
+          });
+
+          run();
+
+          expect(click.calledOnce).to.be.true;
+        });
+
+        it('should update ctx.inc and not call updateClickableAttributes', function() {
+          ctx.Model.modelName = 'upVote';
+
+          var click = sandbox.spy(Click, 'updateClickableAttributes');
+
+          run();
+          expect(ctx.inc).to.deep.equal({clickCount: -1});
+          expect(click.callCount).to.equal(0);
+        });
+      });
+
       describe('after save', function() {
         beforeEach(function() {
           hookName = 'after save';
