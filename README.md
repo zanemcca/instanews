@@ -22,6 +22,10 @@ Local Citizen Journalism in an elegant simple platform
 - ```cd ~/workdir/instanews```
 - ```npm test```
 
+You can specify to only run integration or unit tests by setting the TEST_TYPE environment variable before running the test.
+- ```export TEST_TYPE=unit && npm test```
+- You can also add the ```--coverage``` option to ```npm test``` to include the Istanbul coverage report
+
 #### Frontend
 - ```cd ~/workdir/instanews/client```
 - ```grunt karma```
@@ -34,7 +38,7 @@ Local Citizen Journalism in an elegant simple platform
 
 #### Headless frontend
 - ```cd ~/workdir/instanews/client```
-- ```ionic serve```
+- ```grunt serve```
 - A browser should be opened automatically
 
 #### Full site
