@@ -1,3 +1,6 @@
+
+/* jshint camelcase: false */
+
 module.exports = function(app) {
 
   var DownVote = app.models.downVote;
@@ -23,6 +26,7 @@ module.exports = function(app) {
       }
       else {
         var error = new Error('Downvote expected there to be ctx.inc!');
+        error.http_code = 400;
         console.log(error);
         next(error);
       }
