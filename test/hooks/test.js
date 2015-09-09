@@ -77,6 +77,7 @@ exports.run = function() {
        });
      });
       require('./article').run();
+      require('./click').run();
       /*
       require('./comment').run();
       require('./down-vote').run();

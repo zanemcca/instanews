@@ -1,4 +1,6 @@
 
+/* jshint camelcase: false */
+
 module.exports = function(app) {
 
   var Click = app.models.click;
@@ -35,6 +37,186 @@ module.exports = function(app) {
       return false;
     }
   };
+
+  var preVoteChecker = function(ctx, next) {
+    var inst = ctx.instance;
+    if(inst && ctx.isNewInstance) {
+      var name = ctx.Model.modelName;
+      var Model, OppositeModel;
+      switch(name) {
+        case 'upVote':
+          Model = UpVote;
+          OppositeModel = DownVote;
+          break;
+        case 'downVote':
+          Model = DownVote;
+          OppositeModel = UpVote;
+          break;
+        default:
+          return next();
+      }
+
+      var filter = {
+        where: {
+          username: inst.username,
+          clickableId: inst.clickableId,
+          clickableType: inst.clickableType
+        }
+      };
+
+      Model.findOne(filter, function(err, res) {
+        if(err) {
+          console.log('Error: Failed to complete preVoteChecker');
+          next(err);
+        }
+        else if(res) {
+          var error = new Error('A user can only ' + name + ' once per item');
+          error.http_code = 401;
+          console.log(error);
+          next(error);
+        } 
+        else {
+          OppositeModel.findOne(filter, function(err, res) {
+            if(err) {
+              console.log('Error: Failed to complete preVoteChecker');
+              next(err);
+            }
+            else if(res) {
+              res.destroy(function(err) {
+                if(err) {
+                  console.log('Error: Failed to complete preVoteChecker');
+                  next(err);
+                }
+                else {
+                  next();
+                }
+              });
+            }
+            else {
+              next();
+            }
+          });
+        }
+      });
+    }
+    else {
+      console.log('PreVoteChecker should only be called on new votes');
+      next();
+    }
+  };
+
+  Click.observe('before save', function(ctx, next) {
+    var inst = ctx.instance;
+
+    if(inst && ctx.isNewInstance) {
+      delete inst.id;
+
+      var error = new Error('Missing key information for new click!');
+      error.http_code = 400;
+
+      var context = loopback.getCurrentContext();
+      if(context) {
+        var token = context.get('accessToken');
+        if(token) {
+          inst.username = token.userId;
+          if(inst.clickableId && inst.clickableType) {
+            preVoteChecker(ctx, next);
+          }
+          else {
+            console.log(inst);
+            return next(error);
+          }
+        }
+        else {
+          console.log(inst);
+          return next(error);
+        }
+      }
+      else {
+        console.log(inst);
+        return next(error);
+      }
+    }
+    else {
+      console.log('Warning: Invalid instance for clicks before save');
+      next();
+    }
+  });
+
+  Click.observe('before save', function(ctx, next) {
+    var inst = ctx.instance;
+    if(inst && ctx.isNewInstance) {
+      var where;
+      if( inst.clickableId && inst.clickableType) {
+        where = {
+          username: inst.username,
+          viewableId: inst.clickableId,
+          viewableType: inst.clickableType
+        };
+      }
+      else {
+        var error = new Error('Missing key information for new click!');
+        error.http_code = 400;
+        console.log(inst);
+        return next(error);
+      }
+
+      View.findOne({
+        where: where, 
+        order: 'created DESC'
+      }, function(err, res) {
+        if(err) {
+          console.log('Warning: Failed to find a view for Type: ' +
+                      inst.clickableType + '\tTypeId: ' +
+                      inst.clickableId);
+          next(err);
+        }
+        else if(res) {
+          inst.viewId = res.id;
+          inst.clickableType = res.viewableType;
+          inst.clickableId = res.viewableId;
+          next();
+        }
+        else {
+          err = new Error('There is a missing dependency for click creation!');
+          console.log(err);
+          err.http_code = 403;
+          next(err);
+        }
+      });
+    }
+    else {
+      console.log('Warning: Invalid instance for clicks before save');
+      next();
+    }
+  });
+
+  Click.observe('after save', function(ctx, next) {
+    var inst = ctx.instance;
+
+    if(inst && ctx.isNewInstance) {
+
+      //Delegate the count updating to the inherited model 
+      if(ctx.Model.modelName !== 'click') {
+        ctx.inc = {
+          clickCount: 1
+        };
+        next();
+      }
+      else {
+        Click.updateClickableAttributes(ctx, {
+          '$inc': {
+            clickCount: 1
+          }
+        },
+        next);
+      }
+    }
+    else {
+      console.log('Warning: Instance is invalid for click');
+      next();
+    }
+  });
 
   Click.updateVoteParent = function(ctx, next) {
     var inst = ctx.instance;
@@ -120,6 +302,7 @@ module.exports = function(app) {
     }
     else {
       var error = new Error('Invalid instance for updateClickableAttributes');
+      error.http_code = 400;
       console.log(error);
       next(error);
     }
@@ -166,183 +349,4 @@ module.exports = function(app) {
       next(error);
     }
   };
-
-  Click.observe('after save', function(ctx, next) {
-    var inst = ctx.instance;
-
-    if(inst && ctx.isNewInstance) {
-
-      //Delegate the count updating to the inherited model 
-      if(ctx.Model.modelName !== 'click') {
-        ctx.inc = {
-          clickCount: 1
-        };
-        next();
-      }
-      else {
-        Click.updateClickableAttributes(ctx, {
-          '$inc': {
-            clickCount: 1
-          }
-        },
-        next);
-      }
-    }
-    else {
-      console.log('Warning: Instance is invalid for click');
-      next();
-    }
-  });
-
-  var preVoteChecker = function(ctx, next) {
-    var inst = ctx.instance;
-    if(inst && ctx.isNewInstance) {
-      var name = ctx.Model.modelName;
-      var Model, OppositeModel;
-      switch(name) {
-        case 'upVote':
-          Model = UpVote;
-          OppositeModel = DownVote;
-          break;
-        case 'downVote':
-          Model = DownVote;
-          OppositeModel = UpVote;
-          break;
-        default:
-          return next();
-      }
-
-      var filter = {
-        where: {
-          username: inst.username,
-          clickableId: inst.clickableId,
-          clickableType: inst.clickableType
-        }
-      };
-
-      Model.findOne(filter, function(err, res) {
-        if(err) {
-          console.log('Error: Failed to complete preVoteChecker');
-          next(err);
-        }
-        else if(res) {
-          var error = new Error('A user can only ' + name + ' once per item');
-          console.log(error);
-          next(error);
-        } 
-        else {
-          OppositeModel.findOne(filter, function(err, res) {
-            if(err) {
-              console.log('Error: Failed to complete preVoteChecker');
-              next(err);
-            }
-            else if(res) {
-              res.destroy(function(err) {
-                if(err) {
-                  console.log('Error: Failed to complete preVoteChecker');
-                  next(err);
-                }
-                else {
-                  next();
-                }
-              });
-            }
-            else {
-              next();
-            }
-          });
-        }
-      });
-    }
-    else {
-      console.log('PreVoteChecker should only be called on new votes');
-      next();
-    }
-  };
-
-  Click.observe('before save', function(ctx, next) {
-    var inst = ctx.instance;
-
-    if(inst && ctx.isNewInstance) {
-      delete inst.id;
-
-      var error = new Error('Missing key information for new click!');
-      error.code = 400;
-
-      var context = loopback.getCurrentContext();
-      if(context) {
-        var token = context.get('accessToken');
-        if(token) {
-          inst.username = token.userId;
-          if(inst.clickableId && inst.clickableType) {
-            preVoteChecker(ctx, next);
-          }
-          else {
-            console.log(inst);
-            return next(error);
-          }
-        }
-        else {
-          console.log(inst);
-          return next(error);
-        }
-      }
-      else {
-        console.log(inst);
-        return next(error);
-      }
-    }
-    else {
-      console.log('Warning: Invalid instance for clicks before save');
-      next();
-    }
-  });
-
-  Click.observe('before save', function(ctx, next) {
-    var inst = ctx.instance;
-    if(inst && ctx.isNewInstance) {
-      var where;
-      if( inst.clickableId && inst.clickableType) {
-        where = {
-          username: inst.username,
-          viewableId: inst.clickableId,
-          viewableType: inst.clickableType
-        };
-      }
-      else {
-        var error = new Error('Missing key information for new click!');
-        error.code = 400;
-        console.log(inst);
-        return next(error);
-      }
-
-      View.findOne({
-        where: where, 
-        order: 'created DESC'
-      }, function(err, res) {
-        if(err) {
-          console.log('Warning: Failed to find a view for Type: ' +
-                      inst.clickableType + '\tTypeId: ' +
-                      inst.clickableId);
-          next(err);
-        }
-        else if(res) {
-          inst.viewId = res.id;
-          inst.clickableType = res.viewableType;
-          inst.clickableId = res.viewableId;
-          next();
-        }
-        else {
-          err = new Error('Failed to find view for click');
-          console.log(err);
-          next(err);
-        }
-      });
-    }
-    else {
-      console.log('Warning: Invalid instance for clicks before save');
-      next();
-    }
-  });
-
 };
