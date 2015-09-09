@@ -1,4 +1,6 @@
 
+/* jshint camelcase: false */
+
 module.exports = function(app) {
 
   var View = app.models.view;
@@ -9,17 +11,22 @@ module.exports = function(app) {
 
     if(inst && ctx.isNewInstance) {
       inst.id = null;
+      var error = new Error(
+        'Cannot create a view because there is no user logged in.');
       var context = loopback.getCurrentContext();
+
+      error.http_code = 400;
       if(context) {
         var token = context.get('accessToken');
         if(token) {
-          inst.username = token.userId;
-          return next();
+          if( inst.viewableType && inst.viewableId) {
+            inst.username = token.userId;
+            return next();
+          } else {
+            error.message = 'View does not have a viewable Type or Id';
+          }
         }
       }
-      var error = new Error(
-        'Cannot create a view because there is no user logged in.');
-      error.code = 400;
       console.log(error);
       next(error);
     }
@@ -29,37 +36,14 @@ module.exports = function(app) {
     }
   });
 
-  View.updateViewableAttributes = function(ctx, data, next) {
-    if(ctx.instance) {
-      //Only new instances can update the attributes of the parent
-      if(ctx.isNewInstance) {
-        ctx.instance.viewable(function(err, res) {
-          if(err) {
-            console.log('Warning: Failed to fetch viewable');
-            return next(err);
-          }
-
-          res.updateAttributes(data, function(err,res) {
-            if(err) {
-              console.log('Warning: Failed to save viewable');
-              next(err);
-            }
-            else {
-              next();
-            }
-          });
-        });
+  View.observe('after delete', function(ctx, next) {
+    View.updateViewableAttributes(ctx, {
+      '$inc': {
+        viewCount: -1 
       }
-      else {
-        next();
-      }
-    }
-    else {
-      var error = new Error('Invalid instance for updateViewableAttributes');
-      console.log(error);
-      next(error);
-    }
-  };
+    },
+    next);
+  });
 
   View.observe('after save', function(ctx, next) {
     var inst = ctx.instance;
@@ -77,4 +61,29 @@ module.exports = function(app) {
       next();
     }
   });
+
+  View.updateViewableAttributes = function(ctx, data, next) {
+    if(ctx.instance) {
+      ctx.instance.viewable(function(err, res) {
+        if(err) {
+          console.log('Warning: Failed to fetch viewable');
+          return next(err);
+        }
+
+        res.updateAttributes(data, function(err,res) {
+          if(err) {
+            console.log('Warning: Failed to save viewable');
+            next(err);
+          } else {
+            next();
+          }
+        });
+      });
+    } else {
+      var error = new Error('Invalid instance for updateViewableAttributes');
+      error.http_code = 400;
+      console.log(error);
+      next(error);
+    }
+  };
 };
