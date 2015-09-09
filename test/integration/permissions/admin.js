@@ -1,5 +1,5 @@
 
-var common = require('../common');
+var common = require('../../common');
 var api = common.api;
 var assert = common.assert;
 var dump = common.dump;

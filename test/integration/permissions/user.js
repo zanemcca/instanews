@@ -1,10 +1,10 @@
 
-var common = require('../common');
+var common = require('../../common');
 var api = common.api;
 var assert = common.assert;
 var dump = common.dump;
 
-var journalists = require('../sample-data/journalist.json');
+var journalists = require('../../sample-data/journalist.json');
 
 var user = journalists[1];
 var credentials = { email: user.email, password: user.password };

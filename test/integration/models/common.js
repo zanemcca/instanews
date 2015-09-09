@@ -4,10 +4,10 @@
 var expect = require('chai').expect;
 var sinon = require('sinon');
 
-var c = require('../common');
+var c = require('../../common');
 var Article = c.app.models.Article;
 
-var common = require(c.serverDir + 'models/common');
+var common = c.req('models/common');
 
 exports.run = function() {
   describe('Common', function() {

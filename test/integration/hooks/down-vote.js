@@ -3,14 +3,14 @@
 
 var expect = require('chai').expect;
 
-var common =  require('../common');
+var common =  require('../../common');
 var app = common.app;
 
 var Articles = app.models.Article;
 var View = app.models.view;
 var DownVotes = app.models.DownVote;
 
-var genericModels = require('../genericModels');
+var genericModels = require('../../genericModels');
 
 exports.run = function() {
    describe('DownVote', function() {

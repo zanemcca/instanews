@@ -2,7 +2,7 @@
 /*jshint expr: true*/
 var expect = require('chai').expect;
 
-var common =  require('../common');
+var common =  require('../../common');
 var api = common.api;
 
 exports.run = function() {

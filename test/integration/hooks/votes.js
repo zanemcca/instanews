@@ -6,13 +6,13 @@ var chai = require('chai');
 chai.use(require('chai-datetime'));
 var expect = chai.expect;
 
-var common =  require('../common');
+var common =  require('../../common');
 var app = common.app;
 
 var Articles = app.models.Article;
 var UpVotes = app.models.UpVote;
 
-var genericModels = require('../genericModels');
+var genericModels = require('../../genericModels');
 
 exports.run = function() {
    var article = common.findModel('articles', genericModels);

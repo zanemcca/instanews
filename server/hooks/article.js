@@ -1,4 +1,6 @@
 
+/* jshint camelcase: false */
+
 var loopback = require('loopback');
 module.exports = function(app) {
 
@@ -94,11 +96,12 @@ module.exports = function(app) {
         });
       });
      */
-    }
-    else {
-      var message = 'Invalid filter for article.triggerRating: ' + where;
-      console.log('Warning: ' + message);
-      cb(new Error(message));
+    } else {
+      var error = new Error(
+        'Invalid filter for article.triggerRating: ' + where);
+      console.log(error);
+      error.http_code = 400;
+      cb(error);
     }
   };
 };

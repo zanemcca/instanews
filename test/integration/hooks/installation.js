@@ -2,12 +2,12 @@
 /*jshint expr: true*/
 var expect = require('chai').expect;
 
-var common =  require('../common');
+var common =  require('../../common');
 var app = common.app;
 
 var Installations = app.models.installation;
 
-var genericModels = require('../genericModels');
+var genericModels = require('../../genericModels');
 
 exports.run = function() {
    describe('Installation', function() {

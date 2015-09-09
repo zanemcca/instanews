@@ -6,7 +6,7 @@ var chai = require('chai');
 var expect = chai.expect;
 chai.use(require('chai-datetime'));
 
-var common =  require('../common');
+var common =  require('../../common');
 var app = common.app;
 var api = common.api;
 
@@ -15,7 +15,7 @@ var Stats = app.models.stat;
 var Articles = app.models.Article;
 var Subarticles = app.models.Subarticle;
 
-var genericModels = require('../genericModels');
+var genericModels = require('../../genericModels');
 
 var purgeDB = function(cb) {
 

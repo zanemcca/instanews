@@ -3,7 +3,7 @@
 
 var expect = require('chai').expect;
 var sinon = require('sinon');
-var common =  require('../common');
+var common =  require('../../common');
 
 var app = common.req('server');
 var loopback = require('loopback');
