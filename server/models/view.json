@@ -17,7 +17,8 @@
   "relations": {
     "viewable": {
       "type": "belongsTo",
-      "polymorphic": true
+      "polymorphic": true,
+      "required": true
     },
     "clicks": {
       "type": "hasMany",

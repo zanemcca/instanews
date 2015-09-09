@@ -11,6 +11,7 @@ exports.run = function() {
      */
       require('./subarticle').run();
       require('./up-vote').run();
+      require('./view').run();
       /*
       require('./vote').run();
       require('./votes').run();

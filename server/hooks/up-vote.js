@@ -94,11 +94,6 @@ module.exports = function(app) {
                               username: username
                            }, function(err, res) {
                               if (err) console.log('Error: ' + err);
-                              /*
-                              else {
-                                 console.log('Created a notification!');
-                              }
-                              */
                            });
                         }
                      }
@@ -124,11 +119,6 @@ module.exports = function(app) {
                            username: username
                         }, function(err, res) {
                            if (err) console.log('Error: ' + err);
-                           /*
-                           else {
-                              console.log('Created a notification!');
-                           }
-                           */
                         });
                      }
                   }
@@ -153,11 +143,6 @@ module.exports = function(app) {
                            username: username
                         }, function(err, res) {
                            if (err) console.log('Error: ' + err);
-                           /*
-                           else {
-                              console.log('Created a notification!');
-                           }
-                           */
                         });
                      }
                   }
