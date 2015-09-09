@@ -1,4 +1,6 @@
 
+/* jshint camelcase: false */
+
 module.exports = function(app) {
 
    var Comment = app.models.comment;
@@ -175,7 +177,6 @@ module.exports = function(app) {
                break;
             default:
                console.log('Error: bad votableType');
-               next();
          }
 
       }
@@ -184,34 +185,44 @@ module.exports = function(app) {
    });
 
   Comment.triggerRating = function(where, modify, cb) {
-    Stat.updateRating(where, Comment.modelName, modify, function(err, res) {
-      if(err) {
-        console.log('Warning: Failed to update a comment');
-        cb(err);
-      }
-      else {
-        var query = {
-          where: where,
-          limit: 1
-        };
+    if(where && Object.getOwnPropertyNames(where).length > 0) {
+      Stat.updateRating(where, Comment.modelName, modify, function(err, res) {
+        if(err) {
+          console.log('Warning: Failed to update a comment');
+          cb(err);
+        }
+        else {
+          var query = {
+            where: where,
+            limit: 1
+          };
 
-        Comment.find(query, function(err, res) {
-          if(err) {
-            console.log('Warning: Failed to find comment');
-            cb(err);
-          }
-          else if(res.length > 0) {
-            Stat.triggerRating({
-              id: res[0].commentableId
-            }, res[0].commentableType, null, cb);
-          }
-          else {
-            console.log(
-              'Warning: No Comments were found.' +
-              'Cannot trigger commentable rating');
-          }
-        });
-      }
-    });
+          Comment.find(query, function(err, res) {
+            if(err) {
+              console.log('Warning: Failed to find comment');
+              cb(err);
+            }
+            else if(res.length > 0) {
+              Stat.triggerRating({
+                id: res[0].commentableId
+              }, res[0].commentableType, null, cb);
+            }
+            else {
+              err = new Error( 
+                'Warning: No Comments were found.' +
+                'Cannot trigger commentable rating');
+              err.http_code = 500;
+              cb(err);
+            }
+          });
+        }
+      });
+    } else {
+      var error = new Error(
+        'Invalid filter for comment.triggerRating: ' + where);
+      console.log(error);
+      error.http_code = 400;
+      cb(error);
+    }
   };
 };

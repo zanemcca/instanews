@@ -3,7 +3,7 @@
 
 var expect = require('chai').expect;
 var sinon = require('sinon');
-var common =  require('../common');
+var common =  require('../../common');
 
 var app = common.req('server');
 var Article = app.models.Article;
@@ -84,7 +84,7 @@ exports.run = function () {
           Inst = 'instance';
 
           sandbox.stub(Article, 'afterRemote', function(func, cb) {
-            if(func !== remoteMethod) {
+            if(func === remoteMethod) {
               cb(Ctx, Inst, Next);
             }
           });

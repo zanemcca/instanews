@@ -2,14 +2,14 @@
 /*jshint expr: true*/
 var expect = require('chai').expect;
 
-var common =  require('../common');
+var common =  require('../../common');
 var app = common.app;
 
 var Articles = app.models.Article;
 var UpVotes = app.models.UpVote;
 var Journalists = app.models.Journalist;
 
-var genericModels = require('../genericModels');
+var genericModels = require('../../genericModels');
 
 exports.run = function() {
    describe('UpVote', function() {

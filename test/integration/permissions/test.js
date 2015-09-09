@@ -3,7 +3,7 @@ var async = require('async');
 var expect = require('chai').expect;
 var path = require('path');
 
-var common =  require('../common');
+var common =  require('../../common');
 var api = common.api;
 var app = common.app;
 var Roles =       app.models.Role;
@@ -20,7 +20,7 @@ var Notifications = app.models.Notif;
 
 var users = require('./users.json');
 //Import the genericModels to be used by the testcases
-var genericModels = require('../genericModels');
+var genericModels = require('../../genericModels');
 var articles = require('./articles');
 var apps = require('./apps');
 var comments = require('./comments');

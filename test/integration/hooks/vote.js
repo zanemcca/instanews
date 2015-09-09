@@ -2,7 +2,7 @@
 /*jshint expr: true*/
 var expect = require('chai').expect;
 
-var common =  require('../common');
+var common =  require('../../common');
 var app = common.app;
 var runTillDone = common.runTillDone;
 
@@ -14,7 +14,7 @@ var UpVotes = app.models.UpVote;
 var Journalists = app.models.Journalist;
 var Stats = app.models.Stat;
 
-var genericModels = require('../genericModels');
+var genericModels = require('../../genericModels');
 
 exports.run = function() {
    describe('vote', function() {

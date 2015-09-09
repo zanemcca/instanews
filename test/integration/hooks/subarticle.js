@@ -2,7 +2,7 @@
 /*jshint expr: true*/
 var expect = require('chai').expect;
 
-var common =  require('../common');
+var common =  require('../../common');
 var app = common.app;
 var runTillDone = common.runTillDone;
 
@@ -10,7 +10,7 @@ var Articles = app.models.Article;
 var Subarticles = app.models.Subarticle;
 var Notifications = app.models.notif;
 
-var genericModels = require('../genericModels');
+var genericModels = require('../../genericModels');
 
 exports.run = function() {
    var subarticle = common.findModel('subarticles', genericModels);
