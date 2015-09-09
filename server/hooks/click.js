@@ -191,6 +191,24 @@ module.exports = function(app) {
     }
   });
 
+  Click.observe('after delete', function(ctx, next) {
+    //Delegate the count updating to the inherited model 
+    if(ctx.Model.modelName !== 'click') {
+      ctx.inc = {
+        clickCount: -1
+      };
+      next();
+    }
+    else {
+      Click.updateClickableAttributes(ctx, {
+        '$inc': {
+          clickCount: -1
+        }
+      },
+      next);
+    }
+  });
+
   Click.observe('after save', function(ctx, next) {
     var inst = ctx.instance;
 

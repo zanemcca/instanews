@@ -1,4 +1,6 @@
 
+/* jshint camelcase: false */
+
 module.exports = function(app) {
 
    var Subarticle = app.models.subarticle;
@@ -8,16 +10,11 @@ module.exports = function(app) {
    var Notification = app.models.notif;
   var Votes = app.models.votes;
 
-  var secondsAgo =  function(seconds) {
-    var now = (new Date()).getTime();
-    var secondsAgo = new Date(now - seconds*1000);
-    return secondsAgo;
-  };
-
   Subarticle.afterRemote('prototype.__get__comments', function(ctx, inst,next){
     Votes.createClickAfterRemote(ctx, next);
   });
 
+  /*
    Subarticle.observe('before save', function(ctx, next) {
       var inst = ctx.instance;
       if (inst && ctx.isNewInstance) {
@@ -36,39 +33,50 @@ module.exports = function(app) {
       }
       next();
    });
+  */
 
   Subarticle.triggerRating = function(where, modify, cb) {
-    Stat.updateRating(where, Subarticle.modelName, modify,
-    function(err, count) {
-      if(err) {
-        console.log('Warning: Failed to update a subarticle');
-        cb(err);
-      }
-      else {
-        var query = {
-          where: where,
-          limit: 1
-        };
-        Subarticle.find(query, function(err, res) {
-          if(err) {
-            console.log('Warning: Failed to find subarticle');
-            cb(err);
-          }
-          else if(res.length > 0) {
-            Article.triggerRating({
-              id: res[0].parentId
-            }, null, function(err, res) {
-              cb(err, count);
-            });
-          }
-          else {
-            console.log('Warning: Failed to find subarticles.' +
-                        ' Cannot trigger article rating');
-            cb();
-          }
-        });
-      }
-    });
+    if(where && Object.getOwnPropertyNames(where).length > 0) {
+      Stat.updateRating(where, Subarticle.modelName, modify,
+      function(err, count) {
+        if(err) {
+          console.log('Warning: Failed to update a subarticle');
+          cb(err);
+        }
+        else {
+          var query = {
+            where: where,
+            limit: 1
+          };
+          Subarticle.find(query, function(err, res) {
+            if(err) {
+              console.log('Warning: Failed to find subarticle');
+              cb(err);
+            }
+            else if(res.length > 0) {
+              Article.triggerRating({
+                id: res[0].parentId
+              }, null, function(err, res) {
+                cb(err, count);
+              });
+            }
+            else {
+              err = new Error( 
+                'Warning: Failed to find subarticles.' +
+                ' Cannot trigger article rating');
+              err.http_code = 500;
+              cb(err);
+            }
+          });
+        }
+      });
+    } else {
+      var error = new Error(
+        'Invalid filter for comment.triggerRating: ' + where);
+      console.log(error);
+      error.http_code = 400;
+      cb(error);
+    }
   };
 
   Subarticle.observe('after save', function(ctx, next) {

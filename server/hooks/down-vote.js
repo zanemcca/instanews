@@ -7,11 +7,17 @@ module.exports = function(app) {
   var Click = app.models.click;
    
   DownVote.observe('after delete', function(ctx, next) {
-    ctx.inc = {
-      downVoteCount: -1
-    };
-
-    Click.updateVoteParent(ctx, next);
+    //The click after save should have added an incrementation parameter
+    if(ctx.inc && typeof(ctx.inc) === 'object') {
+      ctx.inc.downVoteCount = -1;
+      Click.updateVoteParent(ctx, next);
+    }
+    else {
+      var error = new Error('Upvote  deletion expected there to be ctx.inc!');
+      error.http_code = 400;
+      console.log(error);
+      next(error);
+    }
   });
 
   DownVote.observe('after save', function(ctx, next) {
