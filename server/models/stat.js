@@ -1,4 +1,5 @@
 var common = require('./common');
+var loopback = require('loopback');
 
 module.exports = function(Stat) {
 
@@ -299,4 +300,65 @@ module.exports = function(Stat) {
        }
      );
    };
+
+  Stat.getCustomRating = function(Model, instance, cb) {
+     //TODO Check if rating for instance is in cache first
+
+    var ctx = loopback.getCurrentContext();
+    if(ctx) {
+      var stat = ctx.get('currentStat');
+
+      if(stat) {
+        var inst = Stat.getRating(instance, Stat.convertRawStats(Model, stat));
+        cb(null, inst);
+      }
+      else {
+        console.log('Warning: Could not find stat object for user.' +
+                    'Using global rank instead.');
+        cb(null, instance);
+      }
+    }
+  };
+
+  Stat.convertRawStats = function(Model, raw) {
+    //All of the necessary parts of the raw statistics are converted into
+    //the parameters needed to compute the rating of the votes instance
+
+    var commentView, subView, ageQ, Wcomment, Wsubarticle, Wvote;
+
+    //TODO Use clicks instead of age
+    var total = raw.comment.age.count + raw.upVote.age.count;
+
+    if(Model.modelName === 'article') {
+      total += raw.subarticle.age.count;
+      Wsubarticle = raw.subarticle.age.count/total;
+
+      subView = Stat.getGeometricStats(raw.subarticle.views);
+      //ageQ = Stat.getAgeQFunction(raw.article.age);
+    }
+    /*
+    else if(Model.modelName === 'subarticle') {
+      ageQ = Stat.getAgeQFunction(raw.subarticle.age);
+    }
+   */
+
+    Wcomment = raw.comment.age.count/total;
+    Wvote =  raw.upVote.age.count/total;
+
+    commentView = Stat.getGeometricStats(raw.comment.views);
+
+    //TODO Remove the ageQFunction
+    var stats = {
+    //  age: ageQ,
+      views: {
+        comment: commentView,
+        subarticle: subView
+      },
+      Wcomment: Wcomment,
+      Wsubarticle: Wsubarticle,
+      Wvote: Wvote 
+    };
+
+    return stats;
+  };
 };

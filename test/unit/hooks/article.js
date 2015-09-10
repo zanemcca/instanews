@@ -209,23 +209,46 @@ exports.run = function () {
           });
         });
 
-        //TODO Finish when loopback_datasource_juggler issue #610 gets resolved
-        /*
         describe('access', function() {
-          before(function() {
+          var loopback = require('loopback');
+          beforeEach(function() {
             hookName = 'access';
+            sandbox.stub(loopback, 'getCurrentContext', function () {
+              return {
+                get: function(stat) {
+                  expect(stat).to.equal('currentStat');
+                  return {
+                    subarticle: {
+                     views: {
+                      mean: 12
+                     }
+                    } 
+                  };
+                }
+              };
+            });
           });
 
           it('should convert ctx.query.include into an array', function() {
-            next = sinon.stub().returns(
-              expect(Array.isArray(ctx.query.include)).to.be.true
-            );
-
+            ctx.options.rate = true;
             run();
-            expect(next.calledOnce).to.be.true;
+            expect(Array.isArray(ctx.query.include)).to.be.true;
+          });
+
+          it('should create a ctx.query.include array', function() {
+            ctx.options.rate = true;
+            ctx.query.include = null;
+            run();
+            expect(Array.isArray(ctx.query.include)).to.be.true;
+          });
+
+          it('should include subarticles in  ctx.query.include', function() {
+            ctx.options.rate = true;
+            ctx.query.include = null;
+            run();
+            expect(Array.isArray(ctx.query.include)).to.be.true;
           });
         });
-       */
       });
    });
 };

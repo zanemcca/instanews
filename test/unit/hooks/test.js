@@ -9,6 +9,7 @@ exports.run = function() {
       require('./journalist').run();
       require('./notification').run();
      */
+      require('./stat').run();
       require('./subarticle').run();
       require('./up-vote').run();
       require('./view').run();

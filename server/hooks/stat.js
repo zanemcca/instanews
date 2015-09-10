@@ -1,7 +1,9 @@
+
+/* jshint camelcase: false */
+
 module.exports = function(app) {
 
   var Stat = app.models.Stat;
-  var loopback = require('loopback');
 
   var secondsAgo =  function(seconds) {
     var now = (new Date()).getTime();
@@ -14,11 +16,11 @@ module.exports = function(app) {
 
   Stat.updateRating = function(where, type, modify, cb) {
     if(!where || !type) {
-      var message =
+      var err = new Error(
         'Error: Either id or type is missing for Stat.updateRating. Id: ' +
-        where + ' Type: ' + type;
-      console.log(message);
-      cb(new Error(message));
+        where + ' Type: ' + type);
+      err.http_code = 400;
+      cb(err);
       return;
     }
 
@@ -58,8 +60,9 @@ module.exports = function(app) {
             Model = app.models.Comment;
           }
           else {
-            console.log('Error: Unrecognized type ' + type);
-            cb(new Error('Unrecognized type ' + type));
+            err = new Error('Error: Unrecognized type ' + type);
+            err.http_code = 400;
+            cb(err);
             return;
           }
 
@@ -91,29 +94,28 @@ module.exports = function(app) {
             if(err) {
               console.log('Error: Failed to modify '+ Model.modelName);
               console.log(err);
-              cb(err, res);
             }
-            cb(null, res);
+            cb(err, res);
           }, {
             customVersionName: 'ratingVersion',
             retryCount: 0
           });
         }
         else {
-          var message = Stat.averageId + ' was not found!';
-          console.log('Error:' + message);
-          cb(new Error(message));
+          err = new Error(Stat.averageId + ' was not found!');
+          err.http_code = 404;
+          cb(err);
         }
       }
     });
   };
 
   Stat.triggerRating = function(where, modelName, modify, cb) {
-    var message;
+    var error = new Error('Unrecognized modelName: ' + modelName);
+    error.http_code = 400;
     if(!app.models.hasOwnProperty(modelName)) {
-      message = 'Unrecognized modelName: ' + modelName;
-      console.log('Warning: ' + message);
-      cb(new Error(message));
+      console.log(error);
+      cb(error);
     }
     else {
       var Model = app.models[modelName];
@@ -121,71 +123,12 @@ module.exports = function(app) {
         Model.triggerRating(where, modify, cb);
       }
       else {
-        message = 'No triggerRating function attached to the model';
-        console.log('Warning: ' + message);
-        cb(new Error(message));
+        error = new Error(
+          'No triggerRating function attached to the ' + modelName);
+        error.http_code = 400;
+        console.log(error);
+        cb(error);
       }
     }
-  };
-
-   Stat.getCustomRating = function(Model, instance, cb) {
-     //TODO Check if rating for instance is in cache first
-
-    var ctx = loopback.getCurrentContext();
-    if(ctx) {
-      var stat = ctx.get('currentStat');
-
-      if(stat) {
-        var inst = Stat.getRating(instance, Stat.convertRawStats(Model, stat));
-        cb(null, inst);
-      }
-      else {
-        console.log('Warning: Could not find stat object for user.' +
-                    'Using global rank instead.');
-        cb(null, instance);
-      }
-    }
-   };
-
-  Stat.convertRawStats = function(Model, raw) {
-    //All of the necessary parts of the raw statistics are converted into
-    //the parameters needed to compute the rating of the votes instance
-
-    var commentView, subView, ageQ, Wcomment, Wsubarticle, Wvote;
-
-    //TODO Use clicks instead of age
-    var total = raw.comment.age.count + raw.upVote.age.count;
-
-    if(Model.modelName === 'article') {
-      total += raw.subarticle.age.count;
-      Wsubarticle = raw.subarticle.age.count/total;
-
-      subView = Stat.getGeometricStats(raw.subarticle.views);
-      //ageQ = Stat.getAgeQFunction(raw.article.age);
-    }
-    /*
-    else if(Model.modelName === 'subarticle') {
-      ageQ = Stat.getAgeQFunction(raw.subarticle.age);
-    }
-   */
-
-    Wcomment = raw.comment.age.count/total;
-    Wvote =  raw.upVote.age.count/total;
-
-    commentView = Stat.getGeometricStats(raw.comment.views);
-
-    //TODO Remove the ageQFunction
-    var stats = {
-    //  age: ageQ,
-      views: {
-        comment: commentView,
-        subarticle: subView
-      },
-      Wcomment: Wcomment,
-      Wsubarticle: Wsubarticle,
-      Wvote: Wvote 
-    };
-
-    return stats;
   };
 };
