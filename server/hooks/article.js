@@ -5,17 +5,17 @@ var loopback = require('loopback');
 module.exports = function(app) {
 
    var Article = app.models.Article;
-   var Votes = app.models.votes;
+   var Base = app.models.base;
    var View = app.models.view;
    var Subarticle = app.models.Subarticle;
    var Stat = app.models.Stat;
 
   Article.afterRemote('prototype.__get__comments', function(ctx, instance,next){
-    Votes.createClickAfterRemote(ctx, next);
+    Base.createClickAfterRemote(ctx, next);
   });
 
   Article.afterRemote('prototype.__get__subarticles', function(ctx, inst, next){
-    Votes.createClickAfterRemote(ctx, next);
+    Base.createClickAfterRemote(ctx, next);
   });
 
   Article.observe('after save', function(ctx, next) {

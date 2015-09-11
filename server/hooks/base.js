@@ -1,17 +1,18 @@
 
+/* jshint camelcase: false */
 var LIMIT = 50;
 
 module.exports = function(app) {
 
   var loopback = require('loopback');
-  var Votes = app.models.votes;
+  var Base = app.models.base;
   var Article = app.models.article;
   var Subarticle = app.models.subarticle;
   var Comment = app.models.comment;
   var Stat = app.models.Stat;
   var Click = app.models.Click;
 
-  Votes.createClickAfterRemote = function(ctx, next){
+  Base.createClickAfterRemote = function(ctx, next){
     if(
       ctx &&
       ctx.req &&
@@ -59,7 +60,7 @@ module.exports = function(app) {
     }
   };
 
-  Votes.observe('access', function(ctx, next) {
+  Base.observe('access', function(ctx, next) {
     //Limit the queries to LIMIT per request
     if( !ctx.query.limit || ctx.query.limit > LIMIT) {
        ctx.query.limit = LIMIT;
@@ -115,7 +116,7 @@ module.exports = function(app) {
     next();
   });
 
-   Votes.observe('before save', function(ctx, next) {
+   Base.observe('before save', function(ctx, next) {
 
       var inst = ctx.instance;
       if (!inst) {
@@ -129,19 +130,20 @@ module.exports = function(app) {
             var rawStat;
             if(context) {
               rawStat = context.get('currentStat');
-              if(rawStat) {
-                inst.username = rawStat.username;
-              }
             }
 
-            if(!inst.username) {
-              console.log('Error: ' +
-                'There should be a valid user logged in for votes creation');
+            if(!rawStat) {
+              var err = new Error(
+                'There should be a valid user logged in for base creation');
+              err.http_code = 401;
+              console.log(err);
+              return next(err);
             }
 
             //TODO add this on loaded and remove on before save
             inst.modelName = ctx.Model.modelName;
 
+            inst.username = rawStat.username;
             inst.id = null;
             inst.version = 0;
             inst.ratingVersion = 0;
@@ -207,7 +209,7 @@ module.exports = function(app) {
       next();
    });
 
-   Votes.observe('loaded', function(ctx, next) {
+   Base.observe('loaded', function(ctx, next) {
      var instance = ctx.instance;
      if(!instance) {
        instance = ctx.data;

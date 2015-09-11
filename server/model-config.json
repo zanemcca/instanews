@@ -35,7 +35,7 @@
     "dataSource": "Articles",
     "public": true
   },
-  "votes": {
+  "base": {
     "dataSource": null,
     "public": false
   },

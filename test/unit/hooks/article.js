@@ -93,9 +93,9 @@ exports.run = function () {
           });
         });
 
-        describe('should call votes.createClickAfterRemote', function() {
+        describe('should call base.createClickAfterRemote', function() {
           beforeEach(function() {
-            sandbox.stub(app.models.votes, 'createClickAfterRemote', function(ctx, next) {
+            sandbox.stub(app.models.base, 'createClickAfterRemote', function(ctx, next) {
               expect(ctx).to.equal(Ctx);
               expect(next).to.equal(Next);
             });
@@ -104,13 +104,13 @@ exports.run = function () {
           it('prototype.__get__comments', function() {
             remoteMethod = 'prototype.__get__comments';
             run();
-            expect(app.models.votes.createClickAfterRemote.calledOnce).to.be.true;
+            expect(app.models.base.createClickAfterRemote.calledOnce).to.be.true;
           });
 
           it('prototype.__get__subarticles', function() {
             remoteMethod = 'prototype.__get__subarticles';
             run();
-            expect(app.models.votes.createClickAfterRemote.calledOnce).to.be.true;
+            expect(app.models.base.createClickAfterRemote.calledOnce).to.be.true;
           });
         });
       });

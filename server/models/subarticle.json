@@ -1,6 +1,6 @@
 {
   "name": "subarticle",
-  "base": "votes",
+  "base": "base",
   "strict": false,
   "properties": {
     "text": {

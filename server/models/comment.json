@@ -1,6 +1,6 @@
 {
   "name": "comment",
-  "base": "votes",
+  "base": "base",
   "idInjection": true,
   "properties": {
     "content": {

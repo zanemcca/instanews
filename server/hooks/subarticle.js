@@ -8,10 +8,10 @@ module.exports = function(app) {
    var Article = app.models.Article;
    var Stat = app.models.stat;
    var Notification = app.models.notif;
-  var Votes = app.models.votes;
+  var Base = app.models.base;
 
   Subarticle.afterRemote('prototype.__get__comments', function(ctx, inst,next){
-    Votes.createClickAfterRemote(ctx, next);
+    Base.createClickAfterRemote(ctx, next);
   });
 
   /*

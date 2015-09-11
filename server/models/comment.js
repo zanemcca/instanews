@@ -2,7 +2,7 @@ var common = require('./common');
 
 module.exports = function(Comment) {
 
-   common.initVotes(Comment);
+   common.initBase(Comment);
 
    Comment.readModifyWrite = function(query, modify, cb, options) {
      common.readModifyWrite(Comment, query, modify, cb, options);
