@@ -15,7 +15,7 @@ exports.disableRemotes = function(Model,list,isStatic) {
    }
 };
 
-exports.initVotes = function(Model) {
+exports.initBase = function(Model) {
    var staticDisable = [
    ];
 

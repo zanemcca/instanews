@@ -1,7 +1,7 @@
 
 module.exports = function(app) {
    //Setup all server side hooks that we need
-   require('./votes.js')(app);
+   require('./base.js')(app);
    require('./view.js')(app);
    require('./installation.js')(app);
    require('./notification.js')(app);

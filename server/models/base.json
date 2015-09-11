@@ -1,5 +1,5 @@
 {
-  "name": "votes",
+  "name": "base",
   "base": "PersistedModel",
   "strict": false,
   "idInjection": true,

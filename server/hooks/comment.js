@@ -7,7 +7,7 @@ module.exports = function(app) {
    var Click = app.models.click;
    var Notification = app.models.notif;
    var Stat = app.models.stat;
-  var Votes = app.models.votes;
+  var Base = app.models.base;
 
    var report = function(err,res) {
       if (err) console.log('Error: ' + err);
@@ -26,7 +26,7 @@ module.exports = function(app) {
   */
 
   Comment.afterRemote('prototype.__get__comments', function(ctx, instance,next){
-    Votes.createClickAfterRemote(ctx, next);
+    Base.createClickAfterRemote(ctx, next);
   });
 
   Comment.observe('after save', function(ctx, next) {

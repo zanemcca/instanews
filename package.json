@@ -4,7 +4,8 @@
   "main": "server/server.js",
   "scripts": {
     "pretest": "jshint .",
-    "test": "./node_modules/.bin/istanbul test ./node_modules/.bin/_mocha -- -R spec"
+    "test": "./node_modules/.bin/istanbul test ./node_modules/.bin/_mocha -- -R spec",
+    "posttest": "./node_modules/.bin/istanbul check-coverage"
   },
   "dependencies": {
     "async": "^0.9.0",

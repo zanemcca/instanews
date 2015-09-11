@@ -1,6 +1,6 @@
 {
   "name": "article",
-  "base": "votes",
+  "base": "base",
   "strict": false,
   "idInjection": false,
   "properties": {

@@ -1,6 +1,7 @@
 exports.run = function() {
    describe('Hooks', function() {
       require('./article').run();
+      require('./base').run();
       require('./click').run();
       require('./comment').run();
       require('./down-vote').run();
