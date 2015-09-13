@@ -19,12 +19,15 @@ Local Citizen Journalism in an elegant simple platform
 
 ### Documentation
 - ```grunt docs```
+
 #### Generate
 - ```grunt docs:gen```
+
 #### Serve
 - ```grunt docs:serve```
+
 #### Update Client SDK and update the docs
--```grunt sdk```
+- ```grunt sdk```
 
 ### Testing
 #### Backend
@@ -32,6 +35,9 @@ Local Citizen Journalism in an elegant simple platform
 - ```grunt coverage:open``` (Opens the generated coverage report in youe default browser)
 - ```grunt check``` (Checks if the generated coverage meets the required limits)
 - ```grunt test(:[unit,integration])``` (Skips coverage reporting)
+
+##### Example
+- ```grunt coverage:unit```
 
 #### Frontend
 - ```cd ~/workdir/instanews/client```
