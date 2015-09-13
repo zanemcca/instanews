@@ -94,6 +94,13 @@ module.factory(
           url: urlBase + "/articles/:id/subarticles",
           method: "POST"
         },
+
+        // INTERNAL. Use Article.subarticles.createMany() instead.
+        "::createMany::article::subarticles": {
+          isArray: true,
+          url: urlBase + "/articles/:id/subarticles",
+          method: "POST"
+        },
       }
     );
 
@@ -122,7 +129,7 @@ module.factory(
          *
          * @param {Object=} parameters Request parameters.
          *
-         *  - `id` – `{*}` - votes id
+         *  - `id` – `{*}` - base id
          *
          *  - `filter` – `{object=}` - 
          *
@@ -235,6 +242,45 @@ module.factory(
 
         /**
          * @ngdoc method
+         * @name lbServices.Article#createMany
+         * @methodOf lbServices.Article
+         *
+         * @description
+         *
+         * Create a new instance of the model and persist it into the data source.
+         *
+         * @param {Object=} parameters Request parameters.
+         *
+         *   This method does not accept any parameters.
+         *   Supply an empty object or omit this argument altogether.
+         *
+         * @param {Object} postData Request data.
+         *
+         * This method expects a subset of model properties as request parameters.
+         *
+         * @param {function(Array.<Object>,Object)=} successCb
+         *   Success callback with two arguments: `value`, `responseHeaders`.
+         *
+         * @param {function(Object)=} errorCb Error callback with one argument:
+         *   `httpResponse`.
+         *
+         * @returns {Array.<Object>} An empty reference that will be
+         *   populated with the actual data once the response is returned
+         *   from the server.
+         *
+         * <em>
+         * (The remote method definition does not provide any description.
+         * This usually means the response is a `Article` object.)
+         * </em>
+         */
+        "createMany": {
+          isArray: true,
+          url: urlBase + "/articles",
+          method: "POST"
+        },
+
+        /**
+         * @ngdoc method
          * @name lbServices.Article#find
          * @methodOf lbServices.Article
          *
@@ -315,7 +361,7 @@ module.factory(
          *
          * @param {Object=} parameters Request parameters.
          *
-         *  - `id` – `{*}` - votes id
+         *  - `id` – `{*}` - base id
          *
          *  - `filter` – `{object=}` - 
          *
@@ -351,7 +397,7 @@ module.factory(
          *
          * @param {Object=} parameters Request parameters.
          *
-         *  - `id` – `{*}` - votes id
+         *  - `id` – `{*}` - base id
          *
          * @param {Object} postData Request data.
          *
@@ -380,6 +426,44 @@ module.factory(
 
         /**
          * @ngdoc method
+         * @name lbServices.Article.subarticles#createMany
+         * @methodOf lbServices.Article.subarticles
+         *
+         * @description
+         *
+         * Creates a new instance in subarticles of this model.
+         *
+         * @param {Object=} parameters Request parameters.
+         *
+         *  - `id` – `{*}` - base id
+         *
+         * @param {Object} postData Request data.
+         *
+         * This method expects a subset of model properties as request parameters.
+         *
+         * @param {function(Array.<Object>,Object)=} successCb
+         *   Success callback with two arguments: `value`, `responseHeaders`.
+         *
+         * @param {function(Object)=} errorCb Error callback with one argument:
+         *   `httpResponse`.
+         *
+         * @returns {Array.<Object>} An empty reference that will be
+         *   populated with the actual data once the response is returned
+         *   from the server.
+         *
+         * <em>
+         * (The remote method definition does not provide any description.
+         * This usually means the response is a `Subarticle` object.)
+         * </em>
+         */
+        R.subarticles.createMany = function() {
+          var TargetResource = $injector.get("Subarticle");
+          var action = TargetResource["::createMany::article::subarticles"];
+          return action.apply(R, arguments);
+        };
+
+        /**
+         * @ngdoc method
          * @name lbServices.Article#comments
          * @methodOf lbServices.Article
          *
@@ -389,7 +473,7 @@ module.factory(
          *
          * @param {Object=} parameters Request parameters.
          *
-         *  - `id` – `{*}` - votes id
+         *  - `id` – `{*}` - base id
          *
          *  - `filter` – `{object=}` - 
          *
@@ -477,6 +561,9 @@ module.factory(
          * </em>
          */
         "prototype$__updateById__notifications": {
+          params: {
+          'fk': '@fk'
+          },
           url: urlBase + "/journalists/:id/notifications/:fk",
           method: "PUT"
         },
@@ -595,6 +682,45 @@ module.factory(
          * </em>
          */
         "create": {
+          url: urlBase + "/journalists",
+          method: "POST"
+        },
+
+        /**
+         * @ngdoc method
+         * @name lbServices.Journalist#createMany
+         * @methodOf lbServices.Journalist
+         *
+         * @description
+         *
+         * Create a new instance of the model and persist it into the data source.
+         *
+         * @param {Object=} parameters Request parameters.
+         *
+         *   This method does not accept any parameters.
+         *   Supply an empty object or omit this argument altogether.
+         *
+         * @param {Object} postData Request data.
+         *
+         * This method expects a subset of model properties as request parameters.
+         *
+         * @param {function(Array.<Object>,Object)=} successCb
+         *   Success callback with two arguments: `value`, `responseHeaders`.
+         *
+         * @param {function(Object)=} errorCb Error callback with one argument:
+         *   `httpResponse`.
+         *
+         * @returns {Array.<Object>} An empty reference that will be
+         *   populated with the actual data once the response is returned
+         *   from the server.
+         *
+         * <em>
+         * (The remote method definition does not provide any description.
+         * This usually means the response is a `Journalist` object.)
+         * </em>
+         */
+        "createMany": {
+          isArray: true,
           url: urlBase + "/journalists",
           method: "POST"
         },
@@ -969,6 +1095,45 @@ module.factory(
           method: "POST"
         },
 
+        /**
+         * @ngdoc method
+         * @name lbServices.Comment#createMany
+         * @methodOf lbServices.Comment
+         *
+         * @description
+         *
+         * Create a new instance of the model and persist it into the data source.
+         *
+         * @param {Object=} parameters Request parameters.
+         *
+         *   This method does not accept any parameters.
+         *   Supply an empty object or omit this argument altogether.
+         *
+         * @param {Object} postData Request data.
+         *
+         * This method expects a subset of model properties as request parameters.
+         *
+         * @param {function(Array.<Object>,Object)=} successCb
+         *   Success callback with two arguments: `value`, `responseHeaders`.
+         *
+         * @param {function(Object)=} errorCb Error callback with one argument:
+         *   `httpResponse`.
+         *
+         * @returns {Array.<Object>} An empty reference that will be
+         *   populated with the actual data once the response is returned
+         *   from the server.
+         *
+         * <em>
+         * (The remote method definition does not provide any description.
+         * This usually means the response is a `Comment` object.)
+         * </em>
+         */
+        "createMany": {
+          isArray: true,
+          url: urlBase + "/comments",
+          method: "POST"
+        },
+
         // INTERNAL. Use Subarticle.comments() instead.
         "::get::subarticle::comments": {
           isArray: true,
@@ -1017,7 +1182,7 @@ module.factory(
          *
          * @param {Object=} parameters Request parameters.
          *
-         *  - `id` – `{*}` - votes id
+         *  - `id` – `{*}` - base id
          *
          *  - `filter` – `{object=}` - 
          *
@@ -1168,88 +1333,6 @@ module.factory(
 
 /**
  * @ngdoc object
- * @name lbServices.Click
- * @header lbServices.Click
- * @object
- *
- * @description
- *
- * A $resource object for interacting with the `Click` model.
- *
- * ## Example
- *
- * See
- * {@link http://docs.angularjs.org/api/ngResource.$resource#example $resource}
- * for an example of using this object.
- *
- */
-module.factory(
-  "Click",
-  ['LoopBackResource', 'LoopBackAuth', '$injector', function(Resource, LoopBackAuth, $injector) {
-    var R = Resource(
-      urlBase + "/clicks/:id",
-      { 'id': '@id' },
-      {
-
-        /**
-         * @ngdoc method
-         * @name lbServices.Click#create
-         * @methodOf lbServices.Click
-         *
-         * @description
-         *
-         * Create a new instance of the model and persist it into the data source.
-         *
-         * @param {Object=} parameters Request parameters.
-         *
-         *   This method does not accept any parameters.
-         *   Supply an empty object or omit this argument altogether.
-         *
-         * @param {Object} postData Request data.
-         *
-         * This method expects a subset of model properties as request parameters.
-         *
-         * @param {function(Object,Object)=} successCb
-         *   Success callback with two arguments: `value`, `responseHeaders`.
-         *
-         * @param {function(Object)=} errorCb Error callback with one argument:
-         *   `httpResponse`.
-         *
-         * @returns {Object} An empty reference that will be
-         *   populated with the actual data once the response is returned
-         *   from the server.
-         *
-         * <em>
-         * (The remote method definition does not provide any description.
-         * This usually means the response is a `Click` object.)
-         * </em>
-         */
-        "create": {
-          url: urlBase + "/clicks",
-          method: "POST"
-        },
-      }
-    );
-
-
-
-
-    /**
-    * @ngdoc property
-    * @name lbServices.Click#modelName
-    * @propertyOf lbServices.Click
-    * @description
-    * The name of the model represented by this $resource,
-    * i.e. `Click`.
-    */
-    R.modelName = "Click";
-
-
-    return R;
-  }]);
-
-/**
- * @ngdoc object
  * @name lbServices.UpVote
  * @header lbServices.UpVote
  * @object
@@ -1307,6 +1390,45 @@ module.factory(
          * </em>
          */
         "create": {
+          url: urlBase + "/upVotes",
+          method: "POST"
+        },
+
+        /**
+         * @ngdoc method
+         * @name lbServices.UpVote#createMany
+         * @methodOf lbServices.UpVote
+         *
+         * @description
+         *
+         * Create a new instance of the model and persist it into the data source.
+         *
+         * @param {Object=} parameters Request parameters.
+         *
+         *   This method does not accept any parameters.
+         *   Supply an empty object or omit this argument altogether.
+         *
+         * @param {Object} postData Request data.
+         *
+         * This method expects a subset of model properties as request parameters.
+         *
+         * @param {function(Array.<Object>,Object)=} successCb
+         *   Success callback with two arguments: `value`, `responseHeaders`.
+         *
+         * @param {function(Object)=} errorCb Error callback with one argument:
+         *   `httpResponse`.
+         *
+         * @returns {Array.<Object>} An empty reference that will be
+         *   populated with the actual data once the response is returned
+         *   from the server.
+         *
+         * <em>
+         * (The remote method definition does not provide any description.
+         * This usually means the response is a `UpVote` object.)
+         * </em>
+         */
+        "createMany": {
+          isArray: true,
           url: urlBase + "/upVotes",
           method: "POST"
         },
@@ -1392,6 +1514,45 @@ module.factory(
           url: urlBase + "/downVotes",
           method: "POST"
         },
+
+        /**
+         * @ngdoc method
+         * @name lbServices.DownVote#createMany
+         * @methodOf lbServices.DownVote
+         *
+         * @description
+         *
+         * Create a new instance of the model and persist it into the data source.
+         *
+         * @param {Object=} parameters Request parameters.
+         *
+         *   This method does not accept any parameters.
+         *   Supply an empty object or omit this argument altogether.
+         *
+         * @param {Object} postData Request data.
+         *
+         * This method expects a subset of model properties as request parameters.
+         *
+         * @param {function(Array.<Object>,Object)=} successCb
+         *   Success callback with two arguments: `value`, `responseHeaders`.
+         *
+         * @param {function(Object)=} errorCb Error callback with one argument:
+         *   `httpResponse`.
+         *
+         * @returns {Array.<Object>} An empty reference that will be
+         *   populated with the actual data once the response is returned
+         *   from the server.
+         *
+         * <em>
+         * (The remote method definition does not provide any description.
+         * This usually means the response is a `DownVote` object.)
+         * </em>
+         */
+        "createMany": {
+          isArray: true,
+          url: urlBase + "/downVotes",
+          method: "POST"
+        },
       }
     );
 
@@ -1474,6 +1635,45 @@ module.factory(
           url: urlBase + "/installations",
           method: "POST"
         },
+
+        /**
+         * @ngdoc method
+         * @name lbServices.Installation#createMany
+         * @methodOf lbServices.Installation
+         *
+         * @description
+         *
+         * Create a new instance of the model and persist it into the data source.
+         *
+         * @param {Object=} parameters Request parameters.
+         *
+         *   This method does not accept any parameters.
+         *   Supply an empty object or omit this argument altogether.
+         *
+         * @param {Object} postData Request data.
+         *
+         * This method expects a subset of model properties as request parameters.
+         *
+         * @param {function(Array.<Object>,Object)=} successCb
+         *   Success callback with two arguments: `value`, `responseHeaders`.
+         *
+         * @param {function(Object)=} errorCb Error callback with one argument:
+         *   `httpResponse`.
+         *
+         * @returns {Array.<Object>} An empty reference that will be
+         *   populated with the actual data once the response is returned
+         *   from the server.
+         *
+         * <em>
+         * (The remote method definition does not provide any description.
+         * This usually means the response is a `Installation` object.)
+         * </em>
+         */
+        "createMany": {
+          isArray: true,
+          url: urlBase + "/installations",
+          method: "POST"
+        },
       }
     );
 
@@ -1553,6 +1753,45 @@ module.factory(
          * </em>
          */
         "create": {
+          url: urlBase + "/views",
+          method: "POST"
+        },
+
+        /**
+         * @ngdoc method
+         * @name lbServices.View#createMany
+         * @methodOf lbServices.View
+         *
+         * @description
+         *
+         * Create a new instance of the model and persist it into the data source.
+         *
+         * @param {Object=} parameters Request parameters.
+         *
+         *   This method does not accept any parameters.
+         *   Supply an empty object or omit this argument altogether.
+         *
+         * @param {Object} postData Request data.
+         *
+         * This method expects a subset of model properties as request parameters.
+         *
+         * @param {function(Array.<Object>,Object)=} successCb
+         *   Success callback with two arguments: `value`, `responseHeaders`.
+         *
+         * @param {function(Object)=} errorCb Error callback with one argument:
+         *   `httpResponse`.
+         *
+         * @returns {Array.<Object>} An empty reference that will be
+         *   populated with the actual data once the response is returned
+         *   from the server.
+         *
+         * <em>
+         * (The remote method definition does not provide any description.
+         * This usually means the response is a `View` object.)
+         * </em>
+         */
+        "createMany": {
+          isArray: true,
           url: urlBase + "/views",
           method: "POST"
         },
@@ -1710,6 +1949,18 @@ module
      */
     this.setUrlBase = function(url) {
       urlBase = url;
+    };
+
+    /**
+     * @ngdoc method
+     * @name lbServices.LoopBackResourceProvider#getUrlBase
+     * @methodOf lbServices.LoopBackResourceProvider
+     * @description
+     * Get the URL of the REST API server. The URL provided
+     * to the code generator (`lb-ng` or `grunt-loopback-sdk-angular`) is used.
+     */
+    this.getUrlBase = function() {
+      return urlBase;
     };
 
     this.$get = ['$resource', function($resource) {

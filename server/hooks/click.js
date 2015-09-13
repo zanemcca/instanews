@@ -269,7 +269,7 @@ module.exports = function(app) {
            res.modelName === 'article' && !res.verified &&
            nearBy(res.location, inst.location)
         ) {
-          if(!data['$set']) {
+          if(!data.$set) {
             data.$set = {
               verified: true
             };

@@ -17,36 +17,46 @@ Local Citizen Journalism in an elegant simple platform
 - ```npm install```
 - ```bower install```
 
+### Documentation
+- ```grunt docs```
+#### Generate
+- ```grunt docs:gen```
+#### Serve
+- ```grunt docs:serve```
+#### Update Client SDK and update the docs
+-```grunt sdk```
+
 ### Testing
 #### Backend
-- ```cd ~/workdir/instanews```
-- ```npm test```
-
-You can specify to only run integration or unit tests by setting the TEST_TYPE environment variable before running the test.
-- ```export TEST_TYPE=unit && npm test```
-- You can also add the ```--coverage``` option to ```npm test``` to include the Istanbul coverage report
+- ```grunt coverage(:[unit,integration])``` (Coverage reporting and checking as well as testing)
+- ```grunt coverage:open``` (Opens the generated coverage report in youe default browser)
+- ```grunt check``` (Checks if the generated coverage meets the required limits)
+- ```grunt test(:[unit,integration])``` (Skips coverage reporting)
 
 #### Frontend
 - ```cd ~/workdir/instanews/client```
 - ```grunt karma```
 
 ### Running the site
-#### Headless backend
-- ```cd ~/workdir/instanews```
-- ```slc run```
-- Visit localhost:3000/explorer
+#### Backend
+- ```grunt start``` (Starts a headless backend on localhost:3000)
+- ```grunt serve``` (Same as start but it also opens localhost:3000 in your default browser)
+- ```grunt explorer``` (Same as start but it also opens localhost:3000/explorer in your default browser)
 
-#### Headless frontend
-- ```cd ~/workdir/instanews/client```
-- ```grunt serve```
-- A browser should be opened automatically
+#### Frontend
+- ```cd client```
+- ```grunt serve``` (Builds the client from app to www and serves it)
 
-#### Full site
-- ```cd ~/workdir/instanews/client```
+#### Full site (livereload backend)
+- ```cd client```
 - ```grunt build```
-- ```cd ~/workdir/instanews```
-- ```slc run```
-- Visit localhost:3000 or localhost:3000/explorer
+- ```cd ..```
+- ```grunt serve```
+
+#### Full site (livereload frontend)
+- ```grunt start```
+- ```cd client```
+- ```grunt serve```
 
 ### Debugging backend
 #### Logs

@@ -144,6 +144,7 @@ module.exports = function(app) {
             inst.modelName = ctx.Model.modelName;
 
             inst.username = rawStat.username;
+
             inst.id = null;
             inst.version = 0;
             inst.ratingVersion = 0;
@@ -190,7 +191,7 @@ module.exports = function(app) {
              };
            }
            else {
-             ctx.data['$inc'].version = 1;
+             ctx.data.$inc.version = 1;
            }
          }
 
