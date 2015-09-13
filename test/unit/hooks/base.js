@@ -1,7 +1,9 @@
 
 /*jshint expr: true*/
 
-var expect = require('chai').expect;
+var chai = require('chai');
+chai.use(require('chai-datetime'));
+var expect = chai.expect;
 var sinon = require('sinon');
 var common =  require('../../common');
 var loopback = require('loopback');
@@ -114,6 +116,7 @@ exports.run = function () {
               };
 
               getRatingCb = function(inst, stat){
+                inst.rating = 0.75;
                 return inst;
               };
 
@@ -126,16 +129,34 @@ exports.run = function () {
               });
             });
 
+            it('should initialize the instance', function() {
+              run();
+
+              var inst = ctx.instance;
+              expect(inst.modelName).to.equal(ctx.Model.modelName);
+              expect(inst.username).to.equal('user7');
+              expect(inst.version).to.equal(0);
+              expect(inst.ratingVersion).to.equal(0);
+              expect(inst.created).to.equalDate(new Date());
+              expect(inst.clickCount).to.equal(0);
+              expect(inst.viewCount).to.equal(0);
+              expect(inst.upVoteCount).to.equal(0);
+              expect(inst.downVoteCount).to.equal(0);
+              expect(inst.rating).to.equal(0.75);
+            });
+
             describe('rating', function() {
               var Model;
               beforeEach(function() {
                 convertCb = function (model, raw) {
                   expect(model.modelName).to.equal(Model.modelName);
+                  return 'converted';
                 };
               });
 
               afterEach(function() {
                 expect(convert.calledOnce).to.be.true;
+                expect(getRating.calledOnce).to.be.true;
               });
 
               describe('should call Stat.convertStats', function () {
@@ -152,6 +173,13 @@ exports.run = function () {
                     run();
                   });
                 });
+              });
+
+              describe('should pass the converted stats to Stat.getRating', function() {
+                getRatingCb = function(inst, stat) {
+                  expect(stat).to.equal('converted');
+                };
+                run();
               });
             });
           });

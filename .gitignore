@@ -5,6 +5,7 @@ strongloop.json
 
 server/conf/.credentials/unencrypted/
 coverage/
+docs/
 
 client/platforms/
 client/engine/
