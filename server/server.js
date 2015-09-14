@@ -86,7 +86,11 @@ app.use(helmet());
 // Compress everything
 app.use(loopback.compress());
 
-app.use(loopback.static(path.resolve(__dirname, '../client/www/')));
+if( process.env.NODE_ENV && process.env.NODE_ENV !== 'development') {
+  app.use(loopback.static(path.resolve(__dirname, '../common/')));
+} else {
+  app.use(loopback.static(path.resolve(__dirname, '../client/www/')));
+}
 
 // Bootstrap the application, configure models, datasources and middleware.
 // Sub-apps like REST API are mounted via boot scripts.
