@@ -120,6 +120,7 @@ app.start = function() {
 
   var server;
   var httpOnly = true;
+  /*
   if( process.env.NODE_ENV && process.env.NODE_ENV !== 'development') {
     httpOnly = false;
     //Staging and production are done over https
@@ -136,6 +137,9 @@ app.start = function() {
   else {
     server = http.createServer(app);
   }
+ */
+
+  server = http.createServer(app);
 
   server.listen(app.get('port'), function() {
     var baseUrl = (httpOnly? 'http://' : 'https://') + app.get('host') + ':' + app.get('port');
