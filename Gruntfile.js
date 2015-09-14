@@ -119,8 +119,8 @@ module.exports = function(grunt) {
       },
       prod: {
         options: {
-          script: 'server/server.js',
-          node_env: 'production'
+          node_env: 'production',
+          script: 'server/server.js'
         }
       }
     },
