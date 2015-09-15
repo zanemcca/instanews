@@ -124,32 +124,30 @@ app.start = function() {
 
   var server;
   var httpOnly = true;
-  /*
   if( process.env.NODE_ENV && process.env.NODE_ENV !== 'development') {
     httpOnly = false;
     //Staging and production are done over https
     var options = {
        key: cred.get('sslKey'),
        passphrase: cred.get('sslPassphrase'),
-       cert: cred.get('sslCert'),
-       ca: cred.get('sslCa')
+       cert: cred.get('sslCert')
     };
 
     //Create our https server
     server = https.createServer(options, app);
-  }
-  else {
-    server = http.createServer(app);
-  }
- */
 
-  server = http.createServer(app);
+    server.listen(3443, function() {
+      var baseUrl = (httpOnly? 'http://' : 'https://') + app.get('host') + ':' + 3443; 
+      app.set('url', baseUrl);
+      app.emit('started', baseUrl);
+      console.log('Web server listening @ %s%s', baseUrl, '/');
+    });
+  }
 
-  server.listen(app.get('port'), function() {
-    var baseUrl = (httpOnly? 'http://' : 'https://') + app.get('host') + ':' + app.get('port');
-    app.set('url', baseUrl);
-    app.emit('started', baseUrl);
+  app.listen(app.get('port'), function() {
+    var baseUrl = 'http://' + app.get('host') + ':' + app.get('port'); 
     console.log('Web server listening @ %s%s', baseUrl, '/');
+    app.emit('started');
   });
 };
 

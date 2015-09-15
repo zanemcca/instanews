@@ -32,6 +32,7 @@ ENV NODE_ENV production
 
 # expose our port
 EXPOSE 3000
+EXPOSE 3443
 
 # Run the application
 CMD cd /src && node server/server.js 
