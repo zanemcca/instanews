@@ -39,7 +39,8 @@ app.directive('inListItem', [
       },
       controller: function() {},
       templateUrl: 'templates/directives/list.html',
-      link: function($scope,element, attributes) {
+      //link: function($scope,element, attributes) {
+      link: function($scope) {
 
         var date = Date.parse($scope.item.created);
         var age = Date.now() - date; 
@@ -50,7 +51,7 @@ app.directive('inListItem', [
           unit = 'minutes';
           if(age > 60) {
               age /= 60;
-              unit = 'hours'
+              unit = 'hours';
             if(age > 24) {
               age /= 24;
               unit = 'days';
@@ -91,7 +92,7 @@ app.directive('inListItem', [
         }
 
         View.create(view).$promise
-        .then(function(res) {
+        .then(function() {
           console.log('View created: ' + $scope.item.id);
         }, function(err) {
           console.log('Error: Failed to create a view');
