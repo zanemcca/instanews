@@ -43,6 +43,7 @@ module.exports = function (grunt) {
         constants: {
           ENV: {
             name: 'development',
+            //TODO Change this to the local machine that is producing the build
             apiEndpoint: 'http://192.168.1.2:3000/api'
           }
         }
@@ -51,7 +52,7 @@ module.exports = function (grunt) {
         constants: {
           ENV: {
             name: 'production',
-            apiEndpoint: 'https://instanews.com/api'
+            apiEndpoint: 'https://zanemccaig.com/api'
           }
         }
       }
@@ -523,10 +524,17 @@ module.exports = function (grunt) {
     grunt.config('concurrent.ionic.tasks', ['ionic:emulate:' + this.args.join(), 'watch']);
     return grunt.task.run(['init', 'concurrent:ionic']);
   });
+
   grunt.registerTask('run', function() {
-    grunt.config('concurrent.ionic.tasks', ['ionic:run:' + this.args.join(), 'watch']);
-    return grunt.task.run(['init', 'concurrent:ionic']);
+    if(this.args.indexOf('production') > -1) {
+      this.args.splice(this.args.indexOf('production'),1);
+      return grunt.task.run(['newer:jshint', 'init:production', 'ionic:run:' + this.args.join()]);
+    } else {
+      grunt.config('concurrent.ionic.tasks', ['ionic:run:' + this.args.join(), 'watch']);
+      return grunt.task.run(['init', 'concurrent:ionic']);
+    }
   });
+
   grunt.registerTask('build', function() {
     return grunt.task.run(['init', 'ionic:build:' + this.args.join()]);
   });
@@ -536,6 +544,16 @@ module.exports = function (grunt) {
     'ngconstant:development',
     'wiredep',
     'concurrent:server',
+    'autoprefixer',
+    'newer:copy:app',
+    'newer:copy:tmp'
+  ]);
+
+  grunt.registerTask('init:production', [
+    'clean',
+    'ngconstant:production',
+    'wiredep',
+    'concurrent:dist',
     'autoprefixer',
     'newer:copy:app',
     'newer:copy:tmp'

@@ -9,14 +9,12 @@ app.directive('invotes', [
       'UpVote',
       'DownVote',
       'Position',
-      'User',
       function (Comment,
         Article,
         Subarticle,
          UpVote,
          DownVote,
-         Position,
-         User) {
+         Position) {
 
    return {
       restrict: 'E',
@@ -91,10 +89,11 @@ app.directive('invotes', [
 
                UpVote.create(vote)
                .$promise
-               .then( function(res) {
+               .then( function() {
                   console.log('Successfully upvoted');
                }, function(err) {
                   console.log('Error: Failed to create an upvote');
+                  console.log(err);
                });
             });
          };
@@ -122,10 +121,11 @@ app.directive('invotes', [
 
                DownVote.create(vote)
                .$promise
-               .then( function(res) {
+               .then( function() {
                   console.log('Successfully downVoted');
                }, function(err) {
                   console.log('Error: Failed to create an downVote');
+                  console.log(err);
                });
             });
          };

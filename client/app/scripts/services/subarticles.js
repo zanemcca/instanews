@@ -83,7 +83,8 @@ app.service('Subarticles', [
      });
    };
 
-   var get = function(id) {
+   //TODO var get = function(id) {
+   var get = function() {
      return subarticles;
    };
 
