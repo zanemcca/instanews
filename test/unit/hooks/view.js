@@ -197,9 +197,9 @@ exports.run = function () {
         });
       });
 
-      describe('after delete', function() {
+      describe('before delete', function() {
         beforeEach(function () {
-          hookName = 'after delete';
+          hookName = 'before delete';
         });
 
         afterEach(function() {
@@ -207,6 +207,10 @@ exports.run = function () {
         });
 
         it('should update the parents viewCount', function() {
+          var find = sandbox.stub(View, 'findOne', function(query, Next) {
+            Next(null, 'res');
+          });
+
           var view = sandbox.stub(View, 'updateViewableAttributes', function(ctx, query, Next) {
             expect(query).to.deep.equal({
               '$inc': {
