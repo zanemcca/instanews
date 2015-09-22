@@ -36,13 +36,25 @@ module.exports = function(app) {
     }
   });
 
-  View.observe('after delete', function(ctx, next) {
-    View.updateViewableAttributes(ctx, {
-      '$inc': {
-        viewCount: -1 
+  View.observe('before delete', function(ctx, next) {
+    View.findOne({ where: ctx.where }, function (err, res) {
+      if(err) {
+        return next(err);
       }
-    },
-    next);
+      if(res) {
+        View.updateViewableAttributes({
+          instance: res
+        }, {
+          '$inc': {
+            viewCount: -1 
+          }
+        },
+        next);
+      } else {
+        console.log('Warning: There should have been a viewable instance present');
+        next();
+      }
+    });
   });
 
   View.observe('after save', function(ctx, next) {
@@ -70,19 +82,24 @@ module.exports = function(app) {
           return next(err);
         }
 
-        res.updateAttributes(data, function(err,res) {
-          if(err) {
-            console.log('Warning: Failed to save viewable');
-            next(err);
-          } else {
-            next();
-          }
-        });
+        if(res) {
+          res.updateAttributes(data, function(err,res) {
+            if(err) {
+              console.log('Warning: Failed to save viewable');
+              next(err);
+            } else {
+              next();
+            }
+          });
+        } else {
+          console.log('Warning: There should have been a viewable instance present');
+          next();
+        }
       });
     } else {
       var error = new Error('Invalid instance for updateViewableAttributes');
       error.http_code = 400;
-      console.log(error);
+      console.log(ctx);
       next(error);
     }
   };

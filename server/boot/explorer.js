@@ -1,3 +1,4 @@
+/* istanbul ignore next */
 module.exports = function mountLoopBackExplorer(server) {
   var explorer;
   try {

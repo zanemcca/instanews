@@ -71,7 +71,7 @@ module.exports = function(app) {
         }
         else if(res) {
           var error = new Error('A user can only ' + name + ' once per item');
-          error.http_code = 401;
+          error.status = 401;
           console.log(error);
           next(error);
         } 
@@ -112,7 +112,7 @@ module.exports = function(app) {
       delete inst.id;
 
       var error = new Error('Missing key information for new click!');
-      error.http_code = 400;
+      error.status = 400;
 
       var context = loopback.getCurrentContext();
       if(context) {
@@ -156,7 +156,7 @@ module.exports = function(app) {
       }
       else {
         var error = new Error('Missing key information for new click!');
-        error.http_code = 400;
+        error.status = 400;
         console.log(inst);
         return next(error);
       }
@@ -178,9 +178,9 @@ module.exports = function(app) {
           next();
         }
         else {
-          err = new Error('There is a missing dependency for click creation!');
+          err = new Error('The view is missing for click creation!');
           console.log(err);
-          err.http_code = 403;
+          err.status = 403;
           next(err);
         }
       });
@@ -191,7 +191,7 @@ module.exports = function(app) {
     }
   });
 
-  Click.observe('after delete', function(ctx, next) {
+  Click.observe('before delete', function(ctx, next) {
     //Delegate the count updating to the inherited model 
     if(ctx.Model.modelName !== 'click') {
       ctx.inc = {
@@ -200,12 +200,17 @@ module.exports = function(app) {
       next();
     }
     else {
-      Click.updateClickableAttributes(ctx, {
-        '$inc': {
-          clickCount: -1
-        }
-      },
-      next);
+      //TODO This should check the where filter and update the attributes for all parents
+      if(ctx.instance) {
+        Click.updateClickableAttributes(ctx, {
+          '$inc': {
+            clickCount: -1
+          }
+        },
+        next);
+      } else {
+        next();
+      }
     }
   });
 
@@ -317,10 +322,9 @@ module.exports = function(app) {
          */
         });
       });
-    }
-    else {
+    } else {
       var error = new Error('Invalid instance for updateClickableAttributes');
-      error.http_code = 400;
+      error.status = 400;
       console.log(error);
       next(error);
     }

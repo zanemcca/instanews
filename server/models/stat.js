@@ -12,7 +12,7 @@ module.exports = function(Stat) {
        }
      }, function(err, res) {
        if(err) {
-         console.log('Error: Failed to load ' + Stat.averageId +
+         return console.log('Error: Failed to load ' + Stat.averageId +
                      ': ' + JSON.stringify(err));
        }
        if(res.length === 0) {

@@ -110,7 +110,7 @@ var onConnected = function() {
 //      dataSource.disconnect();
       return;
     }
-    console.log('Database autoupdated');
+//    console.log('Database autoupdated');
 //    dataSource.disconnect();
   });
 };
