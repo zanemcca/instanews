@@ -107,6 +107,31 @@ var runTillDone = function(func, cb, interval, timeout) {
    };
 };
 
+var disableDatabase = function () {
+  var memory = app.dataSources.db;
+  if(!memory) {
+    console.log('Failed to find memory DB');
+    return new Error('Failed to find memory DB');
+  }
+  else {
+    for(var index in app.models) {
+      Model = app.models[index];
+      //TODO save current datasources for later reEnablement
+      Model.attachTo(memory);
+    }
+    return;
+  }
+};
+
+var enableDatabase = function () {
+  //TODO reenable the database
+};
+
+exports.database = {
+  disable: disableDatabase,
+  enable: enableDatabase
+};
+
 exports.serverDir = getBaseDir(); 
 exports.assert = assert;
 exports.app = app;
