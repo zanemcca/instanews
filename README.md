@@ -6,6 +6,7 @@ Local Citizen Journalism in an elegant simple platform
 
 ### Setup
 - Encrypt your working directory
+- Install node v4.x from (here)[https://github.com/nodesource/distributions]
 - Install git
 - Install npm (node package manager)
 - ```npm install -g slc grunt grunt-cli mocha karma ionic```
@@ -35,6 +36,7 @@ Local Citizen Journalism in an elegant simple platform
 - ```grunt coverage:open``` (Opens the generated coverage report in youe default browser)
 - ```grunt check``` (Checks if the generated coverage meets the required limits)
 - ```grunt test(:[unit,integration])``` (Skips coverage reporting)
+- You can use `cu`, `ci`, `tu` and `ti` as shortcuts for the different tests
 
 ##### Example
 - ```grunt coverage:unit```
@@ -65,13 +67,19 @@ Local Citizen Journalism in an elegant simple platform
 - ```grunt serve```
 
 ### Debugging backend
+
 #### Logs
 - ```DEBUG=loopback:* slc run```
  
 #### Debugger
 - ```npm install -g node-inspector```
-- ```node-inspector```
-- In another shell ```mocha --debug-brk test``` (For testcases) or ```node --debug-brk server/server.js``` (For code alone)
+- ```grunt debug:OPTION```
+Where options are:
+- `unit` - for unit tests
+- `integration` - for integration tests
+- `server` - for the server 
+- `FILENAME` - any FILENAME relative to the the repo root directory
+The default is `server`
 
 ### Pushing changes
 - Fork a copy of instanews to your Github account
