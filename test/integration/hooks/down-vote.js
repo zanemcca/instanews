@@ -17,7 +17,7 @@ var DownVote = depend.downVote;
 var genericModels = require('../../genericModels');
 
 exports.run = function() {
-  describe.only('DownVote', function() {
+  describe('DownVote', function() {
     on.article().describe('Create downvote', function () {
       it('should update the downVoteCount of the article voted on', function(done) {
         DownVote.create(function(err, vote) {
