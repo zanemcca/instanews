@@ -39,9 +39,7 @@ exports.run = function () {
             relation: 'something'
           }
         },
-        options: {
-          rate: true
-        },
+        options: {},
         Model: {
           modelName: 'base'
         },
@@ -83,7 +81,118 @@ exports.run = function () {
           expect(next.calledOnce).to.be.true;
         });
 
-        //TODO Finish this
+        describe('ctx.query.limit', function () {
+          it('should reduce the limit to the maximum', function () {
+            ctx.query.limit = 5000;
+            run();
+            expect(ctx.query.limit).to.equal(50);
+          });
+
+          it('should set the limit to the maximum', function () {
+            run();
+            expect(ctx.query.limit).to.equal(50);
+          });
+
+          it('should not modify the limit', function () {
+            ctx.query.limit = 49;
+            run();
+            expect(ctx.query.limit).to.equal(49);
+          });
+        });
+
+        describe('ctx.query.include', function () {
+          it('should create a new empty array', function () {
+            delete ctx.query.include;
+            run();
+            expect(Array.isArray(ctx.query.include)).to.be.true;
+            expect(ctx.query.include.length).to.equal(0);
+          });
+
+          it('should convert include into an array', function () {
+            run();
+            expect(ctx.query.include).to.deep.equal([
+              {
+                 relation: 'something'
+              }
+            ]);
+          });
+
+          it('should not change include', function () {
+            ctx.query.include = [ctx.query.include];
+
+            run();
+            expect(ctx.query.include).to.deep.equal([
+              {
+                 relation: 'something'
+              }
+            ]);
+          });
+        });
+
+        describe('authenticated user', function () {
+          var stat;
+          beforeEach(function () {
+            stat = {
+              username: 'user7',
+              comment: {
+                views: {
+                  mean: 44
+                }
+              }
+            };
+
+            sandbox.stub(loopback, 'getCurrentContext', function () {
+              return {
+                get: function(stats) {
+                  expect(stats).to.equal('currentStat');
+                  return stat;
+                }
+              };
+            });
+          });
+
+          it('should include upVotes and downVotes of the user', function () {
+            run();
+            expect(ctx.query.include.length).to.equal(3);
+            expect(ctx.query.include[1]).to.deep.equal({
+              relation: 'upVotes',
+              scope: {
+                where: {
+                  username: stat.username 
+                }
+              }
+            });
+
+            expect(ctx.query.include[2]).to.deep.equal({
+              relation: 'downVotes',
+              scope: {
+                where: {
+                  username: stat.username 
+                }
+              }
+            });
+          });
+
+          it('should include comments', function () {
+            ctx.query.rate = true;
+
+            run();
+            expect(ctx.query.include.length).to.equal(4);
+            expect(ctx.query.include[3]).to.deep.equal({
+              relation: 'comments',
+              scope: {
+                limit: stat.comment.views.mean,
+                order: 'rating DESC'
+              }
+            });
+          });
+        });
+
+        it('should set ctx.options.rate', function () {
+          ctx.query.rate = true;
+          run();
+          expect(ctx.options.rate).to.be.true;
+        });
       });
 
       describe('before save', function() {
@@ -93,6 +202,20 @@ exports.run = function () {
 
         afterEach(function() {
           expect(next.calledOnce).to.be.true;
+        });
+
+        it('should update modified and ratingModified dates', function() {
+          run();
+          expect(ctx.instance.modified).to.equalDate(new Date());
+          expect(ctx.instance.ratingModified).to.equalDate(new Date());
+        });
+
+        it('should delete comments and subarticles', function() {
+          ctx.instance.comments = 'comments';
+          ctx.instance.subarticles = 'subarticles';
+          run();
+          expect(ctx.instance.comments).to.not.exist;
+          expect(ctx.instance.subarticles).to.not.exist;
         });
 
         describe('new instance', function() {
@@ -216,6 +339,42 @@ exports.run = function () {
           });
         });
 
+        describe('is not a new instance', function() {
+          beforeEach(function () {
+            ctx.isNewInstance = false;
+            ctx.data = {
+              $inc: {
+                upVoteCount: 1
+              },
+              $set: {
+                something: true
+              }
+            };
+          });
+
+          it('should delete ctx.data.version', function () {
+            ctx.data.version = 5;
+            run();
+            expect(ctx.data.version).to.not.exist;
+          });
+
+          it('should set ctx.data.$inc.version and ctx.data.$set to ctx.data', function () {
+            delete ctx.data.$inc;
+            ctx.data = ctx.data.$set;
+
+            run();
+            expect(ctx.data.$inc.version).to.equal(1);
+            expect(ctx.data.$set.something).to.be.true;
+          });
+
+          it('should add version to ctx.data.$inc', function () {
+            run();
+            expect(ctx.data.$inc.version).to.equal(1);
+            expect(ctx.data.$inc.upVoteCount).to.equal(1);
+            expect(ctx.data.$set.something).to.be.true;
+          });
+        });
+
         describe('should not return an error', function() {
           beforeEach(function() {
             Next =  function (err) {
@@ -240,7 +399,52 @@ exports.run = function () {
           expect(next.calledOnce).to.be.true;
         });
 
-        //TODO Finsish this
+        describe('rate option', function() {
+          var rating, ratingCb;
+          beforeEach(function () {
+            ctx.options.rate = true;
+            ratingCb = function(Model, instance, cb) {
+              cb();
+            };
+
+            rating = sandbox.stub(app.models.stat, 'getCustomRating', function(Model, instance, cb) {
+              ratingCb(Model, instance, cb);
+            });
+          });
+
+          it('should propagate the error frome Stat.getCustomRating', function (done) {
+            var error = 'error';
+            ratingCb = function(m, i,cb) {
+              cb(error);
+            };
+
+            Next = function(err) {
+              expect(err).to.equal(error);
+              done();
+            };
+
+            run();
+          });
+
+          it('should update the rating', function() {
+            var custom = {
+              rating: 555
+            };
+
+            ratingCb = function(m, i, cb) {
+              cb(null, custom);
+            };
+
+            run();
+            expect(ctx.instance.rating).to.equal(custom.rating);
+          });
+
+          it('should not call Stat.getCustomRating', function () {
+            ctx.options.rate = false;
+            run();
+            expect(rating.called).to.be.false;
+          });
+        });
       });
 
       /*
@@ -284,7 +488,87 @@ exports.run = function () {
     });
 
     describe('createClickAfterRemote', function() {
-      //TODO
+      var click, clickCb, stat, context;
+      beforeEach(function () {
+        ctx.req = {
+          remotingContext: {
+            instance: {
+              id: 'someid',
+              modelName: 'aModel'
+            }
+          }
+        };
+
+        run = function(cb) {
+          return Base.createClickAfterRemote(ctx, cb);
+        };
+
+        clickCb = function (click, cb) {
+          cb();
+        };
+
+        click = sandbox.stub(app.models.click, 'create', function ( click, cb) {
+          clickCb(click, cb);
+        });
+
+        stat = {
+          username: 'user6'
+        };
+
+        context = {
+          get: function(stats) {
+            expect(stats).to.equal('currentStat');
+            return stat;
+          }
+        };
+
+        sandbox.stub(loopback, 'getCurrentContext', function () {
+          return context;
+        });
+      });
+
+      it('should create a click' , function (done) {
+        run(function(err) {
+          expect(click.calledOnce).to.be.true;
+          done();
+        });
+      });
+
+      it('should not create a click' , function (done) {
+        context = null;
+        run(function(err) {
+          expect(click.called).to.be.false;
+          done();
+        });
+      });
+
+      it('should also not create a click' , function (done) {
+        stat.username = null;
+        run(function(err) {
+          expect(click.called).to.be.false;
+          done();
+        });
+      });
+
+      it('should propagate an error from click' , function (done) {
+        var error = 'an error';
+        clickCb = function(click, cb) {
+          cb(error);
+        };
+
+        run(function (err) {
+          expect(err).to.equal(error);
+          done();
+        });
+      });
+
+      it('should return a 403 error code', function (done) {
+        delete ctx.req.remotingContext;
+        run( function (err) {
+          expect(err.http_code).to.equal(403);
+          done();
+        });
+      });
     });
   });
 };
