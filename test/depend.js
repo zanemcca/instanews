@@ -20,6 +20,60 @@ var CoDependencies = {
   comment: ['view'],
 };
 
+var samples = {
+  comment: function (parent) {
+    return {
+      content: generateRandomString(Math.floor(Math.random()*40)),
+      commentableType: parent.modelName,
+      commentableId: parent.id 
+    };
+  },
+  view: function (parent) {
+    return {
+      viewableId: parent.id,
+      viewableType: parent.modelName
+    };
+  },
+  click: function (parent) {
+    return {
+      clickableId: parent.id,
+      clickableType: parent.modelName
+    };
+  },
+  upVote: function (parent) {
+    return {
+      clickableId: parent.id,
+      clickableType: parent.modelName
+    };
+  },
+  downVote: function (parent) {
+    return {
+      clickableId: parent.id,
+      clickableType: parent.modelName
+    };
+  },
+  article: function () {
+    return {
+      title: generateRandomString(),
+      isPrivate: false,
+      location: generateRandomLocation() 
+    };
+  },
+  subarticle: function (parent) {
+    return {
+      text: generateRandomString(Math.floor(Math.random()*500)),
+      parentId: parent.id
+    };
+  },
+  journalist: function (name) {
+    return {
+      password: generateRandomString(),
+      username: name,
+      email: name + '@mail.com'
+    };
+  }
+};
+
 /*
    var Models = {
 article: ['subarticle', 'comment'],
@@ -223,9 +277,8 @@ function Instances() {
       cb();
     }
 
-    var insts = this._instances;
     var cb = function(err) {
-      insts.length = 0;
+      instances.length = 0;
       done(err);
     };
   };
@@ -255,12 +308,15 @@ function Instances() {
 }
 
 var destroy = function(inst, cb) {
+  //console.log(inst);
   var name = inst.modelName;
   var id = inst.id;
   if(!name) {
     if(inst.userId) {
       name = 'journalist';
       id = inst.userId;
+    } else if(inst.clickableId) {
+      name = 'click';
     } else {
       name = 'view';
     }
@@ -366,15 +422,26 @@ var Describe = function (previous) {
 
     describe(description, function () {
       beforeEach( function (done) {
-        satisfyDependencies(previous, done); 
+        satisfyDependencies(previous, function(err) {
+          if(err) return done(err);
+          var current = previous;
+          while(current) {
+            current._instance = null;
+            current._parent = null;
+            current.isActionable = false;
+            current = current._previous;
+          }
+          done();
+        }); 
       });
+
       afterEach( function (done) {
         exports.instances.clear(function (err) {
           if(err) return done(err);
           exports.users.clear(done);
         });
-        //tearDown(done);
       });
+
       next();
     });
   };
@@ -402,10 +469,10 @@ function satisfyDependencies(current, done) {
             if(!err) {
               this.parent = this.createables[this.createables.length - 1];
               this.createables.length = 0;
+              satisfyDependencies(current._previous, done);
             } else {
               return done(err);
             }
-            satisfyDependencies(current._previous, done);
           });
         } else {
           satisfyDependencies(current._previous, done);
@@ -563,48 +630,6 @@ var generateRandomLocation = function (bottomLeft, upperRight) {
     lat: Math.random()*(maxLat -minLat) + minLat,
     lng: Math.random()*(maxLng -minLng) + minLng
   };
-};
-
-var samples = {
-  comment: function (parent) {
-    return {
-      content: generateRandomString(Math.floor(Math.random()*40)),
-      commentableType: parent.modelName,
-      commentableId: parent.id 
-    };
-  },
-  view: function (parent) {
-    return {
-      viewableId: parent.id,
-      viewableType: parent.modelName
-    };
-  },
-  click: function (parent) {
-    return {
-      clickableId: parent.id,
-      clickableType: parent.modelName
-    };
-  },
-  article: function () {
-    return {
-      title: generateRandomString(),
-      isPrivate: false,
-      location: generateRandomLocation() 
-    };
-  },
-  subarticle: function (parent) {
-    return {
-      text: generateRandomString(Math.floor(Math.random()*500)),
-      parentId: parent.id
-    };
-  },
-  journalist: function (name) {
-    return {
-      password: generateRandomString(),
-      username: name,
-      email: name + '@mail.com'
-    };
-  }
 };
 
 function getModelInstance(type, arg) {
