@@ -661,7 +661,8 @@ var createCreate = function(model) {
   return {
     create: function(inst, cb) {
       var parent = exports.instances.getActionableInstance();
-      if(!inst) {
+      if(!cb) {
+        cb = inst;
         inst = getModelInstance(model, parent);
       }
       var url = getURL(model, parent);
@@ -670,7 +671,7 @@ var createCreate = function(model) {
         if(err) return cb(err);
         post(url, token, inst, function(err, instance) {
           exports.instances.add(instance, parent);
-          cb(err);
+          cb(err, instance);
         });
       });
     }
