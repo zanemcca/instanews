@@ -24,27 +24,20 @@ module.exports = function(app) {
       var context = loopback.getCurrentContext();
       if(context) {
         var stat = context.get('currentStat');
-        if(stat) {
-          if(stat.username) {
-            var click = {
-              username: stat.username,
-              clickableType: ctx.req.remotingContext.instance.modelName,
-              clickableId: ctx.req.remotingContext.instance.id
-            };
-            Click.create(click, function(err, res) {
-              if(err) {
-                console.log(err);
-                next(err);
-              }
-              next();
-            });
-          }
-          else {
-            next();
-          }
+        if(stat.username) {
+          var click = {
+            username: stat.username,
+            clickableType: ctx.req.remotingContext.instance.modelName,
+            clickableId: ctx.req.remotingContext.instance.id
+          };
+          Click.create(click, function(err, res) {
+            if(err) {
+              console.log(err);
+            }
+            next(err);
+          });
         }
         else {
-          console.log('Warning: No stat object was found!');
           next();
         }
       }
@@ -55,6 +48,7 @@ module.exports = function(app) {
     }
     else {
       var error = new Error('Invalid context for prototype.__get__comments');
+      error.http_code = 403;
       console.log(ctx);
       next(error);
     }
@@ -78,12 +72,13 @@ module.exports = function(app) {
     var context = loopback.getCurrentContext();
     if(context) {
       var stat = context.get('currentStat');
-      if(stat) {
+      var username =  stat.username;
+      if(username) {
         ctx.query.include.push({
           relation: 'upVotes',
           scope: {
             where: {
-              username: stat.username 
+              username: username 
             }
           }
         });
@@ -91,7 +86,7 @@ module.exports = function(app) {
           relation: 'downVotes',
           scope: {
             where: {
-              username: stat.username 
+              username: username 
             }
           }
         });
@@ -123,6 +118,14 @@ module.exports = function(app) {
         inst = ctx.data;
       }
       if(inst) {
+         //TODO use a mixin for this 
+         //Update the modification date
+         inst.modified = new Date();
+         inst.ratingModified = new Date();
+
+         delete inst.comments;
+         delete inst.subarticles;
+
          if(ctx.isNewInstance) {
             inst.username = undefined;
 
@@ -194,14 +197,6 @@ module.exports = function(app) {
              ctx.data.$inc.version = 1;
            }
          }
-
-         //TODO use a mixin for this 
-         //Update the modification date
-         inst.modified = new Date();
-         inst.ratingModified = new Date();
-
-         delete inst.comments;
-         delete inst.subarticles;
       }
       else {
         console.log('Warning: There does not seem to be an instance present!');
@@ -212,9 +207,7 @@ module.exports = function(app) {
 
    Base.observe('loaded', function(ctx, next) {
      var instance = ctx.instance;
-     if(!instance) {
-       instance = ctx.data;
-     }
+
      if(instance && ctx.options.rate) {
        Stat.getCustomRating(ctx.Model, instance, function(err, inst) {
         if(err) {

@@ -14,6 +14,11 @@ module.exports = function(app) {
     if(ctx.inc && typeof(ctx.inc) === 'object') {
       ctx.inc.upVoteCount = -1;
       Click.updateVoteParent(ctx, next);
+    } else if(ctx.where) {
+      //TODO deal with deletion of multiple votes
+      console.log('warning: Strange upvote deletion request!');
+      console.log(ctx.where);
+      next();
     }
     else {
       var error = new Error('Upvote  deletion expected there to be ctx.inc!');

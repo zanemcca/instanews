@@ -4,6 +4,8 @@
   "strict": false,
   "idInjection": true,
   "hidden": [
+    "ratingModified",
+    "ratingVersion",
     "clickCount",
     "viewCount"
   ],
@@ -13,6 +15,12 @@
       "required": true
     },
     "rating": {
+      "type": "number"
+    },
+    "ratingModified": {
+      "type": "date"
+    },
+    "ratingVersion": {
       "type": "number"
     },
     "clickCount": {
