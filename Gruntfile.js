@@ -47,7 +47,8 @@ module.exports = function(grunt) {
       all: {
         src: ['test/unit/test.js', 'test/integration/test.js'],
         options: {
-          reporter: 'spec'
+          reporter: 'spec',
+          bail: true
         }
       },
       unit: {
@@ -59,7 +60,8 @@ module.exports = function(grunt) {
       integration: {
         src: ['test/integration/test.js'],
         options: {
-          reporter: 'spec'
+          reporter: 'spec',
+          bail: true
         }
       }
     },
@@ -67,7 +69,10 @@ module.exports = function(grunt) {
     mocha_istanbul: {
       unit: {
         src: 'test/unit',
-        root: './server'
+        root: './server',
+        options: {
+          excludes: ['./server/boot/**']
+        }
       },
       integration: {
         src: 'test/integration',
@@ -107,6 +112,20 @@ module.exports = function(grunt) {
         path: 'http://localhost:4000'
       }
     },
+    //Shell commands
+    shell: {
+      debug: {
+        command: function (file) { 
+          //return 'node-debug --no-preload ' + file;
+          return 'node-debug --ignore "**/node_modules/**" ' + file;
+        }
+      },
+      debugTest: {
+        command: function (file) { 
+          return 'node-debug --ignore "**/node_modules/**" _mocha --no-timeouts ' + file;
+        }
+      }
+    },
     //Express server
     express: {
       options: {
@@ -124,6 +143,7 @@ module.exports = function(grunt) {
         }
       }
     },
+    //Watch tasks
     watch: {
       server: {
         files: ['server/**/*'],
@@ -137,12 +157,20 @@ module.exports = function(grunt) {
         tasks: ['nodestatic:docs']
       }
     },
+    //Jshint
     jshint: {
-      server: ['Gruntfile.js', 'server/**/*.js', 'test/**/**/*.js'],
+      server: {
+        options: {
+          esnext: true
+        },
+        files: {
+          src: ['Gruntfile.js', 'server/**/*.js', 'test/**/**/*.js'],
+        }
+      },
       client: ['client/app/scripts/**/*.js' , 'client/test/**/**/*.js']
     }
   });
- 
+
   // Load the plugin that provides the "loopback-sdk-angular" and "grunt-docular" tasks.
   grunt.loadNpmTasks('grunt-loopback-sdk-angular');
   grunt.loadNpmTasks('grunt-docular');
@@ -153,6 +181,7 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-express-server');
   grunt.loadNpmTasks('grunt-contrib-watch');
   grunt.loadNpmTasks('grunt-contrib-jshint');
+  grunt.loadNpmTasks('grunt-shell');
 
 
   /**
@@ -161,6 +190,38 @@ module.exports = function(grunt) {
   //Serve the webpage
   // Start the web server
   grunt.registerTask('start', ['jshint:server', 'express:dev', 'watch:server']);
+
+  // Debug the server
+  // Ex. 'grunt debug:server/serverj.js' --> 'node-debug --no-preload server/server.js'
+  grunt.registerTask('debug', function (option) {
+    var command = 'shell:debug:';
+    var file = '';
+    if(!option) {
+      file = 'server/server.js';
+    } else {
+      switch(option) {
+        case 'server':
+          file = 'server/server.js';
+        break;
+        case 'integration':
+          command = 'shell:debugTest:';
+          file = 'test/integration/test.js';
+        break;
+        case 'unit':
+          command = 'shell:debugTest:';
+          file = 'test/unit/test.js';
+        break;
+        default:
+          file = option;
+        break;
+      }
+    }
+    if(file.slice(file.length - 3) !== '.js') {
+      file += '.js';
+    }
+
+    grunt.task.run(command + file);
+  });
 
   // Start and open the web server
   grunt.registerTask('serve', ['jshint:server', 'express:dev', 'open:server', 'watch:server']);
@@ -183,7 +244,6 @@ module.exports = function(grunt) {
 
 
   //TODO Front end testing and coverage 
-  //TODO Unit, Integration and All
   //Coverage reporting and testing
   grunt.registerTask('coverage', ['jshint:server', 'mocha_istanbul:all', 'istanbul_check_coverage']);
   grunt.registerTask('coverage:unit', ['jshint:server', 'mocha_istanbul:unit', 'istanbul_check_coverage']);
@@ -198,4 +258,12 @@ module.exports = function(grunt) {
   grunt.registerTask('test:unit', ['jshint:server', 'mochaTest:unit']);
   grunt.registerTask('test:integration', ['jshint:server', 'mochaTest:integration']);
 
+  // Shortcuts
+  grunt.registerTask('ci', 'coverage:integration');
+  grunt.registerTask('cu', 'coverage:unit');
+  grunt.registerTask('ca', 'coverage');
+
+  grunt.registerTask('ti', 'test:integration');
+  grunt.registerTask('tu', 'test:unit');
+  grunt.registerTask('ta', 'test');
 };
