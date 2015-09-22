@@ -152,7 +152,7 @@ exports.run = function () {
 
               Next = function (err) {
                 if(next.calledOnce) {
-                  expect(err.http_code).to.equal(401);
+                  expect(err.status).to.equal(401);
                 }
               };
 
@@ -267,7 +267,7 @@ exports.run = function () {
             it('should return a  error message', function() {
               Next = function (err) {
                 if(next.calledTwice) {
-                  expect(err.http_code).to.equal(403);
+                  expect(err.status).to.equal(403);
                 }
               };
 
@@ -338,7 +338,7 @@ exports.run = function () {
           beforeEach(function() {
             Next =  function (err) {
               if(next.calledTwice) {
-                expect(err.http_code).to.equal(400);
+                expect(err.status).to.equal(400);
               }
             };
           });
@@ -404,9 +404,9 @@ exports.run = function () {
         });
       });
 
-      describe('after delete', function() {
+      describe('before delete', function() {
         beforeEach(function () {
-          hookName = 'after delete';
+          hookName = 'before delete';
         });
 
         afterEach(function() {
@@ -535,7 +535,7 @@ exports.run = function () {
       it('should return a 400 error message', function() {
         ctx.instance = null;
         Next = function (err) {
-          expect(err.http_code).to.equal(400);
+          expect(err.status).to.equal(400);
         };
 
         Click.updateClickableAttributes(ctx, null, next);
