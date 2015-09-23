@@ -28,7 +28,6 @@ function req(file) {
   return require(getBaseDir() + file);
 }
 
-
 var dump = function(err, res) {
   /*
    if (err) {
@@ -65,6 +64,44 @@ var findModel = function(type, models) {
    }
    //console.log('No model found for ' + type);
    return;
+};
+
+var generateRandomString = function (length) {
+  if(!length) length = 8;
+  var chars = ['a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z'];
+  var name = '';
+  for(var i = 0; i < length; i++) {
+    name += chars[Math.floor(Math.random()*chars.length)];
+  }
+  return name;
+};
+
+var generateRandomLocation = function (bottomLeft, upperRight) {
+  var maxLat, minLat, maxLng, minLng;
+  if(bottomLeft && upperRight) {
+    maxLat = upperRight.lat;
+    maxLng = upperRight.lng;
+    minLat = bottomLeft.lat;
+    minLng = bottomLeft.lng;
+  }
+
+  if(!minLng) {
+    minLng = -180;
+  }
+  if(!minLat) {
+    minLat = -90;
+  }
+  if(!maxLat) {
+    maxLat = 90;
+  }
+  if(!maxLng) {
+    maxLng = 180;
+  }
+
+  return {
+    lat: Math.random()*(maxLat -minLat) + minLat,
+    lng: Math.random()*(maxLng -minLng) + minLng
+  };
 };
 
 /*
@@ -142,3 +179,7 @@ exports.findModel = findModel;
 exports.removeModel = removeModel;
 exports.runTillDone = runTillDone;
 exports.req = req;
+exports.generate = {
+  randomString: generateRandomString,
+  randomLocation: generateRandomLocation
+};
