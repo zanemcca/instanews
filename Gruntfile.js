@@ -45,7 +45,14 @@ module.exports = function(grunt) {
     //Solo mocha testing
     mochaTest: {
       all: {
-        src: ['test/unit/test.js', 'test/integration/test.js'],
+        src: ['test/unit/test.js', 'test/integration/test.js', 'test/depend/*.test.js'],
+        options: {
+          reporter: 'spec',
+          bail: true
+        }
+      },
+      test: {
+        src: ['test/depend/*.test.js'],
         options: {
           reporter: 'spec',
           bail: true
@@ -54,7 +61,8 @@ module.exports = function(grunt) {
       unit: {
         src: ['test/unit/test.js'],
         options: {
-          reporter: 'spec'
+          reporter: 'spec',
+          bail: true
         }
       },
       integration: {
@@ -67,6 +75,10 @@ module.exports = function(grunt) {
     },
     //Mocha-istanbul testing
     mocha_istanbul: {
+      test: {
+        src: 'test/depend/*.test.js',
+        root: 'test/depend'
+      },
       unit: {
         src: 'test/unit',
         root: './server',
@@ -79,7 +91,7 @@ module.exports = function(grunt) {
         root: './server'
       },
       all: {
-        src: ['test/unit', 'test/integration'],
+        src: ['test/unit', 'test/integration', 'test/depend/*.test.js'],
         root: './server'
       }
     },
@@ -211,6 +223,10 @@ module.exports = function(grunt) {
           command = 'shell:debugTest:';
           file = 'test/unit/test.js';
         break;
+        case 'test':
+          command = 'shell:debugTest:';
+          file = 'test/depend/test.js';
+        break;
         default:
           file = option;
         break;
@@ -247,6 +263,7 @@ module.exports = function(grunt) {
   //Coverage reporting and testing
   grunt.registerTask('coverage', ['jshint:server', 'mocha_istanbul:all', 'istanbul_check_coverage']);
   grunt.registerTask('coverage:unit', ['jshint:server', 'mocha_istanbul:unit', 'istanbul_check_coverage']);
+  grunt.registerTask('coverage:test', ['jshint:server', 'mocha_istanbul:test', 'istanbul_check_coverage']);
   grunt.registerTask('coverage:integration', ['jshint:server', 'mocha_istanbul:integration', 'istanbul_check_coverage']);
   grunt.registerTask('coverage:open', ['open:coverage']);
 
@@ -256,14 +273,17 @@ module.exports = function(grunt) {
   // Just run the tests
   grunt.registerTask('test', ['jshint:server', 'mochaTest:all']);
   grunt.registerTask('test:unit', ['jshint:server', 'mochaTest:unit']);
+  grunt.registerTask('test:test', ['jshint:server', 'mochaTest:test']);
   grunt.registerTask('test:integration', ['jshint:server', 'mochaTest:integration']);
 
   // Shortcuts
   grunt.registerTask('ci', 'coverage:integration');
   grunt.registerTask('cu', 'coverage:unit');
+  grunt.registerTask('ct', 'coverage:test');
   grunt.registerTask('ca', 'coverage');
 
   grunt.registerTask('ti', 'test:integration');
   grunt.registerTask('tu', 'test:unit');
+  grunt.registerTask('tt', 'test:test');
   grunt.registerTask('ta', 'test');
 };

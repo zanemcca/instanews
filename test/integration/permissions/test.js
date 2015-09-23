@@ -164,7 +164,7 @@ var testEndpoint = function(oldEndpoint, test, role, next) {
 
         dump(err, ret);
         next(err, ret);
-        });
+      });
     };
 
 
@@ -172,422 +172,423 @@ var testEndpoint = function(oldEndpoint, test, role, next) {
      * This function will add the given model based on the given endpoint
      * from the diffUser account
      */
-        var diffUserAddModel = function(model, endpoint, cb) {
+    var diffUserAddModel = function(model, endpoint, cb) {
 
-          var handleResult =  function(err, res) {
+      var handleResult =  function(err, res) {
 
-            dump(err, res);
-            //Save the model locally
-            var body = res.body;
-            if(!body) {
-              body = res;
-            }
-            if(body.error) {
-              //console.log(body.error);
-            }
-            else {
-              body.type = type;
-              if( type === 'journalists' ) {
-                body.password = model.password;
-              }
-              models.push(body);
-            }
+        dump(err, res);
+        //Save the model locally
+        var body = res.body;
+        if(!body) {
+          body = res;
+        }
+        if(body.error) {
+          //console.log(body.error);
+        }
+        else {
+          body.type = type;
+          if( type === 'journalists' ) {
+            body.password = model.password;
+          }
+          models.push(body);
+        }
 
-            //console.log('Created a model: ' + JSON.stringify(body));
-            cb(err, res);
-          };
+        //console.log('Created a model: ' + JSON.stringify(body));
+        cb(err, res);
+      };
 
-          if( model.type === 'subarticles') {
-            model.username = users.diffUser.username;
-            Subarticles.create(model, handleResult);
+      if( model.type === 'subarticles') {
+        model.username = users.diffUser.username;
+        Subarticles.create(model, handleResult);
+      }
+      else {
+        if( endpoint.indexOf('/upload') > -1 ) {
+          api.post(endpoint)
+          .set('Authorization', diffUserToken.id)
+          .attach('file', path.join(__dirname, '../' + model.filename))
+          .set('Accept', 'application/json')
+          .expect('Content-Type', /json/)
+          .expect(200)
+          .end( handleResult);
+        }
+        else {
+          api.post(endpoint)
+          .send(model)
+          .set('Authorization', diffUserToken.id)
+          .expect(200)
+          .end( handleResult);
+        }
+      }
+    };
+
+    /*
+     * This function will clear all models that the current test has created
+     */
+    var clearEndpoint =  function(endpoint, ends, count, callback, diffUser) {
+      if(count ===  ends.length) {
+        callback();
+      }
+      else{
+        endpoint += '/' + ends[count];
+
+        var tempModel = findModel(ends[count], models);
+
+        if(tempModel) {
+
+          var id;
+          if(role === 'guest' || diffUser) {
+            id = diffUserToken.id;
           }
           else {
-            if( endpoint.indexOf('/upload') > -1 ) {
-              api.post(endpoint)
-              .set('Authorization', diffUserToken.id)
-              .attach('file', path.join(__dirname, '../' + model.filename))
-              .set('Accept', 'application/json')
-              .expect('Content-Type', /json/)
-              .expect(200)
-              .end( handleResult);
-            }
-            else {
-              api.post(endpoint)
-              .send(model)
-              .set('Authorization', diffUserToken.id)
-              .expect(200)
-              .end( handleResult);
-            }
+            id = token.id;
           }
-        };
 
-        /*
-         * This function will clear all models that the current test has created
-         */
-        var clearEndpoint =  function(endpoint, ends, count, callback, diffUser) {
-          if(count ===  ends.length) {
-            callback();
-          }
-          else{
-            endpoint += '/' + ends[count];
-
-            var tempModel = findModel(ends[count], models);
-
-            if(tempModel) {
-
-              var id;
-              if(role === 'guest' || diffUser) {
-                id = diffUserToken.id;
-              }
-              else {
-                id = token.id;
-              }
-
-              //console.log('Deleting a model: ' + JSON.stringify(tempModel));
-              if( tempModel.type === 'journalists') {
-                Journalists.deleteById(tempModel.username, function(err, res) {
-                  dump(err, res);
-                  models = removeModel(tempModel, models);
-                  clearEndpoint(endpoint, ends, count + 1, callback);
+          //console.log('Deleting a model: ' + JSON.stringify(tempModel));
+          if( tempModel.type === 'journalists') {
+            Journalists.deleteById(tempModel.username, function(err, res) {
+                dump(err, res);
+                models = removeModel(tempModel, models);
+                clearEndpoint(endpoint, ends, count + 1, callback);
                 });
-              }
-              else {
-                api.delete(endpoint)
-                .send(tempModel)
-                .set('Authorization', id)
-                .end( function(err, res) {
+          }
+          else {
+            api.delete(endpoint)
+              .send(tempModel)
+              .set('Authorization', id)
+              .end( function(err, res) {
 
                   dump(err, res);
                   models = removeModel(tempModel, models);
                   clearEndpoint(endpoint, ends, count +1, callback);
-                });
-              }
-            }
-            else {
-              clearEndpoint(endpoint, ends, count +1, callback);
-            }
-          }
-        };
-
-        /*
-         * This function is meant to be recursively called before the
-         * execution of each unittest.
-         * It will create any models that are needed and it will prepare
-         * the endpoint to be used by the unittest.
-         */
-        var prepEndpoint = function(ends, count, callback, diffUser) {
-          //Ending condition
-
-          var tempModel = {};
-          if(count === ends.length) {
-            callback();
-          }
-          else if( ends[count] === '{id}') {
-            tempModel = findModel(ends[count-1], models);
-
-            if( tempModel ) {
-              if( tempModel.id ) {
-                endpoint += '/' + tempModel.id;
-              }
-              else if( tempModel.username ) {
-                endpoint += '/' + tempModel.username;
-              }
-              else if( tempModel.result.files.file[0].name ) {
-                endpoint += '/' + tempModel.result.files.file[0].name;
-              }
-              else {
-                endpoint += '/{id}';
-                console.log('Warning: Model was found but has an invalid id');
-              }
-            }
-            else if( ends[2] === 'storages' ) {
-              if( ends[count -1] === 'storages') {
-                endpoint += '/instanews.test';
-              }
-              else {
-                endpoint += '/file.txt';
-              }
-            }
-            else {
-              //console.log('Warning: A model should be available for ' + ends[count-1]);
-              endpoint += '/{id}';
-            }
-
-            prepEndpoint(ends,count + 1,callback);
-          }
-          else {
-            type = ends[count];
-            endpoint += '/' + type;
-            //Check for a model instance designed specifically for this testcase
-            tempModel = findModel(ends[count], test.models);
-            if( !tempModel) {
-              //Since a model was not given in the test it is assumed
-              //that a generic model will suffice
-              tempModel = findModel(ends[count], genericModels);
-            }
-
-            if( tempModel ) {
-
-              if( !tempModel.noPreCreate ) {
-
-                var url = endpoint;
-                if(tempModel.customUrl) {
-                  url = tempModel.customUrl;
-                }
-
-                //Check if the test is requesting for the
-                // models used to be created by a different
-                // user than the one logged in. This is always
-                // the case with a guest
-                if(diffUser || role === 'guest') {
-                  diffUserAddModel(tempModel, url, function() {
-                    prepEndpoint(ends,count + 1,callback, true);
                   });
-                }
-                else{
-
-                  var handleResult =  function(err, res) {
-                    //Save the model locally
-                    if(err) {
-                      dump(err,res);
-                      return done(err);
-                    }
-
-                    var body = res.body;
-                    if(!body) {
-                      body = res;
-                    }
-                    if(body.error) {
-                      //console.log(body.error);
-                    }
-                    else {
-                      body.type = type;
-                      if( type === 'journalists' ) {
-                        body.password = tempModel.password;
-                      }
-                      models.push(body);
-                    }
-
-                    //console.log('Created a model: ' + JSON.stringify(body));
-                    dump(err, res);
-                    prepEndpoint(ends,count + 1,callback);
-                  };
-
-                  if( tempModel.type === 'subarticles') {
-                    tempModel.username = user.username;
-                    Subarticles.create(tempModel, handleResult);
-                  }
-                  else {
-                    if( url.indexOf('/upload') > -1 ) {
-                      api.post(url)
-                      .set('Authorization', token.id)
-                      .attach('file', path.join(__dirname, '../' + tempModel.filename))
-                      .set('Accept', 'application/json')
-                      .expect('Content-Type', /json/)
-                      .end( handleResult);
-                    }
-                    else {
-                      api.post(url)
-                      .send(tempModel)
-                      .set('Authorization', token.id)
-                      .end( handleResult);
-                    }
-                  }
-                  //Create a model for every time {id} shows up
-                  //console.log('Creating a model: ' + JSON.stringify(tempModel));
-                  //console.log('At ' + endpoint);
-                }
-              }
-              else{
-                prepEndpoint(ends, count + 1, callback);
-              }
-            }
-            else {
-              //console.log('Error: A model should be available for ' + ends[count]);
-              prepEndpoint(ends,count + 1,callback, diffUser);
-            }
           }
-        };
-
-        //Run the tests on the current endpoint
-        describe('testing my model @ ' + endpoint, function() {
-
-          beforeEach( function(done) {
-            //Recursively prepare the endpoint and
-            //create any models that will be needed
-            models = [];
-            var ends = endpoint.split('/');
-            endpoint = ends[0];
-            purgeDB( function(err) {
-              if(err) return done(err);
-              prepEndpoint(ends,1,done);
-            });
-          });
-
-          afterEach( function(done) {
-            var ends = endpoint.split('/');
-            clearEndpoint(ends[0], ends,1,done);
-          });
-
-          if( test.myResults) {
-            it.each(test.myResults,
-                    role + ' %s ' + endpoint,
-                    ['request'],
-                    unitTest);
-          }
-        });
-
-        //Run the tests on the current endpoint
-        describe('testing a different users model @ ' + endpoint, function() {
-
-          beforeEach( function(done) {
-            //Recursively prepare the endpoint and
-            //create any models that will be needed
-            models = [];
-            var ends = endpoint.split('/');
-            endpoint = ends[0];
-            purgeDB( function(err) {
-              if(err) return done(err);
-              prepEndpoint(ends,1,done, true);
-            });
-          });
-
-          afterEach( function(done) {
-            var ends = endpoint.split('/');
-            clearEndpoint(ends[0], ends,1,done, true);
-          });
-
-          if( test.theirResults) {
-            it.each(test.theirResults,
-                    role + ' %s ' + endpoint,
-                    ['request'],
-                    unitTest);
-          }
-        });
-
-        describe('related', function() {
-          if( test.children ) {
-            async.each(test.children,
-                       function(child, callback) {
-                         testEndpoint(endpoint, child, role, callback);
-                       },
-                       function(err, res) {
-                         dump(err,res);
-                       });
-          }
-        });
-
-        if( next) {
-          next();
         }
-
-      });
+        else {
+          clearEndpoint(endpoint, ends, count +1, callback);
+        }
+      }
     };
 
+    /*
+     * This function is meant to be recursively called before the
+     * execution of each unittest.
+     * It will create any models that are needed and it will prepare
+     * the endpoint to be used by the unittest.
+     */
+    var prepEndpoint = function(ends, count, callback, diffUser) {
+      //Ending condition
 
-    var testModel = function(tests) {
+      var tempModel = {};
+      if(count === ends.length) {
+        callback();
+      }
+      else if( ends[count] === '{id}') {
+        tempModel = findModel(ends[count-1], models);
 
-      describe(tests.endpoint, function() {
+        if( tempModel ) {
+          if( tempModel.id ) {
+            endpoint += '/' + tempModel.id;
+          }
+          else if( tempModel.username ) {
+            endpoint += '/' + tempModel.username;
+          }
+          else if( tempModel.result.files.file[0].name ) {
+            endpoint += '/' + tempModel.result.files.file[0].name;
+          }
+          else {
+            endpoint += '/{id}';
+            console.log('Warning: Model was found but has an invalid id');
+          }
+        }
+        else if( ends[2] === 'storages' ) {
+          if( ends[count -1] === 'storages') {
+            endpoint += '/instanews.test';
+          }
+          else {
+            endpoint += '/file.txt';
+          }
+        }
+        else {
+          //console.log('Warning: A model should be available for ' + ends[count-1]);
+          endpoint += '/{id}';
+        }
 
-        //This function creates the admin role and inserts the admin user
-        function createAdmin(callback) {
-          AccessToken.destroyAll( function(err) {
-            if (err) return callback(err);
+        prepEndpoint(ends,count + 1,callback);
+      }
+      else {
+        type = ends[count];
+        endpoint += '/' + type;
+        //Check for a model instance designed specifically for this testcase
+        tempModel = findModel(ends[count], test.models);
+        if( !tempModel) {
+          //Since a model was not given in the test it is assumed
+          //that a generic model will suffice
+          tempModel = findModel(ends[count], genericModels);
+        }
 
-            RoleMapping.destroyAll( function(err) {
+        if( tempModel ) {
+
+          if( !tempModel.noPreCreate ) {
+
+            var url = endpoint;
+            if(tempModel.customUrl) {
+              url = tempModel.customUrl;
+            }
+
+            //Check if the test is requesting for the
+            // models used to be created by a different
+            // user than the one logged in. This is always
+            // the case with a guest
+            if(diffUser || role === 'guest') {
+              diffUserAddModel(tempModel, url, function() {
+                  prepEndpoint(ends,count + 1,callback, true);
+                  });
+            }
+            else{
+
+              var handleResult =  function(err, res) {
+                //Save the model locally
+                if(err) {
+                  dump(err,res);
+                  return done(err);
+                }
+
+                var body = res.body;
+                if(!body) {
+                  body = res;
+                }
+                if(body.error) {
+                  //console.log(body.error);
+                }
+                else {
+                  body.type = type;
+                  if( type === 'journalists' ) {
+                    body.password = tempModel.password;
+                  }
+                  models.push(body);
+                }
+
+                //console.log('Created a model: ' + JSON.stringify(body));
+                dump(err, res);
+                prepEndpoint(ends,count + 1,callback);
+              };
+
+              if( tempModel.type === 'subarticles') {
+                tempModel.username = user.username;
+                Subarticles.create(tempModel, handleResult);
+              }
+              else {
+                if( url.indexOf('/upload') > -1 ) {
+                  api.post(url)
+                    .set('Authorization', token.id)
+                    .attach('file', path.join(__dirname, '../' + tempModel.filename))
+                    .set('Accept', 'application/json')
+                    .expect('Content-Type', /json/)
+                    .end( handleResult);
+                }
+                else {
+                  api.post(url)
+                    .send(tempModel)
+                    .set('Authorization', token.id)
+                    .end( handleResult);
+                }
+              }
+              //Create a model for every time {id} shows up
+              //console.log('Creating a model: ' + JSON.stringify(tempModel));
+              //console.log('At ' + endpoint);
+            }
+          }
+          else{
+            prepEndpoint(ends, count + 1, callback);
+          }
+        }
+        else {
+          //console.log('Error: A model should be available for ' + ends[count]);
+          prepEndpoint(ends,count + 1,callback, diffUser);
+        }
+      }
+    };
+
+      //Run the tests on the current endpoint
+      describe('testing my model @ ' + endpoint, function() {
+
+        beforeEach( function(done) {
+          //Recursively prepare the endpoint and
+          //create any models that will be needed
+          models = [];
+          var ends = endpoint.split('/');
+          endpoint = ends[0];
+          purgeDB( function(err) {
+            if(err) return done(err);
+            prepEndpoint(ends,1,done);
+          });
+        });
+
+        afterEach( function(done) {
+          var ends = endpoint.split('/');
+          clearEndpoint(ends[0], ends,1,done);
+        });
+
+        if( test.myResults) {
+          it.each(test.myResults,
+                  role + ' %s ' + endpoint,
+                  ['request'],
+                  unitTest);
+        }
+      });
+
+      //Run the tests on the current endpoint
+      describe('testing a different users model @ ' + endpoint, function() {
+
+        beforeEach( function(done) {
+          //Recursively prepare the endpoint and
+          //create any models that will be needed
+          models = [];
+          var ends = endpoint.split('/');
+          endpoint = ends[0];
+          purgeDB( function(err) {
+            if(err) return done(err);
+            prepEndpoint(ends,1,done, true);
+          });
+        });
+
+        afterEach( function(done) {
+          var ends = endpoint.split('/');
+          clearEndpoint(ends[0], ends,1,done, true);
+        });
+
+        if( test.theirResults) {
+          it.each(test.theirResults,
+                  role + ' %s ' + endpoint,
+                  ['request'],
+                  unitTest);
+        }
+      });
+
+      describe('related', function() {
+        if( test.children ) {
+          async.each(test.children,
+                     function(child, callback) {
+                       testEndpoint(endpoint, child, role, callback);
+                     },
+                     function(err, res) {
+                       dump(err,res);
+                     });
+        }
+      });
+
+      if( next) {
+        next();
+      }
+
+    });
+      };
+
+
+      var testModel = function(tests) {
+
+        describe(tests.endpoint, function() {
+
+          //This function creates the admin role and inserts the admin user
+          function createAdmin(callback) {
+            AccessToken.destroyAll( function(err) {
               if (err) return callback(err);
 
-              Roles.destroyAll( function(err) {
+              RoleMapping.destroyAll( function(err) {
                 if (err) return callback(err);
 
-                Roles.create({
-                  name: 'admin'
-                }, function(err, role) {
+                Roles.destroyAll( function(err) {
                   if (err) return callback(err);
-                  //console.log('Created role:', role.name);
 
-                  role.principals.create({
-                    principalType: RoleMapping.USER,
-                    principalId: users.admin.username
-                  }, function(err, principal) {
+                  Roles.create({
+                    name: 'admin'
+                  }, function(err, role) {
                     if (err) return callback(err);
+                    //console.log('Created role:', role.name);
 
-                    //console.log('Created principal:', principal.principalType);
-                    callback();
+                    role.principals.create({
+                      principalType: RoleMapping.USER,
+                      principalId: users.admin.username
+                    }, function(err, principal) {
+                      if (err) return callback(err);
+
+                      //console.log('Created principal:', principal.principalType);
+                      callback();
+                    });
                   });
                 });
               });
             });
-          });
-        }
+          }
 
-        //Create the users that will be required in the testcases
-        before( function(done) {
-          this.timeout(5000);
-          //Clear all existing things in the model
-          Journalists.destroyAll( function(err) {
-            if (err) return done(err);
-
-            Journalists.create(users.admin, function(err,res){
+          //Create the users that will be required in the testcases
+          before( function(done) {
+            this.timeout(5000);
+            //Clear all existing things in the model
+            Journalists.destroyAll( function(err) {
               if (err) return done(err);
-              createAdmin( function(err, res) {
-                if(err) {
-                  console.log('Failed to create the admin role: ' + err);
-                  done(err);
-                }
-                else {
-                  Journalists.create(users.user, function(err,res) {
-                    if(err) return done(err);
-                    Journalists.create(users.diffUser, function(err,res) {
+
+              Journalists.create(users.admin, function(err,res){
+                if (err) return done(err);
+                createAdmin( function(err, res) {
+                  if(err) {
+                    console.log('Failed to create the admin role: ' + err);
+                    done(err);
+                  }
+                  else {
+                    Journalists.create(users.user, function(err,res) {
                       if(err) return done(err);
+                      Journalists.create(users.diffUser, function(err,res) {
+                        if(err) return done(err);
 
-                      var credentials = users.diffUser;
-                      //Login as the diffUser and save the credentials
-                      api.post('/api/journalists/login')
-                      .send(credentials)
-                      .expect(200)
-                      .end(function(err, res) {
-                        if (err) return done(err);
+                        var credentials = users.diffUser;
+                        //Login as the diffUser and save the credentials
+                        api.post('/api/journalists/login')
+                        .send(credentials)
+                        .expect(200)
+                        .end(function(err, res) {
+                          if (err) return done(err);
 
-                        diffUserToken = res.body;
-                        expect(diffUserToken.userId).to.equal(credentials.username);
+                          diffUserToken = res.body;
+                          expect(diffUserToken.userId).to.equal(credentials.username);
 
-                        //console.log('Before Setup was successful');
-                        done(err,res);
+                          //console.log('Before Setup was successful');
+                          done(err,res);
+                        });
                       });
                     });
-                  });
-                }
+                  }
+                });
               });
             });
           });
-        });
 
-        after( function (done) {
-          //Logout
-          api.post('/api/journalists/logout')
-          .set('Authorization', diffUserToken.id)
-          .expect(204)
-          .end( function(err,res) {
-            dump(err, res);
-            var error = err;
-            Installations.destroyAll(function(err) {
-              if(!error && err) error = err;
-              Articles.destroyAll(function(err) {
+          after( function (done) {
+            //Logout
+            api.post('/api/journalists/logout')
+            .set('Authorization', diffUserToken.id)
+            .expect(204)
+            .end( function(err,res) {
+              dump(err, res);
+              var error = err;
+              Installations.destroyAll(function(err) {
                 if(!error && err) error = err;
-                Subarticles.destroyAll(function(err) {
+                Articles.destroyAll(function(err) {
                   if(!error && err) error = err;
-                  Comments.destroyAll(function(err) {
+                  Subarticles.destroyAll(function(err) {
                     if(!error && err) error = err;
-                    Notifications.destroyAll(function(err) {
+                    Comments.destroyAll(function(err) {
                       if(!error && err) error = err;
-                      UpVotes.destroyAll(function(err) {
+                      Notifications.destroyAll(function(err) {
                         if(!error && err) error = err;
-                        DownVotes.destroyAll(function(err) {
+                        UpVotes.destroyAll(function(err) {
                           if(!error && err) error = err;
-                          Journalists.destroyAll(function(err) {
+                          DownVotes.destroyAll(function(err) {
                             if(!error && err) error = err;
-                            done(error);
+                            Journalists.destroyAll(function(err) {
+                              if(!error && err) error = err;
+                              done(error);
+                            });
                           });
                         });
                       });
@@ -597,99 +598,98 @@ var testEndpoint = function(oldEndpoint, test, role, next) {
               });
             });
           });
-        });
 
-        //Run the tests as an admin
-        describe('admin', function() {
-          var role = 'admin';
-          var credentials = users.admin;
-          user = credentials;
+          //Run the tests as an admin
+          describe('admin', function() {
+            var role = 'admin';
+            var credentials = users.admin;
+            user = credentials;
 
-          //Login before the tests are run
-          before( function(done) {
-            api.post('/api/journalists/login')
-            .send(credentials)
-            .expect(200)
-            .end(function(err, res) {
-              if (err) return done(err);
+            //Login before the tests are run
+            before( function(done) {
+              api.post('/api/journalists/login')
+              .send(credentials)
+              .expect(200)
+              .end(function(err, res) {
+                if (err) return done(err);
 
-              token = res.body;
-              expect(token.userId).to.equal(credentials.username);
+                token = res.body;
+                expect(token.userId).to.equal(credentials.username);
 
-              done();
+                done();
+              });
+            });
+
+            //Logout after the tests are finished
+            after( function(done) {
+              api.post('/api/journalists/logout')
+              .set('Authorization', token.id)
+              .expect(204)
+              .end( function(err,res) {
+                done(err);
+              });
+            });
+
+            describe('running', function(done) {
+              testEndpoint('/api', tests, role, done);
             });
           });
 
-          //Logout after the tests are finished
-          after( function(done) {
-            api.post('/api/journalists/logout')
-            .set('Authorization', token.id)
-            .expect(204)
-            .end( function(err,res) {
-              done(err);
+          //Run the tests as a user
+          describe('user', function() {
+            var role = 'user';
+            var credentials = users.user;
+            user = credentials;
+
+            //Login before the tests are run
+            before( function(done) {
+              api.post('/api/journalists/login')
+              .send(credentials)
+              .expect(200)
+              .end(function(err, res) {
+                if (err) return done(err);
+
+                token = res.body;
+                expect(token.userId).to.equal(credentials.username);
+
+                done();
+              });
+            });
+
+            //Logout after the tests are finished
+            after( function(done) {
+              api.post('/api/journalists/logout')
+              .set('Authorization', token.id)
+              .expect(204)
+              .end( function(err,res) {
+                done(err);
+              });
+            });
+
+            describe('running', function(done) {
+              testEndpoint('/api', tests, role, done);
             });
           });
 
-          describe('running', function(done) {
+          //Run the tests as a guest
+          describe('guest', function(done) {
+            var role = 'guest';
+            token.id = '';
+
             testEndpoint('/api', tests, role, done);
           });
         });
+      };
 
-        //Run the tests as a user
-        describe('user', function() {
-          var role = 'user';
-          var credentials = users.user;
-          user = credentials;
-
-          //Login before the tests are run
-          before( function(done) {
-            api.post('/api/journalists/login')
-            .send(credentials)
-            .expect(200)
-            .end(function(err, res) {
-              if (err) return done(err);
-
-              token = res.body;
-              expect(token.userId).to.equal(credentials.username);
-
-              done();
-            });
-          });
-
-          //Logout after the tests are finished
-          after( function(done) {
-            api.post('/api/journalists/logout')
-            .set('Authorization', token.id)
-            .expect(204)
-            .end( function(err,res) {
-              done(err);
-            });
-          });
-
-          describe('running', function(done) {
-            testEndpoint('/api', tests, role, done);
-          });
-        });
-
-        //Run the tests as a guest
-        describe('guest', function(done) {
-          var role = 'guest';
-          token.id = '';
-
-          testEndpoint('/api', tests, role, done);
-        });
-      });
-    };
-
-    exports.run = function() {
-      testModel(storages);
-      testModel(apps);
-      testModel(articles);
-      testModel(comments);
-      testModel(downVotes);
-      testModel(upVotes);
-      testModel(installations);
-      testModel(journalists);
-      testModel(subarticles);
-    };
+      exports.run = function() {
+        testModel(storages);
+        testModel(apps);
+        testModel(articles);
+        testModel(comments);
+        testModel(downVotes);
+        testModel(upVotes);
+        testModel(installations);
+        testModel(journalists);
+        testModel(subarticles);
+      };
 

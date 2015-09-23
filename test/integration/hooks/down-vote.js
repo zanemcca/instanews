@@ -33,22 +33,25 @@ exports.run = function() {
         var total = 20;
         var count = 0;
 
-        var cb = function(err, vote) {
-          if(err) return done(err);
-          expect(vote).to.exist;
-          count++;
-          if( count === total) {
-            Articles.findById(vote.clickableId, function(err,res) {
-              if(err) return done(err);
-              expect(res).to.exist;
-              expect(res.downVoteCount).to.equal(20);
-              done();
-            });
-          }
+        var create = function () {
+          DownVote.create(function(err, vote) {
+            if(err) return done(err);
+            expect(vote).to.exist;
+            count++;
+            if( count === total) {
+              Articles.findById(vote.clickableId, function(err,res) {
+                if(err) return done(err);
+                expect(res).to.exist;
+                expect(res.downVoteCount).to.equal(20);
+                done();
+              });
+            }
+          });
         };
 
         for( var i = 0; i < total; i++) {
-          DownVote.create(cb);
+          //1000 votes/sec
+          setTimeout(create, 1);
         }
       });
     });

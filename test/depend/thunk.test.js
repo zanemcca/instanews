@@ -2,7 +2,7 @@
 /*jshint expr: true*/
 
 var chai = require('chai');
-var thunk = require('../thunk');
+var thunk = require('./thunk');
 
 var expect = chai.expect;
 
@@ -55,8 +55,6 @@ describe('thunkify' , function () {
       genFn = function*() {
         try {
           var res = yield hello(input);
-          console.log('Yielded');
-          console.log(res);
           expect(res).to.equal(output);
         } catch(e) {
           return e;
@@ -165,7 +163,6 @@ describe('thunkify' , function () {
         Hello2(arg, cb);
       }
       
-      console.log(input);
       thunk.run(Hello, input, function (err, res) {
         expect(err).to.not.exist;
         expect(res).to.eql([output]);
