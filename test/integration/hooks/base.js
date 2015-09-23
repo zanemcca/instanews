@@ -15,7 +15,7 @@ var app = common.app;
 var Articles = app.models.Article;
 
 exports.run = function() {
-  describe.only('Base', function() {
+  describe('Base', function() {
     on.article().describe('', function () {
       it('should have initialized properly', function() {
         var art = depend.instances.getActionableInstance();
