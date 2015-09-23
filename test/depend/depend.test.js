@@ -2,7 +2,7 @@
 /* jshint expr: true */
 
 var async = require('async');
-var depend = require('../depend');
+var depend = require('./depend');
 var on = depend.on;
 var common = require('../common');
 var app = common.app;
@@ -10,7 +10,7 @@ var app = common.app;
 var chai = require('chai');
 var expect = chai.expect;
 
-var thunk = require('../thunk');
+var thunk = require('./thunk');
 
 function checkDb(cb, not) {
   checkDb2(depend.instances.get(), function (err) {
