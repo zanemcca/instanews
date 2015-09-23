@@ -11,7 +11,6 @@ module.exports = function(app) {
     return secondsAgo;
   };
 
-
    //TODO Periodically update the stats object for averageJoe 
 
   Stat.updateRating = function(where, type, modify, cb) {

@@ -23,7 +23,7 @@ var CoDependencies = {
 var samples = {
   comment: function (parent) {
     return {
-      content: generateRandomString(Math.floor(Math.random()*40)),
+      content: common.generate.randomString(Math.floor(Math.random()*40)),
       commentableType: parent.modelName,
       commentableId: parent.id 
     };
@@ -54,20 +54,20 @@ var samples = {
   },
   article: function () {
     return {
-      title: generateRandomString(),
+      title: common.generate.randomString(),
       isPrivate: false,
-      location: generateRandomLocation() 
+      location: common.generate.randomLocation() 
     };
   },
   subarticle: function (parent) {
     return {
-      text: generateRandomString(Math.floor(Math.random()*500)),
+      text: common.generate.randomString(Math.floor(Math.random()*500)),
       parentId: parent.id
     };
   },
   journalist: function (name) {
     return {
-      password: generateRandomString(),
+      password: common.generate.randomString(),
       username: name,
       email: name + '@mail.com'
     };
@@ -347,7 +347,7 @@ function UserArray() {
     if(username || !this._users.length) {
       var token;
       if(!username) {
-        username = generateRandomString();
+        username = common.generate.randomString();
       } else {
         token =  findOne('userId', username).id;
       }
@@ -382,6 +382,10 @@ function UserArray() {
 
   this.get = function () {
     return this._users;
+  };
+
+  this.getDefault = function () {
+    return this._users[0];
   };
 
   this.clear = function(done) {
@@ -457,18 +461,21 @@ function satisfyDependencies(current, done) {
     var actions = ['on','by','plus'];
     if(actions.indexOf(current._name) > -1) {
       if(current._name === 'on') {
-        if(this.createables.length) {
+        var createables = this.createables;
+        if(createables.length) {
           //Add parent pointers on all of the createables
-          for(var i =0; i < this.createables.length - 1; i++) {
-            this.createables[i].parent = this.createables[i+1];
+          for(var i =0; i < createables.length - 1; i++) {
+            createables[i].parent = createables[i+1];
           }
-          this.createables[this.createables.length - 1].parent = this.parent;
-          this.createables[this.createables.length - 1].isActionable = true;
+          createables[createables.length - 1].parent = this.parent;
+          createables[createables.length - 1].isActionable = true;
+
+          var newParent = createables[createables.length - 1];
           // Create the createables in order
-          thunk.run(create, this.createables.reverse(), function(err, instances) {
+          thunk.run(create, createables.reverse(), function(err, instances) {
             if(!err) {
-              this.parent = this.createables[this.createables.length - 1];
-              this.createables.length = 0;
+              this.parent = newParent;
+              createables.length = 0;
               satisfyDependencies(current._previous, done);
             } else {
               return done(err);
@@ -527,7 +534,8 @@ function create(model, cb) {
 }
 
 function post(url, token, data, cb) {
-  //console.log('\tURL: ' + url);
+//  console.log('\tURL: ' + url);
+//  console.log(data);
   api.post(url)
   .set('Authorization', token)
   .send(data)
@@ -594,44 +602,6 @@ function Plus(previous) {
 }
 
 // User creation, login, logout and destruction
-var generateRandomString = function (length) {
-  if(!length) length = 8;
-  var chars = ['a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z'];
-  var name = '';
-  for(var i = 0; i < length; i++) {
-    name += chars[Math.floor(Math.random()*chars.length)];
-  }
-  return name;
-};
-
-var generateRandomLocation = function (bottomLeft, upperRight) {
-  var maxLat, minLat, maxLng, minLng;
-  if(bottomLeft && upperRight) {
-    maxLat = upperRight.lat;
-    maxLng = upperRight.lng;
-    minLat = bottomLeft.lat;
-    minLng = bottomLeft.lng;
-  }
-
-  if(!minLng) {
-    minLng = -180;
-  }
-  if(!minLat) {
-    minLat = -90;
-  }
-  if(!maxLat) {
-    maxLat = 90;
-  }
-  if(!maxLng) {
-    maxLng = 180;
-  }
-
-  return {
-    lat: Math.random()*(maxLat -minLat) + minLat,
-    lng: Math.random()*(maxLng -minLng) + minLng
-  };
-};
-
 function getModelInstance(type, arg) {
   if(samples.hasOwnProperty(type)) {
     return samples[type](arg);
@@ -657,7 +627,7 @@ function getURL(type, parent) {
 function createUserAndLogin (username, cb) {
   var journalist;
   if(!cb) {
-    journalist = getModelInstance('journalist', generateRandomString());
+    journalist = getModelInstance('journalist', common.generate.randomString());
     cb = username;
   } else {
     journalist = getModelInstance('journalist', username);

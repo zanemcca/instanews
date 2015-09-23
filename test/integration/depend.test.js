@@ -191,6 +191,24 @@ describe('Depend', function () {
           checkDb(done);
         });
       });
+
+      on.subarticle().plus.comment().on.article().describe('checking creation ', function () {
+        it('should work!', function (done) {
+          checkDb(done);
+        });
+      });
+
+      on.subarticle().on.article().plus.comment().describe('Checking creation', function () {
+        it('should work!', function (done) {
+          checkDb(done);
+        });
+      });
+
+      on.subarticle().on.article().plus.subarticle().describe('Checking creation', function () {
+        it('should work!', function (done) {
+          checkDb(done);
+        });
+      });
     });
 
     describe('comment()', function () {
