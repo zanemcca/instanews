@@ -27,7 +27,9 @@ exports.run = function () {
       });
     });
 
-    on.article().plus.subarticle().describe('create comment', function(done) {
+    on.article().by('bob').describe('create comment', function(done) {
+      //TODO Split into two separate tests
+      //TODO Actually trigger the article owner notification
       it('should create a notification for the article owner and the top contributor', function(done) {
         //Create the comment that will trigger a notification
         Comment.create(function(err,res) {
@@ -47,7 +49,8 @@ exports.run = function () {
               }, function(err, res) {
                 if(!err && res && res.length > 0) {
                   expect(res.length).to.equal(1);
-                  expect(res[0].username).to.equal('jane');
+                  console.log(res);
+                  expect(res[0].username).to.equal('bob');
                   expect(res[0].message).to
                   .equal(user.username + ' commented on an article you contributed to');
                   stop();
@@ -79,7 +82,7 @@ exports.run = function () {
               },function(err, res) {
                 if(!err && res && res.length > 0) {
                   expect(res.length).to.equal(1);
-                  expect(res[0].username).to.equal('jane');
+                  expect(res[0].username).to.equal('bob');
                   expect(res[0].message).to
                   .equal(user.username + ' commented on your subarticle');
                   stop();
@@ -93,12 +96,12 @@ exports.run = function () {
     
     on.comment().by('bob').describe('create comment', function() {
       it('should create a notification for bob', function(done) {
-        Comment.create(function(err,res) {
+        Comment.create(function(err, comment) {
           if(err) {
             done(err);
           }
           else {
-            expect(res).to.exist;
+            expect(comment).to.exist;
 
             //Wait until the notification appears and ensure it
             //is properly formated
@@ -106,14 +109,14 @@ exports.run = function () {
               Notification.find({
                 where: {
                   notifiableType: 'comment',
-                  notifiableId: res.id
+                  notifiableId: comment.id
                 }
               }, function(err, res) {
                 if(!err && res && res.length > 0) {
                   expect(res.length).to.equal(1);
-                  expect(res[0].username).to.equal('jane');
+                  expect(res[0].username).to.equal('bob');
                   expect(res[0].message).to
-                  .equal('bob commented on your comment');
+                  .equal(comment.username + ' commented on your comment');
                   stop();
                 }
               });
@@ -143,8 +146,8 @@ exports.run = function () {
               }, function(err, res) {
                 if(!err && res && res.length > 1) {
                   expect(res.length).to.equal(2);
-                  if(res[0].username === 'jane') {
-                    expect(res[0].username).to.equal('jane');
+                  if(res[0].username === 'bob') {
+                    expect(res[0].username).to.equal('bob');
                     expect(res[0].message).to
                     .equal('alice commented on your comment');
                     expect(res[1].username).to.equal('bob');
@@ -152,7 +155,7 @@ exports.run = function () {
                     .equal('alice commented on a comment stream that you are part of');
                   }
                   else {
-                    expect(res[1].username).to.equal('jane');
+                    expect(res[1].username).to.equal('bob');
                     expect(res[1].message).to
                     .equal('alice commented on your comment');
                     expect(res[0].username).to.equal('bob');

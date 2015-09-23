@@ -5,16 +5,12 @@ var expect = require('chai').expect;
 
 var depend = require('../../depend');
 var on = depend.on;
+var DownVote = depend.downVote;
 
 var common =  require('../../common');
 var app = common.app;
 
 var Articles = app.models.Article;
-var View = app.models.view;
-
-var DownVote = depend.downVote;
-
-var genericModels = require('../../genericModels');
 
 exports.run = function() {
   describe('DownVote', function() {

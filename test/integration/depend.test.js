@@ -91,7 +91,8 @@ function checkDb2(instances, cb, not) {
   var timer = wait(1);
 }
 
-var Instances;
+var Instances = [];
+var Users = [];
 var names = [
   'article',
   'subarticle',
@@ -169,6 +170,16 @@ describe('Depend', function () {
         if(err) done(err);
         checkDb2(Users, done, true);
       }, true);
+    });
+
+    describe('by("username")', function () {
+      on.article().by('bob').describe('checking creation ', function () {
+        it('should post an article by bob', function () {
+          var art = depend.instances.getActionableInstance();
+          expect(art).to.exist;
+          expect(art.username).to.equal('bob');
+        });
+      });
     });
 
     describe('article()', function () {

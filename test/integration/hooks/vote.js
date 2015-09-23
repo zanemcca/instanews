@@ -15,21 +15,21 @@ exports.run = function() {
   describe('vote', function() {
     on.upVote().on.article().plus.subarticle().by('bob').describe('Check for notification', function () {
       it('should create a notification for the top contributor for voting on an article', function(done) {
-        var res = depend.instances.getActionableInstance();
+        var vote = depend.instances.getActionableInstance();
         //Wait until the notification appears and ensure it
         //is properly formated
         runTillDone( function(stop) {
           Notifications.find({
             where: {
-              notifiableType: res.clickableType,
-              notifiableId: res.clickableId
+              notifiableType: vote.clickableType,
+              notifiableId: vote.clickableId
             }
           },function(err, res) {
             if(!err && res && res.length > 0) {
               expect(res.length).to.equal(1);
               expect(res[0].username).to.equal('bob');
               expect(res[0].message).to
-              .equal(res.username + ' voted on your article');
+              .equal(vote.username + ' voted on your article');
               stop();
             }
           });
@@ -39,19 +39,19 @@ exports.run = function() {
 
     on.upVote().on.subarticle().by('bob').describe('Check for notification', function () {
       it('should create a notification for voting on a subarticle', function(done) {
-        var res = depend.instances.getActionableInstance();
+        var vote = depend.instances.getActionableInstance();
         runTillDone( function(stop) {
           Notifications.find({
             where: {
-              notifiableType: res.clickableType,
-              notifiableId: res.clickableId
+              notifiableType: vote.clickableType,
+              notifiableId: vote.clickableId
             }
           },function(err, res) {
             if(!err && res && res.length > 0) {
               expect(res.length).to.equal(1);
               expect(res[0].username).to.equal('bob');
               expect(res[0].message).to
-              .equal(res.username + ' voted on your subarticle');
+              .equal(vote.username + ' voted on your subarticle');
               stop();
             }
           });
@@ -61,20 +61,20 @@ exports.run = function() {
 
     on.upVote().on.comment().by('bob').describe('Check for notification', function () {
       it('should create a notification for voting on a comment', function(done) {
-        var res = depend.instances.getActionableInstance();
+        var vote = depend.instances.getActionableInstance();
         runTillDone( function(stop) {
           Notifications.find({
             where: {
-              notifiableType: res.clickableType,
+              notifiableType: vote.clickableType,
               username: 'bob',
-              notifiableId: res.clickableId
+              notifiableId: vote.clickableId
             }
           },function(err, res) {
             if(!err && res && res.length > 0) {
               expect(res.length).to.equal(1);
               expect(res[0].username).to.equal('bob');
               expect(res[0].message).to
-              .equal(res.username + ' voted on your comment');
+              .equal(vote.username + ' voted on your comment');
               stop();
             }
           });

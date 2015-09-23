@@ -20,6 +20,14 @@ var CoDependencies = {
   comment: ['view'],
 };
 
+var PreDependencies = {
+  subarticle: ['view'],
+  comment: ['view'],
+  click: ['view'],
+  upVote: ['view'],
+  downVote: ['view']
+};
+
 var samples = {
   comment: function (parent) {
     return {
@@ -74,14 +82,6 @@ var samples = {
   }
 };
 
-/*
-   var Models = {
-article: ['subarticle', 'comment'],
-subarticle: ['comment'],
-comment: []
-};
-*/
-
 // Parents is an inverted form of Models
 var Parents = {};
 for(var type of Object.getOwnPropertyNames(Models)) {
@@ -106,6 +106,10 @@ function CreateModel(previous, name) {
 }
 
 function Model(previous, name, instance) {
+  if(name === 'by') {
+    previous._username = instance;
+  }
+
   this._previous = previous;
   this._instance = instance;
   this._name = name;
@@ -150,6 +154,7 @@ function Model(previous, name, instance) {
     return end;
   };
 
+  //TODO Move the codep creation to the child
   this.getCodependencies = function () {
     var deps = [];
     var codeps = CoDependencies[this._name];
@@ -157,6 +162,20 @@ function Model(previous, name, instance) {
       for(var dep of CoDependencies[this._name]) {
         var model = new Model(this, dep);
         model.parent = this;
+        deps.push(model);
+      }
+    }
+    return deps;
+  };
+
+  this.getPredependencies = function () {
+    var deps = [];
+    var predeps = PreDependencies[this._name];
+    if(predeps) {
+      for(var dep of predeps) {
+        var model = new Model(this, dep);
+        model.parent = this.parent;
+        model._username = this._username;
         deps.push(model);
       }
     }
@@ -335,7 +354,30 @@ var destroy = function(inst, cb) {
 function UserArray() {
   this._users = [];
 
-  var findOne = function(param, value) {
+  function initUsers() {
+    var done = false;
+    createUserAndLogin(function (err, res) {
+      done = true;
+    });
+
+    var time = 1;
+    var elapsed = 0;
+    function loop() {
+      if(!done) {
+        if( time < 1000) {
+          setTimeout(loop, time);
+          elapsed += time;
+          time *= 2;
+        } else {
+          throw new Error('This shit took way too long: ' + elapsed);
+        }
+      }
+    }
+
+    loop();
+  }
+
+  this.findOne = function(param, value) {
     for(var user of this._users) {
       if( user[param] === value) {
         return user;
@@ -349,7 +391,10 @@ function UserArray() {
       if(!username) {
         username = common.generate.randomString();
       } else {
-        token =  findOne('userId', username).id;
+        var user =  this.findOne('userId', username);
+        if(user) {
+          token = user.id;
+        }
       }
 
       if(token) {
@@ -414,6 +459,9 @@ function UserArray() {
       done(err);
     };
   };
+
+  initUsers();
+
   return this;
 }
 
@@ -506,36 +554,50 @@ function create(model, cb) {
 
   exports.users.getToken(username, function (err, token) {
     if (err) return cb(err);
-    post(url, token, inst, function(err, instance) {
-      model.instance = instance;
 
-      var parent = model.parent;
-      if(parent) {
-        exports.instances.add(instance, model.parent.instance);
-      } else {
-        exports.instances.add(instance);
-      }
+    var Post = function () {
+      post(url, token, inst, function(err, instance) {
+        model.instance = instance;
 
-      if(model.isActionable) {
-        exports.instances.setActionableInstance(instance);
-      }
+        var parent = model.parent;
+        if(parent) {
+          exports.instances.add(instance, model.parent.instance);
+        } else {
+          exports.instances.add(instance);
+        }
 
-      var children = model.getCodependencies();
+        if(model.isActionable) {
+          exports.instances.setActionableInstance(instance);
+        }
 
-      if(children.length) {
-        thunk.run(create, children, function (err, insts) {
-          cb(err, instance);
-        });
-      } else {
+        /*
+           var children = model.getCodependencies();
+
+           if(children.length) {
+           thunk.run(create, children, function (err, insts) {
+           cb(err, instance);
+           });
+           } else {
+           */
         cb(err, instance);
-      }
-    });
+        // }
+      });
+    };
+
+    var predeps = model.getPredependencies();
+    if(predeps.length) {
+      thunk.run(create, predeps, function (err, insts) {
+        Post();
+      });
+    } else {
+      Post();
+    }
   });
 }
 
 function post(url, token, data, cb) {
-//  console.log('\tURL: ' + url);
-//  console.log(data);
+  //  console.log('\tURL: ' + url);
+  //  console.log(data);
   api.post(url)
   .set('Authorization', token)
   .send(data)
@@ -633,18 +695,19 @@ function createUserAndLogin (username, cb) {
     journalist = getModelInstance('journalist', username);
   }
 
-  app.models.Journalist.create(
-    journalist,
-    function(err, res) {
+  app.models.Journalist.destroyById(username, function(err) {
+    app.models.Journalist.create(journalist, function(err, res) {
       if(err) {
         console.log(err);
         cb(err);
       } else {
         app.models.Journalist.login(journalist, function (err,res) {
+//          console.log('Logged in ' +res.userId);
           cb(err, res);
         });
       }
     });
+  });
 }
 
 //Export and test
@@ -664,10 +727,33 @@ var createCreate = function(model) {
 
       exports.users.getToken(inst.username, function(err, token) {
         if(err) return cb(err);
-        post(url, token, inst, function(err, instance) {
-          exports.instances.add(instance, parent);
-          cb(err, instance);
-        });
+
+        var createPreDependency = function(name, cb) {
+          var parent = exports.instances.getActionableInstance();
+          var url = getURL(name, parent);
+          var inst = getModelInstance(name, parent);
+
+          post(url, token, inst, function(err, instance) {
+            exports.instances.add(instance, parent);
+            cb(err, instance);
+          });
+        };
+
+        var names = PreDependencies[model];
+        if(names && names.length) {
+          thunk.run(createPreDependency, names, function (err, insts) {
+            post(url, token, inst, function(err, instance) {
+              exports.instances.add(instance, parent);
+              cb(err, instance);
+            });
+          });
+        } else {
+          post(url, token, inst, function(err, instance) {
+            exports.instances.add(instance, parent);
+            cb(err, instance);
+          });
+        }
+
       });
     }
   };
