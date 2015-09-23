@@ -5,7 +5,7 @@
     "seen": {
       "type": "boolean"
     },
-    "date": {
+    "created": {
       "type": "date",
       "required": true
     },

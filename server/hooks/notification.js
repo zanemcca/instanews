@@ -81,7 +81,7 @@ module.exports = function(app) {
 
       if (note) {
          if(ctx.isNewInstance) {
-            note.date = Date.now();
+            note.created = Date.now();
          }
          note.modified = Date.now();
       }

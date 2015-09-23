@@ -16,21 +16,21 @@ exports.run = function() {
   describe('Subarticle', function() {
     on.article().plus.subarticle().by('bob').describe('Create a subarticle', function () {
       it('should send a notification to other users who have contributed to the same article', function(done) {
-        Subarticle.create(function(err, res) {
+        Subarticle.create(function(err, sub) {
           if(err) return done(err);
 
           runTillDone( function(stop) {
             Notifications.find({
               where: {
                 notifiableType: 'article',
-                notifiableId: res.parentId
+                notifiableId: sub.parentId
               }
             }, function(err, res) {
               if(!err && res && res.length > 0) {
                 expect(res.length).to.equal(1);
                 expect(res[0].username).to.equal('bob');
                 expect(res[0].message).to
-                .equal(res.username + ' collaborated with you on an article');
+                .equal(sub.username + ' collaborated with you on an article');
                 stop();
               }
             });

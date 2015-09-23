@@ -34,7 +34,7 @@ exports.run = function() {
             if(err) return done(err);
 
             expect(res).to.exist;
-            expect(res.date).to.equalDate(new Date());
+            expect(res.created).to.equalDate(new Date());
             expect(res.modified).to.exist;
 
             var date = res.modified;
