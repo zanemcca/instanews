@@ -28,32 +28,29 @@ exports.run = function () {
       });
     });
 
-    on.article().by('bob').describe('create comment', function(done) {
-      //TODO Split into two separate tests
-      //TODO Actually trigger the article owner notification
-      it('should create a notification for the article owner and the top contributor', function(done) {
-        //Create the comment that will trigger a notification
-        Comment.create(function(err,res) {
+    on.comment().by('bob').describe('create comment', function() {
+      it('should create a notification for bob', function(done) {
+        Comment.create(function(err, comment) {
           if(err) {
             done(err);
           }
           else {
-            expect(res).to.exist;
+            expect(comment).to.exist;
+
             //Wait until the notification appears and ensure it
             //is properly formated
             runTillDone( function(stop) {
               Notification.find({
                 where: {
                   notifiableType: 'comment',
-                  notifiableId: res.id
+                  notifiableId: comment.id
                 }
               }, function(err, res) {
                 if(!err && res && res.length > 0) {
                   expect(res.length).to.equal(1);
-                  console.log(res);
                   expect(res[0].username).to.equal('bob');
                   expect(res[0].message).to
-                  .equal(user.username + ' commented on an article you contributed to');
+                  .equal(comment.username + ' commented on your comment');
                   stop();
                 }
               });
@@ -63,6 +60,8 @@ exports.run = function () {
       });
     });
 
+    /*
+     * TODO Re-enable these once notifications are finished
     on.subarticle().describe('create comment', function() {
       it('should create a notification for the author', function(done) {
         //Create the comment that will trigger a notification
@@ -95,29 +94,32 @@ exports.run = function () {
       });
     });
     
-    on.comment().by('bob').describe('create comment', function() {
-      it('should create a notification for bob', function(done) {
-        Comment.create(function(err, comment) {
+    on.article().by('bob').describe('create comment', function(done) {
+      //TODO Split into two separate tests
+      //TODO Actually trigger the article owner notification
+      it('should create a notification for the article owner and the top contributor', function(done) {
+        //Create the comment that will trigger a notification
+        Comment.create(function(err,res) {
           if(err) {
             done(err);
           }
           else {
-            expect(comment).to.exist;
-
+            expect(res).to.exist;
             //Wait until the notification appears and ensure it
             //is properly formated
             runTillDone( function(stop) {
               Notification.find({
                 where: {
                   notifiableType: 'comment',
-                  notifiableId: comment.id
+                  notifiableId: res.id
                 }
               }, function(err, res) {
                 if(!err && res && res.length > 0) {
                   expect(res.length).to.equal(1);
+                  console.log(res);
                   expect(res[0].username).to.equal('bob');
                   expect(res[0].message).to
-                  .equal(comment.username + ' commented on your comment');
+                  .equal(user.username + ' commented on an article you contributed to');
                   stop();
                 }
               });
@@ -171,6 +173,8 @@ exports.run = function () {
         });
       });
     });
+
+    */
 
   });
 };

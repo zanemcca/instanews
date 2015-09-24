@@ -66,23 +66,13 @@ exports.readModifyWrite = function(Model, query, modify, cb, options) {
           id: instance.id,
         };
 
-        if(versionName) {
-          if(instance.hasOwnProperty(versionName)) {
-            where[versionName] = instance[versionName];
-            //If a custom version name is used then ensure it is incremented
-            if(options && options.customVersionName) {
-              instance[versionName]++;
-            }
-          }
-          else {
-            console.log('Log: The instance did not have the version name ' + 
-                        versionName + '. Adding a new one initialized at zero');
-            instance[versionName] = 0;
-          }
+        if(versionName && instance.hasOwnProperty(versionName)) {
+          where[versionName] = instance[versionName];
         }
         else {
           var err = new Error('The given versionName is invalid.' +
                               'Cannot complete readModifyWrite');
+          err.status = 400;
           return cb(err);
         }
 
@@ -115,7 +105,6 @@ exports.readModifyWrite = function(Model, query, modify, cb, options) {
           else{
             if(res.count === 0) {
               if(retryCount > 0) {
-                console.log('Retrying!!!');
                 var opt = {
                   retryCount: retryCount - 1
                 };
@@ -172,7 +161,11 @@ exports.readModifyWrite = function(Model, query, modify, cb, options) {
       };
 
       for(var i = 0; i < res.length; i++) {
-        update(modify(res[i].toObject()), callback);
+        if(res[i].toObject) {
+          update(modify(res[i].toObject()), callback);
+        } else {
+          update(modify(res[i]), callback);
+        }
       }
     }
   });

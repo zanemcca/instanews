@@ -296,7 +296,7 @@ module.exports = function(app) {
               inst.clickableType,
               null,
               function(err, res) {
-                if(err && err.status !== 409) { 
+                if(err) { 
                   //Conflicts are ok because it means that 
                   //someone else has just triggered the rating.
                   //So we will not throw an error

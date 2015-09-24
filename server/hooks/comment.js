@@ -186,7 +186,7 @@ next();
   Comment.triggerRating = function(where, modify, cb) {
     if(where && Object.getOwnPropertyNames(where).length > 0) {
       Stat.updateRating(where, Comment.modelName, modify, function(err, res) {
-        if(err && err.status !== 409) {
+        if(err) {
           console.log('Warning: Failed to update a comment');
           cb(err);
         }

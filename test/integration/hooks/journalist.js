@@ -223,7 +223,7 @@ exports.run = function() {
 
 
       var createObject = function() {
-        object.username = Math.floor(Math.random() * 100000).toString();
+        object.username = common.generate.randomString();
         object.email = object.username + '@instanews.com';
 
         if(objects >= LIMIT + 5) {

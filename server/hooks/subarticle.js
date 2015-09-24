@@ -39,7 +39,7 @@ module.exports = function(app) {
     if(where && Object.getOwnPropertyNames(where).length > 0) {
       Stat.updateRating(where, Subarticle.modelName, modify,
       function(err, count) {
-        if(err && err.status !== 409) {
+        if(err) {
           console.log('Warning: Failed to update a subarticle');
           cb(err);
         }

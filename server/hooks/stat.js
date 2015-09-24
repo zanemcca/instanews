@@ -90,7 +90,7 @@ module.exports = function(app) {
           Model.readModifyWrite(query, rate(modify, stats), function(err, res) {
             delete where.ratingModified;
 
-            if(err && err.status !== 409) {
+            if(err && (!err.status || err.status !== 409)) {
               console.log('Error: Failed to modify '+ Model.modelName);
               return cb(err);
             }
