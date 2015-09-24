@@ -20,7 +20,7 @@ COPY . /src
 # Install our dependencies
 RUN cd /src && \
   npm install && \
-  rm server/boot/explorer.js && \
+  rm server/boot/explorer.js 
 
 # Install strongloop
 #RUN npm install -g strongloop
