@@ -25,8 +25,8 @@ module.exports = function(app) {
       var dLng = (loc1.lng - loc2.lng).toRad();
 
       var a = Math.sin(dLat/2) * Math.sin(dLat/2) +
-              Math.cos(lat1) * Math.cos(lat2) *
-              Math.sin(dLng/2) * Math.sin(dLng/2);
+        Math.cos(lat1) * Math.cos(lat2) *
+        Math.sin(dLng/2) * Math.sin(dLng/2);
       var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
       //Earths radius is 6371Km
 
@@ -46,12 +46,12 @@ module.exports = function(app) {
       switch(name) {
         case 'upVote':
           Model = UpVote;
-          OppositeModel = DownVote;
-          break;
+        OppositeModel = DownVote;
+        break;
         case 'downVote':
           Model = DownVote;
-          OppositeModel = UpVote;
-          break;
+        OppositeModel = UpVote;
+        break;
         default:
           return next();
       }
@@ -272,55 +272,50 @@ module.exports = function(app) {
         //extra read
         if(ctx.Model.modelName === 'upVote' &&
            res.modelName === 'article' && !res.verified &&
-           nearBy(res.location, inst.location)
-        ) {
-          if(!data.$set) {
-            data.$set = {
-              verified: true
-            };
+             nearBy(res.location, inst.location)
+          ) {
+            if(!data.$set) {
+              data.$set = {
+                verified: true
+              };
+            }
+            else {
+              data.$set.verified = true;
+            }
           }
-          else {
-            data.$set.verified = true;
-          }
-        }
 
-        res.updateAttributes(data, function(err,res) {
-          if(err) {
-            console.log('Warning: Failed to save clickable');
-            next(err);
-          }
-          else {
-            Stat.triggerRating({
-              id: inst.clickableId
-            },
-            inst.clickableType,
-            null,
-            function(err, res) {
-              if(err) { 
-                console.log('Error: Failed to update the rating for ' +
-                            inst.clickableType + ' - ' + inst.clickableId +
-                            ' from click ' + inst.id);
-                next(err);
-              }
-              else {
-                /*
-                if(res !== 1) {
-                  console.log('Warning: ' + res + ' ' + inst.clickableType +
-                              ' were updated for id:' + inst.clickableId +
-                              ' when there should have been one');
+          res.updateAttributes(data, function(err,res) {
+            if(err) {
+              console.log('Warning: Failed to save clickable');
+              next(err);
+            }
+            else {
+              Stat.triggerRating({
+                id: inst.clickableId
+              },
+              inst.clickableType,
+              null,
+              function(err, res) {
+                if(err && err.status !== 409) { 
+                  //Conflicts are ok because it means that 
+                  //someone else has just triggered the rating.
+                  //So we will not throw an error
+                  console.log('Error: Failed to update the rating for ' +
+                              inst.clickableType + ' - ' + inst.clickableId +
+                              ' from click ' + inst.id);
+                  console.log(err);
+                  return next(err);
                 }
-               */
                 next();
-              }
-            }); 
-          }
-          /*
+              }); 
+            }
+            /*
           //TODO Remove this.
           //Age statistics are not needed when we do not use timedecay
           var age = Date.now() - res.created;
           Click.addAgeSample(ctx, age, next);
-         */
-        });
+          */
+          });
       });
     } else {
       var error = new Error('Invalid instance for updateClickableAttributes');

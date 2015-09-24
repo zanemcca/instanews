@@ -186,7 +186,7 @@ next();
   Comment.triggerRating = function(where, modify, cb) {
     if(where && Object.getOwnPropertyNames(where).length > 0) {
       Stat.updateRating(where, Comment.modelName, modify, function(err, res) {
-        if(err) {
+        if(err && err.status !== 409) {
           console.log('Warning: Failed to update a comment');
           cb(err);
         }
@@ -210,7 +210,7 @@ next();
               err = new Error( 
                               'Warning: No Comments were found.' +
                                 'Cannot trigger commentable rating');
-                              err.http_code = 500;
+                              err.status = 500;
                               cb(err);
             }
           });
@@ -220,7 +220,7 @@ next();
       var error = new Error(
         'Invalid filter for comment.triggerRating: ' + where);
         console.log(error);
-        error.http_code = 400;
+        error.status = 400;
         cb(error);
     }
   };

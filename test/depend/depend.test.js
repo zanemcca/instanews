@@ -3,7 +3,8 @@
 
 var async = require('async');
 var depend = require('./depend');
-var on = depend.on;
+var on = depend.On();
+
 var common = require('../common');
 var app = common.app;
 
@@ -13,11 +14,11 @@ var expect = chai.expect;
 var thunk = require('./thunk');
 
 function checkDb(cb, not) {
-  checkDb2(depend.instances.get(), function (err) {
-    Instances = depend.instances.get().slice(0);
+  checkDb2(on.Instances.get(), function (err) {
+    Instances = on.Instances.get().slice(0);
     if(err) cb(err);
-    checkDb2(depend.users.get(), function (err) {
-      Users = depend.users.get().slice(0);
+    checkDb2(on.Users.get(), function (err) {
+      Users = on.Users.get().slice(0);
       cb(err);
     }, not);
   }, not);
@@ -175,7 +176,7 @@ describe('Depend', function () {
     describe('by("username")', function () {
       on.article().by('bob').describe('checking creation ', function () {
         it('should post an article by bob', function () {
-          var art = depend.instances.getActionableInstance();
+          var art = on.Instances.getActionableInstance();
           expect(art).to.exist;
           expect(art.username).to.equal('bob');
         });

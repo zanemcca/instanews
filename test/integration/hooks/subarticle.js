@@ -3,8 +3,8 @@
 var expect = require('chai').expect;
 
 var depend = require('../../depend');
-var on = depend.on;
-var Subarticle = depend.subarticle;
+var on = depend.On();
+var Subarticle = on.models.subarticle;
 
 var common =  require('../../common');
 var app = common.app;

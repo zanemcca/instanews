@@ -39,7 +39,7 @@ module.exports = function(app) {
     if(where && Object.getOwnPropertyNames(where).length > 0) {
       Stat.updateRating(where, Subarticle.modelName, modify,
       function(err, count) {
-        if(err) {
+        if(err && err.status !== 409) {
           console.log('Warning: Failed to update a subarticle');
           cb(err);
         }
@@ -64,7 +64,7 @@ module.exports = function(app) {
               err = new Error( 
                 'Warning: Failed to find subarticles.' +
                 ' Cannot trigger article rating');
-              err.http_code = 500;
+              err.status = 500;
               cb(err);
             }
           });
@@ -74,7 +74,7 @@ module.exports = function(app) {
       var error = new Error(
         'Invalid filter for comment.triggerRating: ' + where);
       console.log(error);
-      error.http_code = 400;
+      error.status = 400;
       cb(error);
     }
   };

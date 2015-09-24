@@ -2,7 +2,7 @@
 /*jshint expr: true*/
 
 var depend = require('../../depend');
-var on = depend.on;
+var on = depend.On();
 
 var expect = require('chai').expect;
 var sinon = require('sinon');
@@ -26,7 +26,7 @@ exports.run = function() {
 
       on.article().describe('readModifyWrite', function() {
         it('should find and modify the value appropriately', function(done) {
-          var article = depend.instances.getActionableInstance();
+          var article = on.Instances.getActionableInstance();
           common.readModifyWrite(Article, {
             where: {
               id: article.id 
