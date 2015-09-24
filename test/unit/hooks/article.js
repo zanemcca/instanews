@@ -54,7 +54,6 @@ exports.run = function () {
 
         Article.triggerRating(where, null, function(Err, Res) {
             expect(Err).to.equal(err);
-            expect(Res).to.equal(res);
             done();
         });
       });

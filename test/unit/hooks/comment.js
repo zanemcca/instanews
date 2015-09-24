@@ -75,7 +75,7 @@ exports.run = function () {
       it('should create a new 400 error and pass it to the callback', function(done) {
         Comment.triggerRating(null, null, function(err, res) {
           expect(err).to.exist;
-          expect(err.http_code).to.equal(400);
+          expect(err.status).to.equal(400);
           done();
         });
       });
@@ -83,7 +83,7 @@ exports.run = function () {
       it('should also create a new 400 error and pass it to the callback', function(done) {
         Comment.triggerRating({}, null, function(err, res) {
           expect(err).to.exist;
-          expect(err.http_code).to.equal(400);
+          expect(err.status).to.equal(400);
           done();
         });
       });
@@ -165,7 +165,7 @@ exports.run = function () {
           };
 
           Comment.triggerRating(where, null, function(err, res) {
-            expect(err.http_code).to.equal(500);
+            expect(err.status).to.equal(500);
             done();
           });
         });

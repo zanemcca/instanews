@@ -78,7 +78,7 @@ module.exports = function(app) {
     if(where && where.id) {
       //Update the article
       Stat.updateRating(where, Article.modelName, modify, function(err, res) {
-        if(err && err.status !== 409) {
+        if(err) {
           console.log('Warning: Failed to update an article');
           return cb(err);
         }
