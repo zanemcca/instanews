@@ -3,7 +3,7 @@
 var expect = require('chai').expect;
 
 var depend = require('../../depend');
-var on = depend.on;
+var on = depend.On();
 
 var common =  require('../../common');
 var app = common.app;
@@ -15,7 +15,7 @@ exports.run = function() {
   describe('vote', function() {
     on.upVote().on.article().plus.subarticle().by('bob').describe('Check for notification', function () {
       it('should create a notification for the top contributor for voting on an article', function(done) {
-        var vote = depend.instances.getActionableInstance();
+        var vote = on.Instances.getActionableInstance();
         //Wait until the notification appears and ensure it
         //is properly formated
         runTillDone( function(stop) {
@@ -39,7 +39,7 @@ exports.run = function() {
 
     on.upVote().on.subarticle().by('bob').describe('Check for notification', function () {
       it('should create a notification for voting on a subarticle', function(done) {
-        var vote = depend.instances.getActionableInstance();
+        var vote = on.Instances.getActionableInstance();
         runTillDone( function(stop) {
           Notifications.find({
             where: {
@@ -61,7 +61,7 @@ exports.run = function() {
 
     on.upVote().on.comment().by('bob').describe('Check for notification', function () {
       it('should create a notification for voting on a comment', function(done) {
-        var vote = depend.instances.getActionableInstance();
+        var vote = on.Instances.getActionableInstance();
         runTillDone( function(stop) {
           Notifications.find({
             where: {

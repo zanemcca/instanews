@@ -78,10 +78,11 @@ module.exports = function(app) {
     if(where && where.id) {
       //Update the article
       Stat.updateRating(where, Article.modelName, modify, function(err, res) {
-        if(err) {
+        if(err && err.status !== 409) {
           console.log('Warning: Failed to update an article');
+          return cb(err);
         }
-        cb(err, res);
+        cb(null, res);
       });
       /* without time decay we do not need to trigger the subarticles
       //Update the subarticles
@@ -101,7 +102,7 @@ module.exports = function(app) {
       var error = new Error(
         'Invalid filter for article.triggerRating: ' + where);
       console.log(error);
-      error.http_code = 400;
+      error.status = 400;
       cb(error);
     }
   };

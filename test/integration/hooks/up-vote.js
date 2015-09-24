@@ -4,8 +4,8 @@ var expect = require('chai').expect;
 
 var common =  require('../../common');
 var depend = require('../../depend');
-var on = depend.on;
-var UpVote = depend.upVote;
+var on = depend.On();
+var UpVote = on.models.upVote;
 
 var app = common.app;
 
@@ -15,7 +15,7 @@ exports.run = function() {
   describe('UpVote', function() {
     on.article().describe('Create upvote', function() {
       it('should update the upVoteCount of the artcle voted on and not verify the article', function(done) {
-        var res = depend.instances.getActionableInstance();
+        var res = on.Instances.getActionableInstance();
         UpVote.create({
           clickableType: 'article',
           clickableId: res.id,
@@ -38,7 +38,7 @@ exports.run = function() {
       });
 
       it('should update the upVoteCount of the artcle voted on and verify the article', function(done) {
-        var res = depend.instances.getActionableInstance();
+        var res = on.Instances.getActionableInstance();
         UpVote.create({
           clickableType: 'article',
           clickableId: res.id,
@@ -59,29 +59,42 @@ exports.run = function() {
       });
 
       it('should be able to add multiple votes simultaneously', function(done) {
-        var total = 20;
+
+        this.timeout(10000);
+        var total = 10;
         var count = 0;
 
+        var art = on.Instances.getActionableInstance();
         var create = function () {
-          UpVote.create(function(err, vote) {
+          UpVote.create({
+            clickableType: 'article',
+            clickableId: art.id,
+            location: art.location,
+            username: common.generate.randomString()
+          }, function(err, vote) {
             if(err) return done(err);
             expect(vote).to.exist;
             count++;
             if( count === total) {
               Articles.findById(vote.clickableId, function(err,res) {
-                if(err) return done(err);
                 expect(res).to.exist;
-                expect(res.upVoteCount).to.equal(20);
-                done();
+                expect(res.upVoteCount).to.equal(total);
+                done(err);
               });
             }
           });
         };
 
-        for( var i = 0; i < total; i++) {
-          //1000 votes/sec
-          setTimeout(create, 1);
+        function creator(i) {
+          if(i > 0) {
+            create();
+            setTimeout(function () {
+              creator(i - 1);
+            }, 200);
+          }
         }
+
+        creator(total);
       });
     });
   });

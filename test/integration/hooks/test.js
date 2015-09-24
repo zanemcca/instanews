@@ -1,8 +1,3 @@
-var common =  require('../../common');
-var app = common.app;
-
-var Stat =  app.models.stat;
-
 exports.run = function() {
   describe('Hooks', function() {
     require('./comment').run();

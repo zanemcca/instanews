@@ -30,18 +30,23 @@ var destroy = function(inst, cb) {
 function post(url, token, data, cb) {
   //  console.log('\tURL: ' + url);
   //  console.log(data);
-  api.post(url)
-  .set('Authorization', token)
-  .send(data)
-  .expect(200)
-  .end( function (err, res) {
-    if(err) {
-      console.log(err.stack);
-      cb(err);
-    } else {
-      cb(null, res.body);
-    }
-  });
+  try {
+    api.post(url)
+    .set('Authorization', token)
+    .send(data)
+    .expect(200)
+    .end( function (err, res) {
+      if(err) {
+        console.log(err.stack);
+        cb(err);
+      } else {
+        cb(null, res.body);
+      }
+    });
+  } catch(e) {
+    console.log(e.stack);
+    cb(e);
+  }
 }
 
 function getUrl(type, parent) {

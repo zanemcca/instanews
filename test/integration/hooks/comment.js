@@ -5,13 +5,14 @@ var expect = require('chai').expect;
 
 var common =  require('../../common');
 var depend = require('../../depend');
-var on = depend.on;
+//All tests in this file will share one On intance
+var on = depend.On();
 
 var app = common.app;
 var api = common.api;
 var runTillDone = common.runTillDone;
 
-var Comment = depend.comment;
+var Comment = on.models.comment;
 
 var Notification = app.models.notif;
 

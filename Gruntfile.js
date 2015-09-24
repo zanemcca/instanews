@@ -48,28 +48,24 @@ module.exports = function(grunt) {
         src: ['test/unit/test.js', 'test/integration/test.js', 'test/depend/*.test.js'],
         options: {
           reporter: 'spec',
-          bail: true
         }
       },
       test: {
         src: ['test/depend/*.test.js'],
         options: {
           reporter: 'spec',
-          bail: true
         }
       },
       unit: {
         src: ['test/unit/test.js'],
         options: {
           reporter: 'spec',
-          bail: true
         }
       },
       integration: {
         src: ['test/integration/test.js'],
         options: {
           reporter: 'spec',
-          bail: true
         }
       }
     },

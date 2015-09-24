@@ -72,7 +72,11 @@ module.exports = function(app) {
     var context = loopback.getCurrentContext();
     if(context) {
       var stat = context.get('currentStat');
-      var username =  stat.username;
+      var username;
+      if(stat) {
+        username =  stat.username;
+      }
+
       if(username) {
         ctx.query.include.push({
           relation: 'upVotes',

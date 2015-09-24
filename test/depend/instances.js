@@ -66,6 +66,12 @@ function Instances() {
 
   this.clear = function(done) {
     var instances = this.get();
+
+    var cb = function(err) {
+      instances.length = 0;
+      done(err);
+    };
+
     if(instances.length) {
       var funcs = [];
       var func  = function(inst) {
@@ -84,35 +90,35 @@ function Instances() {
     } else {
       cb();
     }
-
-    var cb = function(err) {
-      instances.length = 0;
-      done(err);
-    };
   };
 
   var clear = function (inst, cb) {
-    if(inst.children && inst.children.length) {
-      var funcs = [];
-      var func  = function(inst) {
-        return function(cb) {
-          clear(inst,cb);
+    if(inst) {
+      if(inst.children && inst.children.length) {
+        var funcs = [];
+        var func  = function(inst) {
+          return function(cb) {
+            clear(inst,cb);
+          };
         };
-      };
 
-      for(var instance of inst.children) {
-        funcs.push(func(instance));
-      }
+        for(var instance of inst.children) {
+          funcs.push(func(instance));
+        }
 
-      async.parallel(funcs, function(err, res) {
+        async.parallel(funcs, function(err, res) {
+          destroy(inst, cb);
+        });
+      } else {
         destroy(inst, cb);
-      });
+      }
     } else {
-      destroy(inst, cb);
+      console.log('That was strange! Why are you trying to delete an empty instance?');
+      cb();
     }
   };
 
   return this;
 }
 
-exports.instances = new Instances();
+exports.Instances = Instances;

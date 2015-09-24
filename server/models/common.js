@@ -1,33 +1,33 @@
 
 exports.disableRemotes = function(Model,list,isStatic) {
-   /*
-   if (isStatic) {
-      console.log('\nDisabling staic remote methods on ' + Model.modelName);
-   }
-   else {
-      console.log('\nDisabling nonStatic remote methods on ' + Model.modelName);
-   }*/
+  /*
+     if (isStatic) {
+     console.log('\nDisabling staic remote methods on ' + Model.modelName);
+     }
+     else {
+     console.log('\nDisabling nonStatic remote methods on ' + Model.modelName);
+     }*/
 
-   for(var i = 0; i < list.length; i++) {
-      var method = list[i];
-      //console.log('\tDisabling ' + method);
-      Model.disableRemoteMethod(method, isStatic);
-   }
+  for(var i = 0; i < list.length; i++) {
+    var method = list[i];
+    //console.log('\tDisabling ' + method);
+    Model.disableRemoteMethod(method, isStatic);
+  }
 };
 
 exports.initBase = function(Model) {
-   var staticDisable = [
-   ];
+  var staticDisable = [
+  ];
 
-   var nonStaticDisable = [
-      '__updateById__upVotes',
-      '__delete__upVotes',
-      '__delete__downVotes',
-      '__updateById__downVotes'
-   ];
+  var nonStaticDisable = [
+    '__updateById__upVotes',
+    '__delete__upVotes',
+    '__delete__downVotes',
+    '__updateById__downVotes'
+  ];
 
-   exports.disableRemotes(Model,staticDisable,true);
-   exports.disableRemotes(Model,nonStaticDisable,false);
+  exports.disableRemotes(Model,staticDisable,true);
+  exports.disableRemotes(Model,nonStaticDisable,false);
 };
 
 //readModifyWrite
@@ -132,13 +132,13 @@ exports.readModifyWrite = function(Model, query, modify, cb, options) {
               }
               else {
                 /*
-                console.log('Warning: Transaction failed to update.' +
-                            ' Likely due to version number');
-                           */
-                cb(
-                  new Error('Transaction failed to update too many times.' +
-                             'likely due to version number')
-                );
+                   console.log('Warning: Transaction failed to update.' +
+                   ' Likely due to version number');
+                   */
+                var e = new Error('Transaction failed to update too many times.' +
+                                  'likely due to version number');
+                e.status = 409;
+                cb(e);
               }
             }
             else if(res.count > 1) {
@@ -212,7 +212,7 @@ exports.math = {
     if(decay <= 0 || decay >= 1) {
       console.log(
         'Error: Decay factor must be less than 1 and greater than 0: ' + decay);
-      return 0;
+        return 0;
     }
 
     var p = 0;
@@ -241,10 +241,10 @@ exports.math = {
   convertMoments: function(moments) {
     console.log(
       'Moments: ' +
-      '  First: ' + moments.first +
-      '  Second: ' + moments.second +
-      '  Third: ' + moments.third +
-      '  Count: ' + moments.count
+        '  First: ' + moments.first +
+        '  Second: ' + moments.second +
+        '  Third: ' + moments.third +
+        '  Count: ' + moments.count
     );
 
     //Convert first, second and third moments to mean, std, and skew 

@@ -20,7 +20,7 @@ function UserArray() {
     var elapsed = 0;
     function loop() {
       if(!done) {
-        if( time < 1000) {
+        if( time < 5000) {
           setTimeout(loop, time);
           elapsed += time;
           time *= 2;
@@ -56,9 +56,10 @@ function UserArray() {
       if(token) {
         cb(null, token);
       } else {
+        var Users = this;
         createUserAndLogin(username, function (err, user) {
           if (err) return cb(err);
-          exports.users.add(user);
+          Users.add(user);
           cb(null, user.id);
         });
       }
@@ -91,6 +92,12 @@ function UserArray() {
 
   this.clear = function(done) {
     var instances = this.get();
+
+    var cb = function(err) {
+      instances.length = 0;
+      done(err);
+    };
+
     if(instances.length) {
       var funcs = [];
       var func  = function(inst) {
@@ -109,11 +116,6 @@ function UserArray() {
     } else {
       cb();
     }
-
-    var cb = function(err) {
-      instances.length = 0;
-      done(err);
-    };
   };
 
   initUsers();
@@ -146,4 +148,4 @@ function createUserAndLogin (username, cb) {
 }
 
 exports.createUserAndLogin = createUserAndLogin;
-exports.users = new UserArray();
+exports.Users = UserArray;

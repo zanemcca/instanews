@@ -3,7 +3,7 @@ var LIMIT = 10;
 
 /*jshint expr: true*/
 var depend = require('../../depend');
-var on = depend.on;
+var on = depend.On();
 
 var chai = require('chai');
 var expect = chai.expect;
@@ -23,7 +23,6 @@ var genericModels = require('../../genericModels');
 var purgeDB = function(cb) {
   Articles.destroyAll(function(err) {
     if(err) return cb(err);
-
     Subarticles.destroyAll(function(err) {
       if(err) return cb(err);
       app.bruteDB.collection('store').remove( {}, function(err) {
@@ -194,7 +193,7 @@ exports.run = function() {
 
     on.article().describe('Using journalist', function () {
       it('should not include the journalists email or password when accessing the model', function(done) {
-        var user = depend.users.getDefault();
+        var user = on.Users.getDefault();
         /*
          * The password does not get stripped until exiting the server
          * so using supertest is needed
@@ -251,8 +250,8 @@ exports.run = function() {
 
     on.subarticle().on.article().plus.subarticle().describe('Checking de-duplication', function () {
       it('should not return duplicate articles when requesting articles of a journalist', function(done) {
-        var user = depend.users.getDefault();
-        var sub = depend.instances.getActionableInstance();
+        var user = on.Users.getDefault();
+        var sub = on.Instances.getActionableInstance();
         /*
          * Apparently loopback does not set the relations up until the server
          * is officially running. So supertest is required to test this hook

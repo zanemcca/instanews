@@ -7,8 +7,8 @@ chai.use(require('chai-datetime'));
 var expect = chai.expect;
 
 var depend = require('../../depend');
-var on = depend.on;
-var Article = depend.article;
+var on = depend.On();
+var Article = on.models.article;
 
 var common =  require('../../common');
 var app = common.app;
@@ -18,7 +18,7 @@ exports.run = function() {
   describe('Base', function() {
     on.article().describe('', function () {
       it('should have initialized properly', function() {
-        var art = depend.instances.getActionableInstance();
+        var art = on.Instances.getActionableInstance();
         expect(art).to.exist;
         expect(art.upVoteCount).to.equal(0);
         expect(art.downVoteCount).to.equal(0);
