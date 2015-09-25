@@ -80,12 +80,16 @@ module.exports = function(grunt) {
         src: 'test/unit',
         root: './server',
         options: {
+          coverageFolder: 'coverageUnit',
           excludes: ['./server/boot/**']
         }
       },
       integration: {
         src: 'test/integration',
-        root: './server'
+        root: './server',
+        options: {
+          coverageFolder: 'coverageIntegration'
+        }
       },
       all: {
         src: ['test/depend/*.test.js', 'test/integration', 'test/unit'],
@@ -98,11 +102,29 @@ module.exports = function(grunt) {
         options: {
           coverageFolder: 'coverage*', // will check both coverage folders and merge the coverage results
           check: {
-            lines: 60 ,
-            statements: 60,
-            branches: 60,
-            functions: 60
+            lines: 75 ,
+            statements: 75,
+            branches: 65,
+            functions: 85
           }
+        }
+      },
+      unit: {
+        coverageFolder: 'coverageUnit',
+        check: {
+          lines: 60 ,
+          statements: 60,
+          branches: 49,
+          functions: 60
+        }
+      },
+      integration: {
+        coverageFolder: 'coverageIntegration',
+        check: {
+          lines: 60 ,
+          statements: 60,
+          branches: 60,
+          functions: 60
         }
       }
     },
@@ -258,20 +280,54 @@ module.exports = function(grunt) {
 
   //TODO Front end testing and coverage 
   //Coverage reporting and testing
-  grunt.registerTask('coverage', ['jshint:server', 'mocha_istanbul:all', 'istanbul_check_coverage']);
-  grunt.registerTask('coverage:unit', ['jshint:server', 'mocha_istanbul:unit', 'istanbul_check_coverage']);
-  grunt.registerTask('coverage:test', ['jshint:server', 'mocha_istanbul:test', 'istanbul_check_coverage']);
-  grunt.registerTask('coverage:integration', ['jshint:server', 'mocha_istanbul:integration', 'istanbul_check_coverage']);
-  grunt.registerTask('coverage:open', ['open:coverage']);
+  //
+  grunt.registerTask('coverage', function(option) {
+    var tasks = ['jshint:server'];
+    switch(option) {
+      case 'unit':
+        tasks.push('mocha_istanbul:unit');
+        break;
+      case 'test':
+        tasks.push('mocha_istanbul:test');
+        break;
+      case 'integration':
+        tasks.push('mocha_istanbul:integration');
+        break;
+      default:
+        tasks.push('mocha_istanbul:unit');
+        tasks.push('istanbul_check_coverage:unit');
+        tasks.push('mocha_istanbul:test');
+        tasks.push('mocha_istanbul:integration');
+        tasks.push('istanbul_check_coverage:integration');
+        break;
+    }
+    tasks.push('istanbul_check_coverage');
+    grunt.task.run(tasks);
+  });
+
+  grunt.registerTask('test', function(option) {
+    var tasks = ['jshint:server'];
+    switch(option) {
+      case 'unit':
+        tasks.push('mochaTest:unit');
+        break;
+      case 'test':
+        tasks.push('mochaTest:test');
+        break;
+      case 'integration':
+        tasks.push('mochaTest:integration');
+        break;
+      default:
+        tasks.push('mochaTest:unit');
+        tasks.push('mochaTest:test');
+        tasks.push('mochaTest:integration');
+        break;
+    }
+    grunt.task.run(tasks);
+  });
 
   // Check the coverage report
   grunt.registerTask('check', ['jshint:server', 'istanbul_check_coverage']);
-
-  // Just run the tests
-  grunt.registerTask('test', ['jshint:server', 'mochaTest:all']);
-  grunt.registerTask('test:unit', ['jshint:server', 'mochaTest:unit']);
-  grunt.registerTask('test:test', ['jshint:server', 'mochaTest:test']);
-  grunt.registerTask('test:integration', ['jshint:server', 'mochaTest:integration']);
 
   // Shortcuts
   grunt.registerTask('ci', 'coverage:integration');
