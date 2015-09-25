@@ -56,7 +56,7 @@ exports.run = function () {
         it('no where filter', function(done) {
           where = null;
           update(function (err) {
-            expect(err.http_code).to.equal(400);
+            expect(err.status).to.equal(400);
             done();
           });
         });
@@ -64,7 +64,7 @@ exports.run = function () {
         it('no type given', function(done) {
           type = null;
           update(function (err) {
-            expect(err.http_code).to.equal(400);
+            expect(err.status).to.equal(400);
             done();
           });
         });
@@ -96,7 +96,7 @@ exports.run = function () {
             cb();
           };
           update(function(err) {
-            expect(err.http_code).to.equal(404);
+            expect(err.status).to.equal(404);
             done();
           });
         });
@@ -141,7 +141,7 @@ exports.run = function () {
           it('should return a 400 becaause the type is unknown', function (done) {
             type  = 'click';
             update(function(err) {
-              expect(err.http_code).to.equal(400);
+              expect(err.status).to.equal(400);
               done();
             });
           });
@@ -332,7 +332,7 @@ exports.run = function () {
 
       it('should return a 400 error code because the given model is unknown', function(done) {
         Stat.triggerRating(where, 'notAModel', modify, function (err, res) {
-          expect(err.http_code).to.equal(400);
+          expect(err.status).to.equal(400);
           done();
         });
       });
@@ -357,7 +357,7 @@ exports.run = function () {
 
       it('should return a 400 error because there is no triggerRating function on upVote', function (done) {
         Stat.triggerRating(where, 'upVote', modify, function(err) {
-          expect(err.http_code).to.equal(400);
+          expect(err.status).to.equal(400);
           done();
         });
       });

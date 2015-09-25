@@ -17,7 +17,7 @@ module.exports = function(app) {
                deviceToken: inst.__data.deviceToken
             }
          }, function(err, res) {
-            if( err) console.log(err);
+            if( err) console.error(err.stack);
             else {
                if( res.length === 1) {
 
@@ -41,15 +41,11 @@ module.exports = function(app) {
                   });
                }
                else if (res.length > 1) {
-                  console.log('Error: There should only be one installation ' +
+                  var error = new Error('Error: There should only be one installation ' +
                         'per unique device but ' +
                         res.length + ' were found!');
-
-                  var error = new Error();
-                  error.message = 'Error: This device already' +
-                     'has multiple installations';
-
-                  ctx.res.status(500);
+                  error.status = 403;
+                  console.error(error.stack);
                   next(error);
                }
                else {

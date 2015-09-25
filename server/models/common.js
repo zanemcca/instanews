@@ -44,7 +44,7 @@ exports.readModifyWrite = function(Model, query, modify, cb, options) {
     if(typeof(options.retryCount) === 'number') {
       retryCount = options.retryCount;
       if(retryCount > MAXRETRYS) {
-        console.log('Warning: Only ' + MAXRETRYS + ' retrys are allowed but ' +
+        console.warn('Warning: Only ' + MAXRETRYS + ' retrys are allowed but ' +
                     retryCount + ' were requested');
         retryCount = MAXRETRYS;
       }
@@ -53,7 +53,7 @@ exports.readModifyWrite = function(Model, query, modify, cb, options) {
 
   Model.find(query, function(err,res) {
     if(err) {
-      console.log('Warning: Transaction failed to read: ' +
+      console.warn('Warning: Transaction failed to read: ' +
                   JSON.stringify(err));
       cb(err);
     }
@@ -98,7 +98,7 @@ exports.readModifyWrite = function(Model, query, modify, cb, options) {
 
         Model.updateAll(where, instance, function(err, res) {
           if(err) {
-            console.log('Warning: Transaction failed to update: ' +
+            console.warn('Warning: Transaction failed to update: ' +
                         JSON.stringify(err));
             cb(err);
           }
@@ -131,7 +131,7 @@ exports.readModifyWrite = function(Model, query, modify, cb, options) {
               }
             }
             else if(res.count > 1) {
-              console.log('Warning: More than one instance was updated: ' +
+              console.warn('Warning: More than one instance was updated: ' +
                           res.count);
               cb(null, res);
             }
@@ -203,7 +203,7 @@ exports.math = {
   //Performs a geometric decay of the given array
   geometricDecay: function(votables, decay) {
     if(decay <= 0 || decay >= 1) {
-      console.log(
+      console.error(
         'Error: Decay factor must be less than 1 and greater than 0: ' + decay);
         return 0;
     }
@@ -223,7 +223,7 @@ exports.math = {
         p *= (1- decay)/(1- total);
       }
       else {
-        console.log('Warning: Geometric decay total > 1'); 
+        console.error('Error: Geometric decay total > 1'); 
         p = 0;
       }
     }
@@ -246,7 +246,7 @@ exports.math = {
     if(moments.second && mean !== undefined) {
       var variance = moments.second/moments.count - mean*mean;
       if(variance < 0) {
-        console.log('Error: Variance is negative: ' + variance);
+        console.error('Error: Variance is negative: ' + variance);
       }
       else {
         std = Math.pow(variance, 1/2);

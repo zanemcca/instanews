@@ -84,7 +84,7 @@ exports.run = function() {
         user.password = 'toshort';
         api.post('/api/journalists')
         .send(user)
-        .expect(500)
+        .expect(403)
         .end( function(err, res) {
 
           expect(err).to.not.exist;
@@ -105,7 +105,7 @@ exports.run = function() {
         user.username = 'bababab';
         api.post('/api/journalists')
         .send(user)
-        .expect(500)
+        .expect(403)
         .end( function(err, res) {
 
           expect(err).to.not.exist;
@@ -126,7 +126,7 @@ exports.run = function() {
         user.email = 'bababab@babab.com';
         api.post('/api/journalists')
         .send(user)
-        .expect(500)
+        .expect(403)
         .end( function(err, res) {
 
           expect(err).to.not.exist;

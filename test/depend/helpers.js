@@ -34,17 +34,17 @@ function post(url, token, data, cb) {
     api.post(url)
     .set('Authorization', token)
     .send(data)
-    .expect(200)
+  //  .expect(200)
     .end( function (err, res) {
       if(err) {
-        console.log(err.stack);
+        console.error(err.stack);
         cb(err);
       } else {
         cb(null, res.body);
       }
     });
   } catch(e) {
-    console.log(e.stack);
+    console.error(e.stack);
     cb(e);
   }
 }

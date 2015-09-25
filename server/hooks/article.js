@@ -1,5 +1,4 @@
 
-
 /* jshint camelcase: false */
 
 var loopback = require('loopback');
@@ -11,15 +10,19 @@ module.exports = function(app) {
    var Subarticle = app.models.Subarticle;
    var Stat = app.models.Stat;
 
+  var debug = app.debug('hooks:article');
+
   Article.afterRemote('prototype.__get__comments', function(ctx, instance,next){
     Base.createClickAfterRemote(ctx, next);
   });
 
   Article.afterRemote('prototype.__get__subarticles', function(ctx, inst, next){
+    debug('afterRemote prototype.__get__subarticles', [ctx, inst]);
     Base.createClickAfterRemote(ctx, next);
   });
 
   Article.observe('after save', function(ctx, next) {
+    debug('observe after save', ctx);
     var inst = ctx.instance;
     if(!inst) {
       inst = ctx.data;
@@ -32,7 +35,7 @@ module.exports = function(app) {
         viewableId: inst.id
       }, function(err, res) {
         if(err) {
-          console.log(
+          console.error(
             'Error: Failed to create a view for article creation');
         }
         next(err);
@@ -40,13 +43,14 @@ module.exports = function(app) {
     }
     else {
       if(!inst) {
-        console.log('Warning: Instance is not valid for article after save');
+        console.warn('Warning: Instance is not valid for article after save');
       }
       next();
     }
   });
 
   Article.observe('access', function(ctx, next) {
+    debug('observe access', ctx);
     if(ctx.options.rate) {
       var context = loopback.getCurrentContext();
       if(context) {
@@ -75,11 +79,12 @@ module.exports = function(app) {
   });
 
   Article.triggerRating = function(where, modify, cb) {
+    debug('triggerRating', [where, modify]);
     if(where && where.id) {
       //Update the article
       Stat.updateRating(where, Article.modelName, modify, function(err, res) {
         if(err) {
-          console.log('Warning: Failed to update an article');
+          console.warn('Warning: Failed to update an article');
           return cb(err);
         }
         cb(null, res);
@@ -92,7 +97,7 @@ module.exports = function(app) {
         //Update the article
         Stat.updateRating(where, Article.modelName, modify, function(err, res) {
           if(err) {
-            console.log('Warning: Failed to update an article');
+            console.warn('Warning: Failed to update an article');
           }
           cb(err, res);
         });
@@ -101,8 +106,8 @@ module.exports = function(app) {
     } else {
       var error = new Error(
         'Invalid filter for article.triggerRating: ' + where);
-      console.log(error);
       error.status = 400;
+      console.error(error.stack);
       cb(error);
     }
   };

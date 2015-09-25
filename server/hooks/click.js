@@ -10,6 +10,7 @@ module.exports = function(app) {
   var DownVote = app.models.downVote;
   var loopback = require('loopback');
 
+  var debug = app.debug('hooks:click');
   // Conversion functions
   Number.prototype.toRad = function() {
     return this * Math.PI / 180;
@@ -39,6 +40,7 @@ module.exports = function(app) {
   };
 
   var preVoteChecker = function(ctx, next) {
+    debug('preVoteChecker', ctx);
     var inst = ctx.instance;
     if(inst && ctx.isNewInstance) {
       var name = ctx.Model.modelName;
@@ -66,25 +68,25 @@ module.exports = function(app) {
 
       Model.findOne(filter, function(err, res) {
         if(err) {
-          console.log('Error: Failed to complete preVoteChecker');
+          console.error('Error: Failed to complete preVoteChecker');
           next(err);
         }
         else if(res) {
           var error = new Error('A user can only ' + name + ' once per item');
           error.status = 401;
-          console.log(error);
+          console.error(error.stack);
           next(error);
         } 
         else {
           OppositeModel.findOne(filter, function(err, res) {
             if(err) {
-              console.log('Error: Failed to complete preVoteChecker');
+              console.error('Error: Failed to complete preVoteChecker');
               next(err);
             }
             else if(res) {
               res.destroy(function(err) {
                 if(err) {
-                  console.log('Error: Failed to complete preVoteChecker');
+                  console.error('Error: Failed to complete preVoteChecker');
                   next(err);
                 }
                 else {
@@ -100,12 +102,13 @@ module.exports = function(app) {
       });
     }
     else {
-      console.log('PreVoteChecker should only be called on new votes');
+      console.warn('Warning: PreVoteChecker should only be called on new votes');
       next();
     }
   };
 
   Click.observe('before save', function(ctx, next) {
+    debug('observe  - before save', ctx);
     var inst = ctx.instance;
 
     if(inst && ctx.isNewInstance) {
@@ -123,27 +126,28 @@ module.exports = function(app) {
             preVoteChecker(ctx, next);
           }
           else {
-            console.log(inst);
+            console.error(inst);
             return next(error);
           }
         }
         else {
-          console.log(inst);
+          console.error(inst);
           return next(error);
         }
       }
       else {
-        console.log(inst);
+        console.error(inst);
         return next(error);
       }
     }
     else {
-      console.log('Warning: Invalid instance for clicks before save');
+      console.warn('Warning: Invalid instance for clicks before save');
       next();
     }
   });
 
   Click.observe('before save', function(ctx, next) {
+    debug('observe - before save', ctx);
     var inst = ctx.instance;
     if(inst && ctx.isNewInstance) {
       var where;
@@ -157,7 +161,7 @@ module.exports = function(app) {
       else {
         var error = new Error('Missing key information for new click!');
         error.status = 400;
-        console.log(inst);
+        console.error(inst);
         return next(error);
       }
 
@@ -166,9 +170,9 @@ module.exports = function(app) {
         order: 'created DESC'
       }, function(err, res) {
         if(err) {
-          console.log('Warning: Failed to find a view for Type: ' +
-                      inst.clickableType + '\tTypeId: ' +
-                      inst.clickableId);
+          console.warn('Warning: Failed to find a view for Type: ' +
+                       inst.clickableType + '\tTypeId: ' +
+                       inst.clickableId);
           next(err);
         }
         else if(res) {
@@ -179,19 +183,20 @@ module.exports = function(app) {
         }
         else {
           err = new Error('The view is missing for click creation!');
-          console.log(err);
           err.status = 403;
+          console.error(err.stack);
           next(err);
         }
       });
     }
     else {
-      console.log('Warning: Invalid instance for clicks before save');
+      console.warn('Warning: Invalid instance for clicks before save');
       next();
     }
   });
 
   Click.observe('before delete', function(ctx, next) {
+    debug('observe - before delete', ctx);
     //Delegate the count updating to the inherited model 
     if(ctx.Model.modelName !== 'click') {
       ctx.inc = {
@@ -215,6 +220,7 @@ module.exports = function(app) {
   });
 
   Click.observe('after save', function(ctx, next) {
+    debug('observe - after save', ctx);
     var inst = ctx.instance;
 
     if(inst && ctx.isNewInstance) {
@@ -236,12 +242,13 @@ module.exports = function(app) {
       }
     }
     else {
-      console.log('Warning: Instance is invalid for click');
+      console.warn('Warning: Instance is invalid for click');
       next();
     }
   });
 
   Click.updateVoteParent = function(ctx, next) {
+    debug('updateVoteParent', ctx);
     var inst = ctx.instance;
 
     if(inst) {
@@ -252,18 +259,19 @@ module.exports = function(app) {
       });
     }
     else {
-      console.log('Warning: Invalid instance for vote!');
-      console.log(inst);
+      console.warn('Warning: Invalid instance for vote!');
+      console.warn(inst);
       next();
     }
   };
 
   Click.updateClickableAttributes = function(ctx, data, next) {
+    debug('updateClickableAttributes', [ctx, data]);
     var inst = ctx.instance;
     if(inst) {
       inst.clickable(function(err, res) {
         if(err) {
-          console.log('Warning: Failed to fetch clickable');
+          console.warn('Warning: Failed to fetch clickable');
           return next(err);
         }
 
@@ -286,7 +294,7 @@ module.exports = function(app) {
 
           res.updateAttributes(data, function(err,res) {
             if(err) {
-              console.log('Warning: Failed to save clickable');
+              console.warn('Warning: Failed to save clickable');
               next(err);
             }
             else {
@@ -300,10 +308,10 @@ module.exports = function(app) {
                   //Conflicts are ok because it means that 
                   //someone else has just triggered the rating.
                   //So we will not throw an error
-                  console.log('Error: Failed to update the rating for ' +
-                              inst.clickableType + ' - ' + inst.clickableId +
-                              ' from click ' + inst.id);
-                  console.log(err);
+                  console.error('Error: Failed to update the rating for ' +
+                                inst.clickableType + ' - ' + inst.clickableId +
+                                ' from click ' + inst.id);
+                  console.error(err.stack);
                   return next(err);
                 }
                 next();
@@ -320,12 +328,13 @@ module.exports = function(app) {
     } else {
       var error = new Error('Invalid instance for updateClickableAttributes');
       error.status = 400;
-      console.log(error);
+      console.error(error.stack);
       next(error);
     }
   };
 
   Click.addAgeSample = function(ctx, age, next) {
+    debug('addAgeSample', [ctx, age]);
     if(ctx.instance) {
       var inst = ctx.instance;
       //Only new clicks can add sample ages
@@ -334,8 +343,8 @@ module.exports = function(app) {
           username: inst.username
         }, ctx.Model.modelName, 'age', age, function(err, res) {
           if(err) {
-            console.log('Error: Failed to add interaction age for upVote');
-            console.log(err);
+            console.error('Error: Failed to add interaction age for upVote');
+            console.error(err.stack);
             next(err);
           }
           else {
@@ -347,9 +356,9 @@ module.exports = function(app) {
             age,
             function(err, res) {
               if(err) {
-                console.log('Error: Failed to add interaction age for ' +
-                            inst.clickableType);
-                console.log(err);
+                console.error('Error: Failed to add interaction age for ' +
+                              inst.clickableType);
+                console.error(err.stack);
               }
               next(err);
             });
@@ -362,7 +371,7 @@ module.exports = function(app) {
     }
     else {
       var error = new Error('Invalid instance for Click.addAge');
-      console.log(error);
+      console.error(error.stack);
       next(error);
     }
   };

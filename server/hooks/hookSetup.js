@@ -1,7 +1,6 @@
 
 module.exports = function(app) {
    //Setup all server side hooks that we need
-   require('./base.js')(app);
    require('./view.js')(app);
    require('./installation.js')(app);
    require('./notification.js')(app);
@@ -13,4 +12,5 @@ module.exports = function(app) {
    require('./comment.js')(app);
    require('./stat.js')(app);
    require('./click.js')(app);
+   require('./base.js')(app);
 };

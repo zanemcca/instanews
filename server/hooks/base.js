@@ -12,7 +12,10 @@ module.exports = function(app) {
   var Stat = app.models.Stat;
   var Click = app.models.Click;
 
+  var debug = app.debug('hooks:base');
+
   Base.createClickAfterRemote = function(ctx, next){
+    debug('createClickAfterRemote', ctx);
     if(
       ctx &&
       ctx.req &&
@@ -32,7 +35,7 @@ module.exports = function(app) {
           };
           Click.create(click, function(err, res) {
             if(err) {
-              console.log(err);
+              console.error(err.stack);
             }
             next(err);
           });
@@ -42,19 +45,20 @@ module.exports = function(app) {
         }
       }
       else {
-        console.log('Warning: No context object was found!');
+        console.warn('Warning: No context object was found!');
         next();
       }
     }
     else {
       var error = new Error('Invalid context for prototype.__get__comments');
-      error.http_code = 403;
-      console.log(ctx);
+      error.status = 403;
+      console.error(ctx);
       next(error);
     }
   };
 
   Base.observe('access', function(ctx, next) {
+    debug('observe.access', ctx);
     //Limit the queries to LIMIT per request
     if( !ctx.query.limit || ctx.query.limit > LIMIT) {
        ctx.query.limit = LIMIT;
@@ -116,7 +120,7 @@ module.exports = function(app) {
   });
 
    Base.observe('before save', function(ctx, next) {
-
+    debug('observe.before save', ctx);
       var inst = ctx.instance;
       if (!inst) {
         inst = ctx.data;
@@ -142,8 +146,8 @@ module.exports = function(app) {
             if(!rawStat) {
               var err = new Error(
                 'There should be a valid user logged in for base creation');
-              err.http_code = 401;
-              console.log(err);
+              err.status = 401;
+              console.error(err.stack);
               return next(err);
             }
 
@@ -203,21 +207,22 @@ module.exports = function(app) {
          }
       }
       else {
-        console.log('Warning: There does not seem to be an instance present!');
+        console.warn('Warning: There does not seem to be an instance present!');
       }
 
       next();
    });
 
    Base.observe('loaded', function(ctx, next) {
+    debug('observe.loaded', ctx);
      var instance = ctx.instance;
 
      if(instance && ctx.options.rate) {
        Stat.getCustomRating(ctx.Model, instance, function(err, inst) {
         if(err) {
-          console.log('Error: Failed to getCustomRating for ' +
+          console.error('Error: Failed to getCustomRating for ' +
                       ctx.Model.modelName + ' ' + instance.id);
-          console.log(err);
+          console.error(err.stack);
           next(err);
         }
         else {

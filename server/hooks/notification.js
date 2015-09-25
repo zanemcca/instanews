@@ -18,13 +18,13 @@ module.exports = function(app) {
             }
          }, function(err, res) {
             if (err)
-               console.log('Error finding installation!: ' + err);
+               console.error('Error finding installation!: ' + err);
             else {
                if( res.length > 0) {
 
                   var report = function(err) {
                      if (err) {
-                        console.log('Error pushing notification: ' + err);
+                        console.error('Error pushing notification: ' + err);
                      }
                      //console.log('Pushing notification to ', note.username);
                   };
@@ -47,7 +47,7 @@ module.exports = function(app) {
                         note.alert =  note.message;
                      }
                      else {
-                        console.log('Unkown device! Not pusing a notification');
+                        console.warn('Unkown device! Not pusing a notification');
                         break;
                      }
                      //console.log('Creating notification: ' + note.toString());

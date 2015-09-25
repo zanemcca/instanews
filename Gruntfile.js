@@ -45,7 +45,7 @@ module.exports = function(grunt) {
     //Solo mocha testing
     mochaTest: {
       all: {
-        src: ['test/unit/test.js', 'test/integration/test.js', 'test/depend/*.test.js'],
+        src: ['test/depend/*.test.js', 'test/integration/test.js', 'test/unit/test.js'],
         options: {
           reporter: 'spec',
         }
@@ -54,6 +54,7 @@ module.exports = function(grunt) {
         src: ['test/depend/*.test.js'],
         options: {
           reporter: 'spec',
+          bail: true,
         }
       },
       unit: {
@@ -87,7 +88,7 @@ module.exports = function(grunt) {
         root: './server'
       },
       all: {
-        src: ['test/unit', 'test/integration', 'test/depend/*.test.js'],
+        src: ['test/depend/*.test.js', 'test/integration', 'test/unit'],
         root: './server'
       }
     },

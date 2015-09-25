@@ -13,14 +13,14 @@ module.exports = function(app) {
       Click.updateVoteParent(ctx, next);
     } else if(ctx.where) {
       //TODO deal with deletion of multiple votes
-      console.log('warning: Strange downvote deletion request!');
-      console.log(ctx.where);
+      console.warn('warning: Strange downvote deletion request!');
+      console.warn(ctx.where);
       next();
     }
     else {
       var error = new Error('Upvote  deletion expected there to be ctx.inc!');
-      error.http_code = 400;
-      console.log(error);
+      error.status = 400;
+      console.error(error.stack);
       next(error);
     }
   });
@@ -37,13 +37,13 @@ module.exports = function(app) {
       }
       else {
         var error = new Error('Downvote expected there to be ctx.inc!');
-        error.http_code = 400;
-        console.log(error);
+        error.status = 400;
+        console.error(error.stack);
         next(error);
       }
     }
     else {
-      console.log('Warning: Invalid instance for downvote!');
+      console.warn('Warning: Invalid instance for downvote!');
       next();
     }
   });

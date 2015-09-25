@@ -157,7 +157,12 @@ var verifyPurge = function(done) {
 };
 
 describe('Depend', function () {
+  before(function(done) {
+    setTimeout(done, 1000);
+  });
+
   describe('on', function () {
+    this.timeout(10000);
     before(function (done) {
       purge(done);
     });

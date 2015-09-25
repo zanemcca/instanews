@@ -47,8 +47,9 @@ module.exports = function(app) {
 
       //TODO make this the same as front end password check
       if( !user.password || user.password.length < 8) {
-        console.log('Password is too weak!');
-        next(new Error('Password is too weak!'));
+        var e = new Error('Password is too weak!');
+        e.status = 403;
+        next(e);
       }
       else {
         Journalist.count({
@@ -66,8 +67,9 @@ module.exports = function(app) {
             next();
           }
           else {
-            console.log('Username or email is already used!');
-            next(new Error('Username or email is already used!')); 
+            var er = new Error('Username or email is already used!'); 
+            er.status = 403;
+            next(er);
           }
         });
       }
@@ -79,8 +81,8 @@ module.exports = function(app) {
     if(instance && ctx.isNewInstance) {
       Stat.findById(Stat.averageId, function(err, res) {
         if( err ) {
-          console.log('Error: Failed to find ' + Stat.averageId);
-          console.log(err);
+          console.error('Error: Failed to find ' + Stat.averageId);
+          console.error(err.stack);
           next(err);
         }
         else {
@@ -98,9 +100,9 @@ module.exports = function(app) {
           // througoughly modify the statistics
           Stat.create(stat, function(err, res) {
             if( err) {
-              console.log('Error: Failed to create stat object for user ' +
+              console.error('Error: Failed to create stat object for user ' +
                           instance.username);
-              console.log(err);
+              console.error(err.stack);
               next(err);
             }
             else {
@@ -111,7 +113,7 @@ module.exports = function(app) {
       });
     }
     else {
-      console.log('Warning: There is no instance attached to' +
+      console.warn('Warning: There is no instance attached to' +
                   ' Journalist after save observer');
       next();
     }

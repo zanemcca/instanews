@@ -114,11 +114,11 @@ var generateRandomLocation = function (bottomLeft, upperRight) {
 var runTillDone = function(func, cb, interval, timeout) {
    if(!interval) {
       //Default interval is 10 milliseconds
-      interval = 10;
+      interval = 40;
    }
    if(!timeout) {
       //Default timeout is 1 seconds
-      timeout = 1000;
+      timeout = 5000;
    }
 
    var intervalFunc = setInterval(function() {
@@ -173,6 +173,13 @@ exports.serverDir = getBaseDir();
 exports.assert = assert;
 exports.app = app;
 exports.api = api;
+
+exports.resetServer = function () {
+  process.exit(0);
+  exports.app = require('../server/server');
+  exports.api = supertest(app);
+};
+
 exports.importTest = importTest;
 exports.dump = dump;
 exports.findModel = findModel;
