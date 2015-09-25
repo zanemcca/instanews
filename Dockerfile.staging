@@ -6,7 +6,7 @@ MAINTAINER Zane McCaig
 RUN apt-get install -y curl && \ 
   curl -sL https://deb.nodesource.com/setup_4.x | sudo -E bash - && \
   apt-get update && \
-  apt-get install -y nodejs openssl
+  apt-get install -y nodejs openssl g++
 
 # Copy our source files into the new docker
 COPY . /src
@@ -14,7 +14,7 @@ COPY . /src
 # Install our dependencies
 RUN cd /src && \
   npm install && \
-  npm install -g grunt grunt-cli && \
+  npm install -g grunt grunt-cli node-gyp && \
   rm server/boot/explorer.js 
 
 # Install strongloop
