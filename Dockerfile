@@ -15,7 +15,7 @@ COPY . /src
 RUN cd /src && \
   npm install && \
   npm install -g grunt grunt-cli && \
-  rm server/boot/explorer.js 
+  rm server/boot/explorer.js && \
   rm -r client && \
   rm -r test
 
