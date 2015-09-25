@@ -15,7 +15,7 @@ module.exports = function(app) {
         'Cannot create a view because there is no user logged in.');
       var context = loopback.getCurrentContext();
 
-      error.http_code = 400;
+      error.status = 400;
       if(context) {
         var token = context.get('accessToken');
         if(token) {
@@ -27,11 +27,11 @@ module.exports = function(app) {
           }
         }
       }
-      console.log(error);
+      console.error(error.stack);
       next(error);
     }
     else {
-      console.log('Warning: Invalid instance for views before save');
+      console.warn('Warning: Invalid instance for views before save');
       next();
     }
   });
@@ -51,7 +51,7 @@ module.exports = function(app) {
         },
         next);
       } else {
-        console.log('Warning: There should have been a viewable instance present');
+        console.warn('Warning: There should have been a viewable instance present');
         next();
       }
     });
@@ -69,7 +69,7 @@ module.exports = function(app) {
       next);
     }
     else {
-      console.log('Warning: Instance is invalid after view creation');
+      console.warn('Warning: Instance is invalid after view creation');
       next();
     }
   });
@@ -78,28 +78,28 @@ module.exports = function(app) {
     if(ctx.instance) {
       ctx.instance.viewable(function(err, res) {
         if(err) {
-          console.log('Warning: Failed to fetch viewable');
+          console.warn('Warning: Failed to fetch viewable');
           return next(err);
         }
 
         if(res) {
           res.updateAttributes(data, function(err,res) {
             if(err) {
-              console.log('Warning: Failed to save viewable');
+              console.warn('Warning: Failed to save viewable');
               next(err);
             } else {
               next();
             }
           });
         } else {
-          console.log('Warning: There should have been a viewable instance present');
+          console.warn('Warning: There should have been a viewable instance present');
           next();
         }
       });
     } else {
       var error = new Error('Invalid instance for updateViewableAttributes');
-      error.http_code = 400;
-      console.log(ctx);
+      error.status = 400;
+      console.error(ctx);
       next(error);
     }
   };

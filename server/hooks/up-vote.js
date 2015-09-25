@@ -16,14 +16,14 @@ module.exports = function(app) {
       Click.updateVoteParent(ctx, next);
     } else if(ctx.where) {
       //TODO deal with deletion of multiple votes
-      console.log('warning: Strange upvote deletion request!');
-      console.log(ctx.where);
+      console.warn('warning: Strange upvote deletion request!');
+      console.warn(ctx.where);
       next();
     }
     else {
       var error = new Error('Upvote  deletion expected there to be ctx.inc!');
-      error.http_code = 400;
-      console.log(error);
+      error.status = 400;
+      console.error(error.stack);
       next(error);
     }
   });
@@ -40,13 +40,13 @@ module.exports = function(app) {
       }
       else {
         var error = new Error('Upvote expected there to be ctx.inc!');
-        error.http_code = 400;
-        console.log(error);
+        error.status = 400;
+        console.error(error.stack);
         next(error);
       }
     }
     else {
-      console.log('Warning: Invalid instance for upvote!');
+      console.warn('Warning: Invalid instance for upvote!');
       next();
     }
   });
@@ -65,7 +65,7 @@ module.exports = function(app) {
                //Notify the original poster
                app.models.Article.findById( inst.clickableId,
                function(err, res) {
-                  if (err) console.log('Error after saving vote: ' + err);
+                  if (err) console.error('Error after saving vote: ' + err);
                   else {
                      var username = res.username;
 
@@ -82,7 +82,7 @@ module.exports = function(app) {
                      parentId: inst.clickableId
                   }
                }, function(err, res) {
-                  if (err) console.log('Error after saving vote: ' + err);
+                  if (err) console.error(err.stack);
                   else {
                      if( res.length > 0) {
                         var username = res[0].username;
@@ -98,7 +98,7 @@ module.exports = function(app) {
                               messageFrom: inst.username,
                               username: username
                            }, function(err, res) {
-                              if (err) console.log('Error: ' + err);
+                              if (err) console.error(err.stack);
                            });
                         }
                      }
@@ -108,7 +108,7 @@ module.exports = function(app) {
             case 'subarticle':
                app.models.Subarticle.findById( inst.clickableId,
                function(err,res) {
-                  if (err) console.log('Error after saving vote: ' + err);
+                  if (err) console.error(err.stack);
                   else {
                      var username = res.username;
 
@@ -123,7 +123,7 @@ module.exports = function(app) {
                            messageFrom: inst.username,
                            username: username
                         }, function(err, res) {
-                           if (err) console.log('Error: ' + err);
+                           if (err) console.error(err.stack);
                         });
                      }
                   }
@@ -132,7 +132,7 @@ module.exports = function(app) {
             case 'comment':
                app.models.Comment.findById( inst.clickableId,
                function(err,res) {
-                  if (err) console.log('Error after saving vote: ' + err);
+                  if (err) console.error(err.stack);
                   else {
                      var username = res.username;
 
@@ -147,19 +147,19 @@ module.exports = function(app) {
                            messageFrom: inst.username,
                            username: username
                         }, function(err, res) {
-                           if (err) console.log('Error: ' + err);
+                           if (err) console.error(err.stack);
                         });
                      }
                   }
                });
                break;
             default:
-               console.log('Unknown clickable type!');
+               console.warn('Unknown clickable type!');
          }
 
       }
       else {
-         console.log('After saving vote the instance is null');
+         console.warn('After saving vote the instance is null');
       }
       next();
    });

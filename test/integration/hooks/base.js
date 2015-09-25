@@ -27,29 +27,34 @@ exports.run = function() {
         expect(new Date(art.modified)).to.equalDate(new Date());
       });
 
-      it('should be limited to ' + LIMIT + ' base objects returned' , function(done) {
-        var objects = 0;
+      describe('',function () {
+        this.timeout(25000);
+        before(function(done) {
+          var objects = 0;
+          var check = function() {
+            if(objects === LIMIT) {
+              setTimeout(done, 500);
+            }
+            else {
+              objects++;
+              Article.create(function(err, art) {
+                if(err) return done(err);
+                check();
+              });
+            }
+          };
+          check();
+        });
 
-        var check = function() {
-          if(objects >= LIMIT + 5) {
-            Articles.find(function(err, res) {
-              if(err) return done(err);
+        it('should be limited to ' + LIMIT + ' base objects returned' , function(done) {
+          Articles.find(function(err, res) {
+            if(err) return done(err);
 
-              expect(res).to.exist;
-              expect(res.length).to.equal(LIMIT);
-              done();
-            });
-          }
-          else {
-            objects++;
-
-            Article.create(function(err, art) {
-              if(err) return done(err);
-              check();
-            });
-          }
-        };
-        check();
+            expect(res).to.exist;
+            expect(res.length).to.equal(LIMIT);
+            done();
+          });
+        });
       });
     });
   });

@@ -310,7 +310,7 @@ exports.run = function () {
           describe('should return a 401 error message', function() {
             beforeEach(function() {
               Next =  function (err) {
-                expect(err.http_code).to.equal(401);
+                expect(err.status).to.equal(401);
               };
             });
 
@@ -565,7 +565,7 @@ exports.run = function () {
       it('should return a 403 error code', function (done) {
         delete ctx.req.remotingContext;
         run( function (err) {
-          expect(err.http_code).to.equal(403);
+          expect(err.status).to.equal(403);
           done();
         });
       });

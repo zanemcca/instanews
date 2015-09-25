@@ -5,7 +5,10 @@ module.exports = function(Stat) {
 
   Stat.averageId = 'averageJoe';
 
+  var debug = require('../logging').debug('models:stat');
+
   Stat.on('dataSourceAttached', function(obj) {
+    debug('dataSourceAttached', obj);
     Stat.find({
       where: {
         id: Stat.averageId 
@@ -323,6 +326,7 @@ module.exports = function(Stat) {
   };
 
   Stat.convertRawStats = function(Model, raw) {
+    debug('convertRawStats', [Model, raw]);
     //All of the necessary parts of the raw statistics are converted into
     //the parameters needed to compute the rating of the votes instance
 

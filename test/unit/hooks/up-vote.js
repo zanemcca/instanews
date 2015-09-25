@@ -91,7 +91,7 @@ exports.run = function() {
 
         it('should return a 400 error code because ctx.inc was not set before the call', function(done) {
           Next = function(err) {
-            expect(err.http_code).to.equal(400);
+            expect(err.status).to.equal(400);
             done();
           };
           run();
@@ -125,7 +125,7 @@ exports.run = function() {
         it('should return a 400 error code because ctx.inc was not set before the call', function() {
           Next = function(err) {
             if(next.calledOnce) {
-              expect(err.http_code).to.equal(400);
+              expect(err.status).to.equal(400);
             }
           };
           run();

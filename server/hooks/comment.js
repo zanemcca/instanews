@@ -10,7 +10,7 @@ module.exports = function(app) {
   var Base = app.models.base;
 
   var report = function(err,res) {
-    if (err) console.log('Error: ' + err);
+    if (err) console.error(err.stack);
     else {
       //console.log('Created a notification!');
     }
@@ -42,14 +42,14 @@ next();
         clickableId: inst.commentableId
       }, function(err, res) {
         if(err) {
-          console.log('Error: Failed to create a click for comment creation');
+          console.error('Error: Failed to create a click for comment creation');
         }
         next(err);
       });
     }
     else {
       if(!inst) {
-        console.log('Warning: Instance is not valid for comment after save');
+        console.warn('Warning: Instance is not valid for comment after save');
       }
       next();
     }
@@ -119,7 +119,7 @@ next();
           }
         }, function(err, res) {
           if (err) {
-            console.log(
+            console.error(
               'Error retrieving items for comment notification');
           }
           else {
@@ -134,7 +134,7 @@ next();
           Model = app.models.Subarticle;
         Model.findById(inst.commentableId, function(err, res) {
           if (err) {
-            console.log(
+            console.error(
               'Error retrieving items for comment notification');
           }
           else {
@@ -149,7 +149,7 @@ next();
 
         Model.findById(inst.commentableId, function(err, res) {
           if (err) {
-            console.log(
+            console.error(
               'Error retrieving items for comment notification');
           }
           else {
@@ -164,7 +164,7 @@ next();
           }
         }, function(err, res) {
           if (err) {
-            console.log(
+            console.error(
               'Error retrieving items for comment notification');
           }
           else {
@@ -175,7 +175,7 @@ next();
         });
         break;
         default:
-          console.log('Error: bad votableType');
+          console.error('Error: bad votableType');
       }
 
     }
@@ -187,7 +187,7 @@ next();
     if(where && Object.getOwnPropertyNames(where).length > 0) {
       Stat.updateRating(where, Comment.modelName, modify, function(err, res) {
         if(err) {
-          console.log('Warning: Failed to update a comment');
+          console.warn('Warning: Failed to update a comment');
           cb(err);
         }
         else {
@@ -198,7 +198,7 @@ next();
 
           Comment.find(query, function(err, res) {
             if(err) {
-              console.log('Warning: Failed to find comment');
+              console.warn('Warning: Failed to find comment');
               cb(err);
             }
             else if(res.length > 0) {
@@ -210,8 +210,8 @@ next();
               err = new Error( 
                               'Warning: No Comments were found.' +
                                 'Cannot trigger commentable rating');
-                              err.status = 500;
-                              cb(err);
+              err.status = 500;
+              cb(err);
             }
           });
         }
@@ -219,8 +219,8 @@ next();
     } else {
       var error = new Error(
         'Invalid filter for comment.triggerRating: ' + where);
-        console.log(error);
         error.status = 400;
+        console.error(error.stack);
         cb(error);
     }
   };

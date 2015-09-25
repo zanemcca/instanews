@@ -78,6 +78,7 @@ function Model(previous, name, instance) {
   };
 
   //TODO Move the codep creation to the child
+  /*
   this.getCodependencies = function () {
     var deps = [];
     var codeps = CoDependencies[this._name];
@@ -90,6 +91,7 @@ function Model(previous, name, instance) {
     }
     return deps;
   };
+ */
 
   this.getPredependencies = function () {
     var deps = [];
@@ -122,7 +124,9 @@ Object.defineProperty(Model.prototype, 'plus', {
 
 Object.defineProperty(Model.prototype, 'instance', {
   get: function() {
-    if(this._instance) return this._instance;
+    if(this._instance) {
+      return this._instance;
+    }
     if(this.parent) {
       return getModelInstance(this._name, this.parent.instance);
     } else {
@@ -170,6 +174,7 @@ function On(previous) {
   } else { // This is a new dependency tree
     this.Instances = new Instances.Instances();
     this.Users = new Users.Users();
+
     models = Object.getOwnPropertyNames(Models);
 
     var Insts = this.Instances;
@@ -256,49 +261,46 @@ function Plus(previous) {
   return this;
 }
 
-function satisfyDependencies(current, done) {
+function satisfyDependencies(current, done, createables, parent) {
   if(current) {
     //Setup createables for first run
-    if(!this.createables) {
-      this.createables = [];
+    if(!createables) {
+      createables = [];
     }
 
     var actions = ['on','by','plus'];
     if(actions.indexOf(current._name) > -1) {
       if(current._name === 'on') {
-        var createables = this.createables;
         if(createables.length) {
           //Add parent pointers on all of the createables
           for(var i =0; i < createables.length - 1; i++) {
             createables[i].parent = createables[i+1];
           }
-          createables[createables.length - 1].parent = this.parent;
+          createables[createables.length - 1].parent = parent;
           createables[createables.length - 1].isActionable = true;
 
           var newParent = createables[createables.length - 1];
           // Create the createables in order
           thunk.run(create, createables.reverse(), function(err, instances) {
             if(!err) {
-              this.parent = newParent;
-              createables.length = 0;
-              satisfyDependencies(current._previous, done);
+              satisfyDependencies(current._previous, done, [], newParent);
             } else {
               return done(err);
             }
           });
         } else {
-          satisfyDependencies(current._previous, done);
+          satisfyDependencies(current._previous, done, createables, parent);
         }
       } else {
-        satisfyDependencies(current._previous, done);
+        satisfyDependencies(current._previous, done, createables, parent);
       }
     } else {
       //Add the model to the createables list
-      this.createables.push(current);
-      satisfyDependencies(current._previous, done);
+      createables.push(current);
+      satisfyDependencies(current._previous, done, createables, parent);
     }
   } else {
-    this.parent = null;
+    //this.parent = null;
     done();
   }
 }
@@ -361,7 +363,7 @@ var Describe = function (previous) {
     previous = previous.addDependencies();
 
     describe(description, function () {
-      this.timeout(5000);
+      this.timeout(10000);
       beforeEach( function (done) {
         satisfyDependencies(previous, function(err) {
           if(err) return done(err);

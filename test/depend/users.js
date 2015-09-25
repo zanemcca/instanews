@@ -86,6 +86,8 @@ function UserArray() {
     return this._users;
   };
 
+  this.create = createUserAndLogin;
+
   this.getDefault = function () {
     return this._users[0];
   };

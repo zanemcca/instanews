@@ -1,4 +1,5 @@
 var setupPush = require('./pushSetup.js');
+var hookSetup = require('./hooks/hookSetup.js');
 var loopback = require('loopback');
 var boot = require('loopback-boot');
 var path = require('path');
@@ -18,34 +19,42 @@ var app = loopback();
 var store = new MongoStore(function (ready) {
   var mongo = cred.get('mongoEast');
   if(!mongo) {
-	 console.error(new Error('No database found!'));
-	//TODO Exit the application
+    console.error(new Error('No database found!'));
+    //TODO Exit the application
   }
   else {
-	 var mongodb = 'mongodb://';
-	 if( mongo.username && mongo.password) {
-		mongodb += mongo.username +
-		':' + mongo.password;
-	 }
+    var mongodb = 'mongodb://';
+    if( mongo.username && mongo.password) {
+      mongodb += mongo.username +
+        ':' + mongo.password;
+    }
 
-	 mongodb  += mongo.url;
-	 mongodb += 'brute';
+    mongodb  += mongo.url;
+    mongodb += 'brute';
 
-	 if(mongo.replicaSet) {
-		mongodb += '?replicaSet=' + mongo.replicaSet;
-	 }
+    if(mongo.replicaSet) {
+      mongodb += '?replicaSet=' + mongo.replicaSet;
+    }
 
-//	 console.log('Connecting to ' + mongodb);
+    //	 console.log('Connecting to ' + mongodb);
 
-	 MongoClient.connect(mongodb, function(err, db) {
-		if (err) return console.error(err);
-		app.bruteDB = db; 
-		ready(db.collection('store'));
-	 });
- }
+    MongoClient.connect(mongodb, function(err, db) {
+      if (err) return console.error(err);
+      app.bruteDB = db; 
+      ready(db.collection('store'));
+    });
+  }
 });
 
 app.brute =  new ExpressBrute(store);
+app.debug = require('./logging.js').debug;
+
+if( process.env.NODE_ENV === 'production') {
+  app.use(loopback.logger('common'));
+} else {
+//} else if( process.env.NODE_ENV !== 'staging') {
+  app.use(loopback.logger('dev'));
+}
 
 //context for use in hooks
 app.use(loopback.context());
@@ -75,7 +84,7 @@ app.use(function setCurrentUser(req, res, next) {
     var loopbackContext = loopback.getCurrentContext();
     if (loopbackContext) {
       loopbackContext.set('currentStat', stat);
-//      console.log('Current user stat is set to ' + stat.id);
+      //      console.log('Current user stat is set to ' + stat.id);
     }
     next();
   });
@@ -100,7 +109,7 @@ boot(app, __dirname);
 //Setup the push server
 setupPush(app);
 //Setup all the back end hooks
-require('./hooks/hookSetup.js')(app);
+hookSetup(app);
 
 var dataSource;
 
@@ -108,11 +117,11 @@ var onConnected = function() {
   dataSource.autoupdate(function(err) {
     if (err) {
       console.error('Database could not be autoupdated', err);
-//      dataSource.disconnect();
+      //      dataSource.disconnect();
       return;
     }
-//    console.log('Database autoupdated');
-//    dataSource.disconnect();
+    console.log('Database autoupdated');
+    //    dataSource.disconnect();
   });
 };
 
@@ -129,9 +138,9 @@ app.start = function() {
     httpOnly = false;
     //Staging and production are done over https
     var options = {
-       key: cred.get('sslKey'),
-       passphrase: cred.get('sslPassphrase'),
-       cert: cred.get('sslCert')
+      key: cred.get('sslKey'),
+      passphrase: cred.get('sslPassphrase'),
+      cert: cred.get('sslCert')
     };
 
     //Create our https server
@@ -158,6 +167,4 @@ if (require.main === module) {
 }
 
 //export the app for testing
-if( process.env.NODE_ENV !== 'production') {
-  exports = module.exports = app;
-}
+exports = module.exports = app;

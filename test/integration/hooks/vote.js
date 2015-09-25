@@ -37,7 +37,7 @@ exports.run = function() {
       });
     });
 
-    on.upVote().on.subarticle().by('bob').describe('Check for notification', function () {
+    on.upVote().on.subarticle().by('ted').describe('Check for notification', function () {
       it('should create a notification for voting on a subarticle', function(done) {
         var vote = on.Instances.getActionableInstance();
         runTillDone( function(stop) {
@@ -49,7 +49,7 @@ exports.run = function() {
           },function(err, res) {
             if(!err && res && res.length > 0) {
               expect(res.length).to.equal(1);
-              expect(res[0].username).to.equal('bob');
+              expect(res[0].username).to.equal('ted');
               expect(res[0].message).to
               .equal(vote.username + ' voted on your subarticle');
               stop();
@@ -59,20 +59,20 @@ exports.run = function() {
       });
     });
 
-    on.upVote().on.comment().by('bob').describe('Check for notification', function () {
+    on.upVote().on.comment().by('bill').describe('Check for notification', function () {
       it('should create a notification for voting on a comment', function(done) {
         var vote = on.Instances.getActionableInstance();
         runTillDone( function(stop) {
           Notifications.find({
             where: {
               notifiableType: vote.clickableType,
-              username: 'bob',
+              username: 'bill',
               notifiableId: vote.clickableId
             }
           },function(err, res) {
             if(!err && res && res.length > 0) {
               expect(res.length).to.equal(1);
-              expect(res[0].username).to.equal('bob');
+              expect(res[0].username).to.equal('bill');
               expect(res[0].message).to
               .equal(vote.username + ' voted on your comment');
               stop();

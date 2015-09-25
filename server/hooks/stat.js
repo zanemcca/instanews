@@ -18,17 +18,16 @@ module.exports = function(app) {
       var err = new Error(
         'Error: Either id or type is missing for Stat.updateRating. Id: ' +
         where + ' Type: ' + type);
-      err.http_code = 400;
+      err.status = 400;
       cb(err);
       return;
     }
 
     Stat.findById(Stat.averageId, function(err, res) {
       if(err) {
-        console.log('Error: Failed to find ' + Stat.averageId);
+        console.error('Error: Failed to find ' + Stat.averageId);
         cb(err);
-      }
-      else {
+      } else {
         if(res) {
           var Model;
 
@@ -60,7 +59,7 @@ module.exports = function(app) {
           }
           else {
             err = new Error('Error: Unrecognized type ' + type);
-            err.http_code = 400;
+            err.status = 400;
             cb(err);
             return;
           }
@@ -91,10 +90,14 @@ module.exports = function(app) {
             delete where.ratingModified;
 
             if(err && (!err.status || err.status !== 409)) {
-              console.log('Error: Failed to modify '+ Model.modelName);
+              console.error('Error: Failed to modify '+ Model.modelName);
               return cb(err);
+            } else {
+              if(!cb) {
+                console.trace('Bad Callback');
+              }
+              cb(null, res);
             }
-            cb(null, res);
           }, {
             customVersionName: 'ratingVersion',
             retryCount: 0
@@ -102,7 +105,7 @@ module.exports = function(app) {
         }
         else {
           err = new Error(Stat.averageId + ' was not found!');
-          err.http_code = 404;
+          err.status = 404;
           cb(err);
         }
       }
@@ -111,9 +114,9 @@ module.exports = function(app) {
 
   Stat.triggerRating = function(where, modelName, modify, cb) {
     var error = new Error('Unrecognized modelName: ' + modelName);
-    error.http_code = 400;
+    error.status = 400;
     if(!app.models.hasOwnProperty(modelName)) {
-      console.log(error);
+      console.error(error.stack);
       cb(error);
     }
     else {
@@ -124,8 +127,8 @@ module.exports = function(app) {
       else {
         error = new Error(
           'No triggerRating function attached to the ' + modelName);
-        error.http_code = 400;
-        console.log(error);
+        error.status = 400;
+        console.error(error.stack);
         cb(error);
       }
     }

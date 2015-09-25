@@ -2,17 +2,11 @@ FROM ubuntu:14.04
 
 MAINTAINER Zane McCaig
 
-# Update the repositories
-RUN apt-get update
-
-# install npm
-RUN apt-get install -y npm
-
-# Link nodejs to node for compatibility
-RUN ln -s /usr/bin/nodejs /usr/bin/node
-
-# install openssl
-RUN apt-get install -y openssl
+# Add nodesource for 4.x
+RUN apt-get install -y curl && \ 
+  curl -sL https://deb.nodesource.com/setup_4.x | sudo -E bash - && \
+  apt-get update && \
+  apt-get install -y nodejs openssl
 
 # Copy our source files into the new docker
 COPY . /src
@@ -20,7 +14,8 @@ COPY . /src
 # Install our dependencies
 RUN cd /src && \
   npm install && \
-  rm server/boot/explorer.js && \
+  npm install -g grunt grunt-cli && \
+  rm server/boot/explorer.js 
   rm -r client && \
   rm -r test
 
@@ -35,5 +30,5 @@ EXPOSE 3000
 EXPOSE 3443
 
 # Run the application
-CMD cd /src && node server/server.js 
+CMD cd /src && grunt start 
 #CMD cd /src && DEBUG=loopback:* node server/server.js 

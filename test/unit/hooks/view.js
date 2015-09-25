@@ -132,7 +132,7 @@ exports.run = function () {
         describe('should return a 400 error message', function() {
           beforeEach(function() {
             Next =  function (err) {
-              expect(err.http_code).to.equal(400);
+              expect(err.status).to.equal(400);
             };
           });
 
@@ -278,7 +278,7 @@ exports.run = function () {
       it('should return a 400 error message', function() {
         ctx.instance = null;
         Next = function (err) {
-          expect(err.http_code).to.equal(400);
+          expect(err.status).to.equal(400);
         };
 
         View.updateViewableAttributes(ctx, null, next);
@@ -302,9 +302,9 @@ exports.run = function () {
 
       describe('should propgate the error', function() {
         var error;
-        beforeEach(function() {
+        beforeEach(function() { 
           error = 'error';
-          Next = function(err) {
+          Next = function(err) { 
             expect(err).to.equal(error);
           };
         });
@@ -313,18 +313,20 @@ exports.run = function () {
           expect(next.calledOnce);
         });
 
-        it('from View.prototype.viewable', function() {
+        it('from View.prototype.viewable', function(done) {
           ctx.instance.viewable = function(cb) {
             cb(error);
+            done();
           };
           View.updateViewableAttributes(ctx, null, next);
         });
 
-        it('from viewable.prototype.updateAttributes', function() {
+        it('from viewable.prototype.updateAttributes', function(done) {
           ctx.instance.viewable = function(cb) {
             cb(null, {
               updateAttributes: function(data, cb) {
                 cb(error);
+                done();
               }
             });
           };

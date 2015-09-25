@@ -40,7 +40,7 @@ module.exports = function(app) {
       Stat.updateRating(where, Subarticle.modelName, modify,
       function(err, count) {
         if(err) {
-          console.log('Warning: Failed to update a subarticle');
+          console.warn('Warning: Failed to update a subarticle');
           cb(err);
         }
         else {
@@ -50,7 +50,7 @@ module.exports = function(app) {
           };
           Subarticle.find(query, function(err, res) {
             if(err) {
-              console.log('Warning: Failed to find subarticle');
+              console.warn('Warning: Failed to find subarticle');
               cb(err);
             }
             else if(res.length > 0) {
@@ -73,7 +73,7 @@ module.exports = function(app) {
     } else {
       var error = new Error(
         'Invalid filter for comment.triggerRating: ' + where);
-      console.log(error);
+      console.error(error.stack);
       error.status = 400;
       cb(error);
     }
@@ -92,7 +92,7 @@ module.exports = function(app) {
         clickableId: inst.parentId
       }, function(err, res) {
         if(err) {
-          console.log(
+          console.error(
             'Error: Failed to create a click for subarticle creation');
         }
         next(err);
@@ -100,7 +100,7 @@ module.exports = function(app) {
     }
     else {
       if(!inst) {
-        console.log('Warning: Instance is not valid for subarticle after save');
+        console.warn('Warning: Instance is not valid for subarticle after save');
       }
       next();
     }
@@ -118,11 +118,11 @@ module.exports = function(app) {
             }
          }, function(err, res) {
             //Error checking
-            if(err) console.log(err);
+            if(err) console.error(err.stack);
             else {
 
                var report = function(err, res) {
-                  if (err) console.log('Error: ' + err);
+                  if (err) console.error(err.stack);
                   else {
                      //console.log('Created a notification!');
                   }
