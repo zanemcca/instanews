@@ -80,16 +80,12 @@ module.exports = function(grunt) {
         src: 'test/unit',
         root: './server',
         options: {
-          coverageFolder: 'coverageUnit',
           excludes: ['./server/boot/**']
         }
       },
       integration: {
         src: 'test/integration',
         root: './server',
-        options: {
-          coverageFolder: 'coverageIntegration'
-        }
       },
       all: {
         src: ['test/depend/*.test.js', 'test/integration', 'test/unit'],
@@ -102,15 +98,15 @@ module.exports = function(grunt) {
         options: {
           coverageFolder: 'coverage*', // will check both coverage folders and merge the coverage results
           check: {
-            lines: 75 ,
-            statements: 75,
-            branches: 65,
+            lines: 80 ,
+            statements: 80,
+            branches: 73,
             functions: 85
           }
         }
       },
       unit: {
-        coverageFolder: 'coverageUnit',
+        coverageFolder: 'coverage',
         check: {
           lines: 60 ,
           statements: 60,
@@ -119,7 +115,7 @@ module.exports = function(grunt) {
         }
       },
       integration: {
-        coverageFolder: 'coverageIntegration',
+        coverageFolder: 'coverage',
         check: {
           lines: 60 ,
           statements: 60,
@@ -286,22 +282,27 @@ module.exports = function(grunt) {
     switch(option) {
       case 'unit':
         tasks.push('mocha_istanbul:unit');
+        tasks.push('istanbul_check_coverage:unit');
         break;
       case 'test':
-        tasks.push('mocha_istanbul:test');
+        tasks.push('mochaTest:test');
         break;
       case 'integration':
         tasks.push('mocha_istanbul:integration');
+        tasks.push('istanbul_check_coverage:integration');
         break;
       default:
+        tasks.push('mocha_istanbul:all');
+        tasks.push('istanbul_check_coverage');
+      /*
         tasks.push('mocha_istanbul:unit');
         tasks.push('istanbul_check_coverage:unit');
         tasks.push('mocha_istanbul:test');
         tasks.push('mocha_istanbul:integration');
         tasks.push('istanbul_check_coverage:integration');
+       */
         break;
     }
-    tasks.push('istanbul_check_coverage');
     grunt.task.run(tasks);
   });
 
@@ -318,9 +319,12 @@ module.exports = function(grunt) {
         tasks.push('mochaTest:integration');
         break;
       default:
+        tasks.push('mochaTest:all');
+      /*
         tasks.push('mochaTest:unit');
         tasks.push('mochaTest:test');
         tasks.push('mochaTest:integration');
+       */
         break;
     }
     grunt.task.run(tasks);
