@@ -157,7 +157,7 @@ exports.run = function () {
           }, callback);
         });
 
-        it('should create a 500 error', function(done) {
+        it('should return successfully', function(done) {
           res = [];
           
           comment = function (query, cb) {
@@ -165,7 +165,7 @@ exports.run = function () {
           };
 
           Comment.triggerRating(where, null, function(err, res) {
-            expect(err.status).to.equal(500);
+            expect(err).to.not.exist;
             done();
           });
         });

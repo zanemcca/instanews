@@ -3,7 +3,6 @@ var app = common.app;
 var api = common.api;
 
 var destroy = function(inst, cb) {
-  //console.log(inst);
   var name = inst.modelName;
   var id = inst.id;
   if(!name) {
@@ -12,8 +11,10 @@ var destroy = function(inst, cb) {
       id = inst.userId;
     } else if(inst.clickableId) {
       name = 'click';
-    } else {
+    } else if(inst.viewableId){
       name = 'view';
+    } else {
+      name = 'NOTaMODEL';
     }
   }
 

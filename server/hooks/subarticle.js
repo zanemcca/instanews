@@ -9,8 +9,10 @@ module.exports = function(app) {
    var Stat = app.models.stat;
    var Notification = app.models.notif;
   var Base = app.models.base;
+  var debug = app.debug('hooks:subarticle');
 
   Subarticle.afterRemote('prototype.__get__comments', function(ctx, inst,next){
+    debug('afterRemote __get__comments', ctx, inst, next);
     Base.createClickAfterRemote(ctx, next);
   });
 
@@ -36,6 +38,7 @@ module.exports = function(app) {
   */
 
   Subarticle.triggerRating = function(where, modify, cb) {
+    debug('triggerRating', where, modify, cb);
     if(where && Object.getOwnPropertyNames(where).length > 0) {
       Stat.updateRating(where, Subarticle.modelName, modify,
       function(err, count) {
@@ -59,13 +62,8 @@ module.exports = function(app) {
               }, null, function(err, res) {
                 cb(err, count);
               });
-            }
-            else {
-              err = new Error( 
-                'Warning: Failed to find subarticles.' +
-                ' Cannot trigger article rating');
-              err.status = 500;
-              cb(err);
+            } else {
+              cb();
             }
           });
         }
@@ -80,6 +78,7 @@ module.exports = function(app) {
   };
 
   Subarticle.observe('after save', function(ctx, next) {
+    debug('after save', ctx, next);
     var inst = ctx.instance;
     if(!inst) {
       inst = ctx.data;
@@ -107,6 +106,7 @@ module.exports = function(app) {
   });
 
    Subarticle.observe('after save', function(ctx, next) {
+    debug('after save', ctx, next);
      
       var inst = ctx.instance;
 

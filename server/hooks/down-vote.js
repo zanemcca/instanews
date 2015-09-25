@@ -5,8 +5,10 @@ module.exports = function(app) {
 
   var DownVote = app.models.downVote;
   var Click = app.models.click;
+  var debug = app.debug('hooks:downvote');
    
   DownVote.observe('after delete', function(ctx, next) {
+    debug('after delete', ctx, next);
     //The click after save should have added an incrementation parameter
     if(ctx.inc && typeof(ctx.inc) === 'object') {
       ctx.inc.downVoteCount = -1;
@@ -26,6 +28,7 @@ module.exports = function(app) {
   });
 
   DownVote.observe('after save', function(ctx, next) {
+    debug('after save', ctx, next);
     var inst = ctx.instance;
 
     if(inst && ctx.isNewInstance) {

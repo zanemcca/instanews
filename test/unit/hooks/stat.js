@@ -76,7 +76,7 @@ exports.run = function () {
             expect(id).to.equal(Stat.averageId);
             done();
           };
-          update();
+          update(done);
         });
 
         it('should propagate the error', function (done) {
@@ -102,6 +102,29 @@ exports.run = function () {
         });
 
         describe('valid stat found', function () {
+          var rmw, readModifyWrite, prep;
+          var getRating;
+          var convert;
+          beforeEach(function () {
+            rmw = function (query, rate, cb, options) {
+              cb();
+            };
+
+            prep = function (Model) {
+              readModifyWrite = sandbox.stub(Model, 'readModifyWrite', rmw);
+            };
+
+            getRating = sandbox.stub(Stat, 'getRating', function(res, stats) {
+              res.rating = 0.5;
+              return res;
+            });
+
+            convert = sandbox.stub(Stat, 'convertRawStats', function (Model, Res) {
+              expect(res).to.equal(Res);
+              return res;
+            });
+          });
+          
           var res;
           beforeEach(function() {
             res = {
@@ -121,24 +144,23 @@ exports.run = function () {
               cb(null, res);
             };
 
-            convert = sandbox.stub(Stat, 'convertRawStats', function (Model, Res) {
-              expect(res).to.equal(Res);
-              return res;
-            });
           });
 
           it('should add < ratingModified to the where filter', function () {
-            update();
+            prep(app.models.article);
+            update(function () {});
             expect(where.ratingModified.lt).to.exist;
             expect(where.ratingModified.lt).to.be.lt(new Date());
           });
 
           it('should call Stat.convertRawStats', function () {
-            update();
+            prep(app.models.article);
+            update(function () {});
             expect(convert.calledOnce).to.be.true;
           });
 
           it('should return a 400 becaause the type is unknown', function (done) {
+            prep(app.models.article);
             type  = 'click';
             update(function(err) {
               expect(err.status).to.equal(400);
@@ -147,29 +169,19 @@ exports.run = function () {
           });
 
           describe('Model.readModifyWrite', function() {
-            var rmw, readModifyWrite, prep;
-            beforeEach(function () {
-              prep = function (Model) {
-                readModifyWrite = sandbox.stub(Model, 'readModifyWrite', rmw);
-              };
-            });
-            
             afterEach(function() {
               expect(readModifyWrite.calledOnce).to.be.true;
             });
 
             describe('rate', function () {
-              var checkRate, getRating;
+              var checkRate;
               beforeEach(function () {
                 rmw = function (query, rate, cb) {
                   checkRate(rate);
+                  cb();
                 };
                 prep(app.models.article);
 
-                getRating = sandbox.stub(Stat, 'getRating', function(res, stats) {
-                  res.rating = 0.5;
-                  return res;
-                });
               });
 
               it('should call stat.getRating', function(done) {
@@ -178,9 +190,8 @@ exports.run = function () {
                   model = rate(model);
                   expect(getRating.calledOnce).to.be.true;
                   expect(model.rating).to.equal(0.5);
-                  done();
                 };
-                update();
+                update(done);
               });
 
               it('should set ratingModified', function(done) {
@@ -188,14 +199,12 @@ exports.run = function () {
                   var model = {rating: 0};
                   model = rate(model);
                   expect(model.ratingModified).to.equalDate(new Date());
-                  done();
                 };
-                update();
+                update(done);
               });
 
               it('should call modify', function(done) {
                 modify = function(model) {
-                  done();
                   return model;
                 };
 
@@ -203,7 +212,8 @@ exports.run = function () {
                   var model = {rating: 0};
                   model = rate(model);
                 };
-                update();
+
+                update(done);
               });
 
               it('should work without a modify function', function(done) {
@@ -213,9 +223,8 @@ exports.run = function () {
                   var model = {rating: 0};
                   model = rate(model);
                   expect(model.rating).to.equal(0.5);
-                  done();
                 };
-                update();
+                update(done);
               });
             });
 
@@ -224,12 +233,12 @@ exports.run = function () {
                 expect(options).to.exist;
                 expect(options.customVersionName).to.equal('ratingVersion');
                 expect(options.retryCount).to.equal(0);
-                done();
+                cb();
               };
 
               prep(app.models.article);
 
-              update();
+              update(done);
             });
 
             it('should propagate the error', function(done) {

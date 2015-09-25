@@ -2,8 +2,10 @@
 module.exports = function(app) {
 
    var Installation = app.models.installation;
+  var debug = app.debug('hooks:installation');
 
    Installation.observe( 'before save' , function(ctx, next) {
+     debug('before save', ctx, next);
 
       var inst = ctx.instance;
 

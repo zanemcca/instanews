@@ -141,8 +141,7 @@ function createUserAndLogin (username, cb) {
         cb(err);
       } else {
         app.models.Journalist.login(journalist, function (err,res) {
-//          console.log('Logged in ' +res.userId);
-          cb(err, res);
+          cb(err, res.toObject());
         });
       }
     });
