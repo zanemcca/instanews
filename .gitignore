@@ -4,7 +4,7 @@ node_modules/
 strongloop.json
 
 server/conf/.credentials/unencrypted/
-coverage/
+coverage**/
 docs/
 
 client/platforms/
