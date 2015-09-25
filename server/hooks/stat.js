@@ -4,6 +4,7 @@
 module.exports = function(app) {
 
   var Stat = app.models.Stat;
+  var debug = app.debug('hooks:stat');
 
   var secondsAgo =  function(seconds) {
     var now = (new Date()).getTime();
@@ -14,6 +15,7 @@ module.exports = function(app) {
    //TODO Periodically update the stats object for averageJoe 
 
   Stat.updateRating = function(where, type, modify, cb) {
+    debug('updateRating', where, type, modify, cb);
     if(!where || !type) {
       var err = new Error(
         'Error: Either id or type is missing for Stat.updateRating. Id: ' +
@@ -87,7 +89,7 @@ module.exports = function(app) {
 
           //console.log(query);
           Model.readModifyWrite(query, rate(modify, stats), function(err, res) {
-            delete where.ratingModified;
+            //delete where.ratingModified;
 
             if(err && (!err.status || err.status !== 409)) {
               console.error('Error: Failed to modify '+ Model.modelName);
@@ -113,6 +115,7 @@ module.exports = function(app) {
   };
 
   Stat.triggerRating = function(where, modelName, modify, cb) {
+    debug('triggerRating', where, modelName, modify, cb);
     var error = new Error('Unrecognized modelName: ' + modelName);
     error.status = 400;
     if(!app.models.hasOwnProperty(modelName)) {

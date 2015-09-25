@@ -8,8 +8,10 @@ module.exports = function(app) {
   var Click = app.models.click;
   var Notification = app.models.notif;
   var Installation = app.models.installation;
+  var debug = app.debug('hooks:upVote');
    
   UpVote.observe('after delete', function(ctx, next) {
+    debug('after delete', ctx, next);
     //The click after save should have added an incrementation parameter
     if(ctx.inc && typeof(ctx.inc) === 'object') {
       ctx.inc.upVoteCount = -1;
@@ -29,6 +31,7 @@ module.exports = function(app) {
   });
 
   UpVote.observe('after save', function(ctx, next) {
+    debug('after save', ctx, next);
     var inst = ctx.instance;
 
     if(inst && ctx.isNewInstance) {
@@ -53,6 +56,7 @@ module.exports = function(app) {
 
   //Send notifications
    UpVote.observe('after save', function(ctx, next) {
+    debug('after save', ctx, next);
       var inst = ctx.instance;
       if (inst && ctx.isNewInstance) {
 

@@ -9,6 +9,8 @@ module.exports = function(app) {
   var Stat = app.models.stat;
   var Base = app.models.base;
 
+  var debug = app.debug('hooks:comment');
+
   var report = function(err,res) {
     if (err) console.error(err.stack);
     else {
@@ -26,10 +28,12 @@ next();
 */
 
   Comment.afterRemote('prototype.__get__comments', function(ctx, instance,next){
+    debug('aterRemote __get__comments', ctx, instance, next);
     Base.createClickAfterRemote(ctx, next);
   });
 
   Comment.observe('after save', function(ctx, next) {
+    debug('ater save', ctx, next);
     var inst = ctx.instance;
     if(!inst) {
       inst = ctx.data;
@@ -56,6 +60,7 @@ next();
   });
 
   Comment.observe('after save', function(ctx, next) {
+    debug('ater save', ctx, next);
     //TODO Rewrite notifications
     var inst = ctx.instance;
 
@@ -184,6 +189,7 @@ next();
   });
 
   Comment.triggerRating = function(where, modify, cb) {
+    debug('triggerRating', where, modify, cb);
     if(where && Object.getOwnPropertyNames(where).length > 0) {
       Stat.updateRating(where, Comment.modelName, modify, function(err, res) {
         if(err) {
@@ -207,11 +213,7 @@ next();
               }, res[0].commentableType, null, cb);
             }
             else {
-              err = new Error( 
-                              'Warning: No Comments were found.' +
-                                'Cannot trigger commentable rating');
-              err.status = 500;
-              cb(err);
+              cb();
             }
           });
         }

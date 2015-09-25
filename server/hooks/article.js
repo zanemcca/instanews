@@ -17,7 +17,7 @@ module.exports = function(app) {
   });
 
   Article.afterRemote('prototype.__get__subarticles', function(ctx, inst, next){
-    debug('afterRemote prototype.__get__subarticles', [ctx, inst]);
+    debug('afterRemote prototype.__get__subarticles', ctx, inst);
     Base.createClickAfterRemote(ctx, next);
   });
 
@@ -79,7 +79,7 @@ module.exports = function(app) {
   });
 
   Article.triggerRating = function(where, modify, cb) {
-    debug('triggerRating', [where, modify]);
+    debug('triggerRating', where, modify);
     if(where && where.id) {
       //Update the article
       Stat.updateRating(where, Article.modelName, modify, function(err, res) {

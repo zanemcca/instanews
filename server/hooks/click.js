@@ -126,7 +126,7 @@ module.exports = function(app) {
             preVoteChecker(ctx, next);
           }
           else {
-            console.error(inst);
+            console.dir(inst);
             return next(error);
           }
         }
@@ -266,7 +266,7 @@ module.exports = function(app) {
   };
 
   Click.updateClickableAttributes = function(ctx, data, next) {
-    debug('updateClickableAttributes', [ctx, data]);
+    debug('updateClickableAttributes', ctx, data);
     var inst = ctx.instance;
     if(inst) {
       inst.clickable(function(err, res) {
@@ -334,7 +334,7 @@ module.exports = function(app) {
   };
 
   Click.addAgeSample = function(ctx, age, next) {
-    debug('addAgeSample', [ctx, age]);
+    debug('addAgeSample', ctx, age);
     if(ctx.instance) {
       var inst = ctx.instance;
       //Only new clicks can add sample ages

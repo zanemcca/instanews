@@ -5,8 +5,10 @@ module.exports = function(app) {
 
   var View = app.models.view;
   var loopback = require('loopback');
+  var debug = app.debug('hooks:view');
 
   View.observe('before save', function(ctx, next) {
+    debug('observe before save', ctx, next);
     var inst = ctx.instance;
 
     if(inst && ctx.isNewInstance) {
@@ -37,6 +39,7 @@ module.exports = function(app) {
   });
 
   View.observe('before delete', function(ctx, next) {
+    debug('before delete', ctx, next);
     View.findOne({ where: ctx.where }, function (err, res) {
       if(err) {
         return next(err);
@@ -58,6 +61,7 @@ module.exports = function(app) {
   });
 
   View.observe('after save', function(ctx, next) {
+    debug('after save', ctx, next);
     var inst = ctx.instance;
 
     if(inst && ctx.isNewInstance) {
@@ -75,6 +79,7 @@ module.exports = function(app) {
   });
 
   View.updateViewableAttributes = function(ctx, data, next) {
+    debug('updateViewableAttributes', ctx, data, next);
     if(ctx.instance) {
       ctx.instance.viewable(function(err, res) {
         if(err) {

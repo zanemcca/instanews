@@ -158,7 +158,7 @@ exports.run = function () {
           }, callback);
         });
 
-        it('should create a 500 error', function(done) {
+        it('should return successfully', function(done) {
           res = [];
           
           subarticle = function (query, cb) {
@@ -166,7 +166,7 @@ exports.run = function () {
           };
 
           Subarticle.triggerRating(where, null, function(err, res) {
-            expect(err.status).to.equal(500);
+            expect(err).to.not.exist;
             done();
           });
         });
@@ -249,6 +249,15 @@ exports.run = function () {
       });
 
       describe('after save', function() {
+        var subFind, sub;
+        beforeEach(function () {
+          subFind = function (query, cb) {};
+
+          sub = sandbox.stub(app.models.subarticle, 'find', function(query, cb) {
+            return subFind(query,cb);
+          });
+        });
+
         describe('Click.create', function() {
           var click, clickCreate;
           beforeEach(function() {
@@ -291,6 +300,7 @@ exports.run = function () {
                 cb();
               };
               run();
+              expect(click.calledOnce).to.be.true;
             });
 
             it('should propgate the error', function() {

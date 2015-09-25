@@ -5,9 +5,11 @@ module.exports = function(app) {
 
    var Journalist = app.models.journalist;
    var Stat = app.models.stat;
+  var debug = app.debug('hooks:journalist');
 
    Journalist.afterRemote('prototype.__get__articles',
    function(ctx, instance, next) {
+     debug('afterRemote __get__articles', ctx, instance, next);
 
       //Automatically remove all duplicate articles
       //Duplicates can be present since the articles associated
@@ -28,12 +30,14 @@ module.exports = function(app) {
 
     Journalist.afterRemoteError('login',
     function(ctx, next) {
+       debug('afterRemoteError login', ctx, instance, next);
       app.brute.prevent(ctx.req, ctx.res, function() {
              next();
       });
     });
 
     Journalist.beforeRemote('create', function(ctx, instance, next) {
+       debug('beforeRemote create', ctx, instance, next);
       var user;
       if( ctx && ctx.req && ctx.req.body) {
         user = ctx.req.body;
@@ -77,6 +81,7 @@ module.exports = function(app) {
 
 //  Journalist.afterRemote('create', function(ctx, instance, next) {
   Journalist.observe('after save', function(ctx, next) {
+     debug('after save', ctx, next);
     var instance = ctx.instance;
     if(instance && ctx.isNewInstance) {
       Stat.findById(Stat.averageId, function(err, res) {
@@ -120,6 +125,7 @@ module.exports = function(app) {
   });
 
    Journalist.observe('access', function(ctx, next) {
+     debug('access', ctx, next);
       //Reserved contents for the owner only
       ctx.query.fields = {
          email: false,
