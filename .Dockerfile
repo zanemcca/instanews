@@ -6,19 +6,7 @@ MAINTAINER Zane McCaig
 RUN apt-get install -y curl && \ 
   curl -sL https://deb.nodesource.com/setup_4.x | sudo -E bash - && \
   apt-get update && \
-  apt-get install -y nodejs
-
-# Update the repositories
-# RUN apt-get update
-
-# install npm
-#RUN apt-get install -y nodejs npm
-
-# Link nodejs to node for compatibility
-#RUN ln -s /usr/bin/nodejs /usr/bin/node
-
-# install openssl
-RUN apt-get install -y openssl
+  apt-get install -y nodejs openssl
 
 # Copy our source files into the new docker
 COPY . /src
