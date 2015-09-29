@@ -59,6 +59,7 @@ if( process.env.NODE_ENV === 'production') {
 //context for use in hooks
 app.use(loopback.context());
 app.use(loopback.token());
+/*
 app.use(function setCurrentUser(req, res, next) {
   var where;
   if (!req.accessToken) {
@@ -89,6 +90,7 @@ app.use(function setCurrentUser(req, res, next) {
     next();
   });
 });
+*/
 
 //Security module
 app.use(helmet());

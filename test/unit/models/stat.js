@@ -31,50 +31,24 @@ exports.run = function () {
     });
 
     describe('getCustomRating' , function () {
-      var run, instance, Model, ctx, stat;
+      var run, instance, Model;
       beforeEach(function () {
         instance = {
           id: 6
-        };
-
-        stat = 'stat';
-        ctx = {
-          get: function(name) {
-            return stat;
-          }
         };
 
         cb = function () {};
         run = function (cb) {
           return Stat.getCustomRating(Model, instance, cb);
         };
-
-        sandbox.stub(loopback, 'getCurrentContext', function () {
-          return ctx;
-        });
       });
 
-      it('should call Stat.getRating with the results from convertRawStats', function (done) {
-        var cStat = 'cStat';
+      it('should call Stat.getRating', function (done) {
         var get = sandbox.stub(Stat, 'getRating', function (instance, stats) {
-          expect(stats).to.equal(cStat);
         });
 
-        var convert = sandbox.stub(Stat, 'convertRawStats', function (instance, stats) {
-          expect(stats).to.equal(stat);
-          return cStat;
-        });
         run(function (err, res) {
           expect(get.calledOnce).to.be.true;
-          expect(convert.calledOnce).to.be.true;
-          done();
-        });
-      });
-
-      it('should not call Stat.getRating because no user stat was found', function (done) {
-        stat = null;
-        run(function (err, res) {
-          expect(res).to.deep.equal(instance);
           done();
         });
       });
@@ -84,6 +58,7 @@ exports.run = function () {
       var rateable,
       run,
       stats;
+      var bonus, weight;
 
       beforeEach(function () {
         run = function () {
@@ -91,96 +66,92 @@ exports.run = function () {
         };
       });
 
-      //TODO Run tests on various inputs 
-      describe('Initialization', function () {
-        var bonus, weight;
-        beforeEach(function () {
+      beforeEach(function () {
+        rateable = {
+          upVoteCount: 0,
+          downVoteCount: 0,
+          viewCount: 0,
+          getCommentsCount: 0,
+          getSubarticlesCount: 0,
+          notSubarticleRating: 1,
+          notCommentRating: 1
+        };
+
+        bonus = {
+          upVoteCount: 25,
+          downVoteCount: 20,
+          viewCount: 120,
+          getCommentsCount: 27,
+          getSubarticlesCount: 28,
+        };
+
+        weight = {
+          upVotes: 1,
+          downVotes: 1,
+          subarticles: 1,
+          comments: 1
+        };
+      });
+
+      var tests = [{
+        notSubarticleRating: 0.75,
+        notCommentRating: 0.25,
+        message: 'should use all available data',
+        // P( up U comments U subarticles ) - P((comments U subarticles) & downvotes)
+        result: 0.14812103818800249 
+      },
+      {
+        notCommentRating: 0.25,
+        message: 'should use the upvote, comment and downvote data',
+        // P( up U comments ) - P(comments & downvotes)
+        result: 0.11041135204081633 
+      },
+      {
+        message: 'should only use the upvote data',
+        // P( up )
+        result: 25/120*(45/(45 + 120)) 
+      }];
+
+      tests.forEach(function(test) {
+        it(test.message, function () {
           rateable = {
             upVoteCount: 0,
             downVoteCount: 0,
             viewCount: 0,
-            getCommentsCount: 0,
-            getSubarticlesCount: 0,
-            notSubarticleRating: 1,
-            notCommentRating: 1
+            clickCount: 0
           };
 
-          bonus = {
-            upVoteCount: 25,
-            downVoteCount: 20,
-            viewCount: 120,
-            getCommentsCount: 27,
-            getSubarticlesCount: 28,
-          };
-
-          weight = {
-            upVotes: 1,
-            downVotes: 1,
-            subarticles: 1,
-            comments: 1
-          };
-        });
-
-        var tests = [{
-          notSubarticleRating: 0.75,
-          notCommentRating: 0.25,
-          message: 'should use all available data',
-          // P( up U comments U subarticles ) - P((comments U subarticles) & downvotes)
-          result: 0.14812103818800249 
-        },
-        {
-          notCommentRating: 0.25,
-          message: 'should use the upvote, comment and downvote data',
-          // P( up U comments ) - P(comments & downvotes)
-          result: 0.11041135204081633 
-        },
-        {
-          message: 'should only use the upvote data',
-          // P( up )
-          result: 25/120*(45/(45 + 120)) 
-        }];
-
-        tests.forEach(function(test) {
-          it(test.message, function () {
-            rateable = {
-              upVoteCount: 0,
-              downVoteCount: 0,
-              viewCount: 0,
-              clickCount: 0
-            };
-
-            if(test.notSubarticleRating) {
-              rateable.getSubarticlesCount = 0;
-              rateable.notSubarticleRating = test.notSubarticleRating;
-            }
-            if(test.notCommentRating) {
-              rateable.getCommentsCount = 0;
-              rateable.notCommentRating = test.notCommentRating;
-            }
-
-            Stat.bonus = bonus;
-            Stat.weight = weight;
-            var obj = run();
-            expect(obj.rating).to.almost.equal(test.result, 5);
-          });
-        });
-
-        it('should use the given input data from the rateable item', function () {
-          rateable = {
-            upVoteCount: 150,
-            downVoteCount: 5,
-            viewCount: 200,
-            getCommentsCount: 20,
-            getSubarticlesCount: 125,
-            notSubarticleRating: 0.8,
-            notCommentRating: 0.6
-          };
+          if(test.notSubarticleRating) {
+            rateable.getSubarticlesCount = 0;
+            rateable.notSubarticleRating = test.notSubarticleRating;
+          }
+          if(test.notCommentRating) {
+            rateable.getCommentsCount = 0;
+            rateable.notCommentRating = test.notCommentRating;
+          }
 
           Stat.bonus = bonus;
           Stat.weight = weight;
           var obj = run();
-          expect(obj.rating).to.almost.equal(0.26613451790368436, 5);
+          expect(obj.rating).to.almost.equal(test.result, 5);
         });
+      });
+
+      it('should use the given input data from the rateable item', function () {
+        rateable = {
+          upVoteCount: 150,
+          downVoteCount: 5,
+          viewCount: 200,
+          getCommentsCount: 20,
+          getSubarticlesCount: 125,
+          notSubarticleRating: 0.8,
+          notCommentRating: 0.6
+        };
+
+        Stat.bonus = bonus;
+        Stat.weight = weight;
+        var obj = run();
+        expect(obj.rating).to.almost.equal(0.26613451790368436, 5);
       });
     });
 

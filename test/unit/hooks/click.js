@@ -44,6 +44,7 @@ exports.run = function () {
         },
         instance: {
           username: 'user',
+          type: 'getComments',
           id: 'id'
         },
         isNewInstance: true
@@ -413,11 +414,11 @@ exports.run = function () {
           expect(next.calledOnce).to.be.true;
         });
 
-        it('should update the parents clickCount', function() {
+        it('should update the parents getCommentsCount', function() {
           var click = sandbox.stub(Click, 'updateClickableAttributes', function(ctx, query, Next) {
             expect(query).to.deep.equal({
               '$inc': {
-                clickCount: -1
+                getCommentsCount: -1
               }
             });
 
@@ -433,10 +434,11 @@ exports.run = function () {
         it('should update ctx.inc and not call updateClickableAttributes', function() {
           ctx.Model.modelName = 'upVote';
 
+          delete ctx.instance.type;
           var click = sandbox.spy(Click, 'updateClickableAttributes');
 
           run();
-          expect(ctx.inc).to.deep.equal({clickCount: -1});
+          expect(ctx.inc).to.deep.equal({});
           expect(click.callCount).to.equal(0);
         });
       });
@@ -454,7 +456,7 @@ exports.run = function () {
           var click = sandbox.stub(Click, 'updateClickableAttributes', function(ctx, query, Next) {
             expect(query).to.deep.equal({
               '$inc': {
-                clickCount: 1
+                getCommentsCount: 1
               }
             });
 
@@ -470,10 +472,11 @@ exports.run = function () {
         it('should update ctx.inc and not call updateClickableAttributes', function() {
           ctx.Model.modelName = 'upVote';
 
+          delete ctx.instance.type;
           var click = sandbox.spy(Click, 'updateClickableAttributes');
 
           run();
-          expect(ctx.inc).to.deep.equal({clickCount: 1});
+          expect(ctx.inc).to.deep.equal({});
           expect(click.callCount).to.equal(0);
         });
 

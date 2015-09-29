@@ -61,6 +61,7 @@ module.exports = function(grunt) {
         src: ['test/unit/test.js'],
         options: {
           reporter: 'spec',
+          bail: true
         }
       },
       integration: {
