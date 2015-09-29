@@ -124,120 +124,282 @@ module.exports = function(Stat) {
      };
      */
 
-  Stat.getRating = function(rateable, stats) {
-    var upVoteBonus = 25;
-    var clickBonus = 100;
-    var viewBonus = 100;
 
-    var upVoteCount, viewCount, clickCount;
-
-    if(typeof(rateable.upVoteCount) === 'number' &&
-       typeof(rateable.viewCount) === 'number' &&
-         typeof(rateable.clickCount) === 'number'
-      ) {
-        upVoteCount = rateable.upVoteCount + upVoteBonus;
-        viewCount = rateable.viewCount + viewBonus;
-        clickCount = rateable.clickCount + clickBonus;
-      }
-      else {
-        console.log('Error: Critical information is missing' + 
-                    ' from the rateable model');
-        console.log(rateable);
-        return rateable;
-      }
-
-      var rating = 0;
-      var commentRating;
-
-      var total = 0;
-
-      //Convert the result to an object if it is not already
-      if(rateable.toObject !== undefined &&
-         typeof rateable.toObject === 'function') {
-        rateable = rateable.toObject();
-      }
-
-      //Votes
-      if(stats.Wvote) {
-        total += stats.Wvote;
-        if(upVoteCount > viewCount) {
-          console.log('Error: There are more upVotes then views');
-          return rateable;
+    //TODO Create a probability and statistics library for javascript
+  // Takes all arguments and calculates the 
+  // union of the probability set
+  Stat.getUnion = function () {
+    var args = Array.prototype.slice.call(arguments);
+    if(args.length > 0) {
+      var res = args[0];
+      if(typeof(res) !== 'number') {
+        var arg;
+        try {
+          arg = Number(res);
+        } catch(e) {
+          console.warn('Cannot calculate union of non-numbers');
+          return NaN;
         }
-        rating += stats.Wvote * (upVoteCount / viewCount);
-      }
-      else {
-        console.log('Warning: getRating has been called without Wvote');
-        console.log(stats);
+        res = arg;
       }
 
-      //Comments
-      if(stats.Wcomment) {
-        total += stats.Wcomment;
-        if(rateable.comments && stats.views.comment) {
-          commentRating = common.math.geometricDecay(
-            rateable.comments,
-            stats.views.comment.decay
-          ); 
-          rating += stats.Wcomment * commentRating;
-        }
+      if(res > 1 || res < 0) {
+        console.warn('Cannot calculate union of non-normalized values: ' + res);
+        return NaN;
+      } 
+
+      if(args.length > 1) {
+        var subArgs = args.slice(1);
+        var subUnion = Stat.getUnion.apply(Stat, subArgs);
+        return subUnion + res*(1-subUnion);
+      } else if(args.length === 1) {
+        return res;
       }
-
-      //Subarticles 
-      if(stats.Wsubarticle) {
-        total += stats.Wsubarticle;
-        var subs = rateable.subarticles;
-        if(subs && stats.views.subarticle) {
-          rating += stats.Wsubarticle * common.math.geometricDecay(
-            subs,
-            stats.views.subarticle.decay
-          );
-        }
-      }
-
-      if( total > 1 || total < 0.999999999) {
-        console.log('Error: The probability of interest in all children ' +
-                    total + ' does not equal 1');
-        console.log(stats);
-      }
-      if( rating > 1 || rating < 0) {
-        console.log('Error: The static probability is not unitary!: ' + rating);
-        return rateable;
-      }
-
-      // Click Thru
-      //Q function of geometric distribution for #clicks > 0
-      var clickThru  = clickCount/(clickCount + viewCount);
-      rating *= clickThru;
-
-      // User affinity
-      // TODO
-
-      var rnd = function(num, precision) {
-        var scale = Math.pow(10,precision);
-        return Math.round(num * scale)/scale;
-      };
-
-      /*
-         console.log(
-         'Score: ' + rnd(rating,4) +
-         '\tStatic: ' + rnd(rating/clickThru, 4) +
-         '\tclick: ' + rnd(clickThru, 4) +
-         '\tType: ' + rateable.modelName + '   ' +
-         '\tWv: ' + rnd(stats.Wvote,3) +
-         '\tWc: ' + rnd(stats.Wcomment,3) +
-         '\tWs: ' + rnd(stats.Wsubarticle,3)
-         );
-         */
-
-      if( rating > 1 || rating < 0) {
-        console.log('Error: The probability is not unitary!: ' + rating);
-        return rateable;
-      }
-
-      rateable.rating = rating;
-      return rateable;
+    } else {
+      console.warn('There were no arguments given for getUnion');
+      return 0;
+    }
   };
+
+  Stat.getIntersection = function () {
+    var args = Array.prototype.slice.call(arguments);
+    if(args.length > 0) {
+      var res = args[0];
+      if(typeof(res) !== 'number') {
+        var arg;
+        try {
+          arg = Number(res);
+        } catch(e) {
+          console.warn('Cannot calculate union of non-numbers');
+          return NaN;
+        }
+        res = arg;
+      }
+
+      if(res > 1 || res < 0) {
+        console.warn('Cannot calculate union of non-normalized values: ' + res);
+        return NaN;
+      } 
+
+      if(args.length > 1) {
+        var subArgs = args.slice(1);
+        var subRes = Stat.getIntersection.apply(Stat, subArgs);
+        return res*subRes;
+      } else if(args.length === 1) {
+        return res;
+      }
+    } else {
+      console.warn('There were no arguments given for getUnion');
+      return 0;
+    }
+  };
+
+  Stat.bonus = {
+    upVoteCount: 25,
+    downVoteCount: 25,
+    clickCount: 100,
+    getCommentsCount: 25,
+    getSubarticlesCount: 25,
+    viewCount: 100
+  };
+
+  Stat.weight = {
+    upVotes: 1,
+    downVotes: 1,
+    subarticles: 1,
+    comments: 1
+  };
+
+  Stat.getRating = function(rateable, stats) {
+    var upVoteCount = Stat.bonus.upVoteCount;
+    var downVoteCount = Stat.bonus.downVoteCount;
+    var getCommentsCount = Stat.bonus.getCommentsCount;
+    var getSubarticlesCount = Stat.bonus.getSubarticlesCount;
+    var viewCount = Stat.bonus.viewCount;
+
+
+    if(typeof(rateable.upVoteCount) === 'number') {
+      upVoteCount += rateable.upVoteCount;
+    }
+    if(typeof(rateable.downVoteCount) === 'number') {
+      downVoteCount += rateable.downVoteCount;
+    }
+    if(typeof(rateable.viewCount) === 'number') {
+      viewCount += rateable.viewCount;
+    }
+
+    var clickCount =
+      upVoteCount +
+      downVoteCount; 
+
+    var Pcom = null;
+    if(typeof(rateable.getCommentsCount) === 'number' && typeof(rateable.notCommentRating) === 'number') {
+      clickCount += getCommentsCount;
+      Pcom = (1 - rateable.notCommentRating);
+      Pcom *= Stat.weight.comments;
+
+      // P(click & comment interaction)
+      getCommentsCount += rateable.getCommentsCount;
+      // Q function of geometric distribution for P(getCommentsCount > 0)
+      Pcom *= (getCommentsCount/(getCommentsCount + viewCount));
+    }
+
+    var Psub = null;
+    if(typeof(rateable.getSubarticlesCount) === 'number' && typeof(rateable.notSubarticleRating) === 'number') {
+      clickCount += getSubarticlesCount;
+      Psub = (1 - rateable.notSubarticleRating);
+      Psub *= Stat.weight.subarticles;
+
+      // P(click & subarticle interaction)
+      getSubarticlesCount += rateable.getSubarticlesCount;
+      // Bernoulli distribution
+      Psub *= (getSubarticlesCount/viewCount);
+    }
+
+    var Pup = Stat.weight.upVotes * upVoteCount/viewCount;
+    var Pdown = Stat.weight.downVotes * downVoteCount/viewCount;
+
+    var Pclick = 0;
+    if(Pcom !== null) {
+      Pclick = Stat.getUnion(Pclick, Pcom);
+    }
+    if(Psub !== null) {
+      Pclick = Stat.getUnion(Pclick, Psub);
+    }
+
+    rating = Stat.getUnion(Pup, Pclick) - Stat.getIntersection(Pclick, Pdown);
+
+    // Click Thru
+    //Q function of geometric distribution for #clicks > 0
+    var clickThru  = clickCount/(clickCount + viewCount);
+    rating *= clickThru;
+
+    if( rating > 1 || rating < 0) {
+      console.log('Error: The probability is not unitary!: ' + rating);
+      return rateable;
+    }
+
+    rateable.rating = rating;
+    return rateable;
+  }; 
+
+  /*
+     Stat.getRating = function(rateable, stats) {
+     var upVoteBonus = 25;
+     var clickBonus = 100;
+     var viewBonus = 100;
+
+     var upVoteCount, viewCount, clickCount;
+
+     if(typeof(rateable.upVoteCount) === 'number' &&
+     typeof(rateable.viewCount) === 'number' &&
+     typeof(rateable.clickCount) === 'number'
+     ) {
+     upVoteCount = rateable.upVoteCount + upVoteBonus;
+     viewCount = rateable.viewCount + viewBonus;
+     clickCount = rateable.clickCount + clickBonus;
+     }
+     else {
+     console.log('Error: Critical information is missing' + 
+     ' from the rateable model');
+     console.log(rateable);
+     return rateable;
+     }
+
+     var rating = 0;
+     var commentRating;
+
+     var total = 0;
+
+//Convert the result to an object if it is not already
+if(rateable.toObject !== undefined &&
+typeof rateable.toObject === 'function') {
+rateable = rateable.toObject();
+}
+
+//Votes
+if(stats.Wvote) {
+total += stats.Wvote;
+if(upVoteCount > viewCount) {
+console.log('Error: There are more upVotes then views');
+return rateable;
+}
+rating += stats.Wvote * (upVoteCount / viewCount);
+}
+else {
+console.log('Warning: getRating has been called without Wvote');
+console.log(stats);
+}
+
+//Comments
+if(stats.Wcomment) {
+total += stats.Wcomment;
+if(rateable.comments && stats.views.comment) {
+commentRating = common.math.geometricDecay(
+rateable.comments,
+stats.views.comment.decay
+); 
+rating += stats.Wcomment * commentRating;
+}
+}
+
+//Subarticles 
+if(stats.Wsubarticle) {
+total += stats.Wsubarticle;
+var subs = rateable.subarticles;
+if(subs && stats.views.subarticle) {
+rating += stats.Wsubarticle * common.math.geometricDecay(
+subs,
+stats.views.subarticle.decay
+);
+}
+}
+
+if( total > 1 || total < 0.999999999) {
+  console.log('Error: The probability of interest in all children ' +
+      total + ' does not equal 1');
+  console.log(stats);
+}
+if( rating > 1 || rating < 0) {
+  console.log('Error: The static probability is not unitary!: ' + rating);
+  return rateable;
+}
+
+// Click Thru
+//Q function of geometric distribution for #clicks > 0
+var clickThru  = clickCount/(clickCount + viewCount);
+rating *= clickThru;
+
+// User affinity
+// TODO
+
+/*
+   var rnd = function(num, precision) {
+   var scale = Math.pow(10,precision);
+   return Math.round(num * scale)/scale;
+   };
+
+   console.log(
+   'Score: ' + rnd(rating,4) +
+   '\tStatic: ' + rnd(rating/clickThru, 4) +
+   '\tclick: ' + rnd(clickThru, 4) +
+   '\tType: ' + rateable.modelName + '   ' +
+   '\tWv: ' + rnd(stats.Wvote,3) +
+   '\tWc: ' + rnd(stats.Wcomment,3) +
+   '\tWs: ' + rnd(stats.Wsubarticle,3)
+   );
+   */
+
+  /*
+if( rating > 1 || rating < 0) {
+  console.log('Error: The probability is not unitary!: ' + rating);
+  return rateable;
+}
+
+rateable.rating = rating;
+return rateable;
+};
+*/
 
   Stat.addSample = function(where, modelName, statName , value, cb) {
     if(!where) {

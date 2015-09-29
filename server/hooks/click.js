@@ -224,19 +224,25 @@ module.exports = function(app) {
     var inst = ctx.instance;
 
     if(inst && ctx.isNewInstance) {
+      var inc = {
+        clickCount: 1
+      };
+
+      //TODO Remove clickcount and have it be the sum of all
+      //other clicks:
+      //subarticles, comments, upVotes, downVotes and journalist clicks
+      if(ctx.instance.type) {
+        inc[ctx.instance.type + 'Count'] = 1;
+      }
 
       //Delegate the count updating to the inherited model 
       if(ctx.Model.modelName !== 'click') {
-        ctx.inc = {
-          clickCount: 1
-        };
+        ctx.inc = inc;
         next();
       }
       else {
         Click.updateClickableAttributes(ctx, {
-          '$inc': {
-            clickCount: 1
-          }
+          '$inc':  inc
         },
         next);
       }

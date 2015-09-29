@@ -28,9 +28,24 @@ var summarize = function (object) {
     }
     return summary;
   } else {
-    return JSON.stringify(object);
+    return stringify(object);
   }
 };
+
+function stringify(o) {
+  var cache = [];
+  return JSON.stringify(o, function(key, value) {
+      if (typeof value === 'object' && value !== null) {
+          if (cache.indexOf(value) !== -1) {
+              // Circular reference found, discard key
+              return;
+          }
+          // Store value in our collection
+          cache.push(value);
+      }
+      return value;
+  }, '  ');
+}
 
 var debug = function(debugString) {
   var verbose = process.env.VERBOSE === 'true' ? true: false;
@@ -44,7 +59,7 @@ var debug = function(debugString) {
       var obj = args.slice(1);
 
       if(verbose) {
-        return dbg(chalk.bold(funcName) + '\n' + JSON.stringify(obj, 'utf8', '  '));
+        return dbg(chalk.bold(funcName) + '\n' + stringify(obj));
       } else {
         var name = chalk.bold(funcName);
         if(obj) {
@@ -84,7 +99,7 @@ function colorConsole() {
         var input = method.toUpperCase() + ': '; 
         input = chalk[color](input);
         if(args.length === 1) {
-          input += chalk[color2](args[0]);
+          input += chalk[color2](stringify(args[0]));
         } else {
           input += chalk[color2](sprintf.apply(sprintf,args));
         }
