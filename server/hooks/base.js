@@ -30,6 +30,7 @@ module.exports = function(app) {
         if(stat.username) {
           var click = {
             username: stat.username,
+            type: ctx.options.clickType,
             clickableType: ctx.req.remotingContext.instance.modelName,
             clickableId: ctx.req.remotingContext.instance.id
           };

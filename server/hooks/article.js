@@ -13,11 +13,18 @@ module.exports = function(app) {
   var debug = app.debug('hooks:article');
 
   Article.afterRemote('prototype.__get__comments', function(ctx, instance,next){
+    ctx.options = {
+      clickType: 'getComments'
+    };
+    debug('afterRemote prototype.__get__comments', ctx, instance, next);
     Base.createClickAfterRemote(ctx, next);
   });
 
   Article.afterRemote('prototype.__get__subarticles', function(ctx, inst, next){
-    debug('afterRemote prototype.__get__subarticles', ctx, inst);
+    ctx.options = {
+      clickType: 'getSubarticles'
+    };
+    debug('afterRemote prototype.__get__subarticles', ctx, inst, next);
     Base.createClickAfterRemote(ctx, next);
   });
 

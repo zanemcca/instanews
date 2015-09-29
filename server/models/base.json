@@ -7,6 +7,8 @@
     "ratingModified",
     "ratingVersion",
     "clickCount",
+    "getCommentsCount",
+    "getSubarticlesCount",
     "viewCount"
   ],
   "properties": {
@@ -15,15 +17,20 @@
       "required": true
     },
     "rating": {
-      "type": "number"
+      "type": "number",
+      "required": true
     },
     "ratingModified": {
-      "type": "date"
+      "type": "date",
+      "required": true
     },
     "ratingVersion": {
       "type": "number"
     },
     "clickCount": {
+      "type": "number"
+    },
+    "getCommentsCount": {
       "type": "number"
     },
     "viewCount": {
