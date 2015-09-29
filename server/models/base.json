@@ -6,8 +6,9 @@
   "hidden": [
     "ratingModified",
     "ratingVersion",
-    "clickCount",
     "getCommentsCount",
+    "notCommentRating",
+    "notSubarticleRating",
     "getSubarticlesCount",
     "viewCount"
   ],
@@ -27,10 +28,10 @@
     "ratingVersion": {
       "type": "number"
     },
-    "clickCount": {
+    "getCommentsCount": {
       "type": "number"
     },
-    "getCommentsCount": {
+    "notCommentRating": {
       "type": "number"
     },
     "viewCount": {

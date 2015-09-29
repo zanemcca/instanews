@@ -171,10 +171,10 @@ exports.readModifyWrite = function(Model, query, modify, cb, options) {
   });
 };
 
-//Math functions
-exports.math = {
   /*
    * TODO Test and then these can be used
+//Math functions
+exports.math = {
   //Error function
   erf: function(x) {
 
@@ -202,7 +202,6 @@ exports.math = {
   cdf: function(x, mean, variance) {
     return 0.5*(1+exports.math.erf((x- mean) /(Math.sqrt(2*variance))));
   },
- */
   //Performs a geometric decay of the given array
   geometricDecay: function(votables, decay) {
     if(decay <= 0 || decay >= 1) {
@@ -233,8 +232,6 @@ exports.math = {
 
     return p;
   },
-  /*
-   * TODO Test and then these can be used
   //Converts nonCentral moments to central moments
   convertMoments: function(moments) {
     console.log(
@@ -269,8 +266,8 @@ exports.math = {
       skew: skew
     };
   }
- */
 };
+ */
 
 //Date functions
 /*
