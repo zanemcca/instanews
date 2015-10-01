@@ -171,6 +171,8 @@ exports.readModifyWrite = function(Model, query, modify, cb, options) {
   });
 };
 
+  /*
+   * TODO Test and then these can be used
 //Math functions
 exports.math = {
   //Error function
@@ -265,8 +267,10 @@ exports.math = {
     };
   }
 };
+ */
 
 //Date functions
+/*
 exports.date = {
   minutesAgo: function(minutes) {
     var now = (new Date()).getTime();
@@ -274,3 +278,4 @@ exports.date = {
     return minutesAgo;
   }
 };
+*/

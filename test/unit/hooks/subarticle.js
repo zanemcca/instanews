@@ -216,9 +216,6 @@ exports.run = function () {
               relation: 'something'
             }
           },
-          options: {
-            rate: true
-          },
           instance: {
             username: 'user',
             parentId: 'someid',
@@ -294,6 +291,7 @@ exports.run = function () {
               clickCreate = function(model, cb) {
                 expect(model).to.deep.equal({
                   username: ctx.instance.username,
+                  type: 'createSubarticle',
                   clickableId: ctx.instance.parentId,
                   clickableType: 'article' 
                 });

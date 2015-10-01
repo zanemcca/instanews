@@ -28,6 +28,9 @@ next();
 */
 
   Comment.afterRemote('prototype.__get__comments', function(ctx, instance,next){
+    ctx.options = {
+      clickType: 'getComments'
+    };
     debug('aterRemote __get__comments', ctx, instance, next);
     Base.createClickAfterRemote(ctx, next);
   });
@@ -42,6 +45,7 @@ next();
     if(inst && ctx.isNewInstance) {
       Click.create({
         username: inst.username,
+        type: 'createComment',
         clickableType: inst.commentableType,
         clickableId: inst.commentableId
       }, function(err, res) {

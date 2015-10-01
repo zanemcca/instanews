@@ -79,6 +79,7 @@ module.exports = function(app) {
       }
     });
 
+  /*
 //  Journalist.afterRemote('create', function(ctx, instance, next) {
   Journalist.observe('after save', function(ctx, next) {
      debug('after save', ctx, next);
@@ -123,6 +124,7 @@ module.exports = function(app) {
       next();
     }
   });
+ */
 
    Journalist.observe('access', function(ctx, next) {
      debug('access', ctx, next);

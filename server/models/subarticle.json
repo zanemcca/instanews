@@ -2,6 +2,11 @@
   "name": "subarticle",
   "base": "base",
   "strict": false,
+  "indexes": {
+    "parent_index": {
+      "parentId": 1
+    }
+  },
   "properties": {
     "text": {
       "type": "string"
@@ -32,11 +37,6 @@
       "type": "hasMany",
       "model": "view",
       "polymorphic": "viewable"
-    }
-  },
-  "indexes": {
-    "parent_index": {
-      "parentId": 1
     }
   },
   "acls": [

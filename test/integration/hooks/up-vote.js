@@ -119,5 +119,18 @@ exports.run = function() {
         });
       });
     });
+
+    on.upVote().on.article().plus.downVote().describe('Replace downVote with upvote', function() {
+      it('should update the upVoteCount of the artcle voted on and decrement the downVoteCount', function(done) {
+        var vote = on.Instances.getActionableInstance();
+        Articles.findById(vote.clickableId, function(err,res) {
+          expect(err).to.not.exist;
+          expect(res).to.exist;
+          expect(res.upVoteCount).to.equal(1);
+          expect(res.downVoteCount).to.equal(0);
+          done();
+        });
+      });
+    });
   });
 };
