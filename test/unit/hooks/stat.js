@@ -15,7 +15,7 @@ function run() {
 }
 
 exports.run = function () {
-  describe.only('Stat', function () {
+  describe('Stat', function () {
 
     //Use sandbox for any beforeEach stubbing
     var sandbox;

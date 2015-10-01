@@ -100,10 +100,10 @@ module.exports = function(grunt) {
         options: {
           coverageFolder: 'coverage*', // will check both coverage folders and merge the coverage results
           check: {
-            statements: 86,
+            statements: 87,
             branches: 79,
-            functions: 91,
-            lines: 87,
+            functions: 92,
+            lines: 88,
           }
         }
       },
