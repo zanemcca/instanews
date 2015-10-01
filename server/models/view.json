@@ -2,6 +2,12 @@
   "name": "view",
   "base": "PersistedModel",
   "idInjection": true,
+  "indexes": {
+    "parent_index": {
+      "viewableId": 1,
+      "viewableType": 1
+    }
+  },
   "options": {
     "validateUpsert": true
   },
@@ -29,12 +35,6 @@
       "type": "belongsTo",
       "model": "journalist",
       "foreignKey": "username"
-    }
-  },
-  "indexes": {
-    "parent_index": {
-      "viewableId": 1,
-      "viewableType": 1
     }
   },
   "acls": [

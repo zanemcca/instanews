@@ -12,6 +12,17 @@ module.exports = function(app) {
    
   UpVote.observe('after delete', function(ctx, next) {
     debug('after delete', ctx, next);
+
+    if(ctx.inc && typeof(ctx.inc) === 'object') {
+      ctx.inc.upVoteCount = -1;
+    } else {
+      ctx.inc = {
+        upVoteCount: -1
+      };
+    }
+    Click.updateVoteParent(ctx, next);
+
+    /*
     //The click after save should have added an incrementation parameter
     if(ctx.inc && typeof(ctx.inc) === 'object') {
       ctx.inc.upVoteCount = -1;
@@ -28,6 +39,7 @@ module.exports = function(app) {
       console.error(error.stack);
       next(error);
     }
+   */
   });
 
   UpVote.observe('after save', function(ctx, next) {

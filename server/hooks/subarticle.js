@@ -90,6 +90,7 @@ module.exports = function(app) {
     if(inst && ctx.isNewInstance) {
       Click.create({
         username: inst.username,
+        type: 'createSubarticle',
         clickableType: 'article',
         clickableId: inst.parentId
       }, function(err, res) {

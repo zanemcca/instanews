@@ -294,6 +294,15 @@ module.exports = function(app) {
             }
           }
 
+          if(inst.type && inst.type.indexOf('create') === 0) {
+            var modelName = inst.type.slice(6);
+            var variable = 'not' + modelName + 'Rating';
+            if(!data.$mul) {
+              data.$mul = {};
+            }
+            data.$mul[variable] = (1 - Stat.getDefaultRating(modelName));
+          }
+
           res.updateAttributes(data, function(err,res) {
             if(err) {
               console.warn('Warning: Failed to save clickable');

@@ -45,6 +45,7 @@ next();
     if(inst && ctx.isNewInstance) {
       Click.create({
         username: inst.username,
+        type: 'createComment',
         clickableType: inst.commentableType,
         clickableId: inst.commentableId
       }, function(err, res) {
