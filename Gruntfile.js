@@ -61,12 +61,14 @@ module.exports = function(grunt) {
         src: ['test/unit/test.js'],
         options: {
           reporter: 'spec',
+          bail: true
         }
       },
       integration: {
         src: ['test/integration/test.js'],
         options: {
           reporter: 'spec',
+          bail: true
         }
       }
     },
@@ -98,29 +100,33 @@ module.exports = function(grunt) {
         options: {
           coverageFolder: 'coverage*', // will check both coverage folders and merge the coverage results
           check: {
-            lines: 80 ,
-            statements: 80,
-            branches: 73,
-            functions: 85
+            statements: 87,
+            branches: 79,
+            functions: 92,
+            lines: 88,
           }
         }
       },
       unit: {
-        coverageFolder: 'coverage',
-        check: {
-          lines: 60 ,
-          statements: 60,
-          branches: 49,
-          functions: 60
+        options: {
+          coverageFolder: 'coverage*',
+          check: {
+            statements: 72,
+            branches: 61,
+            functions: 72,
+            lines: 73,
+          }
         }
       },
       integration: {
-        coverageFolder: 'coverage',
-        check: {
-          lines: 60 ,
-          statements: 60,
-          branches: 60,
-          functions: 60
+        options: {
+          coverageFolder: 'coverage*',
+          check: {
+            statements: 69,
+            branches: 60,
+            functions: 83,
+            lines: 70,
+          }
         }
       }
     },

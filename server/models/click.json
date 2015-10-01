@@ -2,6 +2,12 @@
   "name": "click",
   "base": "PersistedModel",
   "idInjection": true,
+  "indexes": {
+    "parent_index": {
+      "clickableId": 1,
+      "clickableType": 1
+    }
+  },
   "options": {
     "validateUpsert": true
   },
@@ -28,12 +34,6 @@
       "type": "belongsTo",
       "model": "view",
       "foreignKey": ""
-    }
-  },
-  "indexes": {
-    "parent_index": {
-      "clickableId": 1,
-      "clickableType": 1
     }
   },
   "acls": [],

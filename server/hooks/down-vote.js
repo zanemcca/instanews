@@ -12,10 +12,17 @@ module.exports = function(app) {
     //The click after save should have added an incrementation parameter
     if(ctx.inc && typeof(ctx.inc) === 'object') {
       ctx.inc.downVoteCount = -1;
-      Click.updateVoteParent(ctx, next);
-    } else if(ctx.where) {
+    } else {
+      ctx.inc = {
+        downVoteCount: -1
+      };
+    }
+    Click.updateVoteParent(ctx, next);
+
+    /*
+    if(ctx.where) {
       //TODO deal with deletion of multiple votes
-      console.warn('warning: Strange downvote deletion request!');
+      console.warn('Strange downvote deletion request!');
       console.warn(ctx.where);
       next();
     }
@@ -25,6 +32,7 @@ module.exports = function(app) {
       console.error(error.stack);
       next(error);
     }
+    */
   });
 
   DownVote.observe('after save', function(ctx, next) {

@@ -13,11 +13,18 @@ module.exports = function(app) {
   var debug = app.debug('hooks:article');
 
   Article.afterRemote('prototype.__get__comments', function(ctx, instance,next){
+    ctx.options = {
+      clickType: 'getComments'
+    };
+    debug('afterRemote prototype.__get__comments', ctx, instance, next);
     Base.createClickAfterRemote(ctx, next);
   });
 
   Article.afterRemote('prototype.__get__subarticles', function(ctx, inst, next){
-    debug('afterRemote prototype.__get__subarticles', ctx, inst);
+    ctx.options = {
+      clickType: 'getSubarticles'
+    };
+    debug('afterRemote prototype.__get__subarticles', ctx, inst, next);
     Base.createClickAfterRemote(ctx, next);
   });
 
@@ -49,6 +56,7 @@ module.exports = function(app) {
     }
   });
 
+  /*
   Article.observe('access', function(ctx, next) {
     debug('observe access', ctx);
     if(ctx.options.rate) {
@@ -77,6 +85,7 @@ module.exports = function(app) {
     }
     next();
   });
+ */
 
   Article.triggerRating = function(where, modify, cb) {
     debug('triggerRating', where, modify);
@@ -89,20 +98,6 @@ module.exports = function(app) {
         }
         cb(null, res);
       });
-      /* without time decay we do not need to trigger the subarticles
-      //Update the subarticles
-      Stat.updateRating({
-        parentId: where.id
-      }, Subarticle.modelName, null, function(err, res) {
-        //Update the article
-        Stat.updateRating(where, Article.modelName, modify, function(err, res) {
-          if(err) {
-            console.warn('Warning: Failed to update an article');
-          }
-          cb(err, res);
-        });
-      });
-     */
     } else {
       var error = new Error(
         'Invalid filter for article.triggerRating: ' + where);

@@ -6,30 +6,9 @@
     "validateUpsert": true
   },
   "properties": {
-    "version": {
-      "type": "number"
-    },
-    "comments": {
-      "type": "object"
-    },
-    "subarticles": {
-      "type": "object"
-    },
-    "upVotes": {
-      "type": "object"
-    },
-    "article": {
-      "type": "object"
-    }
   },
   "validations": [],
   "relations": {
-    "journalist": {
-      "type": "belongsTo",
-      "model": "journalist",
-      "foreignKey": "username",
-      "index": true
-    }
   },
   "acls": [],
   "methods": []

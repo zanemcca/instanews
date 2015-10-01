@@ -285,6 +285,7 @@ exports.run = function () {
               clickCreate = function(model, cb) {
                 expect(model).to.deep.equal({
                   username: ctx.instance.username,
+                  type: 'createComment',
                   clickableId: ctx.instance.commentableId,
                   clickableType: ctx.instance.commentableType
                 });

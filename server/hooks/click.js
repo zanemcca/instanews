@@ -198,24 +198,25 @@ module.exports = function(app) {
   Click.observe('before delete', function(ctx, next) {
     debug('observe - before delete', ctx);
     //Delegate the count updating to the inherited model 
-    if(ctx.Model.modelName !== 'click') {
-      ctx.inc = {
-        clickCount: -1
-      };
-      next();
-    }
-    else {
-      //TODO This should check the where filter and update the attributes for all parents
-      if(ctx.instance) {
+
+    if(ctx.instance) {
+      var inc = {};
+      if(ctx.instance.type) {
+        inc[ctx.instance.type + 'Count'] = -1;
+      }
+
+      if(ctx.Model.modelName !== 'click') {
+        ctx.inc = inc;
+        next();
+      } else {
+        //TODO This should check the where filter and update the attributes for all parents
         Click.updateClickableAttributes(ctx, {
-          '$inc': {
-            clickCount: -1
-          }
+          '$inc': inc 
         },
         next);
-      } else {
-        next();
       }
+    } else {
+      next();
     }
   });
 
@@ -224,19 +225,20 @@ module.exports = function(app) {
     var inst = ctx.instance;
 
     if(inst && ctx.isNewInstance) {
+      var inc = {};
+
+      if(ctx.instance.type) {
+        inc[ctx.instance.type + 'Count'] = 1;
+      }
 
       //Delegate the count updating to the inherited model 
       if(ctx.Model.modelName !== 'click') {
-        ctx.inc = {
-          clickCount: 1
-        };
+        ctx.inc = inc;
         next();
       }
       else {
         Click.updateClickableAttributes(ctx, {
-          '$inc': {
-            clickCount: 1
-          }
+          '$inc':  inc
         },
         next);
       }
@@ -292,6 +294,15 @@ module.exports = function(app) {
             }
           }
 
+          if(inst.type && inst.type.indexOf('create') === 0) {
+            var modelName = inst.type.slice(6);
+            var variable = 'not' + modelName + 'Rating';
+            if(!data.$mul) {
+              data.$mul = {};
+            }
+            data.$mul[variable] = (1 - Stat.getDefaultRating(modelName));
+          }
+
           res.updateAttributes(data, function(err,res) {
             if(err) {
               console.warn('Warning: Failed to save clickable');
@@ -318,11 +329,11 @@ module.exports = function(app) {
               }); 
             }
             /*
-          //TODO Remove this.
-          //Age statistics are not needed when we do not use timedecay
-          var age = Date.now() - res.created;
-          Click.addAgeSample(ctx, age, next);
-          */
+            //TODO Remove this.
+            //Age statistics are not needed when we do not use timedecay
+            var age = Date.now() - res.created;
+            Click.addAgeSample(ctx, age, next);
+            */
           });
       });
     } else {
@@ -333,46 +344,48 @@ module.exports = function(app) {
     }
   };
 
-  Click.addAgeSample = function(ctx, age, next) {
-    debug('addAgeSample', ctx, age);
-    if(ctx.instance) {
-      var inst = ctx.instance;
-      //Only new clicks can add sample ages
-      if(ctx.isNewInstance) {
-        Stat.addSample({
-          username: inst.username
-        }, ctx.Model.modelName, 'age', age, function(err, res) {
-          if(err) {
-            console.error('Error: Failed to add interaction age for upVote');
-            console.error(err.stack);
-            next(err);
-          }
-          else {
-            Stat.addSample({
-              username: inst.username
-            },
-            inst.clickableType,
-            'age',
-            age,
-            function(err, res) {
-              if(err) {
-                console.error('Error: Failed to add interaction age for ' +
-                              inst.clickableType);
-                console.error(err.stack);
-              }
-              next(err);
-            });
-          }
-        });
-      }
-      else {
-        next();
-      }
-    }
-    else {
-      var error = new Error('Invalid instance for Click.addAge');
-      console.error(error.stack);
-      next(error);
-    }
-  };
+  /*
+     Click.addAgeSample = function(ctx, age, next) {
+     debug('addAgeSample', ctx, age);
+     if(ctx.instance) {
+     var inst = ctx.instance;
+//Only new clicks can add sample ages
+if(ctx.isNewInstance) {
+Stat.addSample({
+username: inst.username
+}, ctx.Model.modelName, 'age', age, function(err, res) {
+if(err) {
+console.error('Error: Failed to add interaction age for upVote');
+console.error(err.stack);
+next(err);
+}
+else {
+Stat.addSample({
+username: inst.username
+},
+inst.clickableType,
+'age',
+age,
+function(err, res) {
+if(err) {
+console.error('Error: Failed to add interaction age for ' +
+inst.clickableType);
+console.error(err.stack);
+}
+next(err);
+});
+}
+});
+}
+else {
+next();
+}
+}
+else {
+var error = new Error('Invalid instance for Click.addAge');
+console.error(error.stack);
+next(error);
+}
 };
+*/
+  };

@@ -12,6 +12,9 @@ module.exports = function(app) {
   var debug = app.debug('hooks:subarticle');
 
   Subarticle.afterRemote('prototype.__get__comments', function(ctx, inst,next){
+    ctx.options = {
+      clickType: 'getComments'
+    };
     debug('afterRemote __get__comments', ctx, inst, next);
     Base.createClickAfterRemote(ctx, next);
   });
@@ -87,6 +90,7 @@ module.exports = function(app) {
     if(inst && ctx.isNewInstance) {
       Click.create({
         username: inst.username,
+        type: 'createSubarticle',
         clickableType: 'article',
         clickableId: inst.parentId
       }, function(err, res) {

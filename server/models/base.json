@@ -3,10 +3,13 @@
   "base": "PersistedModel",
   "strict": false,
   "idInjection": true,
-  "hidden": [
+  "protected": [
     "ratingModified",
     "ratingVersion",
-    "clickCount",
+    "getCommentsCount",
+    "notCommentRating",
+    "notSubarticleRating",
+    "getSubarticlesCount",
     "viewCount"
   ],
   "properties": {
@@ -15,15 +18,20 @@
       "required": true
     },
     "rating": {
-      "type": "number"
+      "type": "number",
+      "required": true
     },
     "ratingModified": {
-      "type": "date"
+      "type": "date",
+      "required": true
     },
     "ratingVersion": {
       "type": "number"
     },
-    "clickCount": {
+    "getCommentsCount": {
+      "type": "number"
+    },
+    "notCommentRating": {
       "type": "number"
     },
     "viewCount": {
