@@ -3,7 +3,7 @@
   "base": "PersistedModel",
   "strict": false,
   "idInjection": true,
-  "protected": [
+  "hidden": [
     "ratingModified",
     "ratingVersion",
     "getCommentsCount",
