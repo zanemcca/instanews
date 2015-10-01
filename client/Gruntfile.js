@@ -383,7 +383,7 @@ module.exports = function (grunt) {
           '<%= yeoman.test %>/spec/**/*.js'
         ],
         autoWatch: false,
-        reporters: ['dots', 'coverage'],
+        reporters: ['spec', 'coverage'],
         port: 8080,
         singleRun: false,
         preprocessors: {
