@@ -20,7 +20,7 @@ function UserArray() {
     var elapsed = 0;
     function loop() {
       if(!done) {
-        if( time < 5000) {
+        if( time < 10000) {
           setTimeout(loop, time);
           elapsed += time;
           time *= 2;
