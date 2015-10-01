@@ -16,7 +16,6 @@ exports.run = function() {
       require('./view').run();
       /*
       require('./vote').run();
-      require('./votes').run();
      */
    });
 };

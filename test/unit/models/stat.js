@@ -93,6 +93,28 @@ exports.run = function () {
         };
       });
 
+      //Without clickthru
+      var tests = [{
+        notSubarticleRating: 0.75,
+        notCommentRating: 0.25,
+        message: 'should use all available data',
+        // P( up U comments U subarticles ) - P((comments U subarticles) & downvotes)
+        result: 0.32586628401360546
+      },
+      {
+        notCommentRating: 0.25,
+        message: 'should use the upvote, comment and downvote data',
+        // P( up U comments ) - P(comments & downvotes)
+        result: 0.29443027210884354 
+      },
+      {
+        message: 'should only use the upvote data',
+        // P( up )
+        result: 25/120 
+      }];
+
+      /*
+       * With clickthru
       var tests = [{
         notSubarticleRating: 0.75,
         notCommentRating: 0.25,
@@ -111,6 +133,7 @@ exports.run = function () {
         // P( up )
         result: 25/120*(45/(45 + 120)) 
       }];
+      */
 
       tests.forEach(function(test) {
         it(test.message, function () {
@@ -151,7 +174,10 @@ exports.run = function () {
         Stat.bonus = bonus;
         Stat.weight = weight;
         var rating = run();
-        expect(rating).to.almost.equal(0.26613451790368436, 5);
+        expect(rating).to.almost.equal(0.600107246253406, 5);
+
+        //With clickthru
+        //expect(rating).to.almost.equal(0.26613451790368436, 5);
       });
     });
 
