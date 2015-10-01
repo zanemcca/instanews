@@ -132,8 +132,8 @@ exports.run = function () {
 
           Stat.bonus = bonus;
           Stat.weight = weight;
-          var obj = run();
-          expect(obj.rating).to.almost.equal(test.result, 5);
+          var rating = run();
+          expect(rating).to.almost.equal(test.result, 5);
         });
       });
 
@@ -150,8 +150,8 @@ exports.run = function () {
 
         Stat.bonus = bonus;
         Stat.weight = weight;
-        var obj = run();
-        expect(obj.rating).to.almost.equal(0.26613451790368436, 5);
+        var rating = run();
+        expect(rating).to.almost.equal(0.26613451790368436, 5);
       });
     });
 

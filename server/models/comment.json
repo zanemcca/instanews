@@ -2,6 +2,11 @@
   "name": "comment",
   "base": "base",
   "idInjection": true,
+  "indexes": {
+    "commentable_index": {
+      "commentableId": 1
+    }
+  },
   "properties": {
     "content": {
       "type": "string",
@@ -28,11 +33,6 @@
       "type": "belongsTo",
       "model": "journalist",
       "foreignKey": "username"
-    }
-  },
-  "indexes": {
-    "commentable_index": {
-      "commentableId": 1
     }
   },
   "acls": [

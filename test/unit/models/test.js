@@ -1,5 +1,5 @@
 exports.run = function() {
-   describe('Hooks', function() {
+   describe('Models', function() {
       require('./common').run();
       require('./stat').run();
    });

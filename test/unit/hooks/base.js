@@ -234,8 +234,8 @@ exports.run = function () {
               };
 
               getRatingCb = function(inst){
-                inst.rating = 0.75;
-                return inst;
+                rating = 0.75;
+                return rating;
               };
 
               getRating = sandbox.stub(app.models.stat, 'getRating', function (inst) {

@@ -80,7 +80,7 @@
     "public": false
   },
   "stat": {
-    "dataSource": "Users",
+    "dataSource": "db",
     "public": false
   },
   "click": {

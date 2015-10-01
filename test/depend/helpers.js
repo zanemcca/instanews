@@ -23,6 +23,7 @@ var destroy = function(inst, cb) {
     model.destroyById(id, cb);
   } else {
     var e = new Error('Failed to find '+ name + ' on app.models');
+    console.dir(inst);
     e.status = 400;
     return cb(e);
   }

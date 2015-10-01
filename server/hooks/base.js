@@ -72,53 +72,38 @@ module.exports = function(app) {
     else {
       ctx.query.include = [];
     } 
-    //Include any upvotes or downvotes on the object
-    var context = loopback.getCurrentContext();
-    if(context) {
-      var token = context.get('accessToken');
-      var username;
-      if(token) {
-        username =  token.userId;
-      }
 
-      if(username) {
-        ctx.query.include.push({
-          relation: 'upVotes',
-          scope: {
-            where: {
-              username: username 
-            }
-          }
-        });
-        ctx.query.include.push({
-          relation: 'downVotes',
-          scope: {
-            where: {
-              username: username 
-            }
-          }
-        });
+    ctx.options = ctx.query.options;
+    if(!(ctx.options && ctx.options.rate)) {
+      //Include any upvotes or downvotes on the object
+      var context = loopback.getCurrentContext();
+      if(context) {
+        var token = context.get('accessToken');
+        var username;
+        if(token) {
+          username =  token.userId;
+        }
 
-        //If we want to rerate the content then we need to load
-        //the top comments
-        /*
-           if(ctx.query.rate) {
-           ctx.query.include.push({
-relation: 'comments',
-scope: {
-limit: stat.comment.views.mean,
-order: 'rating DESC'
-}
-});
-}
-*/
+        if(username) {
+          ctx.query.include.push({
+            relation: 'upVotes',
+            scope: {
+              where: {
+                username: username 
+              }
+            }
+          });
+          ctx.query.include.push({
+            relation: 'downVotes',
+            scope: {
+              where: {
+                username: username 
+              }
+            }
+          });
+        }
       }
     }
-/*
-   if(ctx.query.rate) {
-   ctx.options.rate = true;
-   }
-   */
 
     next();
   });
@@ -130,11 +115,10 @@ order: 'rating DESC'
       inst = ctx.data;
     }
     if(inst) {
-      //TODO use a mixin for this 
-      //Update the modification date
+
+
       inst.modified = new Date();
       inst.ratingModified = new Date();
-
       delete inst.comments;
       delete inst.subarticles;
 
@@ -183,8 +167,8 @@ order: 'rating DESC'
           inst.notCommentRating = 1;
         }
 
-        var res = Stat.getRating(inst);
-        inst.rating = res.rating;
+        var rating = Stat.getRating(inst);
+        inst.rating = rating;
       }
       else {
         //TODO move versioning into a mixin for everyone
@@ -195,17 +179,37 @@ order: 'rating DESC'
 
         //Ensure that the version number is incremented
         if(!ctx.data.hasOwnProperty('$inc')) {
-          ctx.data = {
-            $set: ctx.data,
-            $inc: {
-              version: 1
-            }
+          ctx.data.$inc = {
+            version: 1
           };
         }
         else {
           ctx.data.$inc.version = 1;
         }
-      }
+
+        var set = ctx.data.$set;
+        if(!set) {
+          set = {};
+        }
+
+        var names = Object.getOwnPropertyNames(ctx.data);
+        for(var i in names) {
+          if(names[i].indexOf('$') !== 0) {
+            set[names[i]] = ctx.data[names[i]];
+            delete ctx.data[names[i]];
+          }
+        }
+
+        ctx.data.$set = set;
+
+        /*
+        if(!ctx.data.$set) {
+        ctx.data.$set = {};
+        }
+        ctx.data.$set.modified = new Date();
+        ctx.data.$set.ratingModified = new Date();
+        */
+        }
     }
     else {
       console.warn('Warning: There does not seem to be an instance present!');
@@ -213,6 +217,56 @@ order: 'rating DESC'
 
     next();
   });
+
+  Base.updateStats = function(id, modelName, data, next) {
+    debug('updateStats', id, modelName, data, next);
+    if(app.models[modelName]) {
+      Model = app.models[modelName];
+      var whitelist = ['article', 'subarticle', 'comment'];
+      if(whitelist.indexOf(modelName) > -1) {
+        Model.findById(id, function (err, instance) {
+          if(err) {
+            console.error('Failed to find the instance of ' + modelName + ' - ' + id); 
+            return next(err);
+          } else {
+            instance.updateAttributes(data, function(err,res) {
+              if(err) {
+                console.warn('Failed to save base instance');
+                console.dir(instance);
+                next(err);
+              }
+              else {
+                Stat.triggerRating({
+                  id: instance.id 
+                },
+                instance.modelName,
+                null,
+                function(err, res) {
+                  if(err) { 
+                    //Conflicts are ok because it means that 
+                    //someone else has just triggered the rating.
+                    //So we will not throw an error
+                    console.error('Failed to update the rating for ' +
+                                  instance.modelName + ' - ' + instance.id);
+                    console.error(err.stack);
+                    return next(err);
+                  }
+                  next();
+                }); 
+              }
+            });
+          }
+        });
+      } else {
+        console.warn('Base.updateStats can only be called on models that inherit Base');
+        return next();
+      }
+    } else {
+      var err = new Error('The given modelName ' + modelName + ' does not have a valid model');
+      console.error(err);
+      return next(err);
+    }
+  };
 
   /*
      Base.observe('loaded', function(ctx, next) {
