@@ -2,6 +2,7 @@
 'use strict';
 var app = angular.module('instanews.service.notifications', ['ionic', 'ngResource','ngCordova']);
 
+/* istanbul ignore next */
 app.service('Notifications', [
       '$rootScope',
       '$cordovaPush',

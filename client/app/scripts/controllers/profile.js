@@ -2,6 +2,8 @@
 'use strict';
 var app = angular.module('instanews.controller.profile', ['ionic', 'ngResource']);
 
+/* istanbul ignore next */
+
 app.controller('ProfileCtrl', [
       '$scope',
       '$stateParams',

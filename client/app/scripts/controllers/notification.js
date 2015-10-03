@@ -1,7 +1,9 @@
 
+
 'use strict';
 var app = angular.module('instanews.controller.notification', ['ionic', 'ngResource', 'underscore']);
 
+/* istanbul ignore next */
 app.controller('NotificationCtrl', [
       '$scope',
       '$stateParams',
@@ -109,4 +111,3 @@ app.controller('NotificationCtrl', [
    };
 
 }]);
-
