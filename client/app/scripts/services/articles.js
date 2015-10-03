@@ -119,6 +119,7 @@ app.service('Articles', [
      //Set the top subarticle
       if( article.subarticles && article.subarticles.length > 0 ) {
         article.topSub = article.subarticles[0];
+      } //TODO articles without subarticles should be ignored
 
         var idx = getIndex(articles, article);
         if( idx >= 0 ) {
@@ -130,10 +131,12 @@ app.service('Articles', [
           articles.push(article);
         }
         articles.sort(compareFunction);
+        /*
       }
       else {
         console.log('Warning: An Article without any subarticles has been ignored: ' + article.id);
       }
+     */
    };
 
    var get = function() {
