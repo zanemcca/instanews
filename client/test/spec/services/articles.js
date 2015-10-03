@@ -49,13 +49,13 @@ describe('Articles', function() {
       sinon.stub(article, 'find', function(f) {
         expect(f.filter.limit).to.equal(50);
         expect(f.filter.skip).to.equal(0);
-        expect(f.filter.include).to.deep.equal({
+        expect(f.filter.include).to.deep.equal([{
           relation: 'subarticles',
           scope: {
             limit: 1,
             order: 'rating DESC'
           }
-        });
+        }]);
         expect(f.filter.order).to.equal('rating DESC');
 
         return {
@@ -102,7 +102,7 @@ describe('Articles', function() {
         arts = [
           {
             id: '1',
-            ranking: 0,
+            rating: 0,
             modified: Date.now(),
             subarticles: [
               {
@@ -132,12 +132,12 @@ describe('Articles', function() {
       });
 
       it('should not replace the article because the stored one is newer', function() {
-        var ranking = arts[0].ranking;
+        var rating = arts[0].rating;
 
         arts = [
           {
             id: '1',
-            ranking: 1,
+            rating: 1,
             modified: Date(2000,1,1),
             subarticles: [
               {
@@ -150,14 +150,14 @@ describe('Articles', function() {
         articles.add(arts);
         var results = articles.get();
         expect(results.length).to.equal(1);
-        expect(results[0].ranking).to.equal(ranking);
+        expect(results[0].rating).to.equal(rating);
       });
 
       it('should replace the article because it is newer', function() {
         arts = [
           {
             id: '1',
-            ranking: 1,
+            rating: 1,
             modified: Date.now(),
             subarticles: [
               {
@@ -170,14 +170,14 @@ describe('Articles', function() {
         articles.add(arts);
         var results = articles.get();
         expect(results.length).to.equal(1);
-        expect(results[0].ranking).to.equal(arts[0].ranking);
+        expect(results[0].rating).to.equal(arts[0].rating);
       });
 
-      it('should add the article in order by ranking', function() {
+      it('should add the article in order by rating', function() {
         var moreArticles = [
           {
             id: '2',
-            ranking: 1000,
+            rating: 0.8,
             subarticles: [
               {
                 id: 'a'
@@ -199,12 +199,12 @@ describe('Articles', function() {
       var arts = [
         {
           id: '1',
-          ranking: 0,
+          rating: 0,
           subarticles: []
         },
         {
           id: '2',
-          ranking: 0,
+          rating: 0,
           subarticles: []
         }
       ];
@@ -225,12 +225,12 @@ describe('Articles', function() {
       var arts = [
         {
           id: '1',
-          ranking: 0,
+          rating: 0,
           subarticles: []
         },
         {
           id: '2',
-          ranking: 0,
+          rating: 0,
           subarticles: []
         }
       ];
@@ -255,12 +255,12 @@ describe('Articles', function() {
       var arts = [
         {
           id: '1',
-          ranking: 0,
+          rating: 0,
           subarticles: []
         },
         {
           id: '2',
-          ranking: 0,
+          rating: 0,
           subarticles: []
         }
       ];
@@ -295,12 +295,12 @@ describe('Articles', function() {
       arts = [
         {
           id: '1',
-          ranking: 0,
+          rating: 0,
           subarticles: []
         },
         {
           id: '2',
-          ranking: 0,
+          rating: 0,
           subarticles: []
         }
       ];
@@ -349,12 +349,12 @@ describe('Articles', function() {
       arts = [
         {
           id: '1',
-          ranking: 0,
+          rating: 0,
           subarticles: []
         },
         {
           id: '2',
-          ranking: 0,
+          rating: 0,
           subarticles: []
         }
       ];
@@ -413,12 +413,12 @@ describe('Articles', function() {
       arts = [
         {
           id: '1',
-          ranking: 0,
+          rating: 0,
           subarticles: []
         },
         {
           id: '2',
-          ranking: 0,
+          rating: 0,
           subarticles: []
         }
       ];
@@ -478,12 +478,12 @@ describe('Articles', function() {
       arts = [
         {
           id: '1',
-          ranking: 1,
+          rating: 0.55,
           subarticles: []
         },
         {
           id: '2',
-          ranking: 2,
+          rating: 0.88,
           subarticles: []
         }
       ];
@@ -493,7 +493,7 @@ describe('Articles', function() {
       arts = [
         {
           id: '3',
-          ranking: 3,
+          rating: 0.99,
           subarticles: []
         }
       ];

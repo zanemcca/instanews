@@ -426,7 +426,6 @@ describe('Post service', function() {
               lat: 1,
               lng: 2
             },
-            username: user.get().username,
             title: 'Title' 
           });
 
@@ -491,7 +490,6 @@ describe('Post service', function() {
 
           expect(sub.id).to.equal(newArticle.parentId);
           expect(sub.parentId).to.equal(newArticle.parentId);
-          expect(sub.username).to.equal(user.get().username);
           expect(sub.text).to.equal(newArticle.text[0]);
 
           return {
@@ -518,7 +516,6 @@ describe('Post service', function() {
 
           expect(sub.id).to.equal(newArticle.parentId);
           expect(sub.parentId).to.equal(newArticle.parentId);
-          expect(sub.username).to.equal(user.get().username);
           expect(sub.text).to.exist;
 
           return {
@@ -588,7 +585,6 @@ describe('Post service', function() {
             expect(sub).to.deep.equal({
               id: newArticle.parentId,
               parentId: newArticle.parentId,
-              username: user.get().username,
               _file: {
                 container: 'instanews.videos.us.east',
                 type: video.type,
@@ -686,7 +682,6 @@ describe('Post service', function() {
             expect(sub).to.deep.equal({
               id: newArticle.parentId,
               parentId: newArticle.parentId,
-              username: user.get().username,
               _file: {
                 container: 'instanews.photos.us.east',
                 type: photo.type,

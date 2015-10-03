@@ -35,8 +35,8 @@ var decrypt = function decrypt(text) {
  */
 function readFile(name) {
   return fs.readFileSync(
-     path.resolve(__dirname, name),
-     'UTF-8'
+    path.resolve(__dirname, name),
+    'UTF-8'
   );
 }
 
@@ -58,15 +58,15 @@ var get = function(key) {
 
   //console.log('Looking for ' + key);
   keys.forEach( function(pair) {
-	 //console.log('\t' + pair.key);
-	 if(pair.key === key) {
-		res = pair.value;
-		//console.log('\t' + res);
-	 }
+    //console.log('\t' + pair.key);
+    if(pair.key === key) {
+      res = pair.value;
+      //console.log('\t' + res);
+    }
   });
 
   if( !res ) {
-	  console.log('The key - ' + key + 'given did not have a match!');
+    console.log('The key - ' + key + 'given did not have a match!');
   }
 
   return res;
@@ -75,27 +75,27 @@ var get = function(key) {
 
 // Read the keys and decrypt them
 if( process.env.NODE_ENV === 'production' ||
-	process.env.NODE_ENV === 'staging') {
+   process.env.NODE_ENV === 'staging') {
   if(!password) {
-	 console.error('Error: No password given!');
-	 //TODO Quit the application
+    console.error('Error: No password given!');
+    //TODO Quit the application
   }
   else {
-	 if( process.env.NODE_ENV === 'production') {
-		keys = decryptFile('.keys');
-	 }
-	 else {
-		keys = decryptFile('.keys.staging');
-	 }
+    if( process.env.NODE_ENV === 'production') {
+      keys = decryptFile('.keys');
+    }
+    else {
+      keys = decryptFile('.keys.staging');
+    }
   }
 }
 else {
   //Place any development credentials you need here
   keys = [{
-	 key: 'mongoEast',
-	 value: {
-		url: 'localhost:27017/'
-	 }
+    key: 'mongoEast',
+    value: {
+      url: 'localhost:27017/'
+    }
   }];
 }
 
