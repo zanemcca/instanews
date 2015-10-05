@@ -15,6 +15,15 @@ var Articles = app.models.Article;
 
 exports.run = function() {
   describe('DownVote', function() {
+    on.article().plus.downVote().describe('downVote again by the same user', function () {
+      it('should return an error', function(done) {
+        DownVote.create(function(err, vote) {
+          expect(err).to.exist;
+          done();
+        });
+      });
+    });
+
     on.article().describe('Create downvote', function () {
       it('should update the downVoteCount of the article voted on', function(done) {
         DownVote.create(function(err, vote) {

@@ -117,6 +117,16 @@ exports.run = function() {
 
           creator(total);
         });
+
+      });
+    });
+
+    on.article().plus.upVote().describe('upVote again by the same user', function () {
+      it('should return an error', function(done) {
+        UpVote.create(function(err, vote) {
+          expect(err).to.exist;
+          done();
+        });
       });
     });
 

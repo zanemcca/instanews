@@ -42,7 +42,11 @@ function post(url, token, data, cb) {
         console.error(err.stack);
         cb(err);
       } else {
-        cb(null, res.body);
+        if(res.error) {
+          cb(res.error);
+        } else {
+          cb(null, res.body);
+        }
       }
     });
   } catch(e) {
