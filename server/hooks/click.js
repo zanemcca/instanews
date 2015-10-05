@@ -39,6 +39,8 @@ module.exports = function(app) {
     }
   };
 
+  //TODO Merge upVote and downVote into vote and depricate this as 
+  // uniqueness is guaranteed at the database layer
   var preVoteChecker = function(ctx, next) {
     debug('preVoteChecker', ctx);
     var inst = ctx.instance;
@@ -66,38 +68,24 @@ module.exports = function(app) {
         }
       };
 
-      Model.findOne(filter, function(err, res) {
+      OppositeModel.findOne(filter, function(err, res) {
         if(err) {
           console.error('Error: Failed to complete preVoteChecker');
           next(err);
         }
         else if(res) {
-          var error = new Error('A user can only ' + name + ' once per item');
-          error.status = 401;
-          console.error(error.stack);
-          next(error);
-        } 
-        else {
-          OppositeModel.findOne(filter, function(err, res) {
+          res.destroy(function(err) {
             if(err) {
               console.error('Error: Failed to complete preVoteChecker');
               next(err);
-            }
-            else if(res) {
-              res.destroy(function(err) {
-                if(err) {
-                  console.error('Error: Failed to complete preVoteChecker');
-                  next(err);
-                }
-                else {
-                  next();
-                }
-              });
             }
             else {
               next();
             }
           });
+        }
+        else {
+          next();
         }
       });
     }
@@ -329,12 +317,12 @@ module.exports = function(app) {
               }); 
             }
             /*
-            //TODO Remove this.
-            //Age statistics are not needed when we do not use timedecay
-            var age = Date.now() - res.created;
-            Click.addAgeSample(ctx, age, next);
-            */
-          });
+          //TODO Remove this.
+          //Age statistics are not needed when we do not use timedecay
+          var age = Date.now() - res.created;
+          Click.addAgeSample(ctx, age, next);
+          */
+            });
       });
     } else {
       var error = new Error('Invalid instance for updateClickableAttributes');
@@ -388,4 +376,4 @@ next(error);
 }
 };
 */
-  };
+};
