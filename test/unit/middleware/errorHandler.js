@@ -68,16 +68,17 @@ exports.run = function () {
         });
 
         it('should return the error with a 404', function (done) {
-          res.status = function (code) {
-            expect(code).to.equal(err.status);
+          res.send = function (e) {
+            expect(res.statusCode).to.equal(err.status);
             done();
           };
+
           run();
         });
 
         it('should return the error with a modified error message', function (done) {
-          res.send = function (data) {
-            expect(data.message).to.not.equal(err.message);
+          res.send = function (e) {
+            expect(e.message).to.not.equal(err.message);
             done();
           };
           run();
