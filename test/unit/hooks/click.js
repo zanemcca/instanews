@@ -122,20 +122,16 @@ exports.run = function () {
               });
             });
 
-            it('should call UpVote.findOne then downVote.findOne', function() {
+            it('should call downVote.findOne', function() {
               run();
-              expect(up.calledOnce).to.be.true;
               expect(down.calledOnce).to.be.true;
-              expect(up.calledBefore(down)).to.be.true;
             });
 
-            it('should call downVote.findOne then upVote.findOne', function() {
+            it('should call upVote.findOne', function() {
               ctx.Model.modelName = 'downVote';
 
               run();
               expect(up.calledOnce).to.be.true;
-              expect(down.calledOnce).to.be.true;
-              expect(down.calledBefore(up)).to.be.true;
             });
 
             it('should not call either upVote or downVote.findOne', function() {
@@ -146,25 +142,7 @@ exports.run = function () {
               expect(down.called).to.be.false;
             });
 
-            it('should return 401 if the first model is found', function() {
-              upCB = function(cb) {
-                cb(null, 1);
-              };
-
-              Next = function (err) {
-                if(next.calledOnce) {
-                  expect(err.status).to.equal(401);
-                }
-              };
-
-              run();
-
-              expect(up.calledOnce).to.be.true;
-              expect(down.called).to.be.false;
-              expect(next.calledTwice).to.be.true;
-            });
-
-            it('should call both downVote.findOne and upVote.findOne, ' +
+            it('should call upVote.findOne, ' +
                'then upVote.prototype.destroy. Which should succeed', function() {
               ctx.Model.modelName = 'downVote';
               upCB = function (cb) {
@@ -182,7 +160,6 @@ exports.run = function () {
               run();
 
               expect(up.calledOnce).to.be.true;
-              expect(down.calledOnce).to.be.true;
               expect(next.calledTwice).to.be.true;
             });
 
@@ -214,24 +191,14 @@ exports.run = function () {
                 run();
 
                 expect(up.calledOnce).to.be.true;
-                expect(down.calledOnce).to.be.true;
                 expect(next.calledTwice).to.be.true;
               });
               
-              it('from the first call', function() {
-                run();
-
-                expect(up.calledOnce).to.be.true;
-                expect(down.called).to.be.false;
-                expect(next.calledTwice).to.be.true;
-              });
-
-              it('from the second call', function() {
+              it('from the OppositeModel.find', function() {
                 ctx.Model.modelName = 'downVote';
 
                 run();
                 expect(up.calledOnce).to.be.true;
-                expect(down.calledOnce).to.be.true;
                 expect(next.calledTwice).to.be.true;
               });
             });

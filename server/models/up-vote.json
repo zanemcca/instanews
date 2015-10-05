@@ -3,6 +3,18 @@
   "base": "click",
   "idInjection": true,
   "properties": {},
+  "indexes": {
+    "singleton_index": {
+      "keys": {
+        "username": 1,
+        "clickableType": 1,
+        "clickableId": 1
+      },
+      "options": {
+        "unique": true
+      }
+    }
+  },
   "validations": [],
   "relations": {},
   "acls": [

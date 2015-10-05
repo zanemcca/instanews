@@ -16,10 +16,10 @@ exports.run = function() {
           api.get('/a/nonexistent/endpoint')
           .expect(404)
           .end( function(err, res) {
+            expect(err).to.not.exist;
             expect(res).to.exist;
             expect(res.body).to.exist;
             expect(res.body.error).to.exist;
-            expect(res.body.error).to.equal('404: This is not the page you are looking for ...'); 
             expect(res.body.error.stack).to.not.exist;
             done();
           });

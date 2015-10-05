@@ -113,9 +113,8 @@ setupPush(app);
 //Setup all the back end hooks
 hookSetup(app);
 
-var dataSource;
 
-var onConnected = function() {
+var onConnected = function(dataSource) {
   dataSource.autoupdate(function(err) {
     if (err) {
       console.error('Database could not be autoupdated', err);
@@ -127,9 +126,11 @@ var onConnected = function() {
   });
 };
 
+var dataSource;
+
 for(var name in app.dataSources) {
   dataSource = app.dataSources[name];
-  dataSource.on('connected', onConnected); 
+  dataSource.on('connected', onConnected.bind(onConnected, dataSource)); 
 }
 
 app.start = function() {
