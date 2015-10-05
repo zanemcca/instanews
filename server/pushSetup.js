@@ -1,4 +1,7 @@
 
+
+/* istanbul ignore next */
+
 module.exports = function (app) {
   // Setup push notifications
   var App = app.models.app;

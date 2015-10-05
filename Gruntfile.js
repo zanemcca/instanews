@@ -96,14 +96,14 @@ module.exports = function(grunt) {
     },
     //Istanbul check coverage
     istanbul_check_coverage: {
-      default: {
+      all: {
         options: {
           coverageFolder: 'coverage*', // will check both coverage folders and merge the coverage results
           check: {
-            statements: 87,
-            branches: 79,
-            functions: 92,
-            lines: 88,
+            statements: 89,
+            branches: 82,
+            functions: 95,
+            lines: 90,
           }
         }
       },
@@ -299,7 +299,7 @@ module.exports = function(grunt) {
         break;
       default:
         tasks.push('mocha_istanbul:all');
-        tasks.push('istanbul_check_coverage');
+        tasks.push('istanbul_check_coverage:all');
       /*
         tasks.push('mocha_istanbul:unit');
         tasks.push('istanbul_check_coverage:unit');
@@ -337,16 +337,16 @@ module.exports = function(grunt) {
   });
 
   // Check the coverage report
-  grunt.registerTask('check', ['jshint:server', 'istanbul_check_coverage']);
+  grunt.registerTask('check', ['jshint:server', 'istanbul_check_coverage:all']);
 
   // Shortcuts
   grunt.registerTask('ci', 'coverage:integration');
   grunt.registerTask('cu', 'coverage:unit');
   grunt.registerTask('ct', 'coverage:test');
-  grunt.registerTask('ca', 'coverage');
+  grunt.registerTask('ca', 'coverage:all');
 
   grunt.registerTask('ti', 'test:integration');
   grunt.registerTask('tu', 'test:unit');
   grunt.registerTask('tt', 'test:test');
-  grunt.registerTask('ta', 'test');
+  grunt.registerTask('ta', 'test:all');
 };
