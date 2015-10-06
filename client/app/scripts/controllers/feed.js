@@ -20,7 +20,12 @@ app.controller('FeedCtrl', [
    $scope.toggleMenu = Navigate.toggleMenu;
    $scope.scrollTop = Navigate.scrollTop;
 
-   $scope.itemsAvailable = Articles.areItemsAvailable;
+   $scope.itemsAvailable = function () { return false; };
+
+   Position.boundsReady
+   .then(function () {
+     $scope.itemsAvailable = Articles.areItemsAvailable;
+   });
 
    // Localize the map on the users position
    $scope.localize = function() {
@@ -37,7 +42,19 @@ app.controller('FeedCtrl', [
    //we need this so that all of the articles do not render at the same time
 
    //Update our local articles
+   var first = true;
    var updateArticles = function() {
+     if(first) {
+       first = false;
+       //Hide the splash screen
+        Position.boundsReady.then(function () {
+          //Hide the splash screen
+          setTimeout(function () {
+            navigator.splashscreen.hide();
+          }, 1000);
+        });
+     }
+
       $scope.articles = Articles.get();
       //$scope.itemsAvailable = Articles.areItemsAvailable();
    };
