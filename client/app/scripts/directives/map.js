@@ -1,6 +1,10 @@
 
 'use strict';
-var app = angular.module('instanews.directive.map', ['ionic', 'ngResource', 'underscore']);
+var app = angular.module('instanews.directive.map', [
+  'ionic',
+  'ngResource',
+  'underscore'
+]);
 
 app.directive('inmap', [
   '_',
@@ -19,11 +23,6 @@ app.directive('inmap', [
         Articles) {
 
           var map = {};
-
-          var localizeOnceObserver = function() {
-            Platform.ready.then(initializeMap());
-            Position.unregisterObserver(localizeOnceObserver);
-          };
 
           //Initialize the map
           var initializeMap = function() {
@@ -94,11 +93,9 @@ app.directive('inmap', [
             }
           };
 
-          if(Position.getPosition()) {
+          Position.ready.then(function () {
             initializeMap();
-          } else {
-            Position.registerObserver(localizeOnceObserver);
-          }
+          });
         }
     };
   }]);

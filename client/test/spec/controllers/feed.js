@@ -48,6 +48,11 @@ describe('Feed: ', function(){
               new google.maps.LatLng(33.685282, -116.233942)
             );
           },
+          boundsReady: {
+            then: function (cb) {
+              cb();
+            }
+          },
           registerBoundsObserver: function(cb) {
           }
         };
@@ -162,7 +167,7 @@ describe('Feed: ', function(){
     });
   });
 
-  
+
   describe('localize' , function() {
 
     beforeEach( function() {
@@ -187,7 +192,7 @@ describe('Feed: ', function(){
   describe('load callers', function() {
 
     var arts = [];
-    
+
     beforeEach( function() {
       controller = initController();
 

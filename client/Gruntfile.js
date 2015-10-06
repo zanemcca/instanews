@@ -528,15 +528,15 @@ module.exports = function (grunt) {
   grunt.registerTask('run', function() {
     if(this.args.indexOf('production') > -1) {
       this.args.splice(this.args.indexOf('production'),1);
-      return grunt.task.run(['newer:jshint', 'init:production', 'ionic:run:' + this.args.join()]);
+      return grunt.task.run(['newer:jshint', 'init:production', 'ionic:resources', 'ionic:run:' + this.args.join()]);
     } else {
       grunt.config('concurrent.ionic.tasks', ['ionic:run:' + this.args.join(), 'watch']);
-      return grunt.task.run(['init', 'concurrent:ionic']);
+      return grunt.task.run(['init', 'ionic:resources', 'concurrent:ionic']);
     }
   });
 
   grunt.registerTask('build', function() {
-    return grunt.task.run(['init', 'ionic:build:' + this.args.join()]);
+    return grunt.task.run(['init', 'ionic:resources', 'ionic:build:' + this.args.join()]);
   });
 
   grunt.registerTask('init', [

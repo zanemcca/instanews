@@ -78,17 +78,22 @@ describe('Position service', function() {
     });
 
     describe('set', function () {
-      var loc = { coords: 'valid location' };
+      var loc = {
+        coords: {
+          latitude: 7,
+          longitude: -1 
+        }
+      };
 
       it('should set the given position', function () {
         position.set(loc);
-        expect(position.getPosition()).to.equal(loc);
+        expect(position.getPosition()).to.deep.equal(loc);
       });
 
       it('should write the position to localstorage', function (done) {
         sinon.stub(localStorage, 'secureWrite', function (name, pos) {
           expect(name).to.equal('position' + platform.getUUID());
-          expect(pos).to.equal(loc);
+          expect(pos).to.deep.equal(loc);
           done();
         });
 
@@ -143,7 +148,13 @@ describe('Position service', function() {
         sinon.spy(fake, 'func');
         position.registerObserver(fake.func);
 
-        position.set({ coords: 'valid location' }); 
+        position.set({
+          coords: {
+            latitude: 55,
+            longitude: 7
+          }
+        }); 
+
         expect(fake.func.calledOnce).to.be.true;
       });
     });

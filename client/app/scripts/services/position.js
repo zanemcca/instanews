@@ -5,9 +5,15 @@ var app = angular.module('instanews.service.position', ['ionic', 'ngResource','n
 app.service('Position', [
   'Platform',
   'LocalStorage',
+  '$q',
   function(
     Platform,
-    LocalStorage){
+    LocalStorage,
+    $q
+  ){
+
+       var ready = $q.defer();
+       var boundsReady = $q.defer();
 
       //Boundary for articles and map
       var bounds;
@@ -17,6 +23,7 @@ app.service('Position', [
 
       var setBounds = function(bnds) {
         bounds = bnds;
+        boundsReady.resolve();
         notifyBoundsObservers();
       };
 
@@ -69,15 +76,23 @@ app.service('Position', [
 
       //Set the position
       var set = function(position) {
-        if(position && position.coords) {
+        if(position && position.coords && position.coords.latitude && position.coords.longitude) {
           mPosition = position;
 
           //Store the position
           var UUID = Platform.getUUID();
           if(UUID) {
-            LocalStorage.secureWrite('position' + UUID, mPosition);
+            var pos = {
+              coords: {
+                latitude: position.coords.latitude,
+                longitude: position.coords.longitude
+              }
+            };
+
+            LocalStorage.secureWrite('position' + UUID, pos);
           }
 
+          ready.resolve();
           notifyObservers();
         } else {
           console.log('Invalid position given');
@@ -111,7 +126,8 @@ app.service('Position', [
           console.log('Error on position watch: ' + err);
         },
         {
-          enableHighAccuracy: true
+          enableHighAccuracy: false   //Network based location 
+          //enableHighAccuracy: true   //GPS & Network based location
         }
       );
 
@@ -125,23 +141,23 @@ app.service('Position', [
           var UUID = Platform.getUUID();
           if(UUID) {
             LocalStorage.secureRead('position' + UUID, function(err, res) {
-              if (err || !res) {
+              if (err || !(res && res.coords)) {
                 //If an old location is not found and the users location cannot be determined
                 //then default to Montreal
                 res = { coords: { latitude: 45.5017 , longitude: -73.5673}};
               }
 
-              setTimeout(function () {
-                if(!mPosition) {
-                  set(res);
-                }
-              }, 1000);
+              if(!mPosition) {
+                set(res);
+              }
             });
           }
         }
       });
 
       return {
+        ready: ready.promise,
+        boundsReady: boundsReady.promise,
         posToLatLng: posToLatLng,
         setBounds: setBounds,
         getBounds: getBounds,
