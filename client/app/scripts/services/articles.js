@@ -76,7 +76,7 @@ app.service('Articles', [
          }
          else {
             //Update the global articles list
-           //TODO save the subarticlen memory
+           //TODO save the subarticle memory
             add(articles);
          }
          cb();
