@@ -122,6 +122,7 @@ app.service('LocalStorage', [
  //     console.log('Encrypted to: ' + encrypted);
 
       writeFile('', file, encrypted);
+      //console.log('Successfully wrote ' + JSON.stringify(value, 'utf8', '  ') + ' to ' + key + ' (' + file + ')');
    };
 
    var secureRead = function(key, cb) {
@@ -131,10 +132,15 @@ app.service('LocalStorage', [
 
       readFile('', file, function(err, encrypted) {
         if(!err) {
-         console.log('Successfully read file');
-         var value = encrypted;
-         var decrypted = CryptoJS.AES.decrypt(value, key).toString(CryptoJS.enc.Utf8);
-         cb(null, JSON.parse(decrypted));
+         var decrypted = JSON.parse(CryptoJS.AES.decrypt(encrypted, key).toString(CryptoJS.enc.Utf8));
+         //console.log('Successfully read ' + JSON.stringify(decrypted, 'utf8', '  ') +
+         //' from ' + key + ' (' + file + ')');
+
+         if(decrypted) {
+           cb(null, decrypted);
+         } else {
+           cb();
+         }
         } else {
          console.log('Error reading file: '+ err.message);
          cb(err.message, null);
