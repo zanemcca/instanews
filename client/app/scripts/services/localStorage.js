@@ -132,9 +132,13 @@ app.service('LocalStorage', [
       readFile('', file, function(err, encrypted) {
         if(!err) {
          console.log('Successfully read file');
-         var value = encrypted;
-         var decrypted = CryptoJS.AES.decrypt(value, key).toString(CryptoJS.enc.Utf8);
-         cb(null, JSON.parse(decrypted));
+         console.log(encrypted);
+         if(encrypted) {
+           var decrypted = CryptoJS.AES.decrypt(encrypted, key).toString(CryptoJS.enc.Utf8);
+           cb(null, JSON.parse(decrypted));
+         } else {
+           cb(null, encrypted);
+         }
         } else {
          console.log('Error reading file: '+ err.message);
          cb(err.message, null);

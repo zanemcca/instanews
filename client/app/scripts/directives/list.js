@@ -74,7 +74,7 @@ app.directive('inListItem', [
 
         $scope.getItemTemplate = getItemTemplate;
 
-        var position = Position.getLast();
+        var position = Position.getPosition();
 
         var view = {
           viewableId: $scope.item.id,
