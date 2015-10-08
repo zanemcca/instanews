@@ -37,34 +37,36 @@ app.factory('Post', [
      });
    });
 
+   var isValidArticle = function(article) {
+     if( article.title && typeof article.title === 'string' && article.title.length > 0 &&
+        article.position && article.position.lat && article.position.lng &&
+        typeof article.position.lat === 'number' && typeof article.position.lng === 'number' &&
+        article.text.length + article.videos.length + article.photos.length > 0
+     ) {
+       return true;
+     }
+     else {
+       return false;
+     }
+   };
+
+   var isValidSubarticle = function(sub) {
+     if( sub.parentId && typeof sub.parentId === 'string' && sub.parentId.length > 0 &&
+        sub.text.length + sub.videos.length + sub.photos.length > 0
+     ) {
+       return true;
+     }
+     else { 
+       return false;
+     }
+   };
+
    var getNewArticle = function() {
      var art =  {
        tempId: '',
        videos: [],
        photos: [],
-       text: [],
-       isValidArticle: function() {
-         if( this.title && typeof this.title === 'string' && this.title.length > 0 &&
-            this.position && this.position.lat && this.position.lng &&
-            typeof this.position.lat === 'number' && typeof this.position.lng === 'number' &&
-            this.text.length + this.videos.length + this.photos.length > 0
-         ) {
-           return true;
-         }
-         else {
-           return false;
-         }
-       },
-       isValidSubarticle: function() {
-         if( this.parentId && typeof this.parentId === 'string' && this.parentId.length > 0 &&
-            this.text.length + this.videos.length + this.photos.length > 0
-         ) {
-           return true;
-         }
-         else { 
-           return false;
-         }
-       }
+       text: []
      };
      art.tempId = rfc4122.v4();
       
@@ -202,7 +204,7 @@ app.factory('Post', [
      posting = true;
      var article = getArticle(tempId);
      
-     if(article.isValidArticle()){
+     if(isValidArticle(article)){
        Article.create({
           isPrivate: false,
           location: article.position,
@@ -218,7 +220,7 @@ app.factory('Post', [
          postSubarticle(article);
        });
      }
-     else if(article.isValidSubarticle()) {
+     else if(isValidSubarticle(article)) {
        postSubarticle(article);
      }
      else {
@@ -353,7 +355,7 @@ app.factory('Post', [
 
   //Create a video subarticle for the given parentId
   var createVideo = function(id, video) {
-    var container = 'instanews.videos.us.east';
+    var container = 'instanews.videos';
     var poster = video.name.slice(0,video.name.lastIndexOf('.') + 1) + 'jpg';
     return {
       id: id,
@@ -372,7 +374,7 @@ app.factory('Post', [
 
   //Create a photo subarticle for the given parentId
   var createPhoto = function(id, photo) {
-    var container = 'instanews.photos.us.east';
+    var container = 'instanews.photos';
 
     var subarticle = {
       id: id,
@@ -392,6 +394,8 @@ app.factory('Post', [
 
   return {
     getArticle: getArticle,
+    isValidArticle: isValidArticle,
+    isValidSubarticle: isValidSubarticle,
     saveArticle: saveArticle,
     saveVideos: saveVideos,
     savePhotos: savePhotos,
