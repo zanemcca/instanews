@@ -120,7 +120,7 @@ app.service('Position', [
       };
 
       // Watch the users position
-      var posWatch = navigator.geolocation.watchPosition(
+      navigator.geolocation.watchPosition(
         set,
         function(err) {
           console.log('Error on position watch: ' + err);

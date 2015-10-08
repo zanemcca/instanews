@@ -227,7 +227,11 @@ angular.module('instanews', [
 
    }])
 
-.config(function($stateProvider, $urlRouterProvider, $ionicConfigProvider) {
+.config(function(
+  $stateProvider,
+  $urlRouterProvider,
+  $ionicConfigProvider
+) {
 
    //No transitions for performance
    $ionicConfigProvider.views.transition('none');
