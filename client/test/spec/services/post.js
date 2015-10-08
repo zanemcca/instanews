@@ -185,23 +185,23 @@ describe('Post service', function() {
       });
 
       it('should be valid', function() {
-        expect(art.isValidArticle()).to.be.true;
+        expect(post.isValidArticle(art)).to.be.true;
       });
 
       describe('invalid', function() {
         it('should have a title', function() {
           art.title = '';
-          expect(art.isValidArticle()).to.be.false;
+          expect(post.isValidArticle(art)).to.be.false;
         });
 
         it('should have at least one subarticle', function() {
           art.text = [];
-          expect(art.isValidArticle()).to.be.false;
+          expect(post.isValidArticle(art)).to.be.false;
         });
 
         it('should have a valid position', function() {
           art.position = {};
-          expect(art.isValidArticle()).to.be.false;
+          expect(post.isValidArticle(art)).to.be.false;
         });
       });
     });
@@ -215,18 +215,18 @@ describe('Post service', function() {
       });
 
       it('should be valid', function() {
-        expect(art.isValidSubarticle()).to.be.true;
+        expect(post.isValidSubarticle(art)).to.be.true;
       });
 
       describe('invalid', function() {
         it('should have a parentId', function() {
           art.parentId = '';
-          expect(art.isValidSubarticle()).to.be.false;
+          expect(post.isValidSubarticle(art)).to.be.false;
         });
 
         it('should have at least one subarticle', function() {
           art.text = [];
-          expect(art.isValidSubarticle()).to.be.false;
+          expect(post.isValidSubarticle(art)).to.be.false;
         });
       });
     });
@@ -553,7 +553,7 @@ describe('Post service', function() {
         it('should call FileTransfer.upload twice',function() {
           var count = 0;
           sinon.stub(fileTransfer, 'upload', function(server, url, options) {
-            expect(server).to.equal(env.apiEndpoint + '/storages/instanews.videos.us.east/upload');
+            expect(server).to.equal(env.apiEndpoint + '/storages/instanews.videos/upload');
             expect(options.headers).to.deep.equal({ 'Authorization': user.getToken()});
             if(count === 0) {
               expect(url).to.equal(newArticle.videos[0].nativeURL);
@@ -586,7 +586,7 @@ describe('Post service', function() {
               id: newArticle.parentId,
               parentId: newArticle.parentId,
               _file: {
-                container: 'instanews.videos.us.east',
+                container: 'instanews.videos',
                 type: video.type,
                 name: video.name,
                 size: video.size,
@@ -623,7 +623,7 @@ describe('Post service', function() {
 
           sinon.stub(article.subarticles, 'create', function(sub) {
             expect(sub._file).to.exist;
-            expect(sub._file.container).to.equal('instanews.videos.us.east');
+            expect(sub._file.container).to.equal('instanews.videos');
             return {
               $promise: {
                 then: function(cb) {
@@ -657,7 +657,7 @@ describe('Post service', function() {
 
         it('should call FileTransfer.upload once',function() {
           sinon.stub(fileTransfer, 'upload', function(server, url, options) {
-            expect(server).to.equal(env.apiEndpoint + '/storages/instanews.photos.us.east/upload');
+            expect(server).to.equal(env.apiEndpoint + '/storages/instanews.photos/upload');
             expect(options.headers).to.deep.equal({ 'Authorization': user.getToken()});
             expect(url).to.equal(newArticle.photos[0].nativeURL);
             expect(options.fileName).to.equal(newArticle.photos[0].name);
@@ -683,7 +683,7 @@ describe('Post service', function() {
               id: newArticle.parentId,
               parentId: newArticle.parentId,
               _file: {
-                container: 'instanews.photos.us.east',
+                container: 'instanews.photos',
                 type: photo.type,
                 name: photo.name,
                 size: photo.size,
@@ -719,7 +719,7 @@ describe('Post service', function() {
 
           sinon.stub(article.subarticles, 'create', function(sub) {
             expect(sub._file).to.exist;
-            expect(sub._file.container).to.equal('instanews.photos.us.east');
+            expect(sub._file.container).to.equal('instanews.photos');
             return {
               $promise: {
                 then: function(cb) {
