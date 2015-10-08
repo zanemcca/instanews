@@ -86,10 +86,11 @@ describe('instanews.service.camera', function() {
       }
     };
   }));
+
   describe('captureVideo', function() {
     it('should call $q.defer',function() {
       sinon.spy($q, 'defer');
-      Camera.getVideo();
+      Camera.captureVideo();
 
       expect($q.defer.calledOnce).to.be.true;
     });
@@ -99,7 +100,7 @@ describe('instanews.service.camera', function() {
 
     it('should call window.resolveLocalFileSystemURL twice',function() {
       sinon.spy($window, 'resolveLocalFileSystemURL');
-      Camera.getVideo();
+      Camera.captureVideo();
       expect($window.resolveLocalFileSystemURL.calledTwice).to.be.true;
     });
   });

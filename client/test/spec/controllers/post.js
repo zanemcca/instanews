@@ -145,17 +145,21 @@ describe('Post: ', function(){
 
       $provide.service('Camera', function() {
         return {
-          getPicture: function() {
+          capturePicture: function() {
             return {
               then: function(cb) {
                 cb('url');
               }
             }
           },
-          getPictures: function(cb) {
-            cb([1,2]);
+          openMediaGallery: function() {
+            return {
+              then: function (cb) {
+                cb([1,2]);
+              }
+            };
           },
-          getVideo: function() {
+          captureVideo: function() {
             return {
               then: function(cb) {
                 cb([1]);
@@ -649,11 +653,11 @@ describe('Post: ', function(){
     });
 
     describe('captureVideo', function() {
-      it('should call Camera.getVideo', function() {
-        sinon.spy(camera, 'getVideo');
+      it('should call Camera.captureVideo', function() {
+        sinon.spy(camera, 'captureVideo');
         scope.captureVideo();
 
-        expect(camera.getVideo.calledOnce).to.be.true;
+        expect(camera.captureVideo.calledOnce).to.be.true;
       });
 
       it('should add the video to the videos on newArticle', function() {
@@ -665,17 +669,16 @@ describe('Post: ', function(){
 
     });
 
-    describe('getPhotos', function() {
-      it('should call Camera.getPictures', function() {
-        sinon.spy(camera, 'getPictures');
+    describe('openMediaGallery', function() {
+      it('should call Camera.openMediaGallery', function() {
+        sinon.spy(camera, 'openMediaGallery');
 
-        scope.getPhotos();
-
-        expect(camera.getPictures.calledOnce).to.be.true;
+        scope.openMediaGallery();
+        expect(camera.openMediaGallery.calledOnce).to.be.true;
       });
 
       it('should add the photos to newArticle.photos', function() {
-        scope.getPhotos();
+        scope.openMediaGallery();
 
         expect(scope.newArticle.photos.length).to.equal(2);
         expect(scope.newArticle.photos[0]).to.equal(1);
@@ -683,17 +686,17 @@ describe('Post: ', function(){
       });
     });
 
-    describe('capturePhoto', function() {
+    describe('capturePicture', function() {
       it('should call Camera.getPicture', function() {
-        sinon.spy(camera, 'getPicture');
+        sinon.spy(camera, 'capturePicture');
 
-        scope.capturePhoto();
+        scope.capturePicture();
 
-        expect(camera.getPicture.calledOnce).to.be.true;
+        expect(camera.capturePicture.calledOnce).to.be.true;
       });
 
       it('should add the photo to newArticle.photos', function() {
-        scope.capturePhoto();
+        scope.capturePicture();
 
         expect(scope.newArticle.photos.length).to.equal(1);
         expect(scope.newArticle.photos[0]).to.equal('url');
