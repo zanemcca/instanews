@@ -2,16 +2,6 @@
 'use strict';
 var app = angular.module('instanews.directive.data', ['ionic', 'ngResource']);
 
-//TODO move this into a JSON or something
-var urlBase = ('https:' === document.location.protocol ?
-/*
-   'https://172.20.10.9:3443/api' :
-   'http://172.20.10.9:3000/api');
-*/
-   'https://192.168.1.2:3443/api' :
-   'http://192.168.1.2:3000/api');
-
-
 //This directive will display data in a preview format
 app.directive('indatapreview', [
       function () {
@@ -30,11 +20,15 @@ app.directive('indatapreview', [
 //This directive will display subarticle data in a consumable format
 app.directive('indata',[
       '$compile',
+      'ENV',
       'Platform',
       function (
         $compile,
+        ENV,
         Platform
       ) {
+
+    var urlBase = ENV.apiEndpoint;
 
         //TODO Use the storage api
    var getSrc = function (data) {
@@ -54,9 +48,12 @@ app.directive('indata',[
       }
       else {
         console.log('Data: ' + data);
-         //TODO get rid of this method the URL should be in the data
-         return '"' + urlBase + '/storages/instanews.photos.us.east/download/' +
-            name + '"';
+
+        var src = '"' + urlBase + '/storages/' + data.container;
+
+        src += '/download/' + name + '"';
+
+        return src;
       }
    };
 
@@ -75,7 +72,7 @@ app.directive('indata',[
          videoId = 'video_' + id;
 
          template = '<div id="video-container">' +
-         '<video poster="' + data.poster +
+         '<video poster="' + urlBase + '/storages/' + data.container + '/download/' + data.poster +
          '" controls width="100%" id="'+ videoId + '"';
 
          if (Platform.isIOS()) {
@@ -87,9 +84,15 @@ app.directive('indata',[
             ' vjs-user-active" data-setup={}>';
          }
 
+         var src = getSrc(data);
+
+         template += '<source src=' + src + ' type="'+ type +'">'+
+         '</video></div>';
+         /*
          template += '<source src="http://vjs.zencdn.net/v/oceans.mp4" type="video/mp4">'+
          '<source src="http://vjs.zencdn.net/v/oceans.webm" type="video/webm">'+
          '</video></div>';
+         */
       }
       else {
          console.log('Bad file type... ', data.type);

@@ -5,6 +5,7 @@ exports.run = function() {
       require('./click').run();
       require('./comment').run();
       require('./down-vote').run();
+      require('./file').run();
       /*
       require('./installation').run();
       require('./journalist').run();

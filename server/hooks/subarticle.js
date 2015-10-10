@@ -4,6 +4,7 @@
 module.exports = function(app) {
 
    var Subarticle = app.models.subarticle;
+   var File = app.models.file;
    var Click = app.models.click;
    var Article = app.models.Article;
    var Stat = app.models.stat;
@@ -19,26 +20,19 @@ module.exports = function(app) {
     Base.createClickAfterRemote(ctx, next);
   });
 
-  /*
    Subarticle.observe('before save', function(ctx, next) {
+      debug('before save', ctx, next);
       var inst = ctx.instance;
       if (inst && ctx.isNewInstance) {
-         inst.modelName = 'subarticle';
          if ( inst._file ) {
-            if ( inst._file.type === 'video') {
-               //console.log('Saving a video');
-               if ( !inst._file.poster ) {
-                  inst._file.poster = 'img/ionic.png';
-               }
-            }
-            else {
-               //console.log('Saving some other media type');
-            }
+           File.beforeSave(inst._file, next);
+         } else {
+           next();
          }
+      } else {
+        next();
       }
-      next();
    });
-  */
 
   Subarticle.triggerRating = function(where, modify, cb) {
     debug('triggerRating', where, modify, cb);

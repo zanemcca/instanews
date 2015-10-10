@@ -25,6 +25,13 @@
       "principalId": "$authenticated",
       "permission": "ALLOW",
       "property": "upload"
+    },
+    {
+      "accessType": "EXECUTE",
+      "principalType": "ROLE",
+      "principalId": "$everyone",
+      "permission": "ALLOW",
+      "property": "transcodingComplete"
     }
   ],
   "methods": []
