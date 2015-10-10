@@ -90,8 +90,6 @@ module.exports = function(Storage) {
   };
 
   Storage.transcodingComplete = function (ctx, job, next) {
-    job = JSON.parse(job);
-
     console.dir(job, { colors: true });
     switch(job.Type) {
       case 'Notification':
@@ -102,8 +100,7 @@ module.exports = function(Storage) {
         if(sns) {
           sns.confirmSubscription({
             Token: job.Token,
-            TopicArn: job.TopicArn,
-            AuthenticateOnUnsubscribe: false 
+            TopicArn: job.TopicArn
           }, function(err, data) {
             if( err) {
               console.error(err.stack);
@@ -114,6 +111,7 @@ module.exports = function(Storage) {
             }
           });
         } else {
+          console.warn('No SNS connection established');
           next();
         }
         break;
