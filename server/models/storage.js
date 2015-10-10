@@ -94,38 +94,63 @@ module.exports = function(Storage) {
     console.log('Context');
     console.dir(ctx, { colors: true });
 
-    console.log('\nJob');
-    console.dir(job, { colors: true });
-    switch(job.Type) {
-      case 'Notification':
-        //TODO Handle the notification
-        next();
-        break;
-      case 'SubscriptionConfirmation':
-        if(sns) {
-          sns.confirmSubscription({
-            Token: job.Token,
-            TopicArn: job.TopicArn
-          }, function(err, data) {
-            if( err) {
-              console.error(err.stack);
-              next(err);
-            } else {
-              console.dir(data, {colors: true});
-              next();
-            }
-          });
-        } else {
-          console.warn('No SNS connection established');
-          next();
+    var req = ctx.req;
+
+    var chunks = [];
+    req.on('data', function(chunk) {
+      chunks.push(chunk);
+    });
+
+    req.on('end', function () {
+
+      if(chunks.length > 0) {
+        var job;
+        try {
+          job = JSON.parse(chunks.join(''));
+          job = JSON.parse(job);
+        } catch(e) {
+          var err = new Error('Failed to parse the raw body');
+          console.log(e);
+          return next(err);
         }
-        break;
-      default:
-        var e = new Error('Unknown message type ' + job.Type);
-        e.status = 403;
-        next(e);
-        break;
-    }
+
+        console.log('\nJob');
+        console.dir(job, { colors: true });
+        switch(job.Type) {
+          case 'Notification':
+            //TODO Handle the notification
+            next();
+          break;
+          case 'SubscriptionConfirmation':
+            if(sns) {
+            sns.confirmSubscription({
+              Token: job.Token,
+              TopicArn: job.TopicArn
+            }, function(err, data) {
+              if( err) {
+                console.error(err.stack);
+                next(err);
+              } else {
+                console.dir(data, {colors: true});
+                next();
+              }
+            });
+          } else {
+            console.warn('No SNS connection established');
+            next();
+          }
+          break;
+          default:
+            var e = new Error('Unknown message type ' + job.Type);
+          e.status = 403;
+          next(e);
+          break;
+        }
+      } else {
+        console.log('No data passed into transcodingComplete');
+        next();
+      }
+    });
   };
 
   Storage.remoteMethod(
