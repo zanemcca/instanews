@@ -33,4 +33,4 @@ EXPOSE 3443
 
 # Run the application
 #CMD cd /src && grunt start 
-CMD cd /src && node server/server.js 
+CMD cd /src && node server/server.js 2> stderr.log | tee stdout.log
