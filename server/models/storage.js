@@ -106,15 +106,18 @@ module.exports = function(Storage) {
       if(chunks.length > 0) {
         var job;
         try {
-          job = JSON.parse(chunks.join(''));
+          job = chunks.join('');
+          console.log('\nJob Before Parse');
+          console.log(job);
           job = JSON.parse(job);
+          //job = JSON.parse(job);
         } catch(e) {
           var err = new Error('Failed to parse the raw body');
           console.log(e);
           return next(err);
         }
 
-        console.log('\nJob');
+        console.log('\nJob After Parse');
         console.dir(job, { colors: true });
         switch(job.Type) {
           case 'Notification':
