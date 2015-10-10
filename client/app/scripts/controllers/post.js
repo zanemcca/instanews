@@ -152,7 +152,7 @@ app.controller('PostCtrl', [
    /* Video posting */
    //Capture video using the video camera
    $scope.captureVideo = function() {
-      Camera.getVideo()
+      Camera.captureVideo()
       .then( function(videos) {
         $scope.newArticle = Post.saveVideos(videos, $scope.newArticle.tempId);
       }, function(err) {
@@ -163,15 +163,20 @@ app.controller('PostCtrl', [
    /* Photo posting */
 
    //Get a photo(s) from the gallery
-   $scope.getPhotos = function() {
-     Camera.getPictures( function(photos) {
+   $scope.openMediaGallery = function() {
+     Camera.openMediaGallery()
+     .then( function(media) {
+       //TODO Seperate out the video files
+       var photos = media;
        $scope.newArticle = Post.savePhotos(photos, $scope.newArticle.tempId);
+     }, function(err) {
+         console.log(err);
      });
    };
 
    //Capture a photo using the camera and store it into the new article
-   $scope.capturePhoto = function() {
-      Camera.getPicture()
+   $scope.capturePicture = function() {
+      Camera.capturePicture()
       .then( function(photo) {
         $scope.newArticle = Post.savePhotos(photo, $scope.newArticle.tempId);
       }, function(err) {

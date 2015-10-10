@@ -67,8 +67,8 @@ exports.run = function () {
         });
 
         Subarticle.triggerRating(where, null, function(Err, Res) {
-            expect(Err).to.equal(err);
-            done();
+          expect(Err).to.equal(err);
+          done();
         });
       });
 
@@ -138,7 +138,7 @@ exports.run = function () {
             subarticleableId: 'commId',
             subarticleableType: 'subarticle',
           }];
-          
+
           subarticle = function (query, cb) {
             cb(null, res);
           };
@@ -160,7 +160,7 @@ exports.run = function () {
 
         it('should return successfully', function(done) {
           res = [];
-          
+
           subarticle = function (query, cb) {
             cb(null, res);
           };
@@ -245,9 +245,52 @@ exports.run = function () {
         expect(next.calledTwice).to.be.true;
       });
 
+      /*
+      describe.only('before save', function () {
+        var cb;
+
+        beforeEach(function () {
+          hookName = 'before save';
+          //TODO stub aws commands.
+          // We can just ensure the proper values are passed in.
+
+          ctx.instance = {
+            username: 'user',
+            parentId: 'someId',
+            id: 'id',
+            _file: {
+              type: 'video/mp4',
+              name: 'video.mp4',
+              container: 'videos.container'
+            }
+          };
+
+        });
+
+        //TODO ensure aws commands are called
+
+        it('should create a .m3u8 source file', function () {
+          var sub = ctx.instance;
+          run();
+          expect(sub._file.sources.length).to.equal(2);
+          expect(sub._file.sources[0].indexOf('.m3u8')).to.equal(sub._file.sources[0].length -5);
+        });
+
+        //TODO Other formats
+
+        it('should create a .png thumbnail file', function () {
+          var sub = ctx.instance;
+          run();
+          expect(sub._file.sources.thumbnail.indexOf('.png')).to.equal(sub._file.sources[0].length - 4);
+        });
+      });
+     */
+
       describe('after save', function() {
         var subFind, sub;
+
         beforeEach(function () {
+          hookName = 'after save';
           subFind = function (query, cb) {};
 
           sub = sandbox.stub(app.models.subarticle, 'find', function(query, cb) {
@@ -261,8 +304,6 @@ exports.run = function () {
             clickCreate = function (model, cb) {
               cb();
             };
-
-            hookName = 'after save';
 
             click = sandbox.stub(app.models.click, 'create', function(model, cb) {
               clickCreate(model,cb);

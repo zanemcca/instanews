@@ -61,7 +61,6 @@
     "org.apache.cordova.geolocation",
     "org.apache.cordova.console",
     "com.ionic.keyboard",
-    "com.synconset.imagepicker",
     "org.apache.cordova.splashscreen"
   ],
   "cordovaPlatforms": [

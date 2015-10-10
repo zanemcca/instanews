@@ -2,7 +2,6 @@
   "name": "downVote",
   "base": "click",
   "idInjection": true,
-  "properties": {},
   "indexes": {
     "singleton_index": {
       "keys": {
@@ -15,6 +14,7 @@
       }
     }
   },
+  "properties": {},
   "validations": [],
   "relations": {},
   "acls": [

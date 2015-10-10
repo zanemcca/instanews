@@ -59,17 +59,6 @@ app.factory('Platform', [
      }
    };
 
-   /* Initialization */
-   if(isBrowser()) {
-     console.log('App is running in the browser!');
-     ready.resolve();
-   }
-   else {
-     ionic.Platform.ready( function( device ) {
-        ready.resolve( device);
-     });
-   }
-
   var showToast = function(message) {
     if(!isBrowser()) {
       setTimeout( function() {
@@ -87,6 +76,25 @@ app.factory('Platform', [
     return cordova.file.dataDirectory;
   };
 
+  var isCameraPresent = function () {
+    return (navigator.camera && navigator.camera.getPicture);
+  };
+
+  var isVideoPresent = function () {
+    return (navigator.device && navigator.device.capture && navigator.device.capture.captureVideo);
+  };
+
+   /* Initialization */
+   if(isBrowser()) {
+     console.log('App is running in the browser!');
+     ready.resolve();
+   }
+   else {
+     ionic.Platform.ready( function( device ) {
+        ready.resolve( device);
+     });
+   }
+
    return {
       getUUID: getUUID,
       getDataDir: getDataDir,
@@ -94,6 +102,8 @@ app.factory('Platform', [
       showToast: showToast,
       isIOS: isIOS,
       isBrowser: isBrowser,
+      isCameraPresent: isCameraPresent,
+      isVideoPresent: isVideoPresent,
       getDevice: getDevice,
       setDevice: setDevice,
       setDeviceToken: setDeviceToken,
