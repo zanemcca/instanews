@@ -5,11 +5,9 @@
   "options": {
     "validateUpsert": true
   },
-  "properties": {
-  },
+  "properties": {},
   "validations": [],
-  "relations": {
-  },
+  "relations": {},
   "acls": [],
   "methods": []
 }
