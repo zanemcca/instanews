@@ -89,8 +89,12 @@ module.exports = function(Storage) {
     }
   };
 
-  Storage.transcodingComplete = function (job, next) {
+  Storage.transcodingComplete = function (ctx, job, next) {
+    console.log('\ntranscodingComplete');
+    console.log('Context');
+    console.dir(ctx, { colors: true });
 
+    console.log('\nJob');
     console.dir(job, { colors: true });
     switch(job.Type) {
       case 'Notification':
@@ -107,7 +111,7 @@ module.exports = function(Storage) {
               console.error(err.stack);
               next(err);
             } else {
-              console.dir(data, {color: true});
+              console.dir(data, {colors: true});
               next();
             }
           });
@@ -129,6 +133,9 @@ module.exports = function(Storage) {
     {
       description: 'Handles job completion notifications passed from the transcoder',
       accepts: [{
+        arg: 'ctx', type: 'object', 'http': { source: 'context'}
+      },
+      {
         arg: 'job', type: 'object', 'http': { source: 'body'}
       }]
     }
