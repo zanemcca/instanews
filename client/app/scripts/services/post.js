@@ -355,8 +355,11 @@ app.factory('Post', [
 
   //Create a video subarticle for the given parentId
   var createVideo = function(id, video) {
-    var container = 'instanews.videos';
+    var container = 'instanews.videos.in';
+
+    //TODO remove poster creation from the frontend all together
     var poster = video.name.slice(0,video.name.lastIndexOf('.') + 1) + 'jpg';
+
     return {
       id: id,
       parentId: id,
