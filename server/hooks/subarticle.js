@@ -25,7 +25,16 @@ module.exports = function(app) {
       var inst = ctx.instance;
       if (inst && ctx.isNewInstance) {
          if ( inst._file ) {
-           File.beforeSave(inst._file, next);
+           File.beforeSave(inst._file, function (err) {
+             if(err) {
+               return next(err);
+             } else {
+               if(inst._file.jobId) {
+                 inst.pending = inst._file.jobId;
+               }
+               next();
+             }
+           });
          } else {
            next();
          }
