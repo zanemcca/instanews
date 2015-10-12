@@ -47,11 +47,12 @@ app.directive('indata',[
          return name;
       }
       else {
-        console.log('Data: ' + data);
+        console.log('Data:');
+        console.dir(data);
 
         var src = '"' + urlBase + '/storages/' + data.container;
 
-        src += '/download/' + name + '"';
+        src += '/download/' + data.sources[0] + '"';
 
         return src;
       }
@@ -84,6 +85,7 @@ app.directive('indata',[
             ' vjs-user-active" data-setup={}>';
          }
 
+         //TODO Redo the sourcing
          var src = getSrc(data);
 
          template += '<source src=' + src + ' type="'+ type +'">'+
