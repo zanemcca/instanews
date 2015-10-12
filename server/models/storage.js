@@ -2,6 +2,8 @@
 var common = require('./common');
 var cred = require('../conf/credentials');
 var aws = require('aws-sdk');
+var MessageValidator = require('sns-validator');
+var validator = new MessageValidator();
 
 module.exports = function(Storage) {
 
@@ -33,36 +35,65 @@ module.exports = function(Storage) {
 
   var containers = [{
     Name: 'instanews.videos.in',
+    Output: 'instanews.videos',
     Params: {
       PipelineId: '1444324496785-65xn4p',
       Input: {
-        Key: null 
-        // auto for everything else
+        Key: null,
+        AspectRatio: 'auto', 
+        Container: 'auto',
+        FrameRate: 'auto',
+        Resolution: 'auto',
+        Interlaced: 'auto'
       },
+      //TODO Do a gif to use as the poster
       Outputs: [{
-        Key: 'hd',
+        Key: '2M',
+        SegmentDuration: '5', //Seconds/segment
+        Rotate: 'auto',
+        //HLS 2M
+        PresetId: '1351620000001-200010' 
+      },
+      {
+        Key: 'hd.mp4',
+        Rotate: 'auto',
         //iPhone4S+ (1920x1080 Mp4 High-profile AAC)
         PresetId: '1351620000001-100020' 
       },
       {
-        Key: 'sd',
+        Key: 'sd.mp4',
+        Rotate: 'auto',
         //iPhone1-3 (640x480 Mp4 baseline AAC
         PresetId: '1351620000001-100040' 
       }]
-      //TODO HLS, webM
+      //TODO webM
     }
   }];
 
-  var getTranscoderParams = function (name, filename) {
+  var getContainer = function (name) {
     for(var i in containers) {
       var cntr = containers[i];
       if(cntr.Name === name) {
-        cntr.Params.Input.Key = filename;
-        for(var j in cntr.Params.Outputs) {
-          cntr.Params.Outputs[j].Key += '-' + filename;
-        }
-        return cntr.Params;
+        return cntr;
       }
+    }
+  };
+
+  var getTranscoderParams = function (containerName, filename) {
+    var cntr = getContainer(containerName);
+    var name = filename.slice(0, filename.lastIndexOf('.'));
+
+    cntr.Params.Input.Key = filename;
+    for(var j in cntr.Params.Outputs) {
+      cntr.Params.Outputs[j].Key = name + '-' + cntr.Params.Outputs[j].Key;
+    }
+    return cntr.Params;
+  };
+
+  var getOutputContainerName = function(input) {
+    var cntr = getContainer(input);
+    if(cntr) {
+      return cntr.Output;
     }
   };
 
@@ -71,13 +102,33 @@ module.exports = function(Storage) {
   Storage.triggerTranscoding = function (containerName, file, cb) {
     var params = getTranscoderParams(containerName, file);
 
-    var name = file.slice(0, file.lastIndexOf('.'));
-
     if(params) {
       if(transcoder) {
         transcoder.createJob(params, function (err, res) {
-          console.log(res);
-          cb(err, res);
+          if(err) {
+            console.error('Failed to create transcoding job');
+            console.error(err.stack);
+            return cb(err);
+          } 
+
+          var id = res.Job.Id;
+          var obj = {
+            id: id,
+            container: getOutputContainerName(containerName),
+            outputs: []
+          };
+
+          var outputs = res.Job.Outputs;
+          for(var i in outputs) {
+            var key = outputs[i].Key;
+            if(outputs[i].SegmentDuration) {
+              key += '.m3u8';
+            }
+            obj.outputs.push(key);
+          }
+
+          console.log('Transcoding Job ' + id + ' has started!');
+          cb(null, obj);
         });
       } else {
         console.warn('No transcoder established!');
@@ -90,10 +141,6 @@ module.exports = function(Storage) {
   };
 
   Storage.transcodingComplete = function (ctx, job, next) {
-    console.log('\ntranscodingComplete');
-    console.log('Context');
-    console.dir(ctx, { colors: true });
-
     var req = ctx.req;
 
     var chunks = [];
@@ -107,8 +154,6 @@ module.exports = function(Storage) {
         var job;
         try {
           job = chunks.join('');
-          console.log('\nJob Before Parse');
-          console.log(job);
           job = JSON.parse(job);
           //job = JSON.parse(job);
         } catch(e) {
@@ -119,36 +164,56 @@ module.exports = function(Storage) {
 
         console.log('\nJob After Parse');
         console.dir(job, { colors: true });
-        switch(job.Type) {
-          case 'Notification':
-            //TODO Handle the notification
-            next();
-          break;
-          case 'SubscriptionConfirmation':
-            if(sns) {
-            sns.confirmSubscription({
-              Token: job.Token,
-              TopicArn: job.TopicArn
-            }, function(err, data) {
-              if( err) {
-                console.error(err.stack);
-                next(err);
+
+        validator.validate(job, function(err, job) {
+          if(err) {
+            console.error(err.stack);
+            next(err);
+          } else {
+
+            switch(job.Type) {
+              case 'Notification':
+                var message = job.Message;
+              try {
+                message = JSON.parse(message);
+                console.dir(message, { colors: true });
+                //TODO call Subarticle.update to change the pending subarticle to complete
+
+                console.log('Transcoding Job ' + message.jobId + ' has finished!');
+                return next();
+              } catch(e) {
+                var err = new Error('Failed to parse the notification message');
+                console.log(e);
+                return next(err);
+              }
+              break;
+              case 'SubscriptionConfirmation':
+                if(sns) {
+                sns.confirmSubscription({
+                  Token: job.Token,
+                  TopicArn: job.TopicArn
+                }, function(err, data) {
+                  if( err) {
+                    console.error(err.stack);
+                    next(err);
+                  } else {
+                    console.dir(data, {colors: true});
+                    next();
+                  }
+                });
               } else {
-                console.dir(data, {colors: true});
+                console.warn('No SNS connection established');
                 next();
               }
-            });
-          } else {
-            console.warn('No SNS connection established');
-            next();
+              break;
+              default:
+                var e = new Error('Unknown message type ' + job.Type);
+              e.status = 403;
+              next(e);
+              break;
+            }
           }
-          break;
-          default:
-            var e = new Error('Unknown message type ' + job.Type);
-          e.status = 403;
-          next(e);
-          break;
-        }
+        });
       } else {
         console.log('No data passed into transcodingComplete');
         next();

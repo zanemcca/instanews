@@ -13,8 +13,12 @@ module.exports = function(app) {
     if ( inst.type.indexOf('video') === 0) {
       //TODO Check if video is available on S3
       Storage.triggerTranscoding( inst.container, inst.name, function (err, res) {
-        //TODO Add new formats as the sources for the file and return
-        console.log(res);
+        console.log('Finished transcoding trigger!');
+        console.dir(res);
+        inst.sources = res.outputs;
+        inst.container = res.container;
+        inst.jobId = res.id;
+
         next();
       });
     }
