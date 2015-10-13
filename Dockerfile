@@ -16,7 +16,7 @@ COPY . /src
 # Install our dependencies
 RUN cd /src && \
   npm install --production && \
-  npm install --production https://github.com/aws/aws-js-sns-message-validator && \
+  npm install --production "https://github.com/aws/aws-js-sns-message-validator" && \
   npm install -g grunt grunt-cli node-gyp && \
   rm server/boot/explorer.js && \
   rm -r client && \
