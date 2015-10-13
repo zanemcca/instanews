@@ -332,48 +332,4 @@ module.exports = function(app) {
     }
   };
 
-  /*
-     Click.addAgeSample = function(ctx, age, next) {
-     debug('addAgeSample', ctx, age);
-     if(ctx.instance) {
-     var inst = ctx.instance;
-//Only new clicks can add sample ages
-if(ctx.isNewInstance) {
-Stat.addSample({
-username: inst.username
-}, ctx.Model.modelName, 'age', age, function(err, res) {
-if(err) {
-console.error('Error: Failed to add interaction age for upVote');
-console.error(err.stack);
-next(err);
-}
-else {
-Stat.addSample({
-username: inst.username
-},
-inst.clickableType,
-'age',
-age,
-function(err, res) {
-if(err) {
-console.error('Error: Failed to add interaction age for ' +
-inst.clickableType);
-console.error(err.stack);
-}
-next(err);
-});
-}
-});
-}
-else {
-next();
-}
-}
-else {
-var error = new Error('Invalid instance for Click.addAge');
-console.error(error.stack);
-next(error);
-}
-};
-*/
 };
