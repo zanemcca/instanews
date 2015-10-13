@@ -31,6 +31,7 @@ module.exports = function(app) {
              } else {
                if(inst._file.jobId) {
                  inst.pending = inst._file.jobId;
+                 delete inst._file.jobId;
                }
                next();
              }
