@@ -177,9 +177,29 @@ module.exports = function(Storage) {
               try {
                 message = JSON.parse(message);
                 console.dir(message, { colors: true });
-                //TODO call Subarticle.update to change the pending subarticle to complete
 
-                console.log('Transcoding Job ' + message.jobId + ' has finished!');
+                Subarticle.findOne({
+                  where: {
+                    pending: message.jobId
+                  }
+                }, function (err, res) {
+                  if(err) {
+                    console.log('Failed to find the subarticle');
+                    return next(err);
+                  }
+
+                  console.log(res);
+
+                  res.updateAttributes({
+                    $unset: {
+                      pending: ''
+                    }
+                  }, function (err, res) {
+                    console.log('Transcoding Job ' + message.jobId + ' has finished!');
+                    next(err);
+                  });
+                });
+
                 return next();
               } catch(e) {
                 var err = new Error('Failed to parse the notification message');
