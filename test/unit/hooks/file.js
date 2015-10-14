@@ -8,12 +8,12 @@ var sinon = require('sinon');
 
 var File = app.models.File;
 
-function run() {
+function start() {
   return common.req('hooks/file')(app);
 }
 
 exports.run = function () {
-  describe.skip('File', function () {
+  describe('File', function () {
 
     //Use sandbox for any beforeEach stubbing
     var sandbox;
@@ -25,31 +25,14 @@ exports.run = function () {
       sandbox.restore();
     });
 
-    var observe;
-    beforeEach(function() {
-      observe = function(hook, cb) {};
-      sandbox.stub(File, 'observe', function (hook, cb) {
-        return observe(hook, cb);
-      });
-    });
-
-    describe('observe', function() {
-      var hookName;
-      var ctx, next, Next, ne;
+    describe('beforeSave', function() {
+      var run;
+      var instance, next, Next, ne;
 
       beforeEach(function() {
-        ctx = {
-          query: {
-            include: {
-              relation: 'something'
-            }
-          },
-          instance: {
-            username: 'user',
-            parentId: 'someid',
-            id: 'id'
-          },
-          isNewInstance: true
+        run = function () {
+          start();
+          File.beforeSave(instance, next);
         };
 
         ne = {
@@ -62,79 +45,61 @@ exports.run = function () {
           return Next(err);
         });
 
-        observe = function(hook, cb) {
-          if(hook === hookName) {
-            cb(ctx, next);
-          }
+        instance = {
+          type: 'video/mp4',
+          name: 'video.mp4',
+          container: 'videos.container'
         };
       });
 
-      afterEach(function() {
-        expect(next.calledTwice).to.be.true;
-      });
-
-      describe('before save', function () {
-        var aws = require('aws-sdk');
-        var cred = common.req('conf/credentials');
-        var err, res, credentials;
+      describe('triggerTranscoding', function () {
+        var container,
+        name,
+        cb,
+        triggerCb,
+        err,
+        res;
 
         beforeEach(function () {
-          hookName = 'before save';
+          container = 'videos.container';
+          name = 'video.mp4';
+          res = 'results';
 
-          ctx.instance = {
-            type: 'video/mp4',
-            name: 'video.mp4',
-            container: 'videos.container'
+          triggerCb = function (cntr, name, cb) {
+            cb(err, res);
           };
+
+          res = {
+            outputs: ['a', 'b'],
+            container: 'new.container',
+            id: 'id'
+          };
+
+          sandbox.stub(app.models.storage, 'triggerTranscoding', function(cntr, nme, cb) {
+            triggerCb(cntr, nme, cb);
+          });
         });
 
-        describe('triggerTranscoding', function () {
-          var container,
-          name,
-          cb,
-          triggerCb,
-          err,
-          res;
+        it('should save the result', function (done) {
+          Next = function(err) {
+            expect(err).to.not.exist;
+            expect(instance.sources).to.deep.equal(res.outputs);
+            expect(instance.container).to.equal(res.container);
+            expect(instance.jobId).to.equal(res.id);
+            done();
+          };
 
-          beforeEach(function () {
-            container = 'videos.container';
-            name = 'video.mp4';
-            res = 'results';
+          run();
+        });
 
-            triggerCb = function (cntr, name, cb) {
-              cb(err, res);
-            };
+        it('should propogate the error', function (done) {
+          err = 'error';
+          Next = function(error) {
+            expect(err).to.equal(error);
+            done();
+          };
 
-            //TODO Fill in res appropriately
-            res = {};
-
-            sandbox.stub(app.models.storage, 'triggerTranscoding', function(cntr, nme, cb) {
-              triggerCb(cntr, nme, cb);
-            });
-          });
-
-          it('should create a .m3u8 source file', function (done) {
-            Next = function(err) {
-              expect(err).to.not.exist;
-              var file = ctx.instance;
-              expect(file.sources.length).to.equal(2);
-              expect(file.sources[0].indexOf('.m3u8')).to.equal(file.sources[0].length -5);
-              done();
-            };
-
-            run();
-          });
-
-          it('should create a .png thumbnail file', function (done) {
-            Next = function(err) {
-              expect(err).to.not.exist;
-              var file = ctx.instance;
-              expect(file.sources.thumbnail.indexOf('.png')).to.equal(file.sources[0].length - 4);
-              done();
-            };
-
-            run();
-          });
+          run();
         });
       });
     });

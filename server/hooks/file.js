@@ -10,9 +10,12 @@ module.exports = function(app) {
   File.beforeSave = function (inst, next) {
     debug('before save', inst, next);
     console.log(inst);
-    if ( inst.type.indexOf('video') === 0) {
       //TODO Check if video is available on S3
       Storage.triggerTranscoding( inst.container, inst.name, function (err, res) {
+        if(err) {
+          return next(err);
+        }
+
         console.log('Finished transcoding trigger!');
         console.dir(res);
         inst.sources = res.outputs;
@@ -21,10 +24,5 @@ module.exports = function(app) {
 
         next();
       });
-    }
-    else {
-      //console.log('Saving some other media type');
-      next();
-    }
   };
 };
