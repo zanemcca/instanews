@@ -12,7 +12,6 @@ module.exports = function(app) {
    require('./journalist.js')(app);
    require('./comment.js')(app);
    require('./stat.js')(app);
-   require('./storage.js')(app);
    require('./click.js')(app);
    require('./base.js')(app);
 };
