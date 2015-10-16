@@ -51,8 +51,13 @@ module.exports = function(Storage) {
         Resolution: 'auto',
         Interlaced: 'auto'
       },
-      //TODO Do a gif to use as the poster
       Outputs: [{
+        Key: '.gif',
+        Rotate: 'auto',
+        //Gif poster
+        PresetId: '1351620000001-100200'
+      },
+      {
         Key: '2M',
         SegmentDuration: '5', //Seconds/segment
         Rotate: 'auto',
@@ -60,13 +65,13 @@ module.exports = function(Storage) {
         PresetId: '1351620000001-200010' 
       },
       {
-        Key: 'hd.mp4',
+        Key: 'HD.mp4',
         Rotate: 'auto',
         //iPhone4S+ (1920x1080 Mp4 High-profile AAC)
         PresetId: '1351620000001-100020' 
       },
       {
-        Key: 'sd.mp4',
+        Key: 'SD.mp4',
         Rotate: 'auto',
         //iPhone1-3 (640x480 Mp4 baseline AAC
         PresetId: '1351620000001-100040' 
@@ -91,7 +96,13 @@ module.exports = function(Storage) {
     if(cntr) {
       cntr.Params.Input.Key = filename;
       for(var j in cntr.Params.Outputs) {
-        cntr.Params.Outputs[j].Key = name + '-' + cntr.Params.Outputs[j].Key;
+        var key = cntr.Params.Outputs[j].Key;
+        cntr.Params.Outputs[j].Key = name;
+        if(key.indexOf('.') !== 0) {
+          cntr.Params.Outputs[j].Key += '-';
+        }
+        cntr.Params.Outputs[j].Key += key;
+
       }
       return cntr.Params;
     }
