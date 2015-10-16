@@ -23,9 +23,38 @@
 }
 
 .video-container {
-  width: 80% !important;
-  max-width: 640px;
+  max-width: 100%;
+  max-height: 800px;
   overflow: hidden;
+}
+
+@media only screen and (max-height : 499px) {
+  .video-container {
+    max-height: 300px;
+  }
+}
+
+@media only screen and (min-height : 500px) and (max-height : 599px) {
+  .video-container {
+    max-height: 375px;
+  }
+}
+
+@media only screen and (min-height : 600px) and (max-height : 699px) {
+  .video-container {
+    max-height: 450px;
+  }
+}
+
+@media only screen and (min-height : 700px) and (max-height : 799px) {
+  .video-container {
+    max-height: 525px;
+  }
+}
+
+
+.video-container * {
+  max-height: inherit;
 }
 
 .scroll {
