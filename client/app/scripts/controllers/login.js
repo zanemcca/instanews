@@ -6,7 +6,6 @@ app.controller('LoginCtrl', [
       '$scope',
       '$state',
       '$ionicModal',
-      '$cordovaDevice',
       'Navigate',
       'Platform',
       'User',
@@ -15,7 +14,6 @@ app.controller('LoginCtrl', [
       function($scope,
          $state,
          $ionicModal,
-         $cordovaDevice,
          Navigate,
          Platform,
          User,
@@ -103,8 +101,8 @@ app.controller('LoginCtrl', [
           if(res && device.type) {
             var session = {
               user: res
-            };
-            LocalStorage.secureWrite($cordovaDevice.getUUID(), session);
+            }; 
+            LocalStorage.secureWrite('session', session);
           }
           else {
           console.log('Error: Cannot save user!');
