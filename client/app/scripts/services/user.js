@@ -48,7 +48,7 @@ app.service('User', [
   var clearData = function() {
     set({});
     if(!Platform.isBrowser()) {
-      LocalStorage.secureDelete(Platform.getUUID());
+      LocalStorage.secureDelete('session');
     }
   };
 

@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<div ng-if="media.type && media.type.indexOf('image') > -1" class="item no-padding item-image">
+  <img height="auto" width:"auto" ng-src="{{media.name}}">
+</div>
+
+<div ng-if="media.type && media.type.indexOf('video') > -1" 
+  ng-controller="videoCtrl"
+  class="video-container">
+  <videogular>
+    <vg-media vg-src="sources">
+    </vg-media>
+
+    <vg-controls>
+      <vg-play-pause-button></vg-play-pause-button>
+      <vg-time-display>{{ currentTime | date:'mm:ss':'+0000' }}</vg-time-display>
+      <vg-scrub-bar>
+        <vg-scrub-bar-current-time></vg-scrub-bar-current-time>
+      </vg-scrub-bar>
+      <vg-time-display>{{ totalTime | date:'mm:ss':'+0000' }}</vg-time-display>
+      <vg-fullscreen-button></vg-fullscreen-button>
+    </vg-controls>
+
+    <vg-overlay-play></vg-overlay-play>
+    <vg-buffering></vg-buffering>
+    <vg-poster vg-url='poster'></vg-poster>
+  </videogular>
+</div>
+
+<div class="item" style="padding-bottom:0px">
+  <p class="no-margin">
+  {{media.caption}}
+  </p>
+</div>

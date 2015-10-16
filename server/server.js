@@ -98,7 +98,7 @@ app.use(helmet());
 // Compress everything
 app.use(loopback.compress());
 
-if( process.env.NODE_ENV && process.env.NODE_ENV !== 'development') {
+if( process.env.NODE_ENV && process.env.NODE_ENV === 'production') {
   app.use(loopback.static(path.resolve(__dirname, '../common/')));
 } else {
   app.use(loopback.static(path.resolve(__dirname, '../client/www/')));
