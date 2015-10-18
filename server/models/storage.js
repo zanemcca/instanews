@@ -51,12 +51,7 @@ module.exports = function(Storage) {
         Resolution: 'auto',
         Interlaced: 'auto'
       },
-      Outputs: [{
-        Key: '.gif',
-        Rotate: 'auto',
-        //Gif poster
-        PresetId: '1351620000001-100200'
-      },
+      Outputs: [
       {
         Key: '2M',
         SegmentDuration: '5', //Seconds/segment
@@ -73,8 +68,9 @@ module.exports = function(Storage) {
       {
         Key: 'SD.mp4',
         Rotate: 'auto',
-        //iPhone1-3 (640x480 Mp4 baseline AAC
-        PresetId: '1351620000001-100040' 
+        ThumbnailPattern: '-SD-{count}',
+        //iPhone1-3 (640x480 Mp4 baseline AAC)
+        PresetId: '1445198308687-fnaxk5' 
       }]
       //TODO webM
     }
@@ -103,6 +99,11 @@ module.exports = function(Storage) {
         }
         cntr.Params.Outputs[j].Key += key;
 
+        var thumbnail = cntr.Params.Outputs[j].ThumbnailPattern;
+        if(thumbnail) {
+          thumbnail = name + thumbnail;
+        }
+        cntr.Params.Outputs[j].ThumbnailPattern = thumbnail;
       }
       return cntr.Params;
     }
@@ -131,7 +132,8 @@ module.exports = function(Storage) {
           var obj = {
             id: id,
             container: getOutputContainerName(containerName),
-            outputs: []
+            outputs: [],
+            posters: []
           };
 
           var outputs = res.Job.Outputs;
@@ -139,6 +141,11 @@ module.exports = function(Storage) {
             var key = outputs[i].Key;
             if(outputs[i].SegmentDuration) {
               key += '.m3u8';
+            }
+            var poster = outputs[i].ThumbnailPattern;
+            if(poster) {
+              poster = poster.replace(/{count}/, '00001.png');
+              obj.posters.push(poster);
             }
             obj.outputs.push(key);
           }

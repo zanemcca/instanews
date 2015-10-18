@@ -145,6 +145,7 @@ exports.run = function () {
                 Id: 'id',
                 Outputs: [{
                   Key: 'key1.mp4',
+                  ThumbnailPattern: 'key1-{count}'
                 },
                 {
                   Key: 'key2',
@@ -166,6 +167,9 @@ exports.run = function () {
                 outputs: [
                   'key1.mp4',
                   'key2.m3u8'
+                ],
+                posters: [
+                  'key1-00001.png'
                 ]
               });
               done();
