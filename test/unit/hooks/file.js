@@ -71,6 +71,7 @@ exports.run = function () {
 
           res = {
             outputs: ['a', 'b'],
+            posters: ['c'],
             container: 'new.container',
             id: 'id'
           };
