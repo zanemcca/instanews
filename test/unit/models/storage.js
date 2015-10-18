@@ -104,7 +104,7 @@ exports.run = function () {
         cb;
 
         beforeEach(function () {
-          containerName = 'instanews.videos.in';
+          containerName = 'instanews-videos-in';
           filename = 'video.mp4';
           cb = function () {};
 
@@ -162,7 +162,7 @@ exports.run = function () {
             cb = function (err, obj) {
               expect(obj).to.deep.equal({
                 id: res.Job.Id,
-                container: 'instanews.videos',
+                container: 'instanews-videos',
                 outputs: [
                   'key1.mp4',
                   'key2.m3u8'
