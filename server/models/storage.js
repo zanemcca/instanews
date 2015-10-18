@@ -39,8 +39,8 @@ module.exports = function(Storage) {
   }
 
   var containers = [{
-    Name: 'instanews.videos.in',
-    Output: 'instanews.videos',
+    Name: 'instanews-videos-in',
+    Output: 'instanews-videos',
     Params: {
       PipelineId: '1444324496785-65xn4p',
       Input: {
