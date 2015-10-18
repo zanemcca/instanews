@@ -19,7 +19,15 @@ module.exports = function(app) {
         console.log('Finished transcoding trigger!');
         if(res) {
           console.dir(res);
-          inst.sources = res.outputs;
+          inst.sources = [];
+          for(var i in res.outputs) {
+            var source = res.outputs[i];
+            if(source.indexOf('.gif') > -1 ) {
+              inst.poster = source;
+            } else {
+              inst.sources.push(source);
+            }
+          }
           inst.jobId = res.id;
         } else {
           delete inst.source;
