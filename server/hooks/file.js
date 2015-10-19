@@ -21,9 +21,9 @@ module.exports = function(app) {
         inst.poster = res.posters[0];
         inst.jobId = res.id;
       } else {
-        delete inst.source;
+        delete inst.__data.source;
       }
-      delete inst.container;
+      delete inst.__data.container;
 
       console.dir(inst);
 
