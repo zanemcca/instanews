@@ -20,10 +20,14 @@ module.exports = function(app) {
         inst.sources = res.outputs;
         inst.poster = res.posters[0];
         inst.jobId = res.id;
-      } else {
+      }
+
+      if(inst.__data.source) {
         delete inst.__data.source;
       }
-      delete inst.__data.container;
+      if(inst.__data.container) {
+        delete inst.__data.container;
+      }
 
       console.dir(inst);
 

@@ -48,7 +48,11 @@ exports.run = function () {
         instance = {
           type: 'video/mp4',
           name: 'video.mp4',
-          container: 'videos.container'
+          container: 'videos.container',
+          __data: {
+            source: 'file://some-local-file.jpg',
+            container: 'instanews-photos-fake'
+          }
         };
       });
 
@@ -85,8 +89,8 @@ exports.run = function () {
           Next = function(err) {
             expect(err).to.not.exist;
             expect(instance.sources).to.deep.equal(res.outputs);
-            expect(instance.container).to.not.exist;
-            expect(instance.source).to.not.exist;
+            expect(instance.__data.container).to.not.exist;
+            expect(instance.__data.source).to.not.exist;
             expect(instance.jobId).to.equal(res.id);
             done();
           };
