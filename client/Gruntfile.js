@@ -44,7 +44,9 @@ module.exports = function (grunt) {
           ENV: {
             name: 'development',
             //TODO Change this to the local machine that is producing the build
-            apiEndpoint: 'http://192.168.1.2:3000/api'
+            apiEndpoint: 'http://192.168.1.2:3000/api',
+            videoEndpoint: 'http://192.168.1.2:3000/api/storages/instanews-videos/download',
+            photoEndpoint: 'http://192.168.1.2:3000/api/storages/instanews-photos/download'
           }
         }
       },
@@ -52,7 +54,9 @@ module.exports = function (grunt) {
         constants: {
           ENV: {
             name: 'production',
-            apiEndpoint: 'https://zanemccaig.com/api'
+            apiEndpoint: 'https://api.instanews.com/api',
+            videoEndpoint: 'https://videos.instanews.com',
+            photoEndpoint: 'https://photos.instanews.com'
           }
         }
       }

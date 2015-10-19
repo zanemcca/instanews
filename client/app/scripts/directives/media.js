@@ -10,23 +10,7 @@ var app = angular.module('instanews.directive.media', [
   'com.2fdevs.videogular.plugins.poster'
 ]);
 
-//This directive will display media in a preview format
-app.directive(
-  'inmediapreview', [
-    function () {
-
-      return {
-        restrict: 'E',
-        scope: {
-          article: '='
-        },
-        controller: function() {
-        },
-        templateUrl: 'templates/directives/mediaPreview.html'
-      };
-    }]
-);
-
+// Video controller
 app.controller(
   'videoCtrl', [
     '$scope',
@@ -36,8 +20,13 @@ app.controller(
     function ($scope, $sce, ENV, Platform) {
 
       var getUrl = function(container, fileName) {
-        var urlBase = ENV.apiEndpoint;
-        return urlBase + '/storages/' + container + '/download/' + fileName;
+        if(fileName.indexOf('file://') === 0) {
+          return fileName;
+        } else {
+          var url = ENV.videoEndpoint;
+          url += '/' + fileName;
+          return url;
+        }
       };
 
       console.log($scope.media);
@@ -59,10 +48,10 @@ app.controller(
         }
       }
 
-      $scope.poster = getUrl('instanews.thumbnails', $scope.media.poster);
+      $scope.poster = getUrl($scope.media.container, $scope.media.poster);
 
       $scope.config = {
-        preload: "none",
+        preload: 'none',
         plugins: {
           controls: {
             autoHide: true,
@@ -73,12 +62,40 @@ app.controller(
     }]
 );
 
+app.controller(
+  'imageCtrl', [
+    '$scope',
+    'ENV',
+    function ($scope, ENV) {
+
+      var urlBase = ENV.photoEndpoint;
+
+      var getUrl = function(container, fileName) {
+        if(fileName.indexOf('file://') === 0) {
+          return fileName;
+        } else {
+          return urlBase + '/' + fileName;
+        }
+      };
+
+      console.log($scope.media);
+      var src = $scope.media.source;
+      if(!src) {
+        src= $scope.media.name;
+      }
+      if($scope.media.poster) {
+        urlBase = ENV.videoEndpoint;
+        src = $scope.media.poster;
+      }
+
+      $scope.source = getUrl($scope.container, src);
+    }]
+);
 
 //This directive will display subarticle media in a consumable format
 app.directive(
   'inmedia', [
-    '$compile',
-    function ($compile) {
+    function () {
 
       return {
         restrict: 'E',
@@ -86,6 +103,23 @@ app.directive(
           media: '='
         },
         templateUrl: 'templates/directives/media.html'
+      };
+    }]
+);
+
+//This directive will display media in a preview format
+app.directive(
+  'inmediapreview', [
+    function () {
+
+      return {
+        restrict: 'E',
+        scope: {
+          media: '='
+        },
+        controller: function() {
+        },
+        templateUrl: 'templates/directives/mediaPreview.html'
       };
     }]
 );
