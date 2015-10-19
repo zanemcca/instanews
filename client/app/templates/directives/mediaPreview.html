@@ -1,20 +1,6 @@
 <!DOCTYPE html>
-<div ng-repeat="text in article.text" class="item">
-   <p>{{text}}</p>
-</div>
-<div ng-repeat="video in article.videos">
-   <div class="item">
-      <div class="item item-image">
-         <img ng-src="{{video.thumbnailURI}}">
-         <textarea type="text" style="width:100%;" ng-model="video.caption" placeholder=" Caption"></textarea>
-      </div>
-   </div>
-</div>
-<div ng-repeat="photo in article.photos">
-   <div class="item">
-      <div class="item item-image">
-         <img ng-src="{{photo.nativeURL}}">
-         <textarea type="text" style="width:100%;" ng-model="photo.caption" placeholder=" Caption"></textarea>
-      </div>
-   </div>
+<div ng-controller="imageCtrl"
+  class="item no-padding item-image">
+  <img height="auto" width:"auto" ng-src="{{source}}">
+  <textarea type="text" style="width:100%;" ng-model="media.caption" placeholder=" Caption"></textarea>
 </div>

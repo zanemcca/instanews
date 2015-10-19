@@ -66,7 +66,7 @@ correctOrientation: true
       }
 
       var options = {
-        limit: 3
+        limit: 1 
       };
 
       $cordovaCapture.captureVideo(options)
@@ -87,7 +87,14 @@ correctOrientation: true
               files.push(fileEntry);
               finished++;
               if(finished === videoData.length) { 
-                q.resolve(files);
+                if(files.length) {
+                  if(files.length > 1) {
+                    console.log('More than one video was grabbed');
+                  }
+                  q.resolve(files[0]);
+                } else {
+                  q.resolve();
+                }
               }
             },
             function(err) {
@@ -152,50 +159,6 @@ correctOrientation: true
 
       return getPicture(options);
     };
-
-    /*
-       var getPictures = function( cb) {
-       window.imagePicker.getPictures( function(res) {
-
-       var finished = 0;
-       var files = [];
-
-       var afterCopy = function(entry) {
-       files.push(entry);
-       finished++;
-       if( finished === res.length ) {
-       cb(files);
-       }
-       };
-
-       for( var i = 0; i < res.length; i++) {
-       copyFile(res[i], afterCopy);
-       }
-       }, function(err) {
-       console.log('Error: Failed to get pictures from teh gallery!: ' + JSON.stringify(err));
-       });
-       };
-
-       var capturePicture = function() {
-       var q = $q.defer();
-
-       if (!navigator.device.capture) {
-       q.resolve(null);
-       return q.promise;
-       }
-
-       navigator.camera.getPicture(function(uri) {
-       copyFile(uri, function(fileEntry) {
-       q.resolve(fileEntry);
-       });
-
-       }, function(err) {
-       q.reject(err);
-       }, options);
-
-       return q.promise;
-       };
-       */
 
     return {
       capturePicture: capturePicture,

@@ -7,9 +7,16 @@
       <button class="button button-clear icon ion-forward" ng-click="postSubarticle()"></button>
    </ion-nav-buttons>
    <ion-content>
-      <div ng-repeat="media in newArticle.data">
-         <inMediaPreview media="media"></inMediaPreview>
-      </div>
+     <div ng-repeat="upload in uploads">
+       <inProgress upload="upload"></inProgress>
+     </div>
+
+     <div ng-repeat="subarticle in subarticles"> 
+        <inMedia ng-if="subarticle._file" media="subarticle._file"></inMedia>
+        <div ng-if="subarticle.text" class="item">
+          {{subarticle.text}}
+        </div>
+     </div>
    </ion-content>
    <ion-footer-bar class="bar-dark">
       <div class="row">
