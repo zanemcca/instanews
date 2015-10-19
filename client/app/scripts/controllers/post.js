@@ -3,184 +3,191 @@
 var app = angular.module('instanews.controller.post', ['ionic', 'ngResource', 'uuid']);
 
 app.controller('PostCtrl', [
-      '$stateParams',
-      '$scope',
-      '$ionicModal',
-      '$ionicHistory',
-      'Article',
-      'Articles',
-      'Post',
-      'Platform',
-      'Maps',
-      'User',
-      'Camera',
-      function(
-        $stateParams,
-        $scope,
-        $ionicModal,
-        $ionicHistory,
-        Article,
-        Articles,
-        Post,
-        Platform,
-        Maps,
-        User,
-        Camera
-      ) {
+  '$stateParams',
+  '$scope',
+  '$ionicModal',
+  '$ionicHistory',
+  'Article',
+  'Articles',
+  'Post',
+  'Platform',
+  'Maps',
+  'User',
+  'Upload',
+  'Camera',
+  function(
+    $stateParams,
+    $scope,
+    $ionicModal,
+    $ionicHistory,
+    Article,
+    Articles,
+    Post,
+    Platform,
+    Maps,
+    User,
+    Upload,
+    Camera
+  ) {
 
-   $scope.user = User.get();
-   $scope.getMarker = Maps.getMarker;
+    $scope.user = User.get();
+    $scope.getMarker = Maps.getMarker;
+    $scope.uploads = [];
 
-   var updateUser = function() {
+    var updateUser = function() {
       $scope.user = User.get();
-   };
+    };
 
-   User.registerObserver(updateUser);
+    User.registerObserver(updateUser);
 
     //If we have an ID given then we know we are posting subarticles within an article
-    if( $stateParams.id ) {
-      $scope.article = Articles.getOne($stateParams.id);
-      $scope.newArticle = Post.saveParentId($stateParams.id);
-    }
-    else {
-     $scope.newArticle = Post.getArticle();
+    if( !$stateParams.id ) {
+      $scope.newArticle = {
+        title: ''
+      };
       //Refresh the map everytime we enter the view
       $scope.$on('$ionicView.afterEnter', function() {
         $scope.localize();
       });
     }
 
-   $scope.localize = function() {
-     var map = Maps.getPostMap();
+    $scope.localize = function() {
+      var map = Maps.getPostMap();
       if( map) {
-         Maps.localize(map, function(err, pos) {
-            if(err) {
-               console.log('Error: ' + err);
-            }
-            else {
-               Maps.setMarker(map,pos);
-            }
-         });
+        Maps.localize(map, function(err, pos) {
+          if(err) {
+            console.log('Error: ' + err);
+          }
+          else {
+            Maps.setMarker(map,pos);
+          }
+        });
       }
       else {
-         console.log('Map not valid! Cannot localize!');
+        console.log('Map not valid! Cannot localize!');
       }
-   };
+    };
 
-   $scope.data = {
+    $scope.data = {
       text: '',
-   };
+    };
 
-   $scope.goBack = function() {
+    $scope.goBack = function() {
       Platform.showSheet({
-        buttons: [
-          { text:'<b>Save</b>' }
-        ],
         destructiveText: 'Delete',
-        titleText: 'What would you like done with your unpublished content?',
+        titleText: 'Your unpublished content will be lost if you continue!',
         cancelText: 'Cancel',
         cancel:  function() {},
         buttonClicked: function() {
           $ionicHistory.goBack();
         },
         destructiveButtonClicked: function() {
-          Post.deleteArticle($scope.newArticle);
+          Post.destroy($scope.uploads);
           $ionicHistory.goBack();
         }
       });
-   };
+    };
 
-   var exit = function() {
+    var exit = function() {
       if( Post.isPosting() ) {
         Platform.showToast('We\'ll let you know when your content is uploaded');
       }
       $ionicHistory.goBack();
-   };
+    };
 
-   //Post the new article to the server and also post any subarticles that may be
-   //attached to it
-   $scope.postArticle = function() {
+    $scope.post = function () {
+      if($scope.uploads.length) {
+        if(!$stateParams.id) {
+          var marker = Maps.getMarker();
+          if(marker && $scope.newArticle.title) {
+            var position = {
+              lat: marker.getPosition().lat(),
+              lng: marker.getPosition().lng()
+            };
 
-      var marker = Maps.getMarker();
-      if(marker && $scope.newArticle.tempId) {
-         var position = {
-            lat: marker.getPosition().lat(),
-            lng: marker.getPosition().lng()
-         };
+            var article = {
+              isPrivate: false,
+              location: position,
+              title: $scope.newArticle.title
+            };
 
-         Post.savePosition(position, $scope.newArticle.tempId);
-         Post.saveTitle($scope.newArticle.title, $scope.newArticle.tempId);
-         Post.post($scope.newArticle.tempId);
-         exit();
+            Post.post($scope.uploads, article);
+            exit();
+          }
+          else {
+            console.log('Error: Cannot post article without both position and title');
+          }
+
+        } else {
+          Post.post($scope.uploads, $stateParams.id);
+          exit();
+        }
+      } else {
+        console.log('Cannot post without subarticles');
       }
-      else {
-         console.log('Error: Cannot post article without both position and subarticles');
-      }
-   };
+    };
 
-   /* Subarticle posting */
+    /* Text Posting */
 
-   //Wrapper for easy calling from view
-   $scope.postSubarticle = function() {
-      Post.post($scope.newArticle.tempId);
-      exit();
-   };
-
-   /* Text Posting */
-
-   //Modal for posting text
-   $ionicModal.fromTemplateUrl('templates/postTextModal.html', {
+    //Modal for posting text
+    $ionicModal.fromTemplateUrl('templates/postTextModal.html', {
       scope: $scope,
       animation: 'slide-in-up'
-   }).then( function (modal) {
+    }).then( function (modal) {
       $scope.postTextModal = modal;
-   });
+    });
 
-   //Clean up the temp text value and hide the modal
-   $scope.trashText = function() {
+    //Clean up the temp text value and hide the modal
+    $scope.trashText = function() {
       $scope.data.text = '';
       $scope.postTextModal.hide();
-   };
+    };
 
-   //Move the text out of the form so that it is ready to be submitted
-   $scope.saveText = function() {
-      $scope.newArticle = Post.saveText($scope.data.text, $scope.newArticle.tempId);
+    //Move the text out of the form so that it is ready to be submitted
+    $scope.saveText = function() {
+      $scope.uploads.push(Upload.text($scope.data.text));
       $scope.trashText();
-   };
+    };
 
-
-   /* Video posting */
-   //Capture video using the video camera
-   $scope.captureVideo = function() {
+    /* Video posting */
+    //Capture video using the video camera
+    $scope.captureVideo = function() {
       Camera.captureVideo()
-      .then( function(videos) {
-        $scope.newArticle = Post.saveVideos(videos, $scope.newArticle.tempId);
+      .then( function(video) {
+        if(video) {
+          $scope.uploads.push(Upload.video(video));
+        }
       }, function(err) {
-         console.log(err);
+        console.log(err);
       });
-   };
+    };
 
-   /* Photo posting */
+    /* Photo posting */
 
-   //Get a photo(s) from the gallery
-   $scope.openMediaGallery = function() {
-     Camera.openMediaGallery()
-     .then( function(media) {
-       //TODO Seperate out the video files
-       var photos = media;
-       $scope.newArticle = Post.savePhotos(photos, $scope.newArticle.tempId);
-     }, function(err) {
-         console.log(err);
-     });
-   };
+    //Get a photo(s) from the gallery
+    $scope.openMediaGallery = function() {
+      Camera.openMediaGallery()
+      .then( function(media) {
+        if(media) {
+          console.log(media);
+          //TODO Seperate out the video files
+          var photo = media;
+          $scope.uploads.push(Upload.picture(photo));
+        }
+      }, function(err) {
+        console.log(err);
+      });
+    };
 
-   //Capture a photo using the camera and store it into the new article
-   $scope.capturePicture = function() {
+    //Capture a photo using the camera and store it into the new article
+    $scope.capturePicture = function() {
       Camera.capturePicture()
       .then( function(photo) {
-        $scope.newArticle = Post.savePhotos(photo, $scope.newArticle.tempId);
+        if(photo) {
+          $scope.uploads.push(Upload.picture(photo));
+        }
       }, function(err) {
-         console.log('Error: Failed to capture a new photo: ' + JSON.stringify(err));
+        console.log('Error: Failed to capture a new photo: ' + JSON.stringify(err));
       });
-   };
-}]);
+    };
+  }]);
