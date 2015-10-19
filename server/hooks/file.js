@@ -9,25 +9,25 @@ module.exports = function(app) {
 
   File.beforeSave = function (inst, next) {
     debug('before save', inst, next);
-    console.log(inst);
-      //TODO Check if video is available on S3
-      Storage.triggerTranscoding( inst.container, inst.name, function (err, res) {
-        if(err) {
-          return next(err);
-        }
+    //TODO Check if video is available on S3
+    Storage.triggerTranscoding( inst.container, inst.name, function (err, res) {
+      if(err) {
+        return next(err);
+      }
 
-        console.log('Finished transcoding trigger!');
-        if(res) {
-          console.dir(res);
-          inst.sources = res.outputs;
-          inst.poster = res.posters[0];
-          inst.jobId = res.id;
-        } else {
-          delete inst.source;
-        }
-        delete inst.container;
+      console.log('Finished transcoding trigger!');
+      if(res) {
+        inst.sources = res.outputs;
+        inst.poster = res.posters[0];
+        inst.jobId = res.id;
+      } else {
+        delete inst.source;
+      }
+      delete inst.container;
 
-        next();
-      });
+      console.dir(inst);
+
+      next();
+    });
   };
 };
