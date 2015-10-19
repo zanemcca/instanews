@@ -1,0 +1,11 @@
+<!DOCTYPE html>
+<div ng-controller="uploadCtrl">
+  <div ng-if="upload.subarticle._file">
+    <b>{{upload.progress.loaded}} of {{upload.progress.total}}</b>
+    <inMedia media="upload.subarticle._file"></inMedia>
+  </div>
+
+  <div ng-if="upload.subarticle.text" class="item">
+    <p>{{upload.subarticle.text}}</p>
+  </div>
+</div>
