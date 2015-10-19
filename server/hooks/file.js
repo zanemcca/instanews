@@ -17,10 +17,15 @@ module.exports = function(app) {
         }
 
         console.log('Finished transcoding trigger!');
-        console.dir(res);
-        inst.sources = res.outputs;
-        inst.container = res.container;
-        inst.jobId = res.id;
+        if(res) {
+          console.dir(res);
+          inst.sources = res.outputs;
+          inst.poster = res.posters[0];
+          inst.jobId = res.id;
+        } else {
+          delete inst.source;
+        }
+        delete inst.container;
 
         next();
       });
