@@ -71,6 +71,7 @@ exports.run = function () {
 
           res = {
             outputs: ['a', 'b'],
+            posters: ['c'],
             container: 'new.container',
             id: 'id'
           };
@@ -84,7 +85,8 @@ exports.run = function () {
           Next = function(err) {
             expect(err).to.not.exist;
             expect(instance.sources).to.deep.equal(res.outputs);
-            expect(instance.container).to.equal(res.container);
+            expect(instance.container).to.not.exist;
+            expect(instance.source).to.not.exist;
             expect(instance.jobId).to.equal(res.id);
             done();
           };

@@ -39,8 +39,8 @@ module.exports = function(Storage) {
   }
 
   var containers = [{
-    Name: 'instanews.videos.in',
-    Output: 'instanews.videos',
+    Name: 'instanews-videos-in',
+    Output: 'instanews-videos',
     Params: {
       PipelineId: '1444324496785-65xn4p',
       Input: {
@@ -51,8 +51,8 @@ module.exports = function(Storage) {
         Resolution: 'auto',
         Interlaced: 'auto'
       },
-      //TODO Do a gif to use as the poster
-      Outputs: [{
+      Outputs: [
+      {
         Key: '2M',
         SegmentDuration: '5', //Seconds/segment
         Rotate: 'auto',
@@ -60,16 +60,17 @@ module.exports = function(Storage) {
         PresetId: '1351620000001-200010' 
       },
       {
-        Key: 'hd.mp4',
+        Key: 'HD.mp4',
         Rotate: 'auto',
         //iPhone4S+ (1920x1080 Mp4 High-profile AAC)
         PresetId: '1351620000001-100020' 
       },
       {
-        Key: 'sd.mp4',
+        Key: 'SD.mp4',
         Rotate: 'auto',
-        //iPhone1-3 (640x480 Mp4 baseline AAC
-        PresetId: '1351620000001-100040' 
+        ThumbnailPattern: '-SD-{count}',
+        //iPhone1-3 (640x480 Mp4 baseline AAC)
+        PresetId: '1445198308687-fnaxk5' 
       }]
       //TODO webM
     }
@@ -91,7 +92,18 @@ module.exports = function(Storage) {
     if(cntr) {
       cntr.Params.Input.Key = filename;
       for(var j in cntr.Params.Outputs) {
-        cntr.Params.Outputs[j].Key = name + '-' + cntr.Params.Outputs[j].Key;
+        var key = cntr.Params.Outputs[j].Key;
+        cntr.Params.Outputs[j].Key = name;
+        if(key.indexOf('.') !== 0) {
+          cntr.Params.Outputs[j].Key += '-';
+        }
+        cntr.Params.Outputs[j].Key += key;
+
+        var thumbnail = cntr.Params.Outputs[j].ThumbnailPattern;
+        if(thumbnail) {
+          thumbnail = name + thumbnail;
+        }
+        cntr.Params.Outputs[j].ThumbnailPattern = thumbnail;
       }
       return cntr.Params;
     }
@@ -120,7 +132,8 @@ module.exports = function(Storage) {
           var obj = {
             id: id,
             container: getOutputContainerName(containerName),
-            outputs: []
+            outputs: [],
+            posters: []
           };
 
           var outputs = res.Job.Outputs;
@@ -128,6 +141,11 @@ module.exports = function(Storage) {
             var key = outputs[i].Key;
             if(outputs[i].SegmentDuration) {
               key += '.m3u8';
+            }
+            var poster = outputs[i].ThumbnailPattern;
+            if(poster) {
+              poster = poster.replace(/{count}/, '00001.png');
+              obj.posters.push(poster);
             }
             obj.outputs.push(key);
           }
