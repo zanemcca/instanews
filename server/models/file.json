@@ -12,8 +12,7 @@
       "required": true
     },
     "name": {
-      "type": "string",
-      "required": true
+      "type": "string"
     },
     "poster": {
       "type": "string"
