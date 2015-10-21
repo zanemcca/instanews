@@ -27,7 +27,7 @@ exports.run = function () {
 
     describe('beforeSave', function() {
       var run;
-      var instance, next, Next, ne;
+      var instance, next, Next, ne, unset;
 
       beforeEach(function() {
         run = function () {
@@ -45,13 +45,14 @@ exports.run = function () {
           return Next(err);
         });
 
+        unset = function (name) {};
+
         instance = {
           type: 'video/mp4',
           name: 'video.mp4',
           container: 'videos.container',
-          __data: {
-            source: 'file://some-local-file.jpg',
-            container: 'instanews-photos-fake'
+          unsetAttribute: function (name) {
+            unset(name);
           }
         };
       });
@@ -89,11 +90,40 @@ exports.run = function () {
           Next = function(err) {
             expect(err).to.not.exist;
             expect(instance.sources).to.deep.equal(res.outputs);
-            expect(instance.__data.container).to.not.exist;
-            expect(instance.__data.source).to.not.exist;
             expect(instance.jobId).to.equal(res.id);
             done();
           };
+
+          run();
+        });
+
+        it('should call instance.unsetAttributes on "name", "source" and "container"', function(done) {
+          var callees = ['name', 'source', 'container'];
+          var called = [];
+          unset = function(name) {
+            expect(callees.indexOf(name)).to.be.above(-1);
+            expect(called.indexOf(name)).to.equal(-1);
+            called.push(name);
+            if(called.length === callees.length) {
+              done();
+            }
+          };
+
+          run();
+        });
+
+        it('should call instance.unsetAttributes on "source" and "container"', function(done) {
+          var callees = ['source', 'container'];
+          var called = [];
+          unset = function(name) {
+            expect(callees.indexOf(name)).to.be.above(-1);
+            expect(called.indexOf(name)).to.equal(-1);
+            called.push(name);
+            if(called.length === callees.length) {
+              done();
+            }
+          };
+          res = null;
 
           run();
         });
