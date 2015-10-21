@@ -231,9 +231,8 @@ module.exports = function(Storage) {
                     next(err);
                   });
                 } else {
-                  var e = new Error('Failed to find the subarticle with pending = ' + message.jobId);
-                  console.error(e.stack);
-                  return next(e);
+                  console.log('No Subarticle found with pending: ' + message.jobId);
+                  return next();
                 }
               });
 
@@ -278,9 +277,6 @@ module.exports = function(Storage) {
       description: 'Handles job completion notifications passed from the transcoder',
       accepts: [{
         arg: 'ctx', type: 'object', 'http': { source: 'context'}
-      },
-      {
-        arg: 'job', type: 'object', 'http': { source: 'body'}
       }]
     }
   );
