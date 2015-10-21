@@ -51,10 +51,6 @@ app.factory('Post', [
           sub.id = parentId;
 
           console.log(sub);
-          if(sub._file) {
-            //TODO Video
-            //TODO Picture
-          }
 
           Article.subarticles.create(sub)
           .$promise
@@ -82,7 +78,7 @@ app.factory('Post', [
     var post = function (uploads, article) {
       posting = true;
       if(uploads.length) {
-        if(article instanceof String) {
+        if(typeof article === 'string') {
           postSubarticles(uploads, article);
         } else if(isValidArticle(article)) { 
           Article.create(article)

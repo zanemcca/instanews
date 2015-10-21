@@ -82,6 +82,7 @@ app.controller('PostCtrl', [
           $ionicHistory.goBack();
         },
         destructiveButtonClicked: function() {
+          console.log('post goback button was clicked');
           Post.destroy($scope.uploads);
           $ionicHistory.goBack();
         }
@@ -170,9 +171,11 @@ app.controller('PostCtrl', [
       .then( function(media) {
         if(media) {
           console.log(media);
-          //TODO Seperate out the video files
-          var photo = media;
-          $scope.uploads.push(Upload.picture(photo));
+          if(media.type.indexOf('image') > -1) {
+            $scope.uploads.push(Upload.picture(media));
+          } else if (media.type.indexOf('video') > -1) {
+            $scope.uploads.push(Upload.video(media));
+          }
         }
       }, function(err) {
         console.log(err);
