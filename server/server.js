@@ -50,15 +50,15 @@ app.brute =  new ExpressBrute(store);
 app.debug = require('./logging.js').debug;
 
 if( process.env.NODE_ENV === 'production') {
-  var loggerFmt = '{ method: :method,' +
+  var loggerFmt = 'method: :method,' +
     'url: :url,' +
     'status: :status,' +
     'responseTime :response-time ms,'+
     'length: :res[content-length],' +
     'remoteAddr: :remote-addr,' +
     'referrer: :referrer,' +
-    'user-agent: :user-agent' +
-    '}';
+    'HTTP: :http-version,' +
+    'user-agent: :user-agent';
 
   app.use(loopback.logger(loggerFmt));
 } else {
