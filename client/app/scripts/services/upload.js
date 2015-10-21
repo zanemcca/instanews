@@ -20,7 +20,6 @@ app.factory('Upload', [
           name: video.name,
           sources: [video.nativeURL],
           container: 'instanews-videos-in',
-          poster: video.thumbnailURI,
           size: video.size,
           type: video.type
         }
