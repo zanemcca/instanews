@@ -1,6 +1,4 @@
 
-/* jshint camelcase: false */
-
 module.exports = function(app) {
 
   var File = app.models.file;
@@ -22,12 +20,8 @@ module.exports = function(app) {
         inst.jobId = res.id;
       }
 
-      if(inst.__data.source) {
-        delete inst.__data.source;
-      }
-      if(inst.__data.container) {
-        delete inst.__data.container;
-      }
+      inst.unsetAttribute('source');
+      inst.unsetAttribute('container');
 
       console.dir(inst);
 
