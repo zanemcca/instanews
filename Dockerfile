@@ -8,7 +8,7 @@ RUN apt-get install -y curl && \
   apt-get update && \
   apt-get install -y nodejs openssl && \
   # The next part is to try and manually fix build errors relating to node-gyp
-  apt-get install -y python make g++ libkrb5-dev git
+  apt-get install -y python make g++ libkrb5-dev
 
 # Copy our source files into the new docker
 COPY . /src
@@ -16,7 +16,6 @@ COPY . /src
 # Install our dependencies
 RUN cd /src && \
   npm install --production && \
-  npm install --production "https://github.com/aws/aws-js-sns-message-validator" && \
   npm install -g grunt grunt-cli node-gyp && \
   rm server/boot/explorer.js && \
   rm -r client && \
@@ -27,6 +26,7 @@ RUN cd /src && \
 
 # Prepare for production
 ENV NODE_ENV production 
+# ** Ensure ENCRYPT_PASSWORD is set before node goes live
 
 # expose our port
 EXPOSE 3000
@@ -34,4 +34,4 @@ EXPOSE 3443
 
 # Run the application
 #CMD cd /src && grunt start 
-CMD cd /src && node server/server.js 2> stderr.log | tee stdout.log
+CMD cd /src && node server/server.js 2>&1
