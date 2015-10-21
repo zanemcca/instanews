@@ -97,6 +97,21 @@ exports.run = function () {
           run();
         });
 
+        it('should call instance.unsetAttributes on "name", "source" and "container"', function(done) {
+          var callees = ['name', 'source', 'container'];
+          var called = [];
+          unset = function(name) {
+            expect(callees.indexOf(name)).to.be.above(-1);
+            expect(called.indexOf(name)).to.equal(-1);
+            called.push(name);
+            if(called.length === callees.length) {
+              done();
+            }
+          };
+
+          run();
+        });
+
         it('should call instance.unsetAttributes on "source" and "container"', function(done) {
           var callees = ['source', 'container'];
           var called = [];
@@ -108,6 +123,7 @@ exports.run = function () {
               done();
             }
           };
+          res = null;
 
           run();
         });
