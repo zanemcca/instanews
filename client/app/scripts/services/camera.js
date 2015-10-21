@@ -31,7 +31,7 @@ app.factory('Camera', [
         console.log(fileEntry);
         fileEntry.file(function(fileObj) {
           console.log(fileObj);
-          var whitelist = ['mov', 'qt', 'mp4', 'mkv', 'avi', 'jpg', 'jpeg', 'png'];
+          var whitelist = ['mov', 'mp4', 'jpg', 'jpeg', 'png'];
           var baseType  = fileObj.name.slice(fileObj.name.lastIndexOf('.') + 1);
 
           if(whitelist.indexOf(baseType.toLowerCase()) > -1) {
@@ -111,6 +111,24 @@ app.factory('Camera', [
         return q.promise;
       };
 
+
+      var getType = function (name) {
+        var type = name.slice(name.lastIndexOf('.') + 1);
+        type = type.toLowerCase();
+
+        var map = {
+          mov: 'video/quicktime',
+          mp4: 'video/mp4',
+          jpg: 'image/jpeg',
+          jpeg: 'image/jpeg',
+          png: 'image/png'
+        };
+
+        if(map.hasOwnProperty(type)) {
+          return map[type];
+        }
+      };
+
       var getPicture = function (options) {
         /*jshint undef: false */
         var q = $q.defer();
@@ -118,12 +136,7 @@ app.factory('Camera', [
         if (Platform.isCameraPresent()) {
           navigator.camera.getPicture(function(uri) {
             copyFile(uri, function(fileEntry) {
-              //TODO It could be a video
-              fileEntry.type = 'image/jpeg';
-              if(options.encodingType === Camera.EncodingType.PNG) {
-                fileEntry.type = 'image/png';
-              }
-
+              fileEntry.type = getType(uri);
               q.resolve(fileEntry);
             }, function (err) {
               q.reject(err);
