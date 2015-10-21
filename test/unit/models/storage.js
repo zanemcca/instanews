@@ -386,11 +386,11 @@ exports.run = function () {
                 };
               });
 
-              it('should create an error if the subarticle is not found', function (done) {
+              it('should not create an error if the subarticle is not found', function (done) {
                 sub = null;
 
                 next = function (error) {
-                  expect(error).to.exist;
+                  expect(error).to.not.exist;
                   done();
                 };
 
