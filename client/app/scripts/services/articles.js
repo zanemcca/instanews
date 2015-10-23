@@ -6,10 +6,12 @@ var app = angular.module('instanews.service.articles', ['ionic', 'ngResource','n
 app.service('Articles', [
       '$filter',
       'Article',
+      'Subarticles',
       'Position',
       function(
          $filter,
          Article,
+         Subarticles,
          Position
       ){
 
@@ -20,6 +22,7 @@ app.service('Articles', [
    var defaultFilter = {
       limit: 50,
       skip: 0,
+      /*
       include: [{
          relation: 'subarticles',
          scope: {
@@ -28,6 +31,7 @@ app.service('Articles', [
          }
       }],
       rate: true,
+     */
       order: 'rating DESC'
    };
 
@@ -116,11 +120,7 @@ app.service('Articles', [
 
    // Update or add a new article
    var addOne = function(articles, article) {
-     //Set the top subarticle
-      if( article.subarticles && article.subarticles.length > 0 ) {
-        article.topSub = article.subarticles[0];
-      } //TODO articles without subarticles should be ignored
-
+      var finish = function () {
         var idx = getIndex(articles, article);
         if( idx >= 0 ) {
           if( article.modified >= articles[idx].modified ) {
@@ -131,12 +131,23 @@ app.service('Articles', [
           articles.push(article);
         }
         articles.sort(compareFunction);
-        /*
+      };
+
+     //Set the top subarticle
+      if( article.subarticles && article.subarticles.length > 0 ) {
+        article.topSub = article.subarticles[0];
+        finish();
+      } else {
+        Subarticles.loadBest(article.id, function (sub) {
+          if(sub) {
+            article.topSub = sub;
+            finish();
+          } else {
+            console.log('Warning: An Article without any subarticles has been ignored: ' + article.id);
+          }
+        });
       }
-      else {
-        console.log('Warning: An Article without any subarticles has been ignored: ' + article.id);
-      }
-     */
+
    };
 
    var get = function() {
