@@ -18,22 +18,24 @@ app.controller(
     ) {
       $scope.upload.progress = 0;
 
-      var getServer = function() {
-        var urlBase = ENV.apiEndpoint;
-        return urlBase + '/storages/' + $scope.upload.container + '/upload/';
-      };
+      if($scope.upload.subarticle._file) {
+        var getServer = function() {
+          var urlBase = ENV.apiEndpoint;
+          return urlBase + '/storages/' + $scope.upload.container + '/upload/';
+        };
 
-      FileTransfer.upload(getServer(), $scope.upload.uri, $scope.upload.options)
-      .then(function () {
+        FileTransfer.upload(getServer(), $scope.upload.uri, $scope.upload.options)
+        .then(function () {
+          $scope.upload.complete.resolve();
+        }, function (err) {
+          $scope.upload.complete.reject(err);
+          console.log(err);
+        }, function (progress) {
+          $scope.upload.progress = progress;
+        });
+      } else {
         $scope.upload.complete.resolve();
-        //TODO Change color to green or some shit
-      }, function (err) {
-        $scope.upload.complete.reject(err);
-        console.log(err);
-      }, function (progress) {
-        $scope.upload.progress = progress;
-        console.log('Progress: ' + JSON.stringify(progress));
-      });
+      }
     }]
 );
 
