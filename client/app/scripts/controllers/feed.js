@@ -48,9 +48,10 @@ app.controller('FeedCtrl', [
        first = false;
        //Hide the splash screen
         Position.boundsReady.then(function () {
-          //Hide the splash screen
           setTimeout(function () {
-            navigator.splashscreen.hide();
+            if(navigator.splashscreen) {
+              navigator.splashscreen.hide();
+            }
           }, 1000);
         });
      }
@@ -64,7 +65,7 @@ app.controller('FeedCtrl', [
       console.log('Refresh');
 
       //Reset all necessary values
-      Articles.deleteAll();
+      //Articles.deleteAll();
 
       //Load the initial articles
       Articles.load( function() {
@@ -74,9 +75,14 @@ app.controller('FeedCtrl', [
 
    // This is called when the bottom of the feed is reached
    $scope.loadMore = function() {
+     var temp = $scope.itemsAvailable;
+     $scope.itemsAvailable = function () { return false; };
       console.log('Loading more');
       Articles.load( function() {
          $scope.$broadcast('scroll.infiniteScrollComplete');
+         setTimeout(function () {
+           $scope.itemsAvailable = temp;
+         },5000);
       });
    };
 

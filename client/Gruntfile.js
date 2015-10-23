@@ -44,9 +44,9 @@ module.exports = function (grunt) {
           ENV: {
             name: 'development',
             //TODO Change this to the local machine that is producing the build
-            apiEndpoint: 'http://192.168.1.2:3000/api',
-            videoEndpoint: 'http://192.168.1.2:3000/api/storages/instanews-videos/download',
-            photoEndpoint: 'http://192.168.1.2:3000/api/storages/instanews-photos/download'
+            apiEndpoint: 'http://localhost:3000/api',
+            videoEndpoint: 'http://localhost:3000/api/storages/instanews-videos/download',
+            photoEndpoint: 'http://localhost:3000/api/storages/instanews-photos/download'
           }
         }
       },
