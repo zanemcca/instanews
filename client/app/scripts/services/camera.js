@@ -33,6 +33,7 @@ app.factory('Camera', [
           fileEntry.file(function(fileObj) {
             console.log(fileObj);
             var whitelist = ['mov', 'mp4', 'jpg', 'jpeg', 'png'];
+            var videos = ['mov', 'mp4'];
             var baseType = '';
             if(fileObj.type) {
               baseType = fileObj.type.slice(fileObj.type.lastIndexOf('/') + 1);
@@ -44,6 +45,22 @@ app.factory('Camera', [
             }
 
             if(whitelist.indexOf(baseType.toLowerCase()) > -1) {
+              var message;
+              if(videos.indexOf(baseType.toLowerCase()) > -1) {
+                if(fileObj.size > 250*1024*1024) {
+                  //100Mb video size limit
+                  message = 'Sorry but videos must be less than 250Mb';
+                }
+              } else if(fileObj.size > 5*1024*1024) {
+                //5Mb photo size limit
+                message = 'Sorry but photos must be less than 5Mb';
+              }
+
+              if(message) {
+                Platform.showToast(message);
+                return;
+              }
+
               var newName = rfc4122.v4() + '.' + baseType;
 
               window.resolveLocalFileSystemURL(Platform.getDataDir(), function(filesystem2) {
@@ -163,7 +180,8 @@ app.factory('Camera', [
         /*jshint undef: false */
         var options = {
           savePhotoToAlbum: true,
-          allowEdit: false,
+          targetWidth: 1920,
+          targetHeight: 1920,
           sourceType : Camera.PictureSourceType.CAMERA,
           encodingType: Camera.EncodingType.JPEG,
           correctOrientation: true
@@ -175,7 +193,8 @@ app.factory('Camera', [
       var openMediaGallery = function() {
         /*jshint undef: false */
         var options = {
-          allowEdit: false,
+          targetWidth: 1920,
+          targetHeight: 1920,
           sourceType : Camera.PictureSourceType.PHOTOLIBRARY,
           mediaType: Camera.MediaType.ALLMEDIA,
           correctOrientation: true
