@@ -161,6 +161,7 @@ return gradient;
 
     var updateHeatmap = function() {
       var articles = Articles.get();
+      console.log('Updating map with ' + articles.length + ' articles');
 
       var articleHeatArray = [];
 
@@ -185,11 +186,11 @@ return gradient;
         }
 
         if (Position.withinBounds(position)) {
-          console.log(rating*10);
+          console.log('Rating: ' + rating*1000);
           articleHeatArray.push({
             location: position,
             //weight: 1 - Math.exp(-rating/(2*avg))
-            weight: rating*10
+            weight: rating*1000
           });
         }
       }

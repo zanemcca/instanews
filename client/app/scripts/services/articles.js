@@ -119,7 +119,7 @@ app.service('Articles', [
   };
 
    // Update or add a new article
-   var addOne = function(articles, article) {
+   var addOne = function(articles, article, done) {
       var finish = function () {
         var idx = getIndex(articles, article);
         if( idx >= 0 ) {
@@ -131,6 +131,7 @@ app.service('Articles', [
           articles.push(article);
         }
         articles.sort(compareFunction);
+        done();
       };
 
      //Set the top subarticle
@@ -144,6 +145,7 @@ app.service('Articles', [
             finish();
           } else {
             console.log('Warning: An Article without any subarticles has been ignored: ' + article.id);
+            done();
           }
         });
       }
@@ -156,19 +158,26 @@ app.service('Articles', [
 
    // Add the given articles
    var add = function(arts) {
+     var total = arts.length;
+     var completed = 0;
+     var done = function () {
+       completed++;
+       if(completed === total) {
+        //Update our skip amount
+        filter.skip = inViewArticles.length;
+        notifyObservers();
+       }
+     };
+
       for(var i = 0; i < arts.length; i++) {
         var position = Position.posToLatLng(arts[i].location);
         if(Position.withinBounds(position)) {
-          addOne(inViewArticles, arts[i]);
+          addOne(inViewArticles, arts[i], done);
         }
         else {
-          addOne(outViewArticles, arts[i]);
+          addOne(outViewArticles, arts[i], done);
         }
       }
-      //Update our skip amount
-      filter.skip = inViewArticles.length;
-
-      notifyObservers();
    };
 
    // Deletes the local articles
