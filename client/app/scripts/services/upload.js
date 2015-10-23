@@ -81,8 +81,6 @@ app.factory('Upload', [
         complete: $q.defer()
       };
 
-      upload.complete.resolve();
-
       return upload;
     };
 

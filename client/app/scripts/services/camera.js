@@ -15,50 +15,56 @@ app.factory('Camera', [
       $q
       ) {
 
-      /*
-         var options = {
-         correctOrientation: true
-         };
-         */
 
       //Copy the file into the app directory and rename the file with a UUID
-      var copyFile = function(fileURI, cb, error) {
-        if(fileURI.indexOf('file://') !== 0) {
-          fileURI = 'file://' + fileURI;
-      }
-
-      window.resolveLocalFileSystemURL(fileURI, function(fileEntry) {
-        console.log(fileEntry);
-        fileEntry.file(function(fileObj) {
-          console.log(fileObj);
-          var whitelist = ['mov', 'mp4', 'jpg', 'jpeg', 'png'];
-          var baseType  = fileObj.name.slice(fileObj.name.lastIndexOf('.') + 1);
-
-          if(whitelist.indexOf(baseType.toLowerCase()) > -1) {
-            var newName = rfc4122.v4() + '.' + baseType;
-
-            window.resolveLocalFileSystemURL(Platform.getDataDir(), function(filesystem2) {
-              fileEntry.copyTo(filesystem2, newName, function(entry) {
-                entry.size = fileObj.size;
-                entry.lastModified = fileObj.lastModified;
-                console.log(entry);
-                cb(entry);
-              }, function(err) {
-                console.log('Error: Failed to move the file: ' + err);
-                error(err);
-              });
-            });
-          } else {
-            var e = new Error('Cannot upload content type ' + fileObj.type);
-            console.log(e);
-            error(e);
+      var copyFile = function (fileURI, cb) {
+        if(fileURI.indexOf('content://') === 0) {
+          if(fileURI.indexOf('video') === -1 && fileURI.indexOf('image') === -1) {
+            var message = 'Sorry but you can only upload videos and photos!';
+            Platform.showToast(message);
+            return;
           }
+        } else if(fileURI.indexOf('file:/') !== 0) {
+          fileURI = 'file://' + fileURI;
+        }
+
+        window.resolveLocalFileSystemURL(fileURI, function(fileEntry) {
+          console.log(fileEntry);
+          fileEntry.file(function(fileObj) {
+            console.log(fileObj);
+            var whitelist = ['mov', 'mp4', 'jpg', 'jpeg', 'png'];
+            var baseType = '';
+            if(fileObj.type) {
+              baseType = fileObj.type.slice(fileObj.type.lastIndexOf('/') + 1);
+              if(baseType === 'jpeg'){
+                baseType = 'jpg';
+              }
+            } else {
+              baseType  = fileObj.name.slice(fileObj.name.lastIndexOf('.') + 1);
+            }
+
+            if(whitelist.indexOf(baseType.toLowerCase()) > -1) {
+              var newName = rfc4122.v4() + '.' + baseType;
+
+              window.resolveLocalFileSystemURL(Platform.getDataDir(), function(filesystem2) {
+                fileEntry.copyTo(filesystem2, newName, function(entry) {
+                  entry.size = fileObj.size;
+                  entry.lastModified = fileObj.lastModified;
+                  console.log(entry);
+                  cb(entry);
+                }, function(err) {
+                  console.log('Error: Failed to move the file: ' + err);
+                });
+              });
+            } else {
+              var e = new Error('Cannot upload content type ' + baseType);
+              console.log(e);
+            }
+          });
+        }, function(err) {
+          console.log('Error: Failed to resolve filesystem URL');
+          console.log(err);
         });
-      }, function(err) {
-        console.log('Error: Failed to resolve filesystem URL');
-        console.log(err);
-        error(err);
-      });
       };
 
       var captureVideo = function() {
@@ -136,7 +142,7 @@ app.factory('Camera', [
         if (Platform.isCameraPresent()) {
           navigator.camera.getPicture(function(uri) {
             copyFile(uri, function(fileEntry) {
-              fileEntry.type = getType(uri);
+              fileEntry.type = getType(fileEntry.name);
               q.resolve(fileEntry);
             }, function (err) {
               q.reject(err);
@@ -157,7 +163,7 @@ app.factory('Camera', [
         /*jshint undef: false */
         var options = {
           savePhotoToAlbum: true,
-          allowEdit: true,
+          allowEdit: false,
           sourceType : Camera.PictureSourceType.CAMERA,
           encodingType: Camera.EncodingType.JPEG,
           correctOrientation: true
@@ -169,7 +175,7 @@ app.factory('Camera', [
       var openMediaGallery = function() {
         /*jshint undef: false */
         var options = {
-          allowEdit: true,
+          allowEdit: false,
           sourceType : Camera.PictureSourceType.PHOTOLIBRARY,
           mediaType: Camera.MediaType.ALLMEDIA,
           correctOrientation: true
@@ -183,4 +189,5 @@ app.factory('Camera', [
           openMediaGallery: openMediaGallery,
           captureVideo: captureVideo
       };
-    }]);
+    }
+]);

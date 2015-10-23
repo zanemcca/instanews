@@ -83,7 +83,7 @@ app.controller('PostCtrl', [
         },
         destructiveButtonClicked: function() {
           console.log('post goback button was clicked');
-          Post.destroy($scope.uploads);
+          Upload.destroy($scope.uploads);
           $ionicHistory.goBack();
         }
       });
@@ -93,6 +93,7 @@ app.controller('PostCtrl', [
       if( Post.isPosting() ) {
         Platform.showToast('We\'ll let you know when your content is uploaded');
       }
+
       $ionicHistory.goBack();
     };
 
