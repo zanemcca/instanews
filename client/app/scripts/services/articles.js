@@ -189,6 +189,19 @@ app.service('Articles', [
 
    // Reorganize the articles into the viewable array and the hidden array
    var reorganize = function() {
+     var total = inViewArticles.length + outViewArticles.length;
+     var completed = 0;
+     var done = function () {
+       completed++;
+       if(completed === total) {
+        //Update our skip amount
+        inViewArticles = inView;
+        outViewArticles = outView;
+        filter.skip = inViewArticles.length;
+        notifyObservers();
+       }
+     };
+
      var inView = [];
      var outView = [];
 
@@ -196,23 +209,16 @@ app.service('Articles', [
        for(var i = 0; i < arts.length; i++) {
           var position = Position.posToLatLng(arts[i].location);
           if(Position.withinBounds(position)) {
-            addOne(inView,arts[i]);
+            addOne(inView,arts[i], done);
           }
           else {
-            addOne(outView, arts[i]);
+            addOne(outView, arts[i], done);
           }
        }
      };
 
      organize(inViewArticles);
      organize(outViewArticles);
-     inViewArticles = inView;
-     outViewArticles = outView;
-
-     //Update our skip amount
-     filter.skip = inViewArticles.length;
-
-     notifyObservers();
    };
 
    var observerCallbacks = [];
