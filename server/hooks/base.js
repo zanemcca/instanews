@@ -26,7 +26,7 @@ module.exports = function(app) {
         var context = loopback.getCurrentContext();
         if(context) {
           var token = context.get('accessToken');
-          if(token.userId) {
+          if(token) {
             var click = {
               username: token.userId,
               type: ctx.options.clickType,

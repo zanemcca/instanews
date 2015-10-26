@@ -48,7 +48,9 @@ app.controller(
         }
       }
 
-      $scope.poster = getUrl($scope.media.container, $scope.media.poster);
+      if($scope.media.poster) {
+        $scope.poster = getUrl($scope.media.container, $scope.media.poster);
+      }
 
       $scope.config = {
         preload: 'none',

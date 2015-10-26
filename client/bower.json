@@ -24,6 +24,7 @@
     "videogular": "~1.2.8"
   },
   "resolutions": {
-    "angular": ">=1.4"
+    "angular": ">=1.4",
+    "angular-animate": "~1.4.1"
   }
 }

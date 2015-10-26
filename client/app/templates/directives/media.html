@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <div ng-if="media.type && media.type.indexOf('image') > -1"
-  class="item no-padding item-image"
+  class="no-padding item-image"
   ng-controller="imageCtrl">
   <img height="auto" width:"auto" ng-src="{{source}}">
 </div>
@@ -24,7 +24,7 @@
 
     <vg-overlay-play></vg-overlay-play>
     <vg-buffering></vg-buffering>
-    <vg-poster vg-url='poster'></vg-poster>
+    <vg-poster ng-if="poster" vg-url='poster'></vg-poster>
   </videogular>
 </div>
 
