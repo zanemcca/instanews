@@ -7,11 +7,13 @@ app.service('Articles', [
       '$filter',
       'Article',
       'Subarticles',
+      'Platform',
       'Position',
       function(
          $filter,
          Article,
          Subarticles,
+         Platform,
          Position
       ){
 
@@ -72,18 +74,19 @@ app.service('Articles', [
       /* TODO Take into account fringe cases where content crosses pages.
        * Only dealing with duplicates for the moment
        */
-      Article.find({filter: filter })
-      .$promise
-      .then( function (articles) {
-         if ( articles.length <= 0 ) {
-            itemsAvailable = false;
-         }
-         else {
-            //Update the global articles list
-           //TODO save the subarticle memory
-            add(articles);
-         }
-         cb();
+      Platform.ready.then( function () {
+        Article.find({filter: filter })
+        .$promise
+        .then( function (articles) {
+           if ( articles.length <= 0 ) {
+              itemsAvailable = false;
+           }
+           else {
+              //Update the global articles list
+              add(articles);
+           }
+           cb();
+        });
       });
    };
 

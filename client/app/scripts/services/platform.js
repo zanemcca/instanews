@@ -4,10 +4,12 @@ var app = angular.module('instanews.service.platform', ['ionic', 'ngCordova']);
 
 app.factory('Platform', [
   '$cordovaDevice',
+  '$cordovaDialogs',
   '$ionicActionSheet',
   '$q',
   function(
     $cordovaDevice,
+    $cordovaDialogs,
     $ionicActionSheet,
     $q
   ) {
@@ -72,6 +74,17 @@ app.factory('Platform', [
     $ionicActionSheet.show(sheet);
   };
 
+  var showAlert = function (message, title, cb) {
+    if(!cb) {
+      cb = function () {
+        console.log('Dialog was confirmed');
+      };
+    }
+
+    $cordovaDialogs.alert(message, title, 'Ok')
+    .then(cb);
+  };
+
   var getDataDir = function() {
     return cordova.file.dataDirectory;
   };
@@ -91,14 +104,32 @@ app.factory('Platform', [
    }
    else {
      ionic.Platform.ready( function( device ) {
-        ready.resolve( device);
+        /* jshint undef:false */
+        if(navigator.connection && navigator.connection.type === Connection.NONE) {
+          Platform.showAlert('Instanews is unavailable offline. Please try again later', 'Sorry', function () {
+            if(navigator.app) {
+              navigator.app.exitApp();
+            }
+          });
+        } else {
+          ready.resolve( device);
+
+          setTimeout(function () {
+            console.log('Splashscreen timeout');
+            if(navigator.splashscreen) {
+              navigator.splashscreen.hide();
+            }
+          }, 5000);
+        }
      });
    }
+
 
    return {
       getUUID: getUUID,
       getDataDir: getDataDir,
       showSheet: showSheet,
+      showAlert: showAlert,
       showToast: showToast,
       isIOS: isIOS,
       isBrowser: isBrowser,
