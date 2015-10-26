@@ -10,6 +10,7 @@ docs/
 client/platforms/
 client/engine/
 client/plugins/
+client/hooks/
 client/resources/android
 client/resources/ios
 client/www/

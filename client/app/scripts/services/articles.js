@@ -6,10 +6,14 @@ var app = angular.module('instanews.service.articles', ['ionic', 'ngResource','n
 app.service('Articles', [
       '$filter',
       'Article',
+      'Subarticles',
+      'Platform',
       'Position',
       function(
          $filter,
          Article,
+         Subarticles,
+         Platform,
          Position
       ){
 
@@ -20,6 +24,7 @@ app.service('Articles', [
    var defaultFilter = {
       limit: 50,
       skip: 0,
+      /*
       include: [{
          relation: 'subarticles',
          scope: {
@@ -28,6 +33,7 @@ app.service('Articles', [
          }
       }],
       rate: true,
+     */
       order: 'rating DESC'
    };
 
@@ -68,18 +74,19 @@ app.service('Articles', [
       /* TODO Take into account fringe cases where content crosses pages.
        * Only dealing with duplicates for the moment
        */
-      Article.find({filter: filter })
-      .$promise
-      .then( function (articles) {
-         if ( articles.length <= 0 ) {
-            itemsAvailable = false;
-         }
-         else {
-            //Update the global articles list
-           //TODO save the subarticle memory
-            add(articles);
-         }
-         cb();
+      Platform.ready.then( function () {
+        Article.find({filter: filter })
+        .$promise
+        .then( function (articles) {
+           if ( articles.length <= 0 ) {
+              itemsAvailable = false;
+           }
+           else {
+              //Update the global articles list
+              add(articles);
+           }
+           cb();
+        });
       });
    };
 
@@ -115,12 +122,8 @@ app.service('Articles', [
   };
 
    // Update or add a new article
-   var addOne = function(articles, article) {
-     //Set the top subarticle
-      if( article.subarticles && article.subarticles.length > 0 ) {
-        article.topSub = article.subarticles[0];
-      } //TODO articles without subarticles should be ignored
-
+   var addOne = function(articles, article, done) {
+      var finish = function () {
         var idx = getIndex(articles, article);
         if( idx >= 0 ) {
           if( article.modified >= articles[idx].modified ) {
@@ -131,12 +134,25 @@ app.service('Articles', [
           articles.push(article);
         }
         articles.sort(compareFunction);
-        /*
+        done();
+      };
+
+     //Set the top subarticle
+      if( article.subarticles && article.subarticles.length > 0 ) {
+        article.topSub = article.subarticles[0];
+        finish();
+      } else {
+        Subarticles.loadBest(article.id, function (sub) {
+          if(sub) {
+            article.topSub = sub;
+            finish();
+          } else {
+            console.log('Warning: An Article without any subarticles has been ignored: ' + article.id);
+            done();
+          }
+        });
       }
-      else {
-        console.log('Warning: An Article without any subarticles has been ignored: ' + article.id);
-      }
-     */
+
    };
 
    var get = function() {
@@ -145,19 +161,26 @@ app.service('Articles', [
 
    // Add the given articles
    var add = function(arts) {
+     var total = arts.length;
+     var completed = 0;
+     var done = function () {
+       completed++;
+       if(completed === total) {
+        //Update our skip amount
+        filter.skip = inViewArticles.length;
+        notifyObservers();
+       }
+     };
+
       for(var i = 0; i < arts.length; i++) {
         var position = Position.posToLatLng(arts[i].location);
         if(Position.withinBounds(position)) {
-          addOne(inViewArticles, arts[i]);
+          addOne(inViewArticles, arts[i], done);
         }
         else {
-          addOne(outViewArticles, arts[i]);
+          addOne(outViewArticles, arts[i], done);
         }
       }
-      //Update our skip amount
-      filter.skip = inViewArticles.length;
-
-      notifyObservers();
    };
 
    // Deletes the local articles
@@ -169,6 +192,19 @@ app.service('Articles', [
 
    // Reorganize the articles into the viewable array and the hidden array
    var reorganize = function() {
+     var total = inViewArticles.length + outViewArticles.length;
+     var completed = 0;
+     var done = function () {
+       completed++;
+       if(completed === total) {
+        //Update our skip amount
+        inViewArticles = inView;
+        outViewArticles = outView;
+        filter.skip = inViewArticles.length;
+        notifyObservers();
+       }
+     };
+
      var inView = [];
      var outView = [];
 
@@ -176,23 +212,16 @@ app.service('Articles', [
        for(var i = 0; i < arts.length; i++) {
           var position = Position.posToLatLng(arts[i].location);
           if(Position.withinBounds(position)) {
-            addOne(inView,arts[i]);
+            addOne(inView,arts[i], done);
           }
           else {
-            addOne(outView, arts[i]);
+            addOne(outView, arts[i], done);
           }
        }
      };
 
      organize(inViewArticles);
      organize(outViewArticles);
-     inViewArticles = inView;
-     outViewArticles = outView;
-
-     //Update our skip amount
-     filter.skip = inViewArticles.length;
-
-     notifyObservers();
    };
 
    var observerCallbacks = [];

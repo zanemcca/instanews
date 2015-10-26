@@ -27,9 +27,7 @@ app.service('User', [
   };
 
   var get = function() {
-    if( user && user.user) {
-      return user.user;
-    }
+    return user;
   };
 
   var getToken = function() {
