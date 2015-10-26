@@ -9,14 +9,13 @@ app.service('Notifications', [
       'Platform',
       'User',
       '$filter',
-      '$cordovaDialogs',
       function(
          $rootScope,
          $cordovaPush,
          Platform,
          User,
-         $filter,
-         $cordovaDialogs){
+         $filter
+         ){
 
    var notifications = [];
 
@@ -42,11 +41,7 @@ app.service('Notifications', [
       notifications.push(notification);
       notifyObservers();
 
-      $cordovaDialogs.alert(notification.message, 'instanews', 'Fuck yeah!')
-      .then( function() {
-         console.log('Notifcation is confirmed');
-      });
-
+      Platform.showAlert(notification.message, 'Notification');
    };
 
    var androidPushHandler = function(notification) {
@@ -59,10 +54,7 @@ app.service('Notifications', [
          notifications.push(notification);
          notifyObservers();
 
-         $cordovaDialogs.alert(notification.message, 'instanews', 'Fuck yeah!')
-         .then( function() {
-            console.log('Notifcation is confirmed');
-         });
+         Platform.showAlert(notification.message, 'Notification');
       }
       else {
          console.log('Un-handled notification!');

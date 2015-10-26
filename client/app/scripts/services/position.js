@@ -76,6 +76,8 @@ app.service('Position', [
 
       //Set the position
       var set = function(position) {
+        console.log('Setting position');
+        console.log(position);
         if(position && position.coords && position.coords.latitude && position.coords.longitude) {
           mPosition = position;
 
@@ -116,37 +118,39 @@ app.service('Position', [
         }
       };
 
-      // Watch the users position
-      navigator.geolocation.watchPosition(
-          set,
-          function(err) {
-            console.log('Error on position watch: ' + err);
-          },
-          {
-            enableHighAccuracy: false   //Network based location 
-        //enableHighAccuracy: true   //GPS & Network based location
-          }
-          );
-
       // If we do not have the users position within one second then look for it in 
       // memory or use central Montreal
       Platform.ready
         .then( function() {
           //If we have not filled the position by the time the platform is ready then
           //attempt to load it from storage
-          if( !mPosition || !mPosition.coords) {
-            LocalStorage.secureRead('position', function(err, res) {
-              if (err || !(res && res.coords)) {
-                //If an old location is not found and the users location cannot be determined
-                //then default to Montreal
-                res = { coords: { latitude: 45.5017 , longitude: -73.5673}};
-              }
+          // Watch the users position
+          navigator.geolocation.watchPosition(
+              set,
+              function(err) {
+                console.log('Error on position watch: ' + err);
+              },
+              {
+                enableHighAccuracy: false   //Network based location 
+            //enableHighAccuracy: true   //GPS & Network based location
+          });
 
-              if(!mPosition) {
-                set(res);
-              }
-            });
-          }
+          //If the users location is not found in one second then try and read the last known position
+          setTimeout(function () {
+            if( !mPosition || !mPosition.coords) {
+              LocalStorage.secureRead('position', function(err, res) {
+                if (err || !(res && res.coords)) {
+                  //If an old location is not found and the users location cannot be determined
+                  //then default to Montreal
+                  res = { coords: { latitude: 45.5017 , longitude: -73.5673}};
+                }
+
+                if(!mPosition) {
+                  set(res);
+                }
+              });
+            }
+          },1000);
         });
 
       return {

@@ -47,6 +47,7 @@ app.controller('FeedCtrl', [
      if(first) {
        first = false;
        //Hide the splash screen
+       //TODO Move this to a more appropriate place
         Position.boundsReady.then(function () {
           setTimeout(function () {
             if(navigator.splashscreen) {

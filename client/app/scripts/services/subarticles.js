@@ -45,6 +45,10 @@ app.service('Subarticles', [
         } else {
           cb(subs[0]);
         }
+      }, function (err) {
+        console.log('Error something with the subarticles failed');
+        console.log(err);
+        cb();
       });
    };
 
@@ -78,6 +82,10 @@ app.service('Subarticles', [
             notifyObservers();
          }
          cb();
+      }, function (err) {
+        console.log('Error something with the subarticles failed');
+        console.log(err);
+        cb();
       });
    };
 
