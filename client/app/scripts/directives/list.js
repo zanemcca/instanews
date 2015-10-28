@@ -38,7 +38,7 @@ app.directive('inListItem', [
          item: '='
       },
       controller: function() {},
-      templateUrl: 'templates/directives/list.html',
+      templateUrl: 'templates/directives/listItem.html',
       //link: function($scope,element, attributes) {
       link: function($scope) {
 

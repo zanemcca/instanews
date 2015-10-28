@@ -20,6 +20,18 @@ app.controller('FeedCtrl', [
    $scope.toggleMenu = Navigate.toggleMenu;
    $scope.scrollTop = Navigate.scrollTop;
 
+
+   $scope.scrollTopVisible = false;
+
+   $scope.onSwipeDown = function () {
+     $scope.scrollTopVisible = true;
+     setTimeout(function () {
+       $scope.$apply(function () {
+         $scope.scrollTopVisible = false;
+       });
+     }, 2000);
+   };
+
    $scope.itemsAvailable = function () { return false; };
 
    Position.boundsReady
