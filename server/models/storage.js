@@ -210,9 +210,10 @@ module.exports = function(Storage) {
               }
 
               if(!message.jobId) {
-                var err = new Error('No JobId was given in the notification message');
+                var e = new Error('No JobId was given in the notification message');
+                e.status = 400;
                 console.log(e);
-                return next(err);
+                return next(e);
               }
 
               Subarticle.findOne({
@@ -235,9 +236,9 @@ module.exports = function(Storage) {
 
                   console.log(res);
                   if(message.sources) {
-                    query.$set: {
+                    query.$set = {
                       '_file.sources': message.sources 
-                    }
+                    };
                   }
 
                   res.updateAttributes(query, function (err, res) {
@@ -271,9 +272,9 @@ module.exports = function(Storage) {
               }
               break;
               default:
-                var e = new Error('Unknown message type ' + job.Type);
-              e.status = 403;
-              next(e);
+                var er = new Error('Unknown message type ' + job.Type);
+                er.status = 403;
+                next(er);
               break;
             }
           }
