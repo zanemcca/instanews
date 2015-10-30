@@ -1,4 +1,3 @@
-
 module.exports = function(app) {
 
   var File = app.models.file;
@@ -19,6 +18,8 @@ module.exports = function(app) {
         inst.poster = res.posters[0];
         inst.jobId = res.id;
         inst.unsetAttribute('name');
+      } else {
+        inst.jobId = inst.name;
       }
 
       inst.unsetAttribute('source');

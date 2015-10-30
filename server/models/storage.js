@@ -209,6 +209,13 @@ module.exports = function(Storage) {
                 return next(err);
               }
 
+              if(!message.jobId) {
+                var e = new Error('No JobId was given in the notification message');
+                e.status = 400;
+                console.log(e);
+                return next(e);
+              }
+
               Subarticle.findOne({
                 where: {
                   pending: message.jobId
@@ -220,13 +227,21 @@ module.exports = function(Storage) {
                 }
 
                 if(res) {
-                  console.log(res);
 
-                  res.updateAttributes({
+                  var query = {
                     $unset: {
                       pending: ''
                     }
-                  }, function (err, res) {
+                  };
+
+                  console.log(res);
+                  if(message.sources) {
+                    query.$set = {
+                      '_file.sources': message.sources 
+                    };
+                  }
+
+                  res.updateAttributes(query, function (err, res) {
                     console.log('Transcoding Job ' + message.jobId + ' has finished!');
                     next(err);
                   });
@@ -257,9 +272,9 @@ module.exports = function(Storage) {
               }
               break;
               default:
-                var e = new Error('Unknown message type ' + job.Type);
-              e.status = 403;
-              next(e);
+                var er = new Error('Unknown message type ' + job.Type);
+                er.status = 403;
+                next(er);
               break;
             }
           }
