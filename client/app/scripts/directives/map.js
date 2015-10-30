@@ -53,6 +53,9 @@ app.directive('inmap', [
                 Position.setBounds(map.getBounds());
               }, 100));
 
+              //TODO Use this to create teh localization button on the map
+              //map.controls[google.maps.ControlPosition.TOP_CENTER].push(TEMPLATE);
+
               Maps.setFeedMap(map);
             }
 
