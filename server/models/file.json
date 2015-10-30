@@ -7,10 +7,6 @@
       "type": "string",
       "required": true
     },
-    "size": {
-      "type": "number",
-      "required": true
-    },
     "name": {
       "type": "string"
     },

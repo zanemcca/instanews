@@ -116,6 +116,7 @@ module.exports = function(Storage) {
     }
   };
 
+  //TODO Trigger imageTranscoding as well
   Storage.triggerTranscoding = function (containerName, file, cb) {
     var params = getTranscoderParams(containerName, file);
 
