@@ -1,4 +1,3 @@
-
 module.exports = function(app) {
 
   var File = app.models.file;

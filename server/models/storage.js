@@ -209,6 +209,12 @@ module.exports = function(Storage) {
                 return next(err);
               }
 
+              if(!message.jobId) {
+                var err = new Error('No JobId was given in the notification message');
+                console.log(e);
+                return next(err);
+              }
+
               Subarticle.findOne({
                 where: {
                   pending: message.jobId
@@ -220,13 +226,21 @@ module.exports = function(Storage) {
                 }
 
                 if(res) {
-                  console.log(res);
 
-                  res.updateAttributes({
+                  var query = {
                     $unset: {
                       pending: ''
                     }
-                  }, function (err, res) {
+                  };
+
+                  console.log(res);
+                  if(message.sources) {
+                    query.$set: {
+                      '_file.sources': message.sources 
+                    }
+                  }
+
+                  res.updateAttributes(query, function (err, res) {
                     console.log('Transcoding Job ' + message.jobId + ' has finished!');
                     next(err);
                   });
