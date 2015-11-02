@@ -3,7 +3,6 @@ var common = require('./common');
 var cred = require('../conf/credentials');
 var aws = require('aws-sdk');
 var MessageValidator = require('sns-validator');
-var lambda = new aws.Lambda({apiVersion: '2015-03-31'});
 
 /* jshint camelcase: false */
 
@@ -23,10 +22,19 @@ module.exports = function(Storage) {
 
   var validator = new MessageValidator();
 
-  var transcoder;
+  var transcoder,
+    lambda;
+
   var credentials = cred.get('aws');
   if(credentials) {
     transcoder = new aws.ElasticTranscoder({
+      region: 'us-east-1',
+      accessKeyId: credentials.keyId,
+      secretAccessKey: credentials.key
+    });
+
+    lambda = new aws.Lambda({
+      apiVersion: '2015-03-31',
       region: 'us-east-1',
       accessKeyId: credentials.keyId,
       secretAccessKey: credentials.key
