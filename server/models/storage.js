@@ -3,6 +3,7 @@ var common = require('./common');
 var cred = require('../conf/credentials');
 var aws = require('aws-sdk');
 var MessageValidator = require('sns-validator');
+var lambda = new aws.Lambda({apiVersion: '2015-03-31'});
 
 /* jshint camelcase: false */
 
@@ -37,9 +38,10 @@ module.exports = function(Storage) {
       secretAccessKey: credentials.key
     });
   }
-
+ 
   var containers = [{
     Name: 'instanews-videos-in',
+    Type: 'video',
     Output: 'instanews-videos',
     Params: {
       PipelineId: '1444324496785-65xn4p',
@@ -74,6 +76,13 @@ module.exports = function(Storage) {
       }]
       //TODO webM
     }
+  },
+  {
+    Name: 'instanews-photos-in',
+    Type: 'photo',
+    Params: {
+      FunctionName: 'imageTranscoder'
+    }
   }];
 
   var getContainer = function (name) {
@@ -90,22 +99,30 @@ module.exports = function(Storage) {
     var name = filename.slice(0, filename.lastIndexOf('.'));
 
     if(cntr) {
-      cntr.Params.Input.Key = filename;
-      for(var j in cntr.Params.Outputs) {
-        var key = cntr.Params.Outputs[j].Key;
-        cntr.Params.Outputs[j].Key = name;
-        if(key.indexOf('.') !== 0) {
-          cntr.Params.Outputs[j].Key += '-';
-        }
-        cntr.Params.Outputs[j].Key += key;
+      if(cntr.Type === 'video') {
+        cntr.Params.Input.Key = filename;
+        for(var j in cntr.Params.Outputs) {
+          var key = cntr.Params.Outputs[j].Key;
+          cntr.Params.Outputs[j].Key = name;
+          if(key.indexOf('.') !== 0) {
+            cntr.Params.Outputs[j].Key += '-';
+          }
+          cntr.Params.Outputs[j].Key += key;
 
-        var thumbnail = cntr.Params.Outputs[j].ThumbnailPattern;
-        if(thumbnail) {
-          thumbnail = name + thumbnail;
+          var thumbnail = cntr.Params.Outputs[j].ThumbnailPattern;
+          if(thumbnail) {
+            thumbnail = name + thumbnail;
+          }
+          cntr.Params.Outputs[j].ThumbnailPattern = thumbnail;
         }
-        cntr.Params.Outputs[j].ThumbnailPattern = thumbnail;
+        return cntr.Params;
+      } else if(cntr.Type === 'photo') {
+        cntr.Params.Payload = filename;
+        return cntr.Params;
+      } else {
+        console.log('Unknown container type!');
+        console.dir(cntr);
       }
-      return cntr.Params;
     }
   };
 
@@ -116,46 +133,70 @@ module.exports = function(Storage) {
     }
   };
 
-  //TODO Trigger imageTranscoding as well
+  var getContainerType = function (name) {
+    var cntr = getContainer(name);
+    if(cntr) {
+      return cntr.Type;
+    }
+  };
+
   Storage.triggerTranscoding = function (containerName, file, cb) {
     var params = getTranscoderParams(containerName, file);
+    var type = getContainerType(containerName);
 
     if(params) {
-      if(transcoder) {
-        transcoder.createJob(params, function (err, res) {
-          if(err) {
-            console.error('Failed to create transcoding job');
-            console.error(err.stack);
-            return cb(err);
-          } 
+      if(type === 'video') {
+          if( transcoder) {
+            transcoder.createJob(params, function (err, res) {
+              if(err) {
+                console.error('Failed to create transcoding job');
+                console.error(err.stack);
+                return cb(err);
+              } 
 
-          var id = res.Job.Id;
-          var obj = {
-            id: id,
-            container: getOutputContainerName(containerName),
-            outputs: [],
-            posters: []
-          };
+              var id = res.Job.Id;
+              var obj = {
+                id: id,
+                container: getOutputContainerName(containerName),
+                outputs: [],
+                posters: []
+              };
 
-          var outputs = res.Job.Outputs;
-          for(var i in outputs) {
-            var key = outputs[i].Key;
-            if(outputs[i].SegmentDuration) {
-              key += '.m3u8';
-            }
-            var poster = outputs[i].ThumbnailPattern;
-            if(poster) {
-              poster = poster.replace(/{count}/, '00001.png');
-              obj.posters.push(poster);
-            }
-            obj.outputs.push(key);
+              var outputs = res.Job.Outputs;
+              for(var i in outputs) {
+                var key = outputs[i].Key;
+                if(outputs[i].SegmentDuration) {
+                  key += '.m3u8';
+                }
+                var poster = outputs[i].ThumbnailPattern;
+                if(poster) {
+                  poster = poster.replace(/{count}/, '00001.png');
+                  obj.posters.push(poster);
+                }
+                obj.outputs.push(key);
+              }
+
+              console.log('Transcoding Job ' + id + ' has started!');
+              cb(null, obj);
+            });
+        } else {
+          console.warn('No transcoder established!');
+          cb();
+        }
+      } else if(type === 'photo') {
+        lambda.invoke(params, function(err, data) {
+          if (err) {
+            console.error('imageTranscoding failed!');
+            console.error(err.stack); // an error occurred
+            cb(err);
+          } else {
+            console.log('imageTranscoding of ' + file + ' has started succeffully');
+            console.dir(data);           // successful response
+            cb();
           }
-
-          console.log('Transcoding Job ' + id + ' has started!');
-          cb(null, obj);
         });
       } else {
-        console.warn('No transcoder established!');
+        console.warn('Unkown type of container');
         cb();
       }
     } else {
