@@ -324,7 +324,10 @@ exports.run = function () {
             beforeEach(function () {
               job = {
                 Type: 'Notification',
-                Message: '{ "jobId": "id" }' 
+                Message: JSON.stringify({
+                  jobId: 'id',
+                  sources: [0 ,1 ,2]
+                }) 
               };
 
             });
@@ -334,6 +337,19 @@ exports.run = function () {
 
               next = function (error) {
                 expect(error).to.exist;
+                done();
+              };
+
+              run();
+            });
+
+            it('should return a 400 error because the message did not include a jobId', function (done) {
+              job.Message = JSON.stringify({ name: 'dfddd' });
+
+              next = function (error) {
+                console.log(error);
+                expect(error).to.exist;
+                expect(error.status).to.equal(400);
                 done();
               };
 
@@ -404,6 +420,9 @@ exports.run = function () {
                   expect(attr).to.deep.equal({
                     $unset: {
                       pending: ''
+                    },
+                    $set: {
+                      '_file.sources': [0,1,2]
                     }
                   });
                   cb(err);
@@ -420,18 +439,18 @@ exports.run = function () {
           });
 
           it('Should create a 403 error if the notification type is unknown', function (done) {
-              job = {
-                Type: 'NOT A TYPE'
-              };
+            job = {
+              Type: 'NOT A TYPE'
+            };
 
-              next = function (error) {
-                expect(error).to.exist;
-                expect(error.status).to.equal(403);
-                done();
-              };
+            next = function (error) {
+              expect(error).to.exist;
+              expect(error.status).to.equal(403);
+              done();
+            };
 
-              run();
-            });
+            run();
+          });
         });
       });
     });
