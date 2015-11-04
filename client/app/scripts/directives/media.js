@@ -20,13 +20,14 @@ app.controller(
     function ($scope, $sce, ENV, Platform) {
 
       var getUrl = function(container, fileName) {
+        var url = '';
         if(fileName.indexOf('file://') === 0) {
-          return fileName;
+          url = fileName;
         } else {
-          var url = ENV.videoEndpoint;
+          url = ENV.videoEndpoint;
           url += '/' + fileName;
-          return url;
         }
+        return url;
       };
 
       console.log($scope.media);
@@ -36,13 +37,13 @@ app.controller(
         if(src.indexOf('.m3u8') > -1) {
           if(Platform.isIOS()) {
             $scope.sources.push({
-              src: getUrl($scope.media.container, src),
+              src: $sce.trustAsResourceUrl(getUrl($scope.media.container, src)),
               type: 'application/vnd.apple.mpegURL'
             });
           }
         } else {
           $scope.sources.push({
-            src: getUrl($scope.media.container, src),
+            src: $sce.trustAsResourceUrl(getUrl($scope.media.container, src)),
             type: 'video/mp4'
           });
         }
