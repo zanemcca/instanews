@@ -89,7 +89,9 @@ module.exports = function(Storage) {
     Name: 'instanews-photos-in',
     Type: 'photo',
     Params: {
-      FunctionName: 'imageTranscoder'
+      FunctionName: 'imageTranscoder',
+      Payload: '{}',
+      InvocationType: 'Event'
     }
   }];
 
@@ -125,7 +127,11 @@ module.exports = function(Storage) {
         }
         return cntr.Params;
       } else if(cntr.Type === 'photo') {
-        cntr.Params.Payload = filename;
+        cntr.Params.Payload = JSON.stringify({
+          name: filename,
+          container: containerName
+        });
+        console.dir(cntr.Params);
         return cntr.Params;
       } else {
         console.log('Unknown container type!');
