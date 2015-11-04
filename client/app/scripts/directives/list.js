@@ -5,10 +5,12 @@ var app = angular.module('instanews.directive.list', ['ionic']);
 app.directive('inListItem', [
   '$timeout',
   'Position',
+  'User',
   'View',
   function (
     $timeout,
     Position,
+    User,
     View
   ) {
 
@@ -35,10 +37,10 @@ app.directive('inListItem', [
     return {
       restrict: 'E',
       scope: {
-         item: '='
+        item: '='
       },
       controller: function() {},
-      templateUrl: 'templates/directives/list.html',
+      templateUrl: 'templates/directives/listItem.html',
       //link: function($scope,element, attributes) {
       link: function($scope) {
 
@@ -50,8 +52,8 @@ app.directive('inListItem', [
           age /= 60;
           unit = 'minutes';
           if(age > 60) {
-              age /= 60;
-              unit = 'hours';
+            age /= 60;
+            unit = 'hours';
             if(age > 24) {
               age /= 24;
               unit = 'days';
@@ -74,43 +76,45 @@ app.directive('inListItem', [
 
         $scope.getItemTemplate = getItemTemplate;
 
-        var position = Position.getPosition();
+        if(User.get()) {
+          var position = Position.getPosition();
 
-        var view = {
-          viewableId: $scope.item.id,
-          viewableType: $scope.item.modelName
-        };
-
-        if(position.coords) {
-          view.location = {
-             lat: position.coords.latitude,
-             lng: position.coords.longitude
+          var view = {
+            viewableId: $scope.item.id,
+            viewableType: $scope.item.modelName
           };
-        }
-        else {
-          console.log('Warning: Invalid location for view');
-        }
 
-        View.create(view).$promise
-        .then(function() {
-          console.log('View created: ' + $scope.item.id);
-        }, function(err) {
-          console.log('Error: Failed to create a view');
-          console.log(err);
-        });
+          if(position.coords) {
+            view.location = {
+              lat: position.coords.latitude,
+              lng: position.coords.longitude
+            };
+          }
+          else {
+            console.log('Warning: Invalid location for view');
+          }
+
+          View.create(view).$promise
+          .then(function() {
+            console.log('View created: ' + $scope.item.id);
+          }, function(err) {
+            console.log('Error: Failed to create a view');
+            console.log(err);
+          });
+        }
 
         /*
-        var onRelease = function() {
-          $scope.position = $ionicScrollDelegate.getScrollPosition().top;
-          console.log('Position: ' + $scope.position);
-        };
+           var onRelease = function() {
+           $scope.position = $ionicScrollDelegate.getScrollPosition().top;
+           console.log('Position: ' + $scope.position);
+           };
 
-        $timeout(function() {
-          console.log('Height: ' + element[0].offsetHeight);
-        }, false);
+           $timeout(function() {
+           console.log('Height: ' + element[0].offsetHeight);
+           }, false);
 
-        $ionicGesture.on('on-release', onRelease, element, options);
-       */
+           $ionicGesture.on('on-release', onRelease, element, options);
+           */
       }
     };
-}]);
+  }]);

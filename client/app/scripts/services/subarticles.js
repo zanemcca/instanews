@@ -12,13 +12,45 @@ app.service('Subarticles', [
    var filter = {
       limit: 50,
       skip: 0,
-      rate: true,
+      where: {
+        pending: {
+         exists: false
+        } 
+      },
       order: 'rating DESC'
    };
 
    var subarticles = [];
    var itemsAvailable = true;
    var observers = [];
+
+   var loadBest = function(id, cb) {
+      Article.subarticles({
+        id: id,
+        filter: {
+          limit: 1,
+          where: {
+            pending: {
+             exists: false
+            } 
+          },
+          order: 'rating DESC'
+        }
+      })
+      .$promise
+      .then( function (subs) {
+        if(subs.length < 1) {
+          console.log('No subarticles found for ' + id);
+          cb();
+        } else {
+          cb(subs[0]);
+        }
+      }, function (err) {
+        console.log('Error something with the subarticles failed');
+        console.log(err);
+        cb();
+      });
+   };
 
    var load = function(id, cb) {
       Article.subarticles({id: id, filter: filter })
@@ -50,6 +82,10 @@ app.service('Subarticles', [
             notifyObservers();
          }
          cb();
+      }, function (err) {
+        console.log('Error something with the subarticles failed');
+        console.log(err);
+        cb();
       });
    };
 
@@ -91,6 +127,7 @@ app.service('Subarticles', [
    return {
      get: get,
      load: load,
+     loadBest: loadBest,
      deleteAll: deleteAll,
      registerObserver: registerObserver,
      unregisterObserver: unregisterObserver,

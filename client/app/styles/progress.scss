@@ -1,0 +1,57 @@
+progress:not([value]) {
+  height: 0px;
+  pointer-events: none;
+}
+
+progress[value] {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+
+  border: 0px !important;
+  margin: 0px !important;
+  padding: 0px !important;
+  width: 100%;
+  height: 1px;
+  pointer-events: none;
+}
+
+//Progress bar background
+progress[value]::-webkit-progress-bar {
+  background: transparent;
+  float: left;
+  position: absolute;
+  z-index: 1000;
+  pointer-events: none;
+}
+
+//Progress bar foreground
+progress[value]::-webkit-progress-value {
+  background: transparent;
+
+  float: left;
+  position: absolute;
+  z-index: 1001;
+
+  pointer-events: none;
+
+  -webkit-box-shadow: inset 0px 18px 10px -10px rgba(22,98,120,0.75);
+  -moz-box-shadow: inset 0px 18px 10px -10px rgba(22,98,120,0.75);
+  box-shadow: inset 0px 18px 10px -10px rgba(22,98,120,0.75);
+}
+
+#progressWrap {
+  position: relative;
+}
+
+/*
+progress[value]::-moz-progress-bar {
+  background-image:
+  -webkit-linear-gradient(-45deg, transparent 33%, rgba(0, 0, 0, .1) 33%, rgba(0,0, 0, .1) 66%, transparent 66%),
+  -webkit-linear-gradient(top, rgba(255, 255, 255, .25), rgba(0, 0, 0, .25)),
+  -webkit-linear-gradient(left, #09c, #f44);
+
+  border-radius: 2px; 
+  background-size: 35px 20px, 100% 100%, 100% 100%;
+}
+*/

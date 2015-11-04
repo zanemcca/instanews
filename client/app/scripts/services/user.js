@@ -12,7 +12,7 @@ app.service('User', [
     Platform
   ){
 
-  var user = {};
+  var user;
 
   var observers = [];
 
@@ -27,9 +27,7 @@ app.service('User', [
   };
 
   var get = function() {
-    if( user && user.user) {
-      return user.user;
-    }
+    return user;
   };
 
   var getToken = function() {

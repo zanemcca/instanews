@@ -8,12 +8,12 @@
 
       <ion-side-menu side="left">
          <ion-content>
-         <div class="item item-avatar" nav-clear menu-close ui-sref="app.profile({username: user.username})">
+         <div class="item item-avatar" nav-clear menu-close ui-sref="app.profile({username: user.userId})">
             <img src="images/ionic.png">
-            <div ng-if="user.username">
-               {{user.username}}
+            <div ng-if="user.userId">
+               {{user.userId}}
             </div>
-            <div ng-if="!user.username">
+            <div ng-if="!user.userId">
                Anonymous
             </div>
          </div>
@@ -35,10 +35,10 @@
          </ion-content>
          <ion-footer-bar class="bar-dark">
             <div class="row">
-               <button ng-if="!user.username" class="col button button-clear" nav-clear menu-close ng-click="login()">
+               <button ng-if="!user.userId" class="col button button-clear" nav-clear menu-close ng-click="login()">
                   Login
                </button>
-               <button ng-if="user.username" class="col button button-clear" nav-clear menu-close ng-click="logout()">
+               <button ng-if="user.userId" class="col button button-clear" nav-clear menu-close ng-click="logout()">
                   Logout
                </button>
             </div>

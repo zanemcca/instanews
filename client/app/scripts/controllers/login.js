@@ -95,6 +95,7 @@ app.controller('LoginCtrl', [
      var successLogin = function(res) {
         User.set(res);
 
+        /*
         if ($scope.cred.remember) {
 
           var device = Platform.getDevice();
@@ -108,6 +109,7 @@ app.controller('LoginCtrl', [
           console.log('Error: Cannot save user!');
           }
         }
+       */
 
         $scope.cred = {
           username: '',
@@ -146,7 +148,7 @@ app.controller('LoginCtrl', [
       }
 
       Journalist.login({
-         include: 'user',
+       //  include: 'user',
          rememberMe: $scope.cred.remember
       }, credentials,
       successLogin,
