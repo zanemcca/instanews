@@ -1,0 +1,30 @@
+
+.float-button {
+  //Positioning
+  position: absolute;
+  top: 10%;
+  margin-right: -50%;
+  left: 50%;
+  transform: translate(-50%, 0%);
+
+  // Float way above everyone
+  z-index: 2000;
+
+  //Make it a circle
+  height: 62px;
+  width:62px;
+  border: 0px;
+  border-radius: 50%;
+
+  //Make it a little transparent
+  opacity: 0.85;
+}
+
+.float-button.ng-hide-add, .float-button.ng-hide-remove {
+  @include transition(all 400ms cubic-bezier(.83,.96,.22,1.37));
+}
+
+.float-button.ng-hide {
+  opacity: 0;
+  top: 0;
+}

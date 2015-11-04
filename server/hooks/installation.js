@@ -15,12 +15,14 @@ module.exports = function(app) {
 
          Installation.find({
             where: {
-               deviceType: inst.__data.deviceType,
-               deviceToken: inst.__data.deviceToken
+               deviceType: inst.deviceType,
+               deviceToken: inst.deviceToken
             }
          }, function(err, res) {
-            if( err) console.error(err.stack);
-            else {
+            if( err) {
+              console.error(err.stack);
+              next(err);
+            } else {
                if( res.length === 1) {
 
                   res[0].modified = new Date();
@@ -31,15 +33,12 @@ module.exports = function(app) {
                      'updating it instead of creating a new one');
                      */
                   Installation.upsert(res[0], function(err, res) {
-                     if (err) next(err);
-                     else {
-                        //console.log('Installation update was successful');
+                     if (err) {
+                       next(err);
+                     } else {
+                       console.log('Installation update was successful');
+                       next();
                      }
-
-                     var error = new Error();
-                     error.message = 'Device is already installed. Updating';
-
-                     next(error);
                   });
                }
                else if (res.length > 1) {

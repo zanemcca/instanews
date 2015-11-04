@@ -3,12 +3,10 @@
 var app = angular.module('instanews.directive.comments', ['ionic', 'ngResource']);
 
 app.directive('incomments', [
-      'User',
       'Comment',
       'Subarticle',
       'Article',
       function (
-        User,
         Comment,
         Subarticle,
         Article

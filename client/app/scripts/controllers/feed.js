@@ -20,6 +20,18 @@ app.controller('FeedCtrl', [
    $scope.toggleMenu = Navigate.toggleMenu;
    $scope.scrollTop = Navigate.scrollTop;
 
+
+   $scope.scrollTopVisible = false;
+
+   $scope.onSwipeDown = function () {
+     $scope.scrollTopVisible = true;
+     setTimeout(function () {
+       $scope.$apply(function () {
+         $scope.scrollTopVisible = false;
+       });
+     }, 2000);
+   };
+
    $scope.itemsAvailable = function () { return false; };
 
    Position.boundsReady
@@ -47,10 +59,12 @@ app.controller('FeedCtrl', [
      if(first) {
        first = false;
        //Hide the splash screen
+       //TODO Move this to a more appropriate place
         Position.boundsReady.then(function () {
-          //Hide the splash screen
           setTimeout(function () {
-            navigator.splashscreen.hide();
+            if(navigator.splashscreen) {
+              navigator.splashscreen.hide();
+            }
           }, 1000);
         });
      }
@@ -64,7 +78,7 @@ app.controller('FeedCtrl', [
       console.log('Refresh');
 
       //Reset all necessary values
-      Articles.deleteAll();
+      //Articles.deleteAll();
 
       //Load the initial articles
       Articles.load( function() {
@@ -74,9 +88,14 @@ app.controller('FeedCtrl', [
 
    // This is called when the bottom of the feed is reached
    $scope.loadMore = function() {
+     var temp = $scope.itemsAvailable;
+     $scope.itemsAvailable = function () { return false; };
       console.log('Loading more');
       Articles.load( function() {
          $scope.$broadcast('scroll.infiniteScrollComplete');
+         setTimeout(function () {
+           $scope.itemsAvailable = temp;
+         },5000);
       });
    };
 

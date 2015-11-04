@@ -14,6 +14,37 @@ module.exports = function (grunt) {
   // Time how long tasks take. Can help when optimizing build times
   require('time-grunt')(grunt);
 
+  var os = require('os');
+
+  var lookupIpAddress = function () {
+    var ifaces = os.networkInterfaces();
+    var complete;
+    var check = function(details){
+      if (details.family === 'IPv4' && !complete) {
+        complete =  details.address;
+      }
+    };
+
+    for (var dev in ifaces) {
+      if(dev !== 'en1' && dev !== 'en0') {
+          continue;
+      }
+      ifaces[dev].forEach(check);
+      if(complete) {
+        return complete;
+      }
+    }
+  };
+
+  //If an IP Address is passed
+  //we're going to use the ip/host from the param
+  //passed over the command line 
+  //over the ip addressed that was looked up
+  var ipAddress = grunt.option('host') || lookupIpAddress();
+
+  var url = 'http://' + ipAddress + ':3000/api';
+  console.log('Local server: ' + url);
+
   // Define the configuration for all the tasks
   grunt.initConfig({
 
@@ -43,10 +74,9 @@ module.exports = function (grunt) {
         constants: {
           ENV: {
             name: 'development',
-            //TODO Change this to the local machine that is producing the build
-            apiEndpoint: 'http://192.168.1.2:3000/api',
-            videoEndpoint: 'http://192.168.1.2:3000/api/storages/instanews-videos/download',
-            photoEndpoint: 'http://192.168.1.2:3000/api/storages/instanews-photos/download'
+            apiEndpoint: url,
+            videoEndpoint: url + '/storages/instanews-videos/download',
+            photoEndpoint: url + '/storages/instanews-photos/download'
           }
         }
       },
@@ -525,22 +555,22 @@ module.exports = function (grunt) {
     grunt.task.run(['wiredep', 'init', 'concurrent:ionic']);
   });
   grunt.registerTask('emulate', function() {
-    grunt.config('concurrent.ionic.tasks', ['ionic:emulate:' + this.args.join(), 'watch']);
+    grunt.config('concurrent.ionic.tasks', ['ionic:emulate:' + this.args.join(':'), 'watch']);
     return grunt.task.run(['init', 'concurrent:ionic']);
   });
 
   grunt.registerTask('run', function() {
     if(this.args.indexOf('production') > -1) {
       this.args.splice(this.args.indexOf('production'),1);
-      return grunt.task.run(['newer:jshint', 'init:production', 'ionic:resources', 'ionic:run:' + this.args.join()]);
+      return grunt.task.run(['newer:jshint', 'init:production', 'ionic:resources', 'ionic:run:' + this.args.join(':')]);
     } else {
-      grunt.config('concurrent.ionic.tasks', ['ionic:run:' + this.args.join(), 'watch']);
-      return grunt.task.run(['init', 'ionic:resources', 'concurrent:ionic']);
+      grunt.config('concurrent.ionic.tasks', ['ionic:run:' + this.args.join(':')]);
+      return grunt.task.run(['init', 'ionic:resources', 'ionic:run:' + this.args.join(':')]);
     }
   });
 
   grunt.registerTask('build', function() {
-    return grunt.task.run(['init', 'ionic:resources', 'ionic:build:' + this.args.join()]);
+    return grunt.task.run(['init', 'ionic:resources', 'ionic:build:' + this.args.join(':')]);
   });
 
   grunt.registerTask('init', [

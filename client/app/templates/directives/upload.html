@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <div ng-controller="uploadCtrl">
-  <div ng-if="upload.subarticle._file">
-    <b>{{upload.progress.loaded}} of {{upload.progress.total}}</b>
+  <div ng-if="upload.subarticle._file" id="progressWrap">
+    <progress value="{{upload.progress.loaded}}" max="{{upload.progress.total}}"></progress>
     <inMedia media="upload.subarticle._file"></inMedia>
   </div>
 

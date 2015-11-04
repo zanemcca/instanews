@@ -4,10 +4,12 @@ var app = angular.module('instanews.service.platform', ['ionic', 'ngCordova']);
 
 app.factory('Platform', [
   '$cordovaDevice',
+  '$cordovaDialogs',
   '$ionicActionSheet',
   '$q',
   function(
     $cordovaDevice,
+    $cordovaDialogs,
     $ionicActionSheet,
     $q
   ) {
@@ -72,6 +74,17 @@ app.factory('Platform', [
     $ionicActionSheet.show(sheet);
   };
 
+  var showAlert = function (message, title, cb) {
+    if(!cb) {
+      cb = function () {
+        console.log('Dialog was confirmed');
+      };
+    }
+
+    $cordovaDialogs.alert(message, title, 'Ok')
+    .then(cb);
+  };
+
   var getDataDir = function() {
     return cordova.file.dataDirectory;
   };
@@ -84,6 +97,50 @@ app.factory('Platform', [
     return (navigator.device && navigator.device.capture && navigator.device.capture.captureVideo);
   };
 
+  var getDeviceType = function () {
+    var height = window.innerHeight;
+    var type = 'phone';
+    if( 900 <= height ) {
+      type = 'tablet';
+    }
+    console.log('Device Type: ' + type);
+    return type;
+  };
+
+  // Screen size logic
+  var getSizeClass = function (max) {
+    var pr = window.devicePixelRatio;
+    var sizeClass;
+    switch(getDeviceType()) {
+      case 'phone':
+        sizeClass = Math.floor(pr -1);
+        break;
+      case 'tablet':
+        sizeClass = Math.floor(pr*3/2);
+        break;
+      default:
+        sizeClass = 0;
+        break;
+    }
+
+    if(max || max === 0) {
+      sizeClass = Math.min(sizeClass, max);
+    }
+    console.log('Device size class: ' + sizeClass);
+    return sizeClass;
+  };
+
+  var getSizeClassPrefix = function (max) {
+    var sizes = ['XS','S','M','L'];
+    if(max) {
+      max = Math.min(sizes.length -1, max);
+    } else {
+      max = 0;
+    }
+
+    return sizes[getSizeClass(max)];
+  };
+
    /* Initialization */
    if(isBrowser()) {
      console.log('App is running in the browser!');
@@ -91,14 +148,32 @@ app.factory('Platform', [
    }
    else {
      ionic.Platform.ready( function( device ) {
-        ready.resolve( device);
+        /* jshint undef:false */
+        if(navigator.connection && navigator.connection.type === Connection.NONE) {
+          Platform.showAlert('Instanews is unavailable offline. Please try again later', 'Sorry', function () {
+            if(navigator.app) {
+              navigator.app.exitApp();
+            }
+          });
+        } else {
+          ready.resolve( device);
+
+          setTimeout(function () {
+            console.log('Splashscreen timeout');
+            if(navigator.splashscreen) {
+              navigator.splashscreen.hide();
+            }
+          }, 5000);
+        }
      });
    }
+
 
    return {
       getUUID: getUUID,
       getDataDir: getDataDir,
       showSheet: showSheet,
+      showAlert: showAlert,
       showToast: showToast,
       isIOS: isIOS,
       isBrowser: isBrowser,
@@ -107,6 +182,7 @@ app.factory('Platform', [
       getDevice: getDevice,
       setDevice: setDevice,
       setDeviceToken: setDeviceToken,
+      getSizeClassPrefix: getSizeClassPrefix,
       ready: ready.promise
    };
 }]);

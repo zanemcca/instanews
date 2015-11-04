@@ -539,7 +539,7 @@ exports.run = function () {
       });
 
       it('should also not create a click' , function (done) {
-        token.userId = null;
+        token = null;
         run(function(err) {
           expect(click.called).to.be.false;
           done();
