@@ -97,6 +97,50 @@ app.factory('Platform', [
     return (navigator.device && navigator.device.capture && navigator.device.capture.captureVideo);
   };
 
+  var getDeviceType = function () {
+    var height = window.innerHeight;
+    var type = 'phone';
+    if( 900 <= height ) {
+      type = 'tablet';
+    }
+    console.log('Device Type: ' + type);
+    return type;
+  };
+
+  // Screen size logic
+  var getSizeClass = function (max) {
+    var pr = window.devicePixelRatio;
+    var sizeClass;
+    switch(getDeviceType()) {
+      case 'phone':
+        sizeClass = Math.floor(pr -1);
+        break;
+      case 'tablet':
+        sizeClass = Math.floor(pr*3/2);
+        break;
+      default:
+        sizeClass = 0;
+        break;
+    }
+
+    if(max || max === 0) {
+      sizeClass = Math.min(sizeClass, max);
+    }
+    console.log('Device size class: ' + sizeClass);
+    return sizeClass;
+  };
+
+  var getSizeClassPrefix = function (max) {
+    var sizes = ['XS','S','M','L'];
+    if(max) {
+      max = Math.min(sizes.length -1, max);
+    } else {
+      max = 0;
+    }
+
+    return sizes[getSizeClass(max)];
+  };
+
    /* Initialization */
    if(isBrowser()) {
      console.log('App is running in the browser!');
@@ -138,6 +182,7 @@ app.factory('Platform', [
       getDevice: getDevice,
       setDevice: setDevice,
       setDeviceToken: setDeviceToken,
+      getSizeClassPrefix: getSizeClassPrefix,
       ready: ready.promise
    };
 }]);

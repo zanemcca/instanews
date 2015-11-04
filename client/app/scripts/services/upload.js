@@ -48,7 +48,7 @@ app.factory('Upload', [
         _file: {
           name: picture.name,
           source: picture.nativeURL,
-          container: 'instanews-photos',
+          container: 'instanews-photos-in',
           size: picture.size,
           caption: picture.caption,
           type: picture.type
@@ -56,7 +56,7 @@ app.factory('Upload', [
       };
 
       var upload = {
-        container: 'instanews-photos',
+        container: 'instanews-photos-in',
         uri: picture.nativeURL,
         options: {
           fileName: picture.name,

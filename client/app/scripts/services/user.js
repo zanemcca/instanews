@@ -12,7 +12,7 @@ app.service('User', [
     Platform
   ){
 
-  var user = {};
+  var user;
 
   var observers = [];
 
