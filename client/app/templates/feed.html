@@ -8,7 +8,7 @@
    <ion-nav-buttons side="primary">
       <button ng-click="toggleMenu()" class="button button-icon icon ion-navicon"></button>
    </ion-nav-buttons>
-   <ion-content on-swipe-down="onSwipeDown()">
+   <ion-content on-swipe-down="onSwipeDown()" overflow-scroll="true" class="gpu">
       <ion-refresher pulling-text="Fresh Stuff" on-refresh="onRefresh()">
       </ion-refresher>
       <div class="item no-padding" style="width:100%;height:38%">

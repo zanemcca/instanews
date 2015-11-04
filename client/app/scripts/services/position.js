@@ -118,22 +118,33 @@ app.service('Position', [
         }
       };
 
+      //Prefer HTML5 geolocation if available
+      var geolocation = navigator.geolocation;
+      var watchId;
+
       // If we do not have the users position within one second then look for it in 
       // memory or use central Montreal
       Platform.ready
         .then( function() {
+          if( !geolocation ) {
+            console.log('HTML5 geolocation not availble. Using cordova plugin instead.');
+            geolocation = navigator.geolocation;
+          }
+
           //If we have not filled the position by the time the platform is ready then
           //attempt to load it from storage
           // Watch the users position
-          navigator.geolocation.watchPosition(
-              set,
-              function(err) {
-                console.log('Error on position watch: ' + err);
-              },
-              {
-                enableHighAccuracy: false   //Network based location 
-            //enableHighAccuracy: true   //GPS & Network based location
-          });
+          watchId = geolocation.watchPosition(
+            set,
+            function(err) {
+              console.log('Error on position watch');
+              console.log(err);
+            },
+            {
+              //maximumAge: 5000,
+              timeout: 30000,
+              enableHighAccuracy: true   //GPS & Network based location
+            });
 
           //If the users location is not found in one second then try and read the last known position
           setTimeout(function () {
@@ -146,6 +157,7 @@ app.service('Position', [
                 }
 
                 if(!mPosition) {
+                  console.log('Using stored position');
                   set(res);
                 }
               });

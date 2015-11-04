@@ -9,8 +9,6 @@ var app = angular.module('instanews.directive.media', [
   'com.2fdevs.videogular.plugins.buffering',
   'com.2fdevs.videogular.plugins.poster'
 ]);
-
-// Video controller
 app.controller(
   'videoCtrl', [
     '$scope',
@@ -29,7 +27,6 @@ app.controller(
         }
       };
 
-      console.log($scope.media);
       $scope.sources = [];
       for(var i in $scope.media.sources) {
         var src = $scope.media.sources[i];
@@ -68,29 +65,68 @@ app.controller(
   'imageCtrl', [
     '$scope',
     'ENV',
-    function ($scope, ENV) {
+    'Platform',
+    function (
+      $scope,
+      ENV,
+      Platform
+    ) {
+
+      //TODO Come up with a more clear solution for 
+      //the quality mapping
+      var prefixs = ['XS', 'S', 'M', 'L'];
+      var done = false;
+      var max = -1;
+      for(var j in prefixs) {
+        var idx = prefixs.length - 1 - j;
+        var p = prefixs[idx];
+        for(var i in $scope.media.sources) {
+          var source = $scope.media.sources[i];
+          if(source.prefix === p) {
+            max = idx;
+            done = true;
+            break;
+          }
+        }
+        if(done) {
+          break;
+        }
+      }
+
+      var prefix = Platform.getSizeClassPrefix(max);
 
       var urlBase = ENV.photoEndpoint;
 
       var getUrl = function(container, fileName) {
-        if(fileName.indexOf('file://') === 0) {
-          return fileName;
-        } else {
-          return urlBase + '/' + fileName;
+        var url = fileName;
+        if(fileName.indexOf('file://') !== 0) {
+          url = urlBase + '/' + url;
         }
+        console.log(url);
+        return url;
       };
 
-      console.log($scope.media);
-      var src = $scope.media.source;
-      if(!src) {
-        src= $scope.media.name;
-      }
+      var src = prefix + '-' + $scope.media.name;
+      console.log(src);
+
+      // If this is a video then it will
+      // have a poster which should be used
+      // instead of other sources
       if($scope.media.poster) {
         urlBase = ENV.videoEndpoint;
         src = $scope.media.poster;
+      } else if($scope.media.source) {
+        // Local source
+        src = $scope.media.source;
       }
 
-      $scope.source = getUrl($scope.container, src);
+      if(src) {
+        $scope.source = getUrl($scope.container, src);
+      } else {
+        //TODO Create some kind of image that lets users know the photo is broken
+        console.error('There is no valid photo source given!');
+        console.log($scope.media);
+      }
     }]
 );
 

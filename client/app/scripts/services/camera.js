@@ -65,7 +65,6 @@ app.factory('Camera', [
 
               window.resolveLocalFileSystemURL(Platform.getDataDir(), function(filesystem2) {
                 fileEntry.copyTo(filesystem2, newName, function(entry) {
-                  entry.size = fileObj.size;
                   entry.lastModified = fileObj.lastModified;
                   console.log(entry);
                   cb(entry);
