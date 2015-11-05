@@ -2,17 +2,19 @@
 <ion-view view-title="Instanews"
   style="background-color: #C0C0C0">
    <ion-nav-buttons side="secondary">
-      <button class="button button-clear col icon ion-android-locate" ng-click="localize()"></button>
       <button class="button button-clear icon ion-plus-round" ui-sref="articlePost"></button>
    </ion-nav-buttons>
    <ion-nav-buttons side="primary">
-      <button ng-click="toggleMenu()" class="button button-icon icon ion-navicon"></button>
+      <button ng-click="toggleMenu()" class="button button-icon icon ion-ios-gear-outline"></button>
    </ion-nav-buttons>
    <ion-content on-swipe-down="onSwipeDown()" overflow-scroll="true" class="gpu">
-      <ion-refresher pulling-text="Fresh Stuff" on-refresh="onRefresh()">
-      </ion-refresher>
-      <div class="item no-padding" style="width:100%;height:38%">
-         <inMap>
+      <!--ion-refresher pulling-text="Fresh Stuff" on-refresh="onRefresh()">
+      </ion-refresher-->
+
+      <inAutocomplete place="place"></inAutocomplete>
+      <!-- TODO Put this all into the map directive --> 
+      <div class="item" style="width:100%;padding-bottom:100%;padding-left:0;padding-right:0;padding-top:0;position:relative;">
+         <inMap style="position: absolute;top: 0; bottom: 0, left: 0, right: 0;width:100%;height:100%;">
             <div style="width:100%;height:100%" id="feedMap"></div>
          </inMap>
       </div>

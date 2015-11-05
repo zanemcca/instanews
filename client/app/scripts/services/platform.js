@@ -168,8 +168,14 @@ app.factory('Platform', [
      });
    }
 
+   var hideKeyboard = function () {
+     if(cordova && cordova.plugins && cordova.plugins.Keyboard) {
+       cordova.plugins.Keyboard.close();
+     }
+   };
 
    return {
+      hideKeyboard: hideKeyboard,
       getUUID: getUUID,
       getDataDir: getDataDir,
       showSheet: showSheet,
