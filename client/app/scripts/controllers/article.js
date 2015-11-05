@@ -26,6 +26,10 @@ app.controller('ArticleCtrl', [
    $scope.article = Articles.getOne($stateParams.id);
    $scope.areItemsAvailable = Subarticles.areItemsAvailable;
 
+   $scope.map = {
+     id: 'articleMap'
+   };
+
    var marker;
 
    //Refresh the map everytime we enter the view
