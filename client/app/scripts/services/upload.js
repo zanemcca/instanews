@@ -78,6 +78,7 @@ app.factory('Upload', [
 
       var upload = {
         subarticle: subarticle,
+        noFile: true,
         complete: $q.defer()
       };
 

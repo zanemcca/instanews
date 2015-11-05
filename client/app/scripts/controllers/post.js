@@ -68,6 +68,46 @@ app.controller('PostCtrl', [
       }
     };
 
+    $scope.place = {
+      localize: $scope.localize
+    };
+
+     var geocoder = new google.maps.Geocoder();
+
+     $scope.$watch(function (scope) {
+       return scope.place.value;
+     }, function (newValue, oldValue) {
+       if(newValue !== oldValue) {
+
+         var centerMap = function (place) {
+           var map = Maps.getPostMap();
+           if(place.geometry.viewport) {
+             Maps.fitBounds(map, place.geometry.viewport);
+           }
+           else {
+             Maps.setCenter(map, place.geometry.location);
+           }
+
+           Maps.setMarker(map, place.geometry.location);
+         };
+
+         console.log('New place!');
+         console.log(newValue);
+
+         if(newValue.geometry) {
+           centerMap(newValue);
+         } else {
+           geocoder.geocode({'address': newValue.description}, function(results, status) {
+             if (status === google.maps.GeocoderStatus.OK) {
+               centerMap(results[0]);
+             } else {
+               console.log('Geocode was not successful for the following reason: ' + status);
+             }
+           }); 
+         }
+       }
+     });
+
     $scope.data = {
       text: '',
     };

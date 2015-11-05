@@ -16,7 +16,11 @@ app.controller(
       FileTransfer,
       ENV
     ) {
-      $scope.upload.progress = 0;
+      if($scope.upload.noFile) {
+        $scope.upload.complete.resolve();
+      } else {
+        $scope.upload.progress = {};
+      }
 
       if($scope.upload.subarticle._file) {
         var getServer = function() {
@@ -32,6 +36,7 @@ app.controller(
           console.log(err);
         }, function (progress) {
           $scope.upload.progress = progress;
+          console.log('Progress: ' + JSON.stringify(progress));
         });
       } else {
         $scope.upload.complete.resolve();
