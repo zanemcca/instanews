@@ -35,12 +35,31 @@ app.directive('inautocomplete', [
         };
 
          // Localize the map on the users position
-       $scope.localize = function() {
+       $scope.place.localize = function() {
          $scope.input.placeholder = defaultPlaceholder;
 
          var cb = $scope.place.localizeCallback;
          if($scope.place.getMap instanceof Function) {
-           Maps.localize($scope.place.getMap(), cb);
+           var map;
+           var delay = 100; //ms
+           var timeout = 5000; // 5s
+
+           var localizeMap = function (time) {
+             if(time > 0) {
+               setTimeout(function () {
+                 map = $scope.place.getMap();
+                 if(map) {
+                   Maps.localize(map, cb);
+                 } else {
+                   localizeMap(time - delay);
+                 }
+               } , delay);
+             } else {
+               console.log('No Map found in ' + timeout + ' ms');
+             }
+           };
+
+           localizeMap(timeout);
          }
          else {
            console.log('Map not valid! Cannot localize!');

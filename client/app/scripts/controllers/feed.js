@@ -44,6 +44,10 @@ app.controller('FeedCtrl', [
                getMap: Maps.getFeedMap
              };
 
+             $scope.map = {
+               id: 'feedMap'
+             };
+
              var geocoder = new google.maps.Geocoder();
 
              $scope.$watch(function (scope) {
