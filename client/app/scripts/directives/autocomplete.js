@@ -123,6 +123,10 @@ app.directive('inautocomplete', [
         });
 
         $scope.disableTap = function(){
+          if($scope.input.placeholder !== defaultPlaceholder) {
+            $scope.input.value = $scope.input.placeholder;
+          }
+
           console.log('Disabling tap');
           var container = document.getElementsByClassName('pac-container');
           // disable ionic data tab
