@@ -51,25 +51,16 @@ app.controller('PostCtrl', [
       });
     }
 
-    $scope.localize = function() {
-      var map = Maps.getPostMap();
-      if( map) {
-        Maps.localize(map, function(err, pos) {
-          if(err) {
-            console.log('Error: ' + err);
-          }
-          else {
-            Maps.setMarker(map,pos);
-          }
-        });
-      }
-      else {
-        console.log('Map not valid! Cannot localize!');
-      }
-    };
-
     $scope.place = {
-      localize: $scope.localize
+      getMap: Maps.getPostMap,
+      localizeCallback: function (err, pos) {
+        if(err) {
+          console.log('Error: ' + err);
+        }
+        else {
+          Maps.setMarker(map,pos);
+        }
+      }
     };
 
      var geocoder = new google.maps.Geocoder();

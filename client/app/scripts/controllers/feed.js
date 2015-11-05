@@ -40,19 +40,8 @@ app.controller('FeedCtrl', [
                $scope.itemsAvailable = Articles.areItemsAvailable;
              });
 
-             // Localize the map on the users position
-             $scope.localize = function() {
-               var map = Maps.getFeedMap();
-               if( map) {
-                 Maps.localize(map);
-               }
-               else {
-                 console.log('Map not valid! Cannot localize!');
-               }
-             };
-
              $scope.place = {
-               localize: $scope.localize
+               getMap: Maps.getFeedMap
              };
 
              var geocoder = new google.maps.Geocoder();
