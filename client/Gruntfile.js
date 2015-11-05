@@ -26,7 +26,7 @@ module.exports = function (grunt) {
     };
 
     for (var dev in ifaces) {
-      if(dev !== 'en1' && dev !== 'en0') {
+      if(dev !== 'en1' && dev !== 'en0' && dev !== 'eth0') {
           continue;
       }
       ifaces[dev].forEach(check);
