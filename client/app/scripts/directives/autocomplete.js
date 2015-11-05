@@ -4,7 +4,11 @@ var app = angular.module('instanews.directive.autocomplete', ['ionic', 'ngResour
 
 app.directive('inautocomplete', [
   'Platform',
-  function (Platform) {
+  'Maps',
+  function (
+    Platform,
+    Maps
+  ) {
 
     return {
       restrict: 'E',
@@ -24,9 +28,26 @@ app.directive('inautocomplete', [
           $scope.place.predictions = predictions;
         };
 
+        var defaultPlaceholder = 'Search for a location';
+
         $scope.input = {
-          placeholder: 'Search for a location'
+          placeholder: defaultPlaceholder 
         };
+
+         // Localize the map on the users position
+       $scope.localize = function() {
+         $scope.input.placeholder = defaultPlaceholder;
+
+         var cb = $scope.place.localizeCallback;
+         if($scope.place.getMap instanceof Function) {
+           Maps.localize($scope.place.getMap(), cb);
+         }
+         else {
+           console.log('Map not valid! Cannot localize!');
+         }
+       };
+
+       //TODO Onclick set value to placeholder
 
         $scope.set = function (prediction) {
           console.log(prediction);
@@ -36,18 +57,20 @@ app.directive('inautocomplete', [
         };
 
         $scope.search = function () {
-          service.getQueryPredictions({ input: $scope.input.value }, function (predictions, status) {
-            if (status !== google.maps.places.PlacesServiceStatus.OK) {
-              console.log(status);
-              return;
-            }
+          if($scope.input.value) {
+            service.getQueryPredictions({ input: $scope.input.value }, function (predictions, status) {
+              if (status !== google.maps.places.PlacesServiceStatus.OK) {
+                console.log(status);
+                return;
+              }
 
-            if(predictions.length) {
-              $scope.set(predictions[0]);
-            } else {
-              console.log('Invalid location. Please try again');
-            }
-          });
+              if(predictions.length) {
+                $scope.set(predictions[0]);
+              } else {
+                console.log('Invalid location. Please try again');
+              }
+             });
+          }
 
           Platform.hideKeyboard();
         };
