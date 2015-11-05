@@ -51,24 +51,26 @@
     "test": "grunt test"
   },
   "cordovaPlugins": [
+    "com.ionic.keyboard",
+    "com.phonegap.plugins.PushPlugin",
+    "cordova-plugin-crosswalk-webview",
+    "cordova-plugin-network-information",
+    "cordova-plugin-whitelist",
+    "cordova-plugin-x-toast",
     "org.apache.cordova.camera",
-    "org.apache.cordova.media-capture",
-    "https://github.com/phonegap-build/PushPlugin.git",
+    "org.apache.cordova.console",
     "org.apache.cordova.device",
     "org.apache.cordova.dialogs",
     "org.apache.cordova.file",
-    "cordova-plugin-x-toast",
+    "org.apache.cordova.file-transfer",
     "org.apache.cordova.geolocation",
-    "org.apache.cordova.console",
-    "com.ionic.keyboard",
-    "org.apache.cordova.splashscreen"
+    "org.apache.cordova.media-capture",
+    "org.apache.cordova.splashscreen",
+    "org.apache.cordova.statusbar"
   ],
   "cordovaPlatforms": [
-    {
-      "platform": "android",
-      "locator": "./engine/cordova-android-c0.6.1/"
-    },
-    "ios"
+    "ios",
+    "android"
   ],
   "dependencies": {
     "karma-sinon": "~1.0.4"
