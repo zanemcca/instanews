@@ -18,6 +18,7 @@ app.controller('FeedCtrl', [
 
              $scope.articles = Articles.get();
              $scope.toggleMenu = Navigate.toggleMenu;
+             /*
              $scope.scrollTop = Navigate.scrollTop;
 
              $scope.scrollTopVisible = false;
@@ -30,6 +31,7 @@ app.controller('FeedCtrl', [
                  });
                }, 2000);
              };
+             */
 
              $scope.itemsAvailable = function () { return false; };
 
@@ -68,7 +70,10 @@ app.controller('FeedCtrl', [
                    else {
                      Maps.setCenter(map, place.geometry.location);
                    }
-                   $scope.onRefresh();
+
+                   setTimeout(function () {
+                     $scope.onRefresh();
+                   }, 500);
                  };
 
                  console.log('New place!');
