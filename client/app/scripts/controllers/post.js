@@ -58,7 +58,7 @@ app.controller('PostCtrl', [
           console.log('Error: ' + err);
         }
         else {
-          Maps.setMarker(map,pos);
+          Maps.setMarker(Maps.getPostMap(), pos);
         }
       }
     };
