@@ -68,7 +68,14 @@ app.service('Articles', [
       filter.skip = 0;
 
       itemsAvailable = true;
-      load();
+
+      Platform.loading.show({
+        template: 'Loading...'
+      });
+
+      load(function () {
+        Platform.loading.hide();
+      });
    };
 
    //Load new articles from the server
@@ -85,10 +92,7 @@ app.service('Articles', [
            }
            else {
               //Update the global articles list
-              add(articles);
-           }
-           if(cb instanceof Function) {
-             cb();
+              add(articles, cb);
            }
         });
       });
@@ -149,7 +153,6 @@ app.service('Articles', [
           articles.push(article);
         }
         articles.sort(compareFunction);
-        notifyObservers();
         done();
       };
 
@@ -175,7 +178,7 @@ app.service('Articles', [
    };
 
    // Add the given articles
-   var add = function(arts) {
+   var add = function(arts, cb) {
      var total = arts.length;
      var completed = 0;
      var done = function () {
@@ -183,7 +186,11 @@ app.service('Articles', [
        if(completed === total) {
         //Update our skip amount
         filter.skip = inViewArticles.length;
-        //notifyObservers();
+        notifyObservers();
+
+        if(cb instanceof Function) {
+          cb();
+        }
        }
      };
 
