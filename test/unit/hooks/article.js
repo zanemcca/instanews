@@ -78,8 +78,16 @@ exports.run = function () {
       var Ctx, Next, Inst;
 
       beforeEach(function() {
-        Ctx = 5;
-        Next = 'A';
+        Ctx = {
+          req: {
+            query: {
+              filter: JSON.stringify({
+                limit: 50
+              })
+            }
+          }
+        };
+        Next = function () {};
         Inst = 'instance';
 
         sandbox.stub(Article, 'afterRemote', function(func, cb) {
@@ -92,11 +100,12 @@ exports.run = function () {
         });
       });
 
-      describe('should call base.createClickAfterRemote', function() {
+      describe('should call base.createClickAfterRemote and not block', function() {
         beforeEach(function() {
           sandbox.stub(app.models.base, 'createClickAfterRemote', function(ctx, next) {
             expect(ctx).to.equal(Ctx);
-            expect(next).to.equal(Next);
+            expect(next).to.not.equal(Next);
+            next();
           });
         });
 
@@ -111,6 +120,16 @@ exports.run = function () {
           run();
           expect(app.models.base.createClickAfterRemote.calledOnce).to.be.true;
         });
+      });
+
+      it('should not call base.createClickAfterRemote because there was only one subarticle requested', function () {
+        Ctx.req.query.filter = JSON.stringify({
+          limit: 1
+        });
+        sandbox.spy(app.models.base, 'createClickAfterRemote');
+        remoteMethod = 'prototype.__get__subarticles';
+        run();
+        expect(app.models.base.createClickAfterRemote.callCount).to.equal(0);
       });
     });
 

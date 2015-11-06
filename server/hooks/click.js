@@ -44,6 +44,7 @@ module.exports = function(app) {
   var preVoteChecker = function(ctx, next) {
     debug('preVoteChecker', ctx);
     var inst = ctx.instance;
+    /* istanbul ignore else */
     if(inst && ctx.isNewInstance) {
       var name = ctx.Model.modelName;
       var Model, OppositeModel;
@@ -170,10 +171,26 @@ module.exports = function(app) {
           next();
         }
         else {
-          err = new Error('The view is missing for click creation!');
-          err.status = 403;
-          console.error(err.stack);
-          next(err);
+          View.create(where, function (err, res) {
+            if(err || !res) {
+              console.warn('Warning: Failed to create a view for Type: ' +
+                           inst.clickableType + '\tTypeId: ' +
+                           inst.clickableId);
+              /* istanbul ignore if */
+              if(!err) {
+                err = new Error('No result given');
+                err.status = 403;
+              }
+
+              next(err);
+            } else {
+              console.log('View created and click about to be created');
+              inst.viewId = res.id;
+              inst.clickableType = res.viewableType;
+              inst.clickableId = res.viewableId;
+              next();
+            }
+          });
         }
       });
     }
@@ -187,6 +204,7 @@ module.exports = function(app) {
     debug('observe - before delete', ctx);
     //Delegate the count updating to the inherited model 
 
+    /* istanbul ignore next */
     if(ctx.instance) {
       var inc = {};
       if(ctx.instance.type) {

@@ -12,12 +12,20 @@ module.exports = function(app) {
 
   var debug = app.debug('hooks:article');
 
-  Article.afterRemote('prototype.__get__comments', function(ctx, instance,next){
+  Article.afterRemote('prototype.__get__comments', function(ctx, instance, next){
     ctx.options = {
       clickType: 'getComments'
     };
     debug('afterRemote prototype.__get__comments', ctx, instance, next);
-    Base.createClickAfterRemote(ctx, next);
+
+    Base.createClickAfterRemote(ctx, function (err) {
+      /* istanbul ignore next */
+      if(err) {
+        console.error(err.stack);
+      }
+    });
+
+    next();
   });
 
   Article.afterRemote('prototype.__get__subarticles', function(ctx, inst, next){
@@ -25,7 +33,24 @@ module.exports = function(app) {
       clickType: 'getSubarticles'
     };
     debug('afterRemote prototype.__get__subarticles', ctx, inst, next);
-    Base.createClickAfterRemote(ctx, next);
+
+    // Only requests for more than one subarticle count as a click
+    /* istanbul ignore else */
+    if(ctx.req.query && ctx.req.query.filter) {
+      var filter = JSON.parse(ctx.req.query.filter);
+      if(filter.limit && filter.limit < 2) {
+        return next();
+      }
+    }
+
+    Base.createClickAfterRemote(ctx, function (err) {
+      /* istanbul ignore next */
+      if(err) {
+        console.error(err.stack);
+      }
+    });
+
+    next();
   });
 
   Article.observe('after save', function(ctx, next) {
@@ -41,6 +66,7 @@ module.exports = function(app) {
         viewableType: 'article',
         viewableId: inst.id
       }, function(err, res) {
+        /* istanbul ignore else */
         if(err) {
           console.error(
             'Error: Failed to create a view for article creation');

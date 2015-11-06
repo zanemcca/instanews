@@ -188,6 +188,7 @@ lt: secsAgo
         console.error('Error: Failed to modify '+ Model.modelName);
         return cb(err);
       } else {
+        /* istanbul ignore if */
         if(!cb) {
           console.trace('Bad Callback');
         }
@@ -198,6 +199,7 @@ gt: secsAgo
 };
 */
         Model.find(query, function (err, res) {
+          /* istanbul ignore if */
           if(err) {
             console.error(err.stack);
             return cb(err);
@@ -265,6 +267,7 @@ gt: secsAgo
           // Update attributes on all reduced stat parent Models
           reducedStats.forEach( function(stat) {
             var Model;
+            /* istanbul ignore else */
             if(whitelist.indexOf(stat.parentType) > -1) {
               var mul = {};
               if(type === 'comment') {
@@ -280,6 +283,7 @@ gt: secsAgo
               Base.updateStats(stat.parentId, stat.parentType, {
                 '$mul': mul
               }, function(err) {
+                /* istanbul ignore if */
                 if(err) {
                   console.warn('Failed to update stat ' +stat.deltaRating +
                                ' on ' + stat.parentType + ' ' + stat.parentId);
