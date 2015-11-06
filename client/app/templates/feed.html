@@ -22,6 +22,7 @@
       </ul>
 
       <ion-infinite-scroll
+         immediate-check="false"
          ng-if="itemsAvailable()"
          on-infinite="loadMore()"
          distance="10%">
