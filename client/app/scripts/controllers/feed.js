@@ -33,6 +33,17 @@ app.controller('FeedCtrl', [
              };
              */
 
+            $scope.safeApply = function(fn) {
+              var phase = this.$root.$$phase;
+              if(phase === '$apply' || phase === '$digest') {
+                if(fn && (typeof(fn) === 'function')) {
+                  fn();
+                }
+              } else {
+                this.$apply(fn);
+              }
+            };
+
              $scope.itemsAvailable = function () { return false; };
 
              Position.boundsReady
@@ -124,12 +135,14 @@ app.controller('FeedCtrl', [
              $scope.loadMore = function() {
                var temp = $scope.itemsAvailable;
                $scope.itemsAvailable = function () { return false; };
-               console.log('Loading more');
+               console.log('Loading more articles');
                Articles.load( function() {
-                 $scope.$broadcast('scroll.infiniteScrollComplete');
-                 setTimeout(function () {
-                   $scope.itemsAvailable = temp;
-                 }, 5000);
+                 $scope.safeApply(function(){
+                   $scope.$broadcast('scroll.infiniteScrollComplete');
+                   setTimeout(function () {
+                     $scope.itemsAvailable = temp;
+                   }, 5000);
+                 });
                });
              };
 

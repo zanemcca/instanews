@@ -44,7 +44,6 @@ app.service('Articles', [
    };
 
    //Update the filter bounds 
-   //TODO I think we should probably be loading articles automatically when they change the map
    var updateBounds = function() {
      var bounds = Position.getBounds();
 
@@ -65,6 +64,8 @@ app.service('Articles', [
       else {
          console.log('Bounds not set yet!');
       }
+
+      filter.skip = 0;
 
       itemsAvailable = true;
       load();
@@ -110,13 +111,12 @@ app.service('Articles', [
 
    // Find the index of the article if it exists
    // on the array
-   var getIndex = function(articles, article) {
+   var getArticle = function(articles, article) {
      for( var i = 0; i < articles.length; i++) {
        if( articles[i].id === article.id ) {
-         return i;
+         return articles[i];
        }
      }
-     return -1;
    };
 
    //Compare function for sorting the articles
@@ -127,10 +127,22 @@ app.service('Articles', [
    // Update or add a new article
    var addOne = function(articles, article, done) {
       var finish = function () {
-        var idx = getIndex(articles, article);
-        if( idx >= 0 ) {
-          if( article.modified >= articles[idx].modified ) {
-            articles[idx] = article;
+        var a = getArticle(articles, article);
+        if( a ) {
+          if( article.modified >= a.modified ) {
+            a.rating = article.rating;
+            a.title = article.title;
+            a.modified = article.modified;
+            a.downVoteCount = article.downVoteCount;
+            a.upVoteCount = article.upVoteCount;
+            a.topSub = article.topSub;
+            a.upVotes = article.upVotes;
+            a.verified = article.verified;
+            a.version = article.version;
+
+            console.log('new');
+            console.log(a);
+            console.log('\n\n');
           }
         }
         else {
