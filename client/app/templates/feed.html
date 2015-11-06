@@ -20,14 +20,15 @@
           <in-list-item item="article"></in-list-item>
         </ion-item>
       </ul>
+
       <ion-infinite-scroll
          ng-if="itemsAvailable()"
          on-infinite="loadMore()"
-         distance="1%">
+         distance="10%">
       </ion-infinite-scroll>
    </ion-content>
 
-  <button class="float-button button button-dark icon ion-chevron-up"
+  <!--button class="float-button button button-dark icon ion-chevron-up"
     ng-show="scrollTopVisible" ng-click="scrollTop()">
-  </button>
+  </button-->
 </ion-view>

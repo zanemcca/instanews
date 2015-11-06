@@ -63,10 +63,6 @@ app.controller('FeedCtrl', [
                    else {
                      Maps.setCenter(map, place.geometry.location);
                    }
-
-                   setTimeout(function () {
-                     $scope.onRefresh();
-                   }, 500);
                  };
 
                  console.log('New place!');
@@ -109,6 +105,7 @@ app.controller('FeedCtrl', [
                //$scope.itemsAvailable = Articles.areItemsAvailable();
              };
 
+             /*
              // Refresh the articles completely
              $scope.onRefresh = function () {
                console.log('Refresh');
@@ -121,6 +118,7 @@ app.controller('FeedCtrl', [
                  $scope.$broadcast('scroll.refreshComplete');
                });
              };
+            */
 
              // This is called when the bottom of the feed is reached
              $scope.loadMore = function() {
@@ -131,7 +129,7 @@ app.controller('FeedCtrl', [
                  $scope.$broadcast('scroll.infiniteScrollComplete');
                  setTimeout(function () {
                    $scope.itemsAvailable = temp;
-                 },5000);
+                 }, 5000);
                });
              };
 
