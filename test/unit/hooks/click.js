@@ -205,11 +205,11 @@ exports.run = function () {
           });
 
           describe('View.findOne', function() {
-            var viewCB;
+            var viewCB, createCB;
             beforeEach(function() {
               viewCB = function(filter, cb) {
                 expect(filter).to.deep.equal({
-                  where: {
+                  where: { 
                     username: ctx.instance.username,
                     viewableId: ctx.instance.clickableId,
                     viewableType: ctx.instance.clickableType
@@ -224,6 +224,10 @@ exports.run = function () {
                 viewCB(filter, cb);
               });
 
+              sandbox.stub(app.models.view, 'create', function(mod, cb){
+                createCB(mod, cb);
+              });
+
               sandbox.stub(app.models.upVote, 'findOne', function(filter, cb) {
                 cb();
               });
@@ -232,16 +236,36 @@ exports.run = function () {
               });
             });
 
-            it('should return a  error message', function() {
-              Next = function (err) {
-                if(next.calledTwice) {
-                  expect(err.status).to.equal(403);
-                }
-              };
+            describe('View.create', function () {
+              it('should propgate the error', function() {
+                var error = 'error';
 
-              run();
+                Next = function (err) {
+                  if(next.calledTwice) {
+                    expect(err).to.equal(error);
+                  }
+                };
 
-              expect(next.calledTwice).to.be.true;
+                createCB = function(mod, cb) {
+                  console.log('error');
+                  cb(error);
+                };
+
+                run();
+                expect(next.calledTwice).to.be.true;
+              });
+
+              it.skip('should return a  error message', function() {
+                Next = function (err) {
+                  if(next.calledTwice) {
+                    expect(err.status).to.equal(403);
+                  }
+                };
+
+                run();
+
+                expect(next.calledTwice).to.be.true;
+              });
             });
 
             it('should propgate the error', function() {
