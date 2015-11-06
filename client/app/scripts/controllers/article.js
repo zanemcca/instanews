@@ -26,6 +26,10 @@ app.controller('ArticleCtrl', [
    $scope.article = Articles.getOne($stateParams.id);
    $scope.areItemsAvailable = Subarticles.areItemsAvailable;
 
+   $scope.map = {
+     id: 'articleMap'
+   };
+
    var marker;
 
    //Refresh the map everytime we enter the view
@@ -50,12 +54,17 @@ app.controller('ArticleCtrl', [
     });
   };
 
-  $scope.loadMore = function() {
-    Subarticles.load($stateParams.id, function() {
-      console.log('Loading more');
-      $scope.$broadcast('scroll.infiniteScrollComplete');
-    });
-  };
+ $scope.loadMore = function() {
+   var temp = $scope.areItemsAvailable;
+   $scope.areItemsAvailable = function () { return false; };
+   console.log('Loading more');
+   Subarticles.load($stateParams.id, function() {
+     $scope.$broadcast('scroll.infiniteScrollComplete');
+     setTimeout(function () {
+       $scope.areItemsAvailable = temp;
+     },5000);
+   });
+ };
 
    var updateSubarticles = function() {
      $scope.subarticles = Subarticles.get($stateParams.id);

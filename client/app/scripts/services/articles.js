@@ -67,6 +67,7 @@ app.service('Articles', [
       }
 
       itemsAvailable = true;
+      load();
    };
 
    //Load new articles from the server
@@ -85,7 +86,9 @@ app.service('Articles', [
               //Update the global articles list
               add(articles);
            }
-           cb();
+           if(cb instanceof Function) {
+             cb();
+           }
         });
       });
    };

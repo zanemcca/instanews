@@ -12,26 +12,23 @@
       </ion-refresher-->
 
       <inAutocomplete place="place"></inAutocomplete>
-      <!-- TODO Put this all into the map directive --> 
-      <div class="item" style="width:100%;padding-bottom:100%;padding-left:0;padding-right:0;padding-top:0;position:relative;">
-         <inMap style="position: absolute;top: 0; bottom: 0, left: 0, right: 0;width:100%;height:100%;">
-            <div style="width:100%;height:100%" id="feedMap"></div>
-         </inMap>
-      </div>
+      <inMap map="map"></inMap>
+
       <ul class="list">
         <ion-item ng-repeat="article in articles track by article.id"
           class="no-padding card">
           <in-list-item item="article"></in-list-item>
         </ion-item>
       </ul>
+
       <ion-infinite-scroll
          ng-if="itemsAvailable()"
          on-infinite="loadMore()"
-         distance="1%">
+         distance="10%">
       </ion-infinite-scroll>
    </ion-content>
 
-  <button class="float-button button button-dark icon ion-chevron-up"
+  <!--button class="float-button button button-dark icon ion-chevron-up"
     ng-show="scrollTopVisible" ng-click="scrollTop()">
-  </button>
+  </button-->
 </ion-view>

@@ -179,7 +179,7 @@ exports.run = function () {
 
       beforeEach(function() {
         Ctx = 5;
-        Next = 'A';
+        Next = function () {};
         Inst = 'instance';
 
         afterRemote =  function(func, cb) {
@@ -189,11 +189,11 @@ exports.run = function () {
         };
       });
 
-      describe('should call base.createClickAfterRemote', function() {
+      describe('should call base.createClickAfterRemote and not block', function() {
         beforeEach(function() {
           sandbox.stub(app.models.base, 'createClickAfterRemote', function(ctx, next) {
             expect(ctx).to.equal(Ctx);
-            expect(next).to.equal(Next);
+            expect(next).to.not.equal(Next);
           });
         });
 

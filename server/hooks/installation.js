@@ -9,6 +9,7 @@ module.exports = function(app) {
 
       var inst = ctx.instance;
 
+      /* istanbul ignore else */
       if( inst && ctx.isNewInstance) {
 
         inst.created = new Date();
@@ -41,6 +42,7 @@ module.exports = function(app) {
                      }
                   });
                }
+              /* istanbul ignore else */
                else if (res.length > 1) {
                   var error = new Error('Error: There should only be one installation ' +
                         'per unique device but ' +

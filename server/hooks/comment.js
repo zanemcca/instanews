@@ -11,13 +11,6 @@ module.exports = function(app) {
 
   var debug = app.debug('hooks:comment');
 
-  var report = function(err,res) {
-    if (err) console.error(err.stack);
-    else {
-      //console.log('Created a notification!');
-    }
-  };
-
   /*
      Comment.observe('before save', function(ctx, next) {
 //TODO It should make sure the comment has 
@@ -32,7 +25,13 @@ next();
       clickType: 'getComments'
     };
     debug('aterRemote __get__comments', ctx, instance, next);
-    Base.createClickAfterRemote(ctx, next);
+    Base.createClickAfterRemote(ctx, function (err) {
+      /* istanbul ignore next */
+      if(err) {
+        console.error(err.stack);
+      }
+    });
+    next();
   });
 
   Comment.observe('after save', function(ctx, next) {
@@ -63,6 +62,8 @@ next();
     }
   });
 
+
+  /* istanbul ignore next */
   Comment.observe('after save', function(ctx, next) {
     debug('ater save', ctx, next);
     //TODO Rewrite notifications
@@ -70,6 +71,13 @@ next();
 
     //List of already notified users
     var users = [];
+
+    var report = function(err,res) {
+      if (err) console.error(err.stack);
+      else {
+        //console.log('Created a notification!');
+      }
+    };
 
     var notify = function(message, id, models) {
       var username;

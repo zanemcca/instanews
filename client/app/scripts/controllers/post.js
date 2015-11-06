@@ -47,29 +47,25 @@ app.controller('PostCtrl', [
       };
       //Refresh the map everytime we enter the view
       $scope.$on('$ionicView.afterEnter', function() {
-        $scope.localize();
+        console.log('Post after enter');
+        $scope.place.localize();
       });
     }
 
-    $scope.localize = function() {
-      var map = Maps.getPostMap();
-      if( map) {
-        Maps.localize(map, function(err, pos) {
-          if(err) {
-            console.log('Error: ' + err);
-          }
-          else {
-            Maps.setMarker(map,pos);
-          }
-        });
-      }
-      else {
-        console.log('Map not valid! Cannot localize!');
-      }
+    $scope.map = {
+      id: 'postMap'
     };
 
     $scope.place = {
-      localize: $scope.localize
+      getMap: Maps.getPostMap,
+      localizeCallback: function (err, pos) {
+        if(err) {
+          console.log('Error: ' + err);
+        }
+        else {
+          Maps.setMarker(Maps.getPostMap(), pos);
+        }
+      }
     };
 
      var geocoder = new google.maps.Geocoder();

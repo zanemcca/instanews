@@ -17,13 +17,21 @@ module.exports = function(app) {
       clickType: 'getComments'
     };
     debug('afterRemote __get__comments', ctx, inst, next);
-    Base.createClickAfterRemote(ctx, next);
+    Base.createClickAfterRemote(ctx, function (err) {
+      /* istanbul ignore next */
+      if(err) {
+        console.error(err.stack);
+      }
+    });
+    next();
   });
 
    Subarticle.observe('before save', function(ctx, next) {
       debug('before save', ctx, next);
       var inst = ctx.instance;
+      /* istanbul ignore else */
       if (inst && ctx.isNewInstance) {
+        /* istanbul ignore else */
          if ( inst._file ) {
            File.beforeSave(inst._file, function (err) {
              if(err) {
@@ -113,6 +121,7 @@ module.exports = function(app) {
     }
   });
 
+  /* istanbul ignore next */
    Subarticle.observe('after save', function(ctx, next) {
     debug('after save', ctx, next);
      
