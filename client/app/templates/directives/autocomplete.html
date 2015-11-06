@@ -1,13 +1,27 @@
 <!DOCTYPE html>
 
 <form ng-submit="search()" class="list" style="margin-bottom:-1px; padding-bottom: 0;">
-  <div class="item item-input row" style="border:0px;margin:0px;">
+  <div class="item  item-input row" style="border:0px;margin:0px;">
     <div class="icon ion-search col col-10"></div>
-    <input class="col col-80" ng-focus="disableTap()" type="text" id="search-input" ng-model="input.value" placeholder="{{input.placeholder}}">
-    <button type=submit class="no-padding button-icon dark icon ion-android-locate col col-10" ng-click="place.localize()"></button>
+
+    <input ng-if="!isIOS()" class=" col col-80" ng-focus="disableTap()"
+    ng-click="click(this)" onClick="this.select();" type="text" id="search-input"
+    ng-model="input.value" placeholder="{{input.placeholder}}">
+    <input ng-if="isIOS()"
+      class=" col col-80"
+      ng-focus="disableTap()"
+      ng-click="click()"
+      onClick="this.setSelectionRange(0, this.input.value.length);"
+      type="text" id="search-input"
+      ng-model="input.value"
+      placeholder="{{input.placeholder}}">
+
+    <div class="no-padding button button-icon dark icon ion-android-locate col col-10" ng-click="place.localize()">
+    </div>
+    <input type="submit" class="button" style="position:absolute;left:-9999px;top:-9999px;height:0;width:0;"></button>
   </div>
 </form>
-<div class="list" style="height: 0; overflow:visible; z-index:100;">
+<div ng-if="!done" class="list" style="height: 0; overflow:visible; z-index:100;">
   <div ng-repeat="prediction in place.predictions">
     <div class="item" ng-click="set(prediction)">
       {{prediction.description}}

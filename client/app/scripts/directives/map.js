@@ -27,16 +27,12 @@ app.directive('inmap', [
       scope: {
         map: '='
       },
-      //link: function($scope,element, attributes) {
       link: function(
         scope,
-        elem,
-        attributes
+        elem
       ) {
 
         var element = elem[0].querySelector('#map');
-
-        var map = {};
 
         //Initialize the map
         var initializeMap = function() {
@@ -58,9 +54,10 @@ app.directive('inmap', [
           // Load the maps and check to make sure there is not already a map
           // loaded in the element before initializing
           if ( element && element.textContent.indexOf('Map') === -1) {
+            var map;
             switch(scope.map.id) {
               case 'feedMap':
-                var map = new google.maps.Map(element, mapOptions);
+                map = new google.maps.Map(element, mapOptions);
                 //Listener on bounds changing on the map
                 google.maps.event.addListener(map, 'bounds_changed', _.debounce(function() {
                   console.log('Updating bounds');
@@ -77,7 +74,7 @@ app.directive('inmap', [
                 mapOptions.mapTypeId = google.maps.MapTypeId.HYBRID;
                 //var marker;
 
-                var map = new google.maps.Map(element, mapOptions);
+                map = new google.maps.Map(element, mapOptions);
                 Maps.setPostMap(map);
 
                 google.maps.event.addListener(map, 'click', function(event) {
@@ -96,9 +93,9 @@ app.directive('inmap', [
                 else {
                   console.log('Not id given! The article map is dependent on knowing the article location!');
                 }
-                var articleMap = new google.maps.Map(element, mapOptions);
+                map = new google.maps.Map(element, mapOptions);
 
-                Maps.setArticleMap(articleMap);
+                Maps.setArticleMap(map);
 
                 break;
               default:

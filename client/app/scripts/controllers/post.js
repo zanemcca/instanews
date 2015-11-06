@@ -47,6 +47,7 @@ app.controller('PostCtrl', [
       };
       //Refresh the map everytime we enter the view
       $scope.$on('$ionicView.afterEnter', function() {
+        console.log('Post after enter');
         $scope.place.localize();
       });
     }
