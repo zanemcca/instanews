@@ -89,6 +89,9 @@ app.service('Articles', [
         .then( function (articles) {
            if ( articles.length <= 0 ) {
               itemsAvailable = false;
+              if(cb instanceof Function) {
+                cb();
+              }
            }
            else {
               //Update the global articles list
