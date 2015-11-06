@@ -22,7 +22,6 @@ module.exports = function(app) {
            ctx.req.remotingContext.instance &&
              ctx.req.remotingContext.instance.id
       ){
-        //TODO Unblock this
         var context = loopback.getCurrentContext();
         if(context) {
           var token = context.get('accessToken');
@@ -50,7 +49,7 @@ module.exports = function(app) {
         }
       }
       else {
-        var error = new Error('Invalid context for prototype.__get__comments');
+        var error = new Error('Invalid context for Base.createClickAfterRemote');
         error.status = 403;
         console.error(ctx);
         next(error);
@@ -80,10 +79,12 @@ module.exports = function(app) {
       if(context) {
         var token = context.get('accessToken');
         var username;
+        /* istanbul ignore else */
         if(token) {
           username =  token.userId;
         }
 
+        /* istanbul ignore else */
         if(username) {
           ctx.query.include.push({
             relation: 'upVotes',
@@ -218,6 +219,7 @@ module.exports = function(app) {
     next();
   });
 
+  /* istanbul ignore next */
   Base.updateStats = function(id, modelName, data, next) {
     debug('updateStats', id, modelName, data, next);
     if(app.models[modelName]) {

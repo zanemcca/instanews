@@ -4,7 +4,11 @@ var app = angular.module('instanews.directive.autocomplete', ['ionic', 'ngResour
 
 app.directive('inautocomplete', [
   'Platform',
-  function (Platform) {
+  'Maps',
+  function (
+    Platform,
+    Maps
+  ) {
 
     return {
       restrict: 'E',
@@ -12,6 +16,21 @@ app.directive('inautocomplete', [
         place: '='
       },
       controller: function($scope) {
+
+        $scope.safeApply = function(fn) {
+          var phase = this.$root.$$phase;
+          if(phase === '$apply' || phase === '$digest') {
+            if(fn && (typeof(fn) === 'function')) {
+              fn();
+            }
+          } else {
+            this.$apply(fn);
+          }
+        };
+
+        $scope.isIOS = Platform.isIOS;
+
+        $scope.place.predictions = [];
 
         var service = new google.maps.places.AutocompleteService();
 
@@ -22,32 +41,76 @@ app.directive('inautocomplete', [
           }
 
           $scope.place.predictions = predictions;
+          $scope.safeApply();
         };
 
+        var defaultPlaceholder = 'Search for a location';
+
         $scope.input = {
-          placeholder: 'Search for a location'
+          placeholder: defaultPlaceholder 
+        };
+
+        // Localize the map on the users position
+        $scope.place.localize = function() {
+          $scope.done = true;
+          $scope.input.value = null;
+          $scope.input.placeholder = defaultPlaceholder;
+
+          var cb = $scope.place.localizeCallback;
+          if($scope.place.getMap instanceof Function) {
+            var map;
+            var delay = 100; //ms
+            var timeout = 5000; // 5s
+
+            var localizeMap = function (time) {
+              if(time > 0) {
+                setTimeout(function () {
+                  map = $scope.place.getMap();
+                  if(map) {
+                    Maps.localize(map, cb);
+                  } else {
+                    localizeMap(time - delay);
+                  }
+                } , delay);
+              } else {
+                console.log('No Map found in ' + timeout + ' ms');
+              }
+            };
+
+            localizeMap(timeout);
+          }
+          else {
+            console.log('Map not valid! Cannot localize!');
+          }
         };
 
         $scope.set = function (prediction) {
+          $scope.done = true;
           console.log(prediction);
           $scope.place.value = prediction;
           $scope.input.value = null;
           $scope.input.placeholder = prediction.description;
+          $scope.safeApply();
         };
 
-        $scope.search = function () {
-          service.getQueryPredictions({ input: $scope.input.value }, function (predictions, status) {
-            if (status !== google.maps.places.PlacesServiceStatus.OK) {
-              console.log(status);
-              return;
-            }
+        $scope.done = true;
 
-            if(predictions.length) {
-              $scope.set(predictions[0]);
-            } else {
-              console.log('Invalid location. Please try again');
-            }
-          });
+        $scope.search = function () {
+          $scope.done = true;
+          if($scope.input.value) {
+            service.getQueryPredictions({ input: $scope.input.value }, function (predictions, status) {
+              if (status !== google.maps.places.PlacesServiceStatus.OK) {
+                console.log(status);
+                return;
+              }
+
+              if(predictions.length) {
+                $scope.set(predictions[0]);
+              } else {
+                console.log('Invalid location. Please try again');
+              }
+            });
+          }
 
           Platform.hideKeyboard();
         };
@@ -61,43 +124,22 @@ app.directive('inautocomplete', [
             if(newValue !== oldValue) {
               if(newValue) {
                 service.getQueryPredictions({ input: newValue }, displaySuggestions);
+                $scope.done = false;
               } else {
+                $scope.done = true;
                 $scope.place.predictions.length = 0;
               }
             }
           });
-
-          //TODO Deal with form entry
-
-          /*
-          var input = document.getElementById('search-input');
-          var autocomplete = new google.maps.places.Autocomplete(input);
-
-          //Add a listener on the search box
-          google.maps.event.addListener(autocomplete, 'place_changed', function() {
-            var place = autocomplete.getPlace();
-
-            if(!place.geometry) {
-              console.log('No geometry!');
-              return;
-            }
-
-            var map = Maps.getPostMap();
-            if(place.geometry.viewport) {
-              Maps.fitBounds(map, place.geometry.viewport);
-            }
-            else {
-              Maps.setCenter(map, place.geometry.location);
-            }
-
-            Maps.setMarker(map, place.geometry.location);
-
-            //TODO set newArticle.place
-            //or replace it
-          });
-         */
-
         });
+
+        $scope.click = function () {
+          if($scope.done) {
+            if($scope.input.placeholder !== defaultPlaceholder) {
+              $scope.input.value = $scope.input.placeholder;
+            }
+          }
+        };
 
         $scope.disableTap = function(){
           console.log('Disabling tap');
