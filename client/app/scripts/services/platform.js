@@ -6,11 +6,13 @@ app.factory('Platform', [
   '$cordovaDevice',
   '$cordovaDialogs',
   '$ionicActionSheet',
+  '$ionicLoading',
   '$q',
   function(
     $cordovaDevice,
     $cordovaDialogs,
     $ionicActionSheet,
+    $ionicLoading,
     $q
   ) {
 
@@ -174,8 +176,14 @@ app.factory('Platform', [
      }
    };
 
+   var loading = {
+     show: $ionicLoading.show, 
+     hide: $ionicLoading.hide
+   };
+
    return {
       hideKeyboard: hideKeyboard,
+      loading: loading,
       getUUID: getUUID,
       getDataDir: getDataDir,
       showSheet: showSheet,
