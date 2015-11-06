@@ -149,6 +149,7 @@ app.service('Articles', [
           articles.push(article);
         }
         articles.sort(compareFunction);
+        notifyObservers();
         done();
       };
 
@@ -167,7 +168,6 @@ app.service('Articles', [
           }
         });
       }
-
    };
 
    var get = function() {
@@ -183,7 +183,7 @@ app.service('Articles', [
        if(completed === total) {
         //Update our skip amount
         filter.skip = inViewArticles.length;
-        notifyObservers();
+        //notifyObservers();
        }
      };
 

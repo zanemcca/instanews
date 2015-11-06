@@ -44,11 +44,19 @@ app.controller('FeedCtrl', [
               }
             };
 
-             $scope.itemsAvailable = function () { return false; };
+            var items = {
+              available: function () {
+               return false;
+              }
+            }; 
+
+             $scope.itemsAvailable = function () { 
+               return items.available();
+             };
 
              Position.boundsReady
              .then(function () {
-               $scope.itemsAvailable = Articles.areItemsAvailable;
+               items.available = Articles.areItemsAvailable;
              });
 
              $scope.place = {
@@ -133,14 +141,14 @@ app.controller('FeedCtrl', [
 
              // This is called when the bottom of the feed is reached
              $scope.loadMore = function() {
-               var temp = $scope.itemsAvailable;
-               $scope.itemsAvailable = function () { return false; };
+               var temp = items.available;
+               items.available = function () { return false; };
                console.log('Loading more articles');
                Articles.load( function() {
                  $scope.safeApply(function(){
                    $scope.$broadcast('scroll.infiniteScrollComplete');
                    setTimeout(function () {
-                     $scope.itemsAvailable = temp;
+                     items.available = temp;
                    }, 5000);
                  });
                });
