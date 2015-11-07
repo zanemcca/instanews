@@ -34,6 +34,28 @@ describe('Articles', function() {
           }
         };
       });
+
+      $provide.service('Subarticles', function() {
+        return {
+          loadBest : function(id, cb) {
+            cb('sub');
+          }
+        };
+      });
+
+      $provide.service('Platform', function() {
+        return {
+          ready: {
+            then: function(cb) {
+              cb();
+            }
+          },
+          loading: {
+            show: function() {},
+            hide: function () {}
+          }
+        };
+      });
     });
 
   });
@@ -41,6 +63,7 @@ describe('Articles', function() {
   beforeEach(inject(function($filter, Article, Position, Articles) {
     articles = Articles;
     article = Article;
+    subarticle = Subarticle;
     position = Position;
   }));
 

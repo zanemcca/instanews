@@ -143,6 +143,16 @@ describe('Post: ', function(){
         }
       });
 
+      $provide.service('Upload', function() {
+        return {
+          get: function() {},
+          getToken: function() {},
+          registerObserver: function(cb) {
+            cb();
+          }
+        }
+      });
+
       $provide.service('Camera', function() {
         return {
           capturePicture: function() {
@@ -253,6 +263,7 @@ describe('Post: ', function(){
     Platform,
     Maps,
     User,
+    Upload,
     Camera
   ){
     ionicModal = $ionicModal;
@@ -264,6 +275,7 @@ describe('Post: ', function(){
     platform = Platform;
     maps = Maps;
     user = User;
+    upload = Upload;
     camera = Camera;
     ctrl = $controller;
 
@@ -283,6 +295,7 @@ describe('Post: ', function(){
       Platform: platform,
       Maps: maps,
       User: user,
+      Upload: upload,
       Camera: camera
     });
 
