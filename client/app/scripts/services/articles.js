@@ -70,6 +70,7 @@ app.service('Articles', [
 
       filter.skip = 0;
 
+      console.log('UpateBounds');
       itemsAvailable = true;
 
       Platform.loading.show();
@@ -89,6 +90,8 @@ app.service('Articles', [
         Article.find({filter: filter })
         .$promise
         .then( function (articles) {
+          console.log('Loaded new articles');
+          console.log(articles);
            if ( articles.length <= 0 ) {
               itemsAvailable = false;
               if(cb instanceof Function) {
@@ -181,29 +184,33 @@ app.service('Articles', [
    // Add the given articles
    var add = function(arts, cb) {
      var total = arts.length;
-     var completed = 0;
-     var done = function () {
-       completed++;
-       if(completed === total) {
-        //Update our skip amount
-        filter.skip = Arts.inView.length;
-        notifyObservers();
+     if(total) {
+       var completed = 0;
+       var done = function () {
+         completed++;
+         if(completed === total) {
+          //Update our skip amount
+          filter.skip = Arts.inView.length;
+          notifyObservers();
 
-        if(cb instanceof Function) {
-          cb();
-        }
-       }
-     };
+          if(cb instanceof Function) {
+            cb();
+          }
+         }
+       };
 
-      for(var i = 0; i < arts.length; i++) {
-        var position = Position.posToLatLng(arts[i].location);
-        if(Position.withinBounds(position)) {
-          addOne(Arts.inView, arts[i], done);
+        for(var i = 0; i < arts.length; i++) {
+          var position = Position.posToLatLng(arts[i].location);
+          if(Position.withinBounds(position)) {
+            addOne(Arts.inView, arts[i], done);
+          }
+          else {
+            addOne(Arts.outView, arts[i], done);
+          }
         }
-        else {
-          addOne(Arts.outView, arts[i], done);
-        }
-      }
+     } else {
+       cb();
+     }
    };
 
    // Deletes the local articles
