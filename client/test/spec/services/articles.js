@@ -3,7 +3,9 @@
 
 describe('Articles', function() {
 
+  var arts;
   beforeEach(function() {
+    arts = [];
 
     var bounds = new google.maps.LatLngBounds(
         new google.maps.LatLng(33.671068, -116.25128),
@@ -14,7 +16,15 @@ describe('Articles', function() {
     module(function($provide) {
       $provide.service('Article', function() {
         return {
-          find: function(filter) {}
+          find: function(filter) {
+            return { 
+              $promise: {
+                then: function (cb) {
+                  cb(arts);
+                }
+              }
+            };
+          }
         };
       });
 
@@ -57,13 +67,14 @@ describe('Articles', function() {
         };
       });
     });
-
   });
 
-  beforeEach(inject(function($filter, Article, Position, Articles) {
+  var articles, article, subarticle, position;
+
+  beforeEach(inject(function($filter, Article, Subarticles, Position, Articles) {
     articles = Articles;
     article = Article;
-    subarticle = Subarticle;
+    subarticles = Subarticles;
     position = Position;
   }));
 
@@ -72,6 +83,8 @@ describe('Articles', function() {
       sinon.stub(article, 'find', function(f) {
         expect(f.filter.limit).to.equal(50);
         expect(f.filter.skip).to.equal(0);
+
+        /*
         expect(f.filter.include).to.deep.equal([{
           relation: 'subarticles',
           scope: {
@@ -79,6 +92,7 @@ describe('Articles', function() {
             order: 'rating DESC'
           }
         }]);
+       */
         expect(f.filter.order).to.equal('rating DESC');
 
         return {
@@ -95,6 +109,13 @@ describe('Articles', function() {
     });
   });
 
+  describe('areItemsAvailable', function() {
+    it('should return true', function() {
+      arts = [1];
+      articles.updateBounds();
+      expect(articles.areItemsAvailable()).to.be.true;
+    });
+  });
 
   describe('updateBounds', function() {
 
@@ -263,15 +284,17 @@ describe('Articles', function() {
       expect(results.length).to.equal(0);
     });
 
-    it('should notify observers', function() {
+    it('should notify observers', function(done) {
       var fake = {
         func: function() {}
       };
       sinon.spy(fake, 'func');
       articles.registerObserver(fake.func);
 
-      articles.add([])
-      expect(fake.func.calledOnce).to.be.true;
+      articles.add([1], function () {
+        expect(fake.func.calledOnce).to.be.true;
+        done();
+      })
     });
 
     it('should update the filter.skip', function() {
@@ -424,11 +447,6 @@ describe('Articles', function() {
     });
   });
 
-  describe('areItemsAvailable', function() {
-    it('should return true', function() {
-      expect(articles.areItemsAvailable()).to.be.true;
-    });
-  });
 
   describe('getOne', function() {
     var arts = [];
@@ -477,15 +495,17 @@ describe('Articles', function() {
   });
 
   describe('registerObserver', function() {
-    it('should be notified', function() {
+    it('should be notified', function(done) {
       var fake = {
         func: function() {}
       };
       sinon.spy(fake, 'func');
       articles.registerObserver(fake.func);
 
-      articles.add([])
-      expect(fake.func.calledOnce).to.be.true;
+      articles.add([1], function () {
+        expect(fake.func.calledOnce).to.be.true;
+        done();
+      })
     });
   });
 
