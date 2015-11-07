@@ -133,7 +133,6 @@ app.factory('Camera', [
         return q.promise;
       };
 
-
       var getType = function (name) {
         var type = name.slice(name.lastIndexOf('.') + 1);
         type = type.toLowerCase();
