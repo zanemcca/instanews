@@ -411,7 +411,12 @@ module.exports = function (grunt) {
           '<%= yeoman.app %>/bower_components/angular-resource/angular-resource.js',
           '<%= yeoman.app %>/bower_components/ngCordova/dist/ng-cordova.js',
           '<%= yeoman.app %>/bower_components/angular-uuid-service/angular-uuid-service.js',
-          'https://maps.googleapis.com/maps/api/js?libraries=places,visualization&key=AIzaSyCLYNTmynkgm6Pg8_efYqZUuTnjqGcwYkA&sensor=true',
+          '<%= yeoman.app %>/bower_components/videogular/videogular.js',
+          '<%= yeoman.app %>/bower_components/videogular-controls/vg-controls.js',
+          '<%= yeoman.app %>/bower_components/videogular-buffering/vg-buffering.js',
+          '<%= yeoman.app %>/bower_components/videogular-poster/vg-poster.js',
+          '<%= yeoman.app %>/bower_components/videogular-overlay-play/vg-overlay-play.js',
+          'https://maps.googleapis.com/maps/api/js?libraries=places,visualization&key=AIzaSyCLYNTmynkgm6Pg8_efYqZUuTnjqGcwYkA',
           '<%= yeoman.app %>/<%= yeoman.scripts %>/**/*.js',
           '<%= yeoman.test %>/mock/**/*.js',
           '<%= yeoman.test %>/spec/**/*.js'
