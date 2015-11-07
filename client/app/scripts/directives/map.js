@@ -58,6 +58,10 @@ app.directive('inmap', [
             switch(scope.map.id) {
               case 'feedMap':
                 map = new google.maps.Map(element, mapOptions);
+
+                if(navigator.splashscreen) {
+                  navigator.splashscreen.hide();
+                }
                 //Listener on bounds changing on the map
                 google.maps.event.addListener(map, 'bounds_changed', _.debounce(function() {
                   console.log('Updating bounds');

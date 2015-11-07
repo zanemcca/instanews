@@ -17,8 +17,11 @@ app.service('Articles', [
          Position
       ){
 
-   var inViewArticles = [];
-   var outViewArticles = [];
+   var Arts = {
+     inView: [],
+     outView: []
+   };
+
    var itemsAvailable = true;
 
    var defaultFilter = {
@@ -69,11 +72,10 @@ app.service('Articles', [
 
       itemsAvailable = true;
 
-      Platform.loading.show({
-        template: 'Loading...'
-      });
+      Platform.loading.show();
 
       load(function () {
+        reorganize();
         Platform.loading.hide();
       });
    };
@@ -104,12 +106,12 @@ app.service('Articles', [
 
    //Getters
    var getOne = function (id) {
-      var val = $filter('filter')(inViewArticles, {id: id});
+      var val = $filter('filter')(Arts.inView, {id: id});
       if (val.length > 0) {
          return val[0];
       }
       else {
-        val = $filter('filter')(outViewArticles, {id: id});
+        val = $filter('filter')(Arts.outView, {id: id});
         if (val.length > 0) {
            return val[0];
         }
@@ -146,10 +148,6 @@ app.service('Articles', [
             a.upVotes = article.upVotes;
             a.verified = article.verified;
             a.version = article.version;
-
-            console.log('new');
-            console.log(a);
-            console.log('\n\n');
           }
         }
         else {
@@ -177,7 +175,7 @@ app.service('Articles', [
    };
 
    var get = function() {
-      return inViewArticles;
+      return Arts.inView;
    };
 
    // Add the given articles
@@ -188,7 +186,7 @@ app.service('Articles', [
        completed++;
        if(completed === total) {
         //Update our skip amount
-        filter.skip = inViewArticles.length;
+        filter.skip = Arts.inView.length;
         notifyObservers();
 
         if(cb instanceof Function) {
@@ -200,32 +198,32 @@ app.service('Articles', [
       for(var i = 0; i < arts.length; i++) {
         var position = Position.posToLatLng(arts[i].location);
         if(Position.withinBounds(position)) {
-          addOne(inViewArticles, arts[i], done);
+          addOne(Arts.inView, arts[i], done);
         }
         else {
-          addOne(outViewArticles, arts[i], done);
+          addOne(Arts.outView, arts[i], done);
         }
       }
    };
 
    // Deletes the local articles
    var deleteAll = function() {
-     inViewArticles = [];
+     Arts.inView = [];
      filter.skip = 0;
      notifyObservers();
    };
 
    // Reorganize the articles into the viewable array and the hidden array
    var reorganize = function() {
-     var total = inViewArticles.length + outViewArticles.length;
+     var total = Arts.inView.length + Arts.outView.length;
      var completed = 0;
      var done = function () {
        completed++;
        if(completed === total) {
         //Update our skip amount
-        inViewArticles = inView;
-        outViewArticles = outView;
-        filter.skip = inViewArticles.length;
+        Arts.inView = inView;
+        Arts.outView = outView;
+        filter.skip = Arts.inView.length;
         notifyObservers();
        }
      };
@@ -245,8 +243,8 @@ app.service('Articles', [
        }
      };
 
-     organize(inViewArticles);
-     organize(outViewArticles);
+     organize(Arts.inView);
+     organize(Arts.outView);
    };
 
    var observerCallbacks = [];
@@ -262,7 +260,7 @@ app.service('Articles', [
    };
 
    // Call reorganize every time the bounds change
-   Position.registerBoundsObserver(reorganize);
+//   Position.registerBoundsObserver(reorganize);
    Position.registerBoundsObserver(updateBounds);
 
    return {

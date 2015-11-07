@@ -103,12 +103,10 @@ app.controller(
         if(fileName.indexOf('file://') !== 0) {
           url = urlBase + '/' + url;
         }
-        console.log(url);
         return url;
       };
 
       var src = prefix + '-' + $scope.media.name;
-      console.log(src);
 
       // If this is a video then it will
       // have a poster which should be used

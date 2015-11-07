@@ -28,6 +28,7 @@ app.service('Subarticles', [
       Article.subarticles({
         id: id,
         filter: {
+          skip: 0,
           limit: 1,
           where: {
             pending: {

@@ -105,7 +105,6 @@ app.factory('Platform', [
     if( 900 <= height ) {
       type = 'tablet';
     }
-    console.log('Device Type: ' + type);
     return type;
   };
 
@@ -128,7 +127,6 @@ app.factory('Platform', [
     if(max || max === 0) {
       sizeClass = Math.min(sizeClass, max);
     }
-    console.log('Device size class: ' + sizeClass);
     return sizeClass;
   };
 
@@ -177,7 +175,11 @@ app.factory('Platform', [
    };
 
    var loading = {
-     show: $ionicLoading.show, 
+     show: function () {
+       return $ionicLoading.show({
+          template: 'Loading...'
+        });
+     },
      hide: $ionicLoading.hide
    };
 
