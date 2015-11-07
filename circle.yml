@@ -13,9 +13,11 @@ dependencies:
    override:
      #      - npm install
       - docker build -t instanews .
+      - cd client && npm install && npm install -g grunt grunt-cli
 
 test:
    override:
+     - cd client && grunt karma && cd ..
      - docker run -t instanews
        #- docker run -t -p 3000:3000 instanews
 #      - npm test
