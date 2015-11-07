@@ -30,7 +30,9 @@ describe('instanews.service.camera', function() {
           captureVideo: function(options) {
             return {
               then: function(cb) {
-                cb(['1']);
+                cb([{
+                  fullPath: 'file://uri/to/file.mp4'
+                }]);
               }
             };
           }
