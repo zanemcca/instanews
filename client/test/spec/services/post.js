@@ -3,23 +3,34 @@
 
 describe('Post service', function() {
 
-  var newArticle;
+  var newArticle, uploads;
+  var Upload;
   beforeEach(function() {
+    Upload = function (text) {
+      if(!text) {
+        text = 'subarticle text';
+      }
+
+      this.complete = {
+        promise: {
+          then: function (cb) {
+            cb();
+          }
+        }
+      };
+      this.subarticle = {
+        text: text
+      }
+      return this;
+    };
+
+    uploads = [new Upload()];
+
     newArticle = { 
-      tempId: 'uuid',
       title: 'Title',
-      position: {
+      location: {
         lat: 1,
         lng: 2
-      },
-      text: ['Hey'],
-      videos: [],
-      photos: [],
-      isValidArticle: function() {
-        return true;
-      },
-      isValidSubarticle: function() {
-        return true;
       }
     };
 
@@ -120,11 +131,12 @@ describe('Post service', function() {
 
   var post;
   var article;
+  var platform;
+
   var localStorage;
   var fileTransfer;
   var env;
   var user;
-  var platform;
   var RFC4122;
 
   beforeEach(inject(function(
@@ -145,8 +157,10 @@ describe('Post service', function() {
     user = User;
     platform = Platform;
     RFC4122 = rfc4122;
-  }));
+  })); 
 
+  //Old post tests - some will be moved
+  /*
   describe('Initialization', function() {
     it('should call LocalStorage.readFiles', function() {
       var art = post.getArticle('uuid');
@@ -178,7 +192,7 @@ describe('Post service', function() {
         art = post.getArticle();
         art.title = 'Title';
         art.text = ['some text'];
-        art.position = {
+        art.location = {
           lat: 1,
           lng: 2
         };
@@ -200,7 +214,7 @@ describe('Post service', function() {
         });
 
         it('should have a valid position', function() {
-          art.position = {};
+          art.location = {};
           expect(post.isValidArticle(art)).to.be.false;
         });
       });
@@ -314,22 +328,22 @@ describe('Post service', function() {
 
   describe('savePosition', function() {
     it('should save the position', function() {
-      var position = {
+      var location = {
         lat: 67,
         lng: -65
       };
-      newArticle = post.savePosition(position, newArticle.tempId);
+      newArticle = post.savePosition(location, newArticle.tempId);
 
-      expect(newArticle.position).to.deep.equal(position);
+      expect(newArticle.location).to.deep.equal(location);
     });
 
     it('should not save the position', function() {
-      var position = {
+      var location = {
         lng: -65
       };
-      newArticle = post.savePosition(position, newArticle.tempId);
+      newArticle = post.savePosition(location, newArticle.tempId);
 
-      expect(newArticle.position).to.not.deep.equal(position);
+      expect(newArticle.location).to.not.deep.equal(location);
     });
   });
 
@@ -407,10 +421,118 @@ describe('Post service', function() {
       expect(newArticle).to.be.undefined;
     });
   });
+  */
 
   describe('isPosting', function() {
     it('should return false', function() {
       expect(post.isPosting()).to.be.false;
+    });
+  });
+
+  describe('isValidArticle', function () {
+    var valid = [{
+      title: 'article title',
+      location: {
+        lat: 1,
+        lng: 2
+      }
+    }];
+
+    var invalid = [{
+      title: 'article title',
+      location: {
+        lat: 'string',
+        lng: 2
+      }
+    },
+    {
+      location: {}
+    },
+    {
+      location: {
+        lat: 1,
+        lng: 2
+      }
+    },
+    {
+      title: 'article title',
+      location: {
+        lng: 2
+      }
+    },
+    {
+      title: 'article title',
+      location: {
+        lat: 1
+      }
+    }];
+
+    valid.forEach(function (art) {
+      it('should be valid', function () {
+        expect(post.isValidArticle(art)).to.be.true;
+      });
+    });
+
+    invalid.forEach(function (art) {
+      it('should be invalid', function () {
+        expect(post.isValidArticle(art)).to.be.false;
+      });
+    });
+   });
+
+  describe('isValidSubarticle', function () {
+    var valid = [{
+      parentId: 'stf',
+      text: 'hello'
+    },
+    {
+      parentId: 'gbfrd',
+      _file: {
+        type: 'video',
+        sources: [
+          'file.m3u8',
+          'HD-file.mp4',
+          'SD-file.mp4'
+        ]
+      }
+    },
+    {
+      parentId: 'frd',
+      _file: {
+        type: 'photo',
+        source: 'photo.jpg'
+      }
+    }];
+
+    var invalid = [{
+      text: 'hello'
+    },
+    {
+      parentId: 'gbfrd'
+    },
+    {
+      parentId: 'frd',
+      _file: {
+        source: 'photo.jpg'
+      }
+    },
+    {
+      parentId: 'frd',
+      _file: {
+        type: 'video'
+      }
+    }];
+
+    valid.forEach(function (sub) {
+      it('should be valid', function () {
+        expect(post.isValidSubarticle(sub)).to.be.true;
+      });
+    });
+
+    invalid.forEach(function (sub) {
+      it('should be invalid', function () {
+        expect(post.isValidSubarticle(sub)).to.be.false;
+      });
     });
   });
 
@@ -421,7 +543,6 @@ describe('Post service', function() {
 
         sinon.stub(article, 'create', function(obj) {
           expect(obj).to.deep.equal({
-            isPrivate: false,
             location: {
               lat: 1,
               lng: 2
@@ -436,51 +557,32 @@ describe('Post service', function() {
           }
         });
 
-        post.post(newArticle.tempId);
+        post.post(uploads, newArticle);
 
         expect(article.create.calledOnce).to.be.true;
       });
 
-      it('should delete the article after posting everything', function() {
-        post.post(newArticle.tempId);
-
-        var art = post.getArticle(newArticle.tempId);
-
-        expect(art).to.be.undefined;
-      });
-
-      it('should call Article.subarticles.create through postSubarticle', function() {
+      it('should call Article.subarticles.create through postSubarticles', function() {
         sinon.spy(article.subarticles, 'create');
 
-        post.post(newArticle.tempId);
+        post.post(uploads, newArticle);
 
         expect(article.subarticles.create.calledOnce).to.be.true;
       });
     });
 
     describe('postSubarticle', function() {
+      var parentId;
       beforeEach(function() {
-        newArticle.parentId = 'id';
-        newArticle.isValidArticle = function() {
-          return false;
-        };
-        post.saveArticle(newArticle);
+        parentId = 'id';
       });
 
-      it('should delete the article after posting everything', function() {
-        post.post(newArticle.tempId);
-
-        var art = post.getArticle(newArticle.tempId);
-
-        expect(art).to.be.undefined;
-      });
-
-      it('should call Platform.showToast with message "Your content has finished uploading"', function() {
+      it('should call Platform.showToast with the correct message', function() {
         sinon.stub(platform,'showToast', function(message) {
-          expect(message).to.equal('Your content has finished uploading');
+          expect(message).to.equal('Your content has finished uploading and should be available soon');
         });
 
-        post.post(newArticle.tempId);
+        post.post(uploads, parentId);
 
         expect(platform.showToast.calledOnce).to.be.true;
       });
@@ -488,9 +590,9 @@ describe('Post service', function() {
       it('should post one text subarticle', function() {
         sinon.stub(article.subarticles, 'create', function(sub) {
 
-          expect(sub.id).to.equal(newArticle.parentId);
-          expect(sub.parentId).to.equal(newArticle.parentId);
-          expect(sub.text).to.equal(newArticle.text[0]);
+          expect(sub.id).to.equal(parentId);
+          expect(sub.parentId).to.equal(parentId);
+          expect(sub.text).to.equal(uploads[0].subarticle.text);
 
           return {
             $promise: {
@@ -503,20 +605,20 @@ describe('Post service', function() {
           };
         });
 
-        post.post(newArticle.tempId);
+        post.post(uploads, parentId);
 
         expect(article.subarticles.create.calledOnce).to.be.true;
       });
 
       it('should post more than one text subarticle', function() {
-        newArticle.text = ['text1','text2'];
-        post.saveArticle(newArticle);
+        uploads.push(new Upload('another subarticle'));
 
         sinon.stub(article.subarticles, 'create', function(sub) {
 
-          expect(sub.id).to.equal(newArticle.parentId);
-          expect(sub.parentId).to.equal(newArticle.parentId);
-          expect(sub.text).to.exist;
+          var idx = article.subarticles.create.callCount - 1;
+          expect(sub.id).to.equal(parentId);
+          expect(sub.parentId).to.equal(parentId);
+          expect(sub.text).to.equal(uploads[idx].subarticle.text);
 
           return {
             $promise: {
@@ -530,11 +632,12 @@ describe('Post service', function() {
         });
         sinon.spy(platform, 'showToast');
 
-        post.post(newArticle.tempId);
+        post.post(uploads, parentId);
 
         expect(article.subarticles.create.calledTwice).to.be.true;
       });
 
+      /*
       describe('video', function() {
         beforeEach( function() {
           newArticle.text = [];
@@ -736,6 +839,7 @@ describe('Post service', function() {
           expect(article.subarticles.create.calledTwice).to.be.true;
         });
       });
+      */
     });
   });
 });

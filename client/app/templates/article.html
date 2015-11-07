@@ -6,9 +6,9 @@
          ui-sref="subarticlePost({id: article.id})">
       </a>
    </ion-nav-buttons>
-   <ion-content>
-      <ion-refresher pulling-text="Fresh Stuff" on-refresh="onRefresh()">
-      </ion-refresher>
+   <ion-content overflow-scroll="true" class="gpu">
+      <!--ion-refresher pulling-text="Fresh Stuff" on-refresh="onRefresh()">
+      </ion-refresher-->
       <inMap map="map"></inMap>
 
       <div class="item" style="border:0px;padding-top:0px;padding-bottom:0px">
@@ -24,6 +24,7 @@
         </ion-item>
       </ul>
       <ion-infinite-scroll
+         immediate-check="false"
          ng-if="areItemsAvailable()"
          on-infinite="loadMore()"
          distance="10%">

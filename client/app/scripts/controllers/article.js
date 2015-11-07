@@ -18,6 +18,17 @@ app.controller('ArticleCtrl', [
     Maps
   ) {
 
+    $scope.safeApply = function(fn) {
+      var phase = this.$root.$$phase;
+      if(phase === '$apply' || phase === '$digest') {
+        if(fn && (typeof(fn) === 'function')) {
+          fn();
+        }
+      } else {
+        this.$apply(fn);
+      }
+    };
+
    //TODO Create a click for the article $stateParams.id
 
    //TODO OnScroll create new view for items scrolled past
@@ -55,14 +66,20 @@ app.controller('ArticleCtrl', [
   };
 
  $scope.loadMore = function() {
+   /*
    var temp = $scope.areItemsAvailable;
    $scope.areItemsAvailable = function () { return false; };
-   console.log('Loading more');
+   */
+   console.log('Loading more subarticles');
    Subarticles.load($stateParams.id, function() {
-     $scope.$broadcast('scroll.infiniteScrollComplete');
-     setTimeout(function () {
-       $scope.areItemsAvailable = temp;
-     },5000);
+     $scope.safeApply(function(){
+       $scope.$broadcast('scroll.infiniteScrollComplete');
+       /*
+       setTimeout(function () {
+         $scope.itemsAvailable = temp;
+       }, 5000);
+      */
+     });
    });
  };
 
@@ -71,5 +88,7 @@ app.controller('ArticleCtrl', [
    };
 
    Subarticles.registerObserver(updateSubarticles);
+
+   $scope.loadMore();
 }]);
 

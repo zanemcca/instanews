@@ -40,6 +40,19 @@ app.controller('PostCtrl', [
 
     User.registerObserver(updateUser);
 
+    $scope.place = {
+      getMap: Maps.getPostMap,
+      localizeCallback: function (err, pos) {
+        if(err) {
+          console.log('Error: ' + err);
+        }
+        else {
+          Maps.setMarker(Maps.getPostMap(), pos);
+        }
+      },
+      localize: function () {}    // localize is filled in by the autocomplete directive
+    };
+
     //If we have an ID given then we know we are posting subarticles within an article
     if( !$stateParams.id ) {
       $scope.newArticle = {
@@ -54,18 +67,6 @@ app.controller('PostCtrl', [
 
     $scope.map = {
       id: 'postMap'
-    };
-
-    $scope.place = {
-      getMap: Maps.getPostMap,
-      localizeCallback: function (err, pos) {
-        if(err) {
-          console.log('Error: ' + err);
-        }
-        else {
-          Maps.setMarker(Maps.getPostMap(), pos);
-        }
-      }
     };
 
      var geocoder = new google.maps.Geocoder();

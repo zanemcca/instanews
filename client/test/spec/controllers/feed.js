@@ -58,6 +58,13 @@ describe('Feed: ', function(){
         };
       });
 
+      $provide.service('Platform', function() {
+        return {
+          showSheet: function(sheet) {},
+          showToast: function(message) {}
+        }
+      });
+
       $provide.service('Articles', function() {
         return {
           get: function() {
@@ -88,6 +95,7 @@ describe('Feed: ', function(){
     Article,
     Maps,
     Position,
+    Platform,
     Articles,
     Navigate
   ){
@@ -95,6 +103,7 @@ describe('Feed: ', function(){
     article = Article;
     maps = Maps;
     position = Position;
+    platform = Platform;
     articles = Articles;
     navigate = Navigate;
     ctrl = $controller;
@@ -108,6 +117,7 @@ describe('Feed: ', function(){
       Article: article,
       Maps: maps,
       Position: position,
+      Platform: platform,
       Articles: articles,
       Navigate: navigate
     });
@@ -140,11 +150,10 @@ describe('Feed: ', function(){
       expect(articles.areItemsAvailable.calledOnce).to.be.true;
     });
 
-    it('should set a local copy of toggleMenu and scrollTop', function() {
+    it('should set a local copy of toggleMenu', function() {
       initController();
 
       expect(scope.toggleMenu).to.exist;
-      expect(scope.scrollTop).to.exist;
     });
   });
 
@@ -168,6 +177,8 @@ describe('Feed: ', function(){
   });
 
 
+  //TODO Move this to autocomplete
+  /*
   describe('localize' , function() {
 
     beforeEach( function() {
@@ -188,6 +199,7 @@ describe('Feed: ', function(){
       expect(maps.localize.calledOnce).to.be.true;
     });
   });
+ */
 
   describe('load callers', function() {
 
@@ -215,7 +227,8 @@ describe('Feed: ', function(){
 
     });
 
-    describe('onRefresh', function() {
+    // onRefresh has been disabled
+    describe.skip('onRefresh', function() {
 
       beforeEach(function() { 
         sinon.stub(articles, 'getOne', function(id) {

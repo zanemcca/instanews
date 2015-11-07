@@ -186,11 +186,10 @@ return gradient;
         }
 
         if (Position.withinBounds(position)) {
-          console.log('Rating: ' + rating*1000);
           articleHeatArray.push({
             location: position,
             //weight: 1 - Math.exp(-rating/(2*avg))
-            weight: rating*1000
+            weight: rating*10000
           });
         }
       }

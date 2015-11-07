@@ -156,6 +156,8 @@ angular.module('instanews', [
 
       Platform.ready
       .then(function() {
+        Platform.loading.show();
+
          // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
          // for form inputs)
          /*

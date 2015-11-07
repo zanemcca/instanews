@@ -101,6 +101,7 @@ app.directive('inListItem', [
             console.log('Error: Failed to create a view');
             console.log(err);
           });
+        } else {
         }
 
         /*

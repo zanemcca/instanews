@@ -7,140 +7,151 @@ app.controller('FeedCtrl', [
   'Article',
   'Maps',
   'Position',
+  'Platform',
   'Articles',
   'Navigate',
-  function($scope,
-           Article,
-           Maps,
-           Position,
-           Articles,
-           Navigate) {
+  function(
+    $scope,
+    Article,
+    Maps,
+    Position,
+    Platform,
+    Articles,
+    Navigate
+  ) {
 
-             $scope.articles = Articles.get();
-             $scope.toggleMenu = Navigate.toggleMenu;
-             /*
-             $scope.scrollTop = Navigate.scrollTop;
+    $scope.articles = Articles.get();
+    $scope.toggleMenu = Navigate.toggleMenu;
+    /*
+       $scope.scrollTop = Navigate.scrollTop;
 
-             $scope.scrollTopVisible = false;
+       $scope.scrollTopVisible = false;
 
-             $scope.onSwipeDown = function () {
-               $scope.scrollTopVisible = true;
-               setTimeout(function () {
-                 $scope.$apply(function () {
-                   $scope.scrollTopVisible = false;
-                 });
-               }, 2000);
-             };
-             */
+       $scope.onSwipeDown = function () {
+       $scope.scrollTopVisible = true;
+       setTimeout(function () {
+       $scope.$apply(function () {
+       $scope.scrollTopVisible = false;
+       });
+       }, 2000);
+       };
+       */
 
-             $scope.itemsAvailable = function () { return false; };
+    $scope.safeApply = function(fn) {
+      var phase = this.$root.$$phase;
+      if(phase === '$apply' || phase === '$digest') {
+        if(fn && (typeof(fn) === 'function')) {
+          fn();
+        }
+      } else {
+        this.$apply(fn);
+      }
+    };
 
-             Position.boundsReady
-             .then(function () {
-               $scope.itemsAvailable = Articles.areItemsAvailable;
-             });
+    var items = {
+      available: function () {
+        return false;
+      }
+    }; 
 
-             $scope.place = {
-               getMap: Maps.getFeedMap
-             };
+    $scope.itemsAvailable = function () { 
+      return items.available();
+    };
 
-             $scope.map = {
-               id: 'feedMap'
-             };
+    Position.boundsReady
+    .then(function () {
+      items.available = Articles.areItemsAvailable;
+    });
 
-             var geocoder = new google.maps.Geocoder();
+    $scope.place = {
+      getMap: Maps.getFeedMap
+    };
 
-             $scope.$watch(function (scope) {
-               return scope.place.value;
-             }, function (newValue, oldValue) {
-               if(newValue !== oldValue) {
+    $scope.map = {
+      id: 'feedMap'
+    };
 
-                 var centerMap = function (place) {
-                   var map = Maps.getFeedMap();
-                   if(place.geometry.viewport) {
-                     Maps.fitBounds(map, place.geometry.viewport);
-                   }
-                   else {
-                     Maps.setCenter(map, place.geometry.location);
-                   }
-                 };
+    var geocoder = new google.maps.Geocoder();
 
-                 console.log('New place!');
-                 console.log(newValue);
+    $scope.$watch(function (scope) {
+      return scope.place.value;
+    }, function (newValue, oldValue) {
+      if(newValue !== oldValue) {
 
-                 if(newValue.geometry) {
-                   centerMap(newValue);
-                 } else {
-                   geocoder.geocode({'address': newValue.description}, function(results, status) {
-                     if (status === google.maps.GeocoderStatus.OK) {
-                       centerMap(results[0]);
-                     } else {
-                       console.log('Geocode was not successful for the following reason: ' + status);
-                     }
-                   }); 
-                 }
-               }
-             });
+        var centerMap = function (place) {
+          var map = Maps.getFeedMap();
+          if(place.geometry.viewport) {
+            Maps.fitBounds(map, place.geometry.viewport);
+          }
+          else {
+            Maps.setCenter(map, place.geometry.location);
+          }
+        };
 
-             //TODO Only keep a subset of the articles and load them one at a time from articles
-             //we need this so that all of the articles do not render at the same time
+        console.log('New place!');
+        console.log(newValue);
 
-             //Update our local articles
-             var first = true;
-             var updateArticles = function() {
-               if(first) {
-                 first = false;
-                 //Hide the splash screen
-                 //TODO Move this to a more appropriate place
-                 Position.boundsReady.then(function () {
-                   setTimeout(function () {
-                   if(navigator.splashscreen) {
-                     navigator.splashscreen.hide();
-                   }
-                   }, 1000);
-                 });
-               }
+        if(newValue.geometry) {
+          centerMap(newValue);
+        } else {
+          geocoder.geocode({'address': newValue.description}, function(results, status) {
+            if (status === google.maps.GeocoderStatus.OK) {
+              centerMap(results[0]);
+            } else {
+              console.log('Geocode was not successful for the following reason: ' + status);
+            }
+          }); 
+        }
+      }
+    });
 
-               $scope.articles = Articles.get();
-               //$scope.itemsAvailable = Articles.areItemsAvailable();
-             };
+    //TODO Only keep a subset of the articles and load them one at a time from articles
+    //we need this so that all of the articles do not render at the same time
 
-             /*
-             // Refresh the articles completely
-             $scope.onRefresh = function () {
-               console.log('Refresh');
+    //Update our local articles
+    //var first = true;
+    var updateArticles = function() {
+        $scope.articles = Articles.get();
+      };
 
-               //Reset all necessary values
-               //Articles.deleteAll();
+      /*
+      // Refresh the articles completely
+      $scope.onRefresh = function () {
+      console.log('Refresh');
 
-               //Load the initial articles
-               Articles.load( function() {
-                 $scope.$broadcast('scroll.refreshComplete');
-               });
-             };
-            */
+//Reset all necessary values
+//Articles.deleteAll();
 
-             // This is called when the bottom of the feed is reached
-             $scope.loadMore = function() {
-               var temp = $scope.itemsAvailable;
-               $scope.itemsAvailable = function () { return false; };
-               console.log('Loading more');
-               Articles.load( function() {
-                 $scope.$broadcast('scroll.infiniteScrollComplete');
-                 setTimeout(function () {
-                   $scope.itemsAvailable = temp;
-                 }, 5000);
-               });
-             };
+//Load the initial articles
+Articles.load( function() {
+$scope.$broadcast('scroll.refreshComplete');
+});
+};
+*/
 
-             //Refresh the map everytime we enter the view
-             $scope.$on('$ionicView.afterEnter', function() {
-               var map = Maps.getFeedMap();
-               if(map) {
-                 google.maps.event.trigger(map, 'resize');
-               }
-             });
+      // This is called when the bottom of the feed is reached
+      $scope.loadMore = function() {
+        var temp = items.available;
+        items.available = function () { return false; };
+        console.log('Loading more articles');
+        Articles.load( function() {
+          $scope.safeApply(function(){
+            $scope.$broadcast('scroll.infiniteScrollComplete');
+            setTimeout(function () {
+              items.available = temp;
+            }, 5000);
+          });
+        });
+      };
 
-             //Update the map if the articles are updated
-             Articles.registerObserver(updateArticles);
-           }]);
+      //Refresh the map everytime we enter the view
+      $scope.$on('$ionicView.afterEnter', function() {
+        var map = Maps.getFeedMap();
+        if(map) {
+          google.maps.event.trigger(map, 'resize');
+        }
+      });
+
+      //Update the map if the articles are updated
+      Articles.registerObserver(updateArticles);
+    }]);

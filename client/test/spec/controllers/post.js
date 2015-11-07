@@ -2,9 +2,15 @@
 describe('Post: ', function(){
 
   var deferred;
+  var picture, video, media;
 
   //Load the module and create mocks for all dependencies
   beforeEach( function() {
+    video = 'video';
+    picture = 'picture';
+    media = {
+      type: 'image'
+    };
 
     module('instanews.controller.post');
 
@@ -143,26 +149,57 @@ describe('Post: ', function(){
         }
       });
 
+      $provide.service('Upload', function() {
+        return {
+          destroy: function(uploads) {},
+          text: function(text) {
+            return {
+              subarticle: {
+                text: text
+              }
+            };
+          },
+          video: function(video) {
+            return {
+              subarticle: {
+                _file: {
+                  type: 'video'
+                }
+              }
+            };
+          },
+          picture: function(image) {
+            return {
+              subarticle: {
+                _file: {
+                  type: 'image'
+                }
+              }
+            };
+          },
+        }
+      });
+
       $provide.service('Camera', function() {
         return {
           capturePicture: function() {
             return {
               then: function(cb) {
-                cb('url');
+                cb(picture);
               }
             }
           },
           openMediaGallery: function() {
             return {
               then: function (cb) {
-                cb([1,2]);
+                cb(media);
               }
             };
           },
           captureVideo: function() {
             return {
               then: function(cb) {
-                cb([1]);
+                cb(video);
               }
             }
           }
@@ -253,6 +290,7 @@ describe('Post: ', function(){
     Platform,
     Maps,
     User,
+    Upload,
     Camera
   ){
     ionicModal = $ionicModal;
@@ -264,6 +302,7 @@ describe('Post: ', function(){
     platform = Platform;
     maps = Maps;
     user = User;
+    upload = Upload;
     camera = Camera;
     ctrl = $controller;
 
@@ -283,6 +322,7 @@ describe('Post: ', function(){
       Platform: platform,
       Maps: maps,
       User: user,
+      Upload: upload,
       Camera: camera
     });
 
@@ -328,7 +368,8 @@ describe('Post: ', function(){
       expect(scope.$on.calledOnce).to.be.true;
     });
 
-    it('should call Articles.getOne and set the local article', function() {
+    // The local article was removed
+    it.skip('should call Articles.getOne and set the local article', function() {
       stateParams.id = 'hello';
 
       var art = {
@@ -366,7 +407,28 @@ describe('Post: ', function(){
   describe('', function() {
     beforeEach(initController);
 
-    describe('localize', function() {
+    var upld, uploader;
+    beforeEach(function () {
+      upld = 'upload';
+      uploader = function (text) {
+        return upld;
+      };
+
+      sinon.stub(upload, 'text', function (text) {
+        return uploader(text);
+      });
+
+      sinon.stub(upload, 'video', function (text) {
+        return uploader(text);
+      });
+
+      sinon.stub(upload, 'picture', function (text) {
+        return uploader(text);
+      });
+    });
+
+    //TODO Move this to autocomplete
+    describe.skip('localize', function() {
       it('should call getPostMap', function() {
         sinon.spy(maps, 'getPostMap');
         scope.localize();
@@ -430,7 +492,8 @@ describe('Post: ', function(){
 
     describe('goBack', function() {
 
-      it('should pass in a single button titled "<b>Save</b>"', function() {
+      // No saving for the first version of the app
+      it.skip('should pass in a single button titled "<b>Save</b>"', function() {
         sinon.stub(platform, 'showSheet', function(sheet) {
           expect(sheet.buttons.length).to.equal(1);
           expect(sheet.buttons[0].text).to.equal('<b>Save</b>');
@@ -451,9 +514,9 @@ describe('Post: ', function(){
         expect(platform.showSheet.calledOnce).to.be.true;
       });
 
-      it('should pass in titleText = "What would you like done with your unpublished content?"', function() {
+      it('should pass in proper titleText', function() {
         sinon.stub(platform, 'showSheet', function(sheet) {
-          expect(sheet.titleText).to.equal('What would you like done with your unpublished content?');
+          expect(sheet.titleText).to.equal('Your unpublished content will be lost if you continue!');
         });
 
         scope.goBack();
@@ -484,9 +547,9 @@ describe('Post: ', function(){
         expect(ionicHistory.goBack.calledOnce).to.be.true;
       });
 
-      it('should call Post.deleteArticle then $ionicHistory.goBack() when delete is clicked', function() {
+      it('should call Upload.destroy then $ionicHistory.goBack() when delete is clicked', function() {
         sinon.spy(ionicHistory, 'goBack');
-        sinon.spy(post, 'deleteArticle');
+        sinon.spy(upload, 'destroy');
         sinon.stub(platform, 'showSheet', function(sheet) {
           sheet.destructiveButtonClicked();
         });
@@ -494,11 +557,12 @@ describe('Post: ', function(){
         scope.goBack();
 
         expect(platform.showSheet.calledOnce).to.be.true;
-        expect(post.deleteArticle.calledOnce).to.be.true;
+        expect(upload.destroy.calledOnce).to.be.true;
         expect(ionicHistory.goBack.calledOnce).to.be.true;
       });
     });
 
+    /*
     describe('postArticle', function() {
 
       beforeEach(function() {
@@ -600,6 +664,7 @@ describe('Post: ', function(){
         });
       });
     });
+   */
 
     describe('trashText', function() {
 
@@ -635,13 +700,13 @@ describe('Post: ', function(){
         };
       });
 
-      it('should push data.text onto the newArticle object', function() {
+      it('should push data.text onto the scope.uploads', function() {
         scope.data.text = 'text';
-        
         scope.saveText();
 
-        expect(scope.newArticle.text.length).to.equal(1);
-        expect(scope.newArticle.text[0]).to.equal('text');
+        expect(upload.text.calledOnce).to.be.true;
+        expect(scope.uploads.length).to.equal(1);
+        expect(scope.uploads[0]).to.equal(upld);
       });
 
       it('should call trashText after', function() {
@@ -660,11 +725,17 @@ describe('Post: ', function(){
         expect(camera.captureVideo.calledOnce).to.be.true;
       });
 
-      it('should add the video to the videos on newArticle', function() {
+      it('should add the video to uploads', function() {
+        uploader = function (vid) {
+          expect(vid).to.equal(video);
+          return upld;
+        };
+
         scope.captureVideo();
 
-        expect(scope.newArticle.videos.length).to.equal(1);
-        expect(scope.newArticle.videos[0]).to.equal(1);
+        expect(upload.video.calledOnce).to.be.true;
+        expect(scope.uploads.length).to.equal(1);
+        expect(scope.uploads[0]).to.equal(upld);
       });
 
     });
@@ -677,12 +748,31 @@ describe('Post: ', function(){
         expect(camera.openMediaGallery.calledOnce).to.be.true;
       });
 
-      it('should add the photos to newArticle.photos', function() {
+      it('should add the photo to uploads', function() {
+        uploader = function(pic) {
+          expect(pic).to.deep.equal(media);
+          return upld;
+        };
+
         scope.openMediaGallery();
 
-        expect(scope.newArticle.photos.length).to.equal(2);
-        expect(scope.newArticle.photos[0]).to.equal(1);
-        expect(scope.newArticle.photos[1]).to.equal(2);
+        expect(upload.picture.calledOnce).to.be.true;
+        expect(scope.uploads.length).to.equal(1);
+        expect(scope.uploads[0]).to.equal(upld);
+      });
+
+      it('should add the video to uploads', function() {
+        media.type = 'video';
+        uploader = function(vid) {
+          expect(vid).to.deep.equal(media);
+          return upld;
+        };
+
+        scope.openMediaGallery();
+
+        expect(upload.video.calledOnce).to.be.true;
+        expect(scope.uploads.length).to.equal(1);
+        expect(scope.uploads[0]).to.equal(upld);
       });
     });
 
@@ -695,11 +785,17 @@ describe('Post: ', function(){
         expect(camera.capturePicture.calledOnce).to.be.true;
       });
 
-      it('should add the photo to newArticle.photos', function() {
+      it('should add the photo to uploads', function() {
+        uploader = function (pic) {
+          expect(pic).to.equal(picture);
+          return upld;
+        };
+
         scope.capturePicture();
 
-        expect(scope.newArticle.photos.length).to.equal(1);
-        expect(scope.newArticle.photos[0]).to.equal('url');
+        expect(upload.picture.calledOnce).to.be.true;
+        expect(scope.uploads.length).to.equal(1);
+        expect(scope.uploads[0]).to.equal(upld);
       });
     });
   });

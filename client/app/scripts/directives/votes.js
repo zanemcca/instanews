@@ -29,14 +29,29 @@ app.directive('invotes', [
                     subarticle: Subarticle
                   };
 
-                  $scope.score = Math.round($scope.votable.rating*10000)/10000;
+                  $scope.score = {
+                    value: 0
+                  };
 
-                  if($scope.votable.upVotes && $scope.votable.upVotes.length > 0) {
-                    $scope.votable.upVoted = true;
+                  function update(votable) {
+                    if(votable.upVotes && votable.upVotes.length > 0) {
+                      $scope.votable.upVoted = true;
+                      $scope.votable.downVoted = false;
+                    }
+                    else if(votable.downVotes && votable.downVotes.length > 0) {
+                      $scope.votable.downVoted = true;
+                      $scope.votable.upVoted = false;
+                    }
+
+                    $scope.score.value = Math.round(votable.rating*10000)/100;
                   }
-                  else if($scope.votable.downVotes && $scope.votable.downVotes.length > 0) {
-                    $scope.votable.downVoted = true;
-                  }
+
+                  update($scope.votable);
+                  $scope.$watch(function (scope) {
+                    return scope.votable;
+                  }, function (newV) {
+                    update(newV);
+                  });
 
                   $scope.toggleComments = function() {
                     if(!$scope.votable.showComments) {
