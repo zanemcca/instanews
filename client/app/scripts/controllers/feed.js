@@ -7,161 +7,151 @@ app.controller('FeedCtrl', [
   'Article',
   'Maps',
   'Position',
+  'Platform',
   'Articles',
   'Navigate',
-  function($scope,
-           Article,
-           Maps,
-           Position,
-           Articles,
-           Navigate) {
+  function(
+    $scope,
+    Article,
+    Maps,
+    Position,
+    Platform,
+    Articles,
+    Navigate
+  ) {
 
-             $scope.articles = Articles.get();
-             $scope.toggleMenu = Navigate.toggleMenu;
-             /*
-             $scope.scrollTop = Navigate.scrollTop;
+    $scope.articles = Articles.get();
+    $scope.toggleMenu = Navigate.toggleMenu;
+    /*
+       $scope.scrollTop = Navigate.scrollTop;
 
-             $scope.scrollTopVisible = false;
+       $scope.scrollTopVisible = false;
 
-             $scope.onSwipeDown = function () {
-               $scope.scrollTopVisible = true;
-               setTimeout(function () {
-                 $scope.$apply(function () {
-                   $scope.scrollTopVisible = false;
-                 });
-               }, 2000);
-             };
-             */
+       $scope.onSwipeDown = function () {
+       $scope.scrollTopVisible = true;
+       setTimeout(function () {
+       $scope.$apply(function () {
+       $scope.scrollTopVisible = false;
+       });
+       }, 2000);
+       };
+       */
 
-            $scope.safeApply = function(fn) {
-              var phase = this.$root.$$phase;
-              if(phase === '$apply' || phase === '$digest') {
-                if(fn && (typeof(fn) === 'function')) {
-                  fn();
-                }
-              } else {
-                this.$apply(fn);
-              }
-            };
+    $scope.safeApply = function(fn) {
+      var phase = this.$root.$$phase;
+      if(phase === '$apply' || phase === '$digest') {
+        if(fn && (typeof(fn) === 'function')) {
+          fn();
+        }
+      } else {
+        this.$apply(fn);
+      }
+    };
 
-            var items = {
-              available: function () {
-               return false;
-              }
-            }; 
+    var items = {
+      available: function () {
+        return false;
+      }
+    }; 
 
-             $scope.itemsAvailable = function () { 
-               return items.available();
-             };
+    $scope.itemsAvailable = function () { 
+      return items.available();
+    };
 
-             Position.boundsReady
-             .then(function () {
-               items.available = Articles.areItemsAvailable;
-             });
+    Position.boundsReady
+    .then(function () {
+      items.available = Articles.areItemsAvailable;
+    });
 
-             $scope.place = {
-               getMap: Maps.getFeedMap
-             };
+    $scope.place = {
+      getMap: Maps.getFeedMap
+    };
 
-             $scope.map = {
-               id: 'feedMap'
-             };
+    $scope.map = {
+      id: 'feedMap'
+    };
 
-             var geocoder = new google.maps.Geocoder();
+    var geocoder = new google.maps.Geocoder();
 
-             $scope.$watch(function (scope) {
-               return scope.place.value;
-             }, function (newValue, oldValue) {
-               if(newValue !== oldValue) {
+    $scope.$watch(function (scope) {
+      return scope.place.value;
+    }, function (newValue, oldValue) {
+      if(newValue !== oldValue) {
 
-                 var centerMap = function (place) {
-                   var map = Maps.getFeedMap();
-                   if(place.geometry.viewport) {
-                     Maps.fitBounds(map, place.geometry.viewport);
-                   }
-                   else {
-                     Maps.setCenter(map, place.geometry.location);
-                   }
-                 };
+        var centerMap = function (place) {
+          var map = Maps.getFeedMap();
+          if(place.geometry.viewport) {
+            Maps.fitBounds(map, place.geometry.viewport);
+          }
+          else {
+            Maps.setCenter(map, place.geometry.location);
+          }
+        };
 
-                 console.log('New place!');
-                 console.log(newValue);
+        console.log('New place!');
+        console.log(newValue);
 
-                 if(newValue.geometry) {
-                   centerMap(newValue);
-                 } else {
-                   geocoder.geocode({'address': newValue.description}, function(results, status) {
-                     if (status === google.maps.GeocoderStatus.OK) {
-                       centerMap(results[0]);
-                     } else {
-                       console.log('Geocode was not successful for the following reason: ' + status);
-                     }
-                   }); 
-                 }
-               }
-             });
+        if(newValue.geometry) {
+          centerMap(newValue);
+        } else {
+          geocoder.geocode({'address': newValue.description}, function(results, status) {
+            if (status === google.maps.GeocoderStatus.OK) {
+              centerMap(results[0]);
+            } else {
+              console.log('Geocode was not successful for the following reason: ' + status);
+            }
+          }); 
+        }
+      }
+    });
 
-             //TODO Only keep a subset of the articles and load them one at a time from articles
-             //we need this so that all of the articles do not render at the same time
+    //TODO Only keep a subset of the articles and load them one at a time from articles
+    //we need this so that all of the articles do not render at the same time
 
-             //Update our local articles
-             var first = true;
-             var updateArticles = function() {
-               if(first) {
-                 first = false;
-                 //Hide the splash screen
-                 //TODO Move this to a more appropriate place
-                 Position.boundsReady.then(function () {
-                   setTimeout(function () {
-                   if(navigator.splashscreen) {
-                     navigator.splashscreen.hide();
-                   }
-                   }, 1000);
-                 });
-               }
+    //Update our local articles
+    //var first = true;
+    var updateArticles = function() {
+        $scope.articles = Articles.get();
+      };
 
-               $scope.articles = Articles.get();
-               //$scope.itemsAvailable = Articles.areItemsAvailable();
-             };
+      /*
+      // Refresh the articles completely
+      $scope.onRefresh = function () {
+      console.log('Refresh');
 
-             /*
-             // Refresh the articles completely
-             $scope.onRefresh = function () {
-               console.log('Refresh');
+//Reset all necessary values
+//Articles.deleteAll();
 
-               //Reset all necessary values
-               //Articles.deleteAll();
+//Load the initial articles
+Articles.load( function() {
+$scope.$broadcast('scroll.refreshComplete');
+});
+};
+*/
 
-               //Load the initial articles
-               Articles.load( function() {
-                 $scope.$broadcast('scroll.refreshComplete');
-               });
-             };
-            */
+      // This is called when the bottom of the feed is reached
+      $scope.loadMore = function() {
+        var temp = items.available;
+        items.available = function () { return false; };
+        console.log('Loading more articles');
+        Articles.load( function() {
+          $scope.safeApply(function(){
+            $scope.$broadcast('scroll.infiniteScrollComplete');
+            setTimeout(function () {
+              items.available = temp;
+            }, 5000);
+          });
+        });
+      };
 
-             // This is called when the bottom of the feed is reached
-             $scope.loadMore = function() {
-               var temp = items.available;
-               items.available = function () { return false; };
-               console.log('Loading more articles');
-               Articles.load( function() {
-                 $scope.safeApply(function(){
-                   $scope.$broadcast('scroll.infiniteScrollComplete');
-                   setTimeout(function () {
-                     items.available = temp;
-                   }, 5000);
-                 });
-               });
-             };
+      //Refresh the map everytime we enter the view
+      $scope.$on('$ionicView.afterEnter', function() {
+        var map = Maps.getFeedMap();
+        if(map) {
+          google.maps.event.trigger(map, 'resize');
+        }
+      });
 
-             //Refresh the map everytime we enter the view
-             $scope.$on('$ionicView.afterEnter', function() {
-               var map = Maps.getFeedMap();
-               if(map) {
-                 google.maps.event.trigger(map, 'resize');
-               }
-             });
-
-             //Update the map if the articles are updated
-             Articles.registerObserver(updateArticles);
-           }]);
+      //Update the map if the articles are updated
+      Articles.registerObserver(updateArticles);
+    }]);
