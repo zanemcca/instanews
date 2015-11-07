@@ -37,7 +37,8 @@ app.service('Position', [
           return bounds.contains(position);
         }
         else {
-          return false;
+          console.log('Warning: No Bounds set yet');
+          return true;
         }
       };
 

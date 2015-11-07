@@ -62,13 +62,11 @@ describe('instanews.service.user', function() {
     });
 
     it('should return the user', function() {
-      var usr = {
-        user: 'hey'
-      };
+      var usr = 'hey';
       user.set(usr);
       var res = user.get();
       expect(res).to.be.exist;
-      expect(res).to.equal(usr.user);
+      expect(res).to.equal(usr);
     });
   });
 
@@ -91,13 +89,11 @@ describe('instanews.service.user', function() {
   describe('set', function() {
 
     it('should save the user', function() {
-      var usr = {
-        user: 'hey'
-      };
+      var usr = 'hey';
       user.set(usr);
       var res = user.get();
       expect(res).to.be.exist;
-      expect(res).to.equal(usr.user);
+      expect(res).to.equal(usr);
     });
 
     it('should notify observers', function() {
@@ -135,9 +131,7 @@ describe('instanews.service.user', function() {
 
   describe('clearData', function() {
     it('should delete the in memory user', function() {
-      var usr = {
-        user: 'hey'
-      };
+      var usr = 'hey';
       user.set(usr);
       user.clearData();
       expect(user.get()).to.be.undefined;
@@ -151,7 +145,7 @@ describe('instanews.service.user', function() {
 
     it('should call LocalStorage.secureDelete with result of Platform.getUUID', function() {
       sinon.stub(localStorage, 'secureDelete', function(key) {
-        expect(key).to.equal(platform.getUUID());
+        expect(key).to.equal('session');
       });
       user.clearData();
       expect(localStorage.secureDelete.calledOnce).to.be.true;
@@ -161,9 +155,7 @@ describe('instanews.service.user', function() {
   describe('install', function() {
     beforeEach(function() {
       var usr = {
-        user: {
-          username: 'bob'
-        }
+        username: 'bob'
       };
       user.set(usr);
     });

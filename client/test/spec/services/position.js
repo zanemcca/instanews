@@ -92,7 +92,7 @@ describe('Position service', function() {
 
       it('should write the position to localstorage', function (done) {
         sinon.stub(localStorage, 'secureWrite', function (name, pos) {
-          expect(name).to.equal('position' + platform.getUUID());
+          expect(name).to.equal('position');
           expect(pos).to.deep.equal(loc);
           done();
         });
@@ -135,8 +135,8 @@ describe('Position service', function() {
         expect(position.withinBounds(loc)).to.be.true;
       });
 
-      it('should return false if the bounds are not set yet', function () {
-        expect(position.withinBounds()).to.be.false;
+      it('should return true if the bounds are not set yet', function () {
+        expect(position.withinBounds()).to.be.true;
       });
     });
 

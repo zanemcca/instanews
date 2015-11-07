@@ -17,8 +17,11 @@ app.service('Articles', [
          Position
       ){
 
-   var inViewArticles = [];
-   var outViewArticles = [];
+   var Arts = {
+     inView: [],
+     outView: []
+   };
+
    var itemsAvailable = true;
 
    var defaultFilter = {
@@ -44,7 +47,6 @@ app.service('Articles', [
    };
 
    //Update the filter bounds 
-   //TODO I think we should probably be loading articles automatically when they change the map
    var updateBounds = function() {
      var bounds = Position.getBounds();
 
@@ -66,8 +68,17 @@ app.service('Articles', [
          console.log('Bounds not set yet!');
       }
 
+      filter.skip = 0;
+
+      console.log('UpateBounds');
       itemsAvailable = true;
-      load();
+
+      Platform.loading.show();
+
+      load(function () {
+        reorganize();
+        Platform.loading.hide();
+      });
    };
 
    //Load new articles from the server
@@ -79,15 +90,17 @@ app.service('Articles', [
         Article.find({filter: filter })
         .$promise
         .then( function (articles) {
+          console.log('Loaded new articles');
+          console.log(articles);
            if ( articles.length <= 0 ) {
               itemsAvailable = false;
+              if(cb instanceof Function) {
+                cb();
+              }
            }
            else {
               //Update the global articles list
-              add(articles);
-           }
-           if(cb instanceof Function) {
-             cb();
+              add(articles, cb);
            }
         });
       });
@@ -96,12 +109,12 @@ app.service('Articles', [
 
    //Getters
    var getOne = function (id) {
-      var val = $filter('filter')(inViewArticles, {id: id});
+      var val = $filter('filter')(Arts.inView, {id: id});
       if (val.length > 0) {
          return val[0];
       }
       else {
-        val = $filter('filter')(outViewArticles, {id: id});
+        val = $filter('filter')(Arts.outView, {id: id});
         if (val.length > 0) {
            return val[0];
         }
@@ -110,13 +123,12 @@ app.service('Articles', [
 
    // Find the index of the article if it exists
    // on the array
-   var getIndex = function(articles, article) {
+   var getArticle = function(articles, article) {
      for( var i = 0; i < articles.length; i++) {
        if( articles[i].id === article.id ) {
-         return i;
+         return articles[i];
        }
      }
-     return -1;
    };
 
    //Compare function for sorting the articles
@@ -127,10 +139,18 @@ app.service('Articles', [
    // Update or add a new article
    var addOne = function(articles, article, done) {
       var finish = function () {
-        var idx = getIndex(articles, article);
-        if( idx >= 0 ) {
-          if( article.modified >= articles[idx].modified ) {
-            articles[idx] = article;
+        var a = getArticle(articles, article);
+        if( a ) {
+          if( article.modified >= a.modified ) {
+            a.rating = article.rating;
+            a.title = article.title;
+            a.modified = article.modified;
+            a.downVoteCount = article.downVoteCount;
+            a.upVoteCount = article.upVoteCount;
+            a.topSub = article.topSub;
+            a.upVotes = article.upVotes;
+            a.verified = article.verified;
+            a.version = article.version;
           }
         }
         else {
@@ -155,55 +175,62 @@ app.service('Articles', [
           }
         });
       }
-
    };
 
    var get = function() {
-      return inViewArticles;
+      return Arts.inView;
    };
 
    // Add the given articles
-   var add = function(arts) {
+   var add = function(arts, cb) {
      var total = arts.length;
-     var completed = 0;
-     var done = function () {
-       completed++;
-       if(completed === total) {
-        //Update our skip amount
-        filter.skip = inViewArticles.length;
-        notifyObservers();
-       }
-     };
+     if(total) {
+       var completed = 0;
+       var done = function () {
+         completed++;
+         if(completed === total) {
+          //Update our skip amount
+          filter.skip = Arts.inView.length;
+          notifyObservers();
 
-      for(var i = 0; i < arts.length; i++) {
-        var position = Position.posToLatLng(arts[i].location);
-        if(Position.withinBounds(position)) {
-          addOne(inViewArticles, arts[i], done);
+          if(cb instanceof Function) {
+            cb();
+          }
+         }
+       };
+
+        for(var i = 0; i < arts.length; i++) {
+          var position = Position.posToLatLng(arts[i].location);
+          if(Position.withinBounds(position)) {
+            addOne(Arts.inView, arts[i], done);
+          }
+          else {
+            addOne(Arts.outView, arts[i], done);
+          }
         }
-        else {
-          addOne(outViewArticles, arts[i], done);
-        }
-      }
+     } else {
+       cb();
+     }
    };
 
    // Deletes the local articles
    var deleteAll = function() {
-     inViewArticles = [];
+     Arts.inView = [];
      filter.skip = 0;
      notifyObservers();
    };
 
    // Reorganize the articles into the viewable array and the hidden array
    var reorganize = function() {
-     var total = inViewArticles.length + outViewArticles.length;
+     var total = Arts.inView.length + Arts.outView.length;
      var completed = 0;
      var done = function () {
        completed++;
        if(completed === total) {
         //Update our skip amount
-        inViewArticles = inView;
-        outViewArticles = outView;
-        filter.skip = inViewArticles.length;
+        Arts.inView = inView;
+        Arts.outView = outView;
+        filter.skip = Arts.inView.length;
         notifyObservers();
        }
      };
@@ -223,8 +250,8 @@ app.service('Articles', [
        }
      };
 
-     organize(inViewArticles);
-     organize(outViewArticles);
+     organize(Arts.inView);
+     organize(Arts.outView);
    };
 
    var observerCallbacks = [];
@@ -240,7 +267,7 @@ app.service('Articles', [
    };
 
    // Call reorganize every time the bounds change
-   Position.registerBoundsObserver(reorganize);
+//   Position.registerBoundsObserver(reorganize);
    Position.registerBoundsObserver(updateBounds);
 
    return {

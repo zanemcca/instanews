@@ -223,6 +223,7 @@ describe('Login: ', function(){
         var set = sinon.stub(user, 'set');
         var disable = sinon.stub(navigate, 'disableNextBack');
         var go = sinon.stub(state, 'go');
+        /*
         var write = sinon.stub(storage, 'secureWrite');
         var getDev = sinon.stub(platform, 'getDevice', function() {
             var device = {
@@ -231,6 +232,7 @@ describe('Login: ', function(){
             };
             return device;
         });
+       */
 
         var login = sinon.stub(journalist, 'login', function(obj, cred, success, fail) {
           success(scope.cred);
@@ -241,8 +243,10 @@ describe('Login: ', function(){
         expect(set.calledOnce).to.be.true;
         expect(disable.calledOnce).to.be.true;
         expect(go.calledOnce).to.be.true;
+        /*
         expect(getDev.calledOnce).to.be.true;
         expect(write.calledOnce).to.be.true;
+       */
 
         expect(scope.cred.username).to.equal('');
         expect(scope.cred.email).to.equal('');
