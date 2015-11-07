@@ -44,7 +44,7 @@ app.service('User', [
   };
 
   var clearData = function() {
-    set({});
+    set();
     if(!Platform.isBrowser()) {
       LocalStorage.secureDelete('session');
     }
@@ -56,8 +56,7 @@ app.service('User', [
 
     //TODO check if device is already installed
     if ( user &&
-      user.user &&
-      user.user.username &&
+      user.username &&
       device &&
       device.type &&
       device.token &&
@@ -67,7 +66,7 @@ app.service('User', [
 
       var appConfig = {
         appId: 'instanews',
-        userId: user.user.username,
+        userId: user.username,
         deviceType: device.type,
         deviceToken: device.token,
         status: 'Active'
