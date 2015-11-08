@@ -44,10 +44,10 @@ app.controller(
     }]
 );
 
-//TODO On destroy we need to delete thumbnail file for videos
 //TODO On complete we need to delete local files
 
 //This directive will display subarticle upload in a consumable format
+// istanbul ignore next
 app.directive(
   'inupload', [
     function () {

@@ -119,6 +119,7 @@ app.controller(
         src = $scope.media.source;
       }
 
+      // istanbul ignore else 
       if(src) {
         $scope.source = getUrl($scope.container, src);
       } else {
@@ -130,6 +131,7 @@ app.controller(
 );
 
 //This directive will display subarticle media in a consumable format
+// istanbul ignore next
 app.directive(
   'inmedia', [
     function () {
@@ -145,6 +147,7 @@ app.directive(
 );
 
 //This directive will display media in a preview format
+// istanbul ignore next
 app.directive(
   'inmediapreview', [
     function () {

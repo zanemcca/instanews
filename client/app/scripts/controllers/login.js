@@ -62,6 +62,7 @@ app.controller('LoginCtrl', [
         var p = newVal.password;
         var strength = 0;
 
+        /* istanbul ignore if */
         if( !p || p.length === 0 ) {
           strength = 0;
         }
@@ -125,6 +126,7 @@ app.controller('LoginCtrl', [
       }; 
 
      var failedLogin = function (err) {
+       /* istanbul ignore else */
         if(err) {
           console.log(err);
         }
@@ -172,10 +174,12 @@ app.controller('LoginCtrl', [
          password: $scope.newUser.password
       };
 
+      /* istanbul ignore else */
       if ( $scope.newUser.username ) {
          user.username = $scope.newUser.username.toLowerCase();
       }
 
+      /* istanbul ignore else */
       if( $scope.passwordStrength > 0 && $scope.validEmail()) {
         //Verify that the email and username is unique
         Journalist.count({
@@ -203,11 +207,15 @@ app.controller('LoginCtrl', [
                };
                $scope.login();
                $scope.trashNewUser();
-            }, function(err) {
+            }, 
+            /* istanbul ignore next */
+            function(err) {
               console.log(err);
             });
           }
-        }, function(err) {
+        },
+        /* istanbul ignore next */
+        function(err) {
           console.log(err);
         });
       }
