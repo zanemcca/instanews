@@ -11,12 +11,14 @@ app.directive('inmap', [
   'Maps',
   'Platform',
   'Articles',
+  '_',
   function (
     $stateParams,
     Position,
     Maps,
     Platform,
-    Articles
+    Articles,
+    _
   ) {
 
     return {
