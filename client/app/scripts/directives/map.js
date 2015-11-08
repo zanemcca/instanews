@@ -37,6 +37,7 @@ app.directive('inmap', [
           var position = Position.getPosition();
           var mPosition = {};
 
+          // istanbul ignore else
           if(position && position.coords) {
             mPosition = Position.posToLatLng(position);
           }
@@ -50,12 +51,14 @@ app.directive('inmap', [
 
           // Load the maps and check to make sure there is not already a map
           // loaded in the element before initializing
+          // istanbul ignore else
           if ( element && element.textContent.indexOf('Map') === -1) {
             var map;
             switch(scope.map.id) {
               case 'feedMap':
                 map = new google.maps.Map(element, mapOptions);
 
+                // istanbul ignore else
                 if(navigator.splashscreen) {
                   navigator.splashscreen.hide();
                 }
@@ -85,6 +88,7 @@ app.directive('inmap', [
                 Maps.setMarker(map, mPosition);
                 break;
               case 'articleMap':
+                // istanbul ignore else
                 if ( $stateParams.id) {
                   scope.article = Articles.getOne($stateParams.id);
                   mapOptions.center = new google.maps.LatLng(scope.article.location.lat, scope.article.location.lng);
@@ -100,6 +104,7 @@ app.directive('inmap', [
 
                 break;
               default:
+                // istanbul ignore next
                 console.log('Unknown map Id: ' + map.id);
             }
           } else {

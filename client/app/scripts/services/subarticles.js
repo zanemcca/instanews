@@ -71,6 +71,7 @@ app.service('Subarticles', [
                //Remove duplicates
                for(var j = 0; j < subs.length; j++ ) {
                   var sub = subs[j];
+                  // istanbul ignore else
                   if( sub.id === subarticle.id) {
                      subs.splice(j,1);
                      break;
@@ -83,7 +84,9 @@ app.service('Subarticles', [
             notifyObservers();
          }
          cb();
-      }, function (err) {
+      },
+      // istanbul ignore next 
+      function (err) {
         console.log('Error something with the subarticles failed');
         console.log(err);
         cb();
@@ -107,6 +110,7 @@ app.service('Subarticles', [
 
    var unregisterObserver = function(cb) {
      for(var i = 0; i < observers.length; i++) {
+       // istanbul ignore else
        if(observers[i] === cb) {
          observers.splice(i,1);
          break;

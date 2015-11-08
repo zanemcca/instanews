@@ -55,7 +55,7 @@ app.directive('invotes', [
 
                   $scope.toggleComments = function() {
                     if(!$scope.votable.showComments) {
-
+                      // istanbul ignore else 
                       if(Models.hasOwnProperty($scope.votable.modelName)) {
                         Models[$scope.votable.modelName].comments({
                           id: $scope.votable.id,
@@ -67,7 +67,9 @@ app.directive('invotes', [
                         .then( function (res) {
                           $scope.votable.comments = res;
                           $scope.votable.showComments = true;
-                        }, function(err) {
+                        },
+                        // istanbul ignore next
+                        function(err) {
                           console.log(err);
                         });
                       }
@@ -92,6 +94,7 @@ app.directive('invotes', [
                       clickableType: $scope.votable.modelName
                     };
 
+                    // istanbul ignore else 
                     if(position) {
                       vote.location = {
                         lat: position.coords.latitude,
@@ -101,9 +104,13 @@ app.directive('invotes', [
 
                     UpVote.create(vote)
                     .$promise
-                    .then( function() {
+                    .then(
+                      // istanbul ignore  next 
+                      function() {
                       console.log('Successfully upvoted');
-                    }, function(err) {
+                    }, 
+                    // istanbul ignore  next 
+                    function(err) {
                       console.log('Error: Failed to create an upvote');
                       console.log(err);
                     });
@@ -120,6 +127,7 @@ app.directive('invotes', [
                       clickableType: $scope.votable.modelName
                     };
 
+                    // istanbul ignore else 
                     if(position) {
                       vote.location = {
                         lat: position.coords.latitude,
@@ -129,9 +137,13 @@ app.directive('invotes', [
 
                     DownVote.create(vote)
                     .$promise
-                    .then( function() {
+                    .then(
+                      // istanbul ignore next 
+                      function() {
                       console.log('Successfully downVoted');
-                    }, function(err) {
+                    },
+                    // istanbul ignore next 
+                    function(err) {
                       console.log('Error: Failed to create an downVote');
                       console.log(err);
                     });

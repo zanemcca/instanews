@@ -106,6 +106,7 @@ app.service('Position', [
           //Position as returned from navigator.geolocation
           return new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
         }
+        // istanbul ignore else
         else if(position.lat && position.lng) {
           var latLng =  new google.maps.LatLng(position.lat, position.lng);
           if(!latLng.lat()) {
@@ -127,6 +128,7 @@ app.service('Position', [
       // memory or use central Montreal
       Platform.ready
         .then( function() {
+          // istanbul ignore if
           if( !geolocation ) {
             console.log('HTML5 geolocation not availble. Using cordova plugin instead.');
             geolocation = navigator.geolocation;
@@ -149,14 +151,17 @@ app.service('Position', [
 
           //If the users location is not found in one second then try and read the last known position
           setTimeout(function () {
+            // istanbul ignore else
             if( !mPosition || !mPosition.coords) {
               LocalStorage.secureRead('position', function(err, res) {
+                // istanbul ignore else
                 if (err || !(res && res.coords)) {
                   //If an old location is not found and the users location cannot be determined
                   //then default to Montreal
                   res = { coords: { latitude: 45.5017 , longitude: -73.5673}};
                 }
 
+                // istanbul ignore else
                 if(!mPosition) {
                   console.log('Using stored position');
                   set(res);

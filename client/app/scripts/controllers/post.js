@@ -54,6 +54,7 @@ app.controller('PostCtrl', [
     };
 
     //If we have an ID given then we know we are posting subarticles within an article
+    // istanbul ignore else 
     if( !$stateParams.id ) {
       $scope.newArticle = {
         title: ''
@@ -196,7 +197,9 @@ app.controller('PostCtrl', [
         if(video) {
           $scope.uploads.push(Upload.video(video));
         }
-      }, function(err) {
+      },
+      // istanbul ignore next
+      function(err) {
         console.log(err);
       });
     };
@@ -215,7 +218,9 @@ app.controller('PostCtrl', [
             $scope.uploads.push(Upload.video(media));
           }
         }
-      }, function(err) {
+      },
+      // istanbul ignore next
+      function(err) {
         console.log(err);
       });
     };
@@ -227,7 +232,9 @@ app.controller('PostCtrl', [
         if(photo) {
           $scope.uploads.push(Upload.picture(photo));
         }
-      }, function(err) {
+      }, 
+      // istanbul ignore next
+      function(err) {
         console.log('Error: Failed to capture a new photo: ' + JSON.stringify(err));
       });
     };

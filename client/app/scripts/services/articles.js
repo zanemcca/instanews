@@ -50,6 +50,7 @@ app.service('Articles', [
    var updateBounds = function() {
      var bounds = Position.getBounds();
 
+     // istanbul ignore else
      if(bounds) {
         var sw = bounds.getSouthWest();
         var ne = bounds.getNorthEast();
@@ -94,6 +95,8 @@ app.service('Articles', [
           console.log(articles);
            if ( articles.length <= 0 ) {
               itemsAvailable = false;
+
+              // istanbul ignore else
               if(cb instanceof Function) {
                 cb();
               }
@@ -115,6 +118,7 @@ app.service('Articles', [
       }
       else {
         val = $filter('filter')(Arts.outView, {id: id});
+        // istanbul ignore else
         if (val.length > 0) {
            return val[0];
         }
@@ -166,6 +170,7 @@ app.service('Articles', [
         finish();
       } else {
         Subarticles.loadBest(article.id, function (sub) {
+          // istanbul ignore else
           if(sub) {
             article.topSub = sub;
             finish();
@@ -184,6 +189,7 @@ app.service('Articles', [
    // Add the given articles
    var add = function(arts, cb) {
      var total = arts.length;
+      // istanbul ignore else
      if(total) {
        var completed = 0;
        var done = function () {
