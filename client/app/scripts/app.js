@@ -41,10 +41,13 @@ angular.module('instanews', [
   'ngCordova'
 ])
 
-.config(['LoopBackResourceProvider','ENV',
-        function(LoopBackResourceProvider, ENV) {
-          LoopBackResourceProvider.setUrlBase(ENV.apiEndpoint);
-        }
+.config([
+  'LoopBackResourceProvider',
+  'ENV',
+  // istanbul ignore next
+  function(LoopBackResourceProvider, ENV) {
+    LoopBackResourceProvider.setUrlBase(ENV.apiEndpoint);
+  }
 ])
 
 .constant(

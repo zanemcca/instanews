@@ -168,20 +168,6 @@ describe('instanews.service.user', function() {
       user.clearData();
       expect(user.get()).to.be.undefined;
     });
-
-    it('should call Platform.isBrowser', function() {
-      sinon.spy(platform, 'isBrowser');
-      user.clearData();
-      expect(platform.isBrowser.calledOnce).to.be.true;
-    });
-
-    it('should call LocalStorage.secureDelete with result of Platform.getUUID', function() {
-      sinon.stub(localStorage, 'secureDelete', function(key) {
-        expect(key).to.equal('session');
-      });
-      user.clearData();
-      expect(localStorage.secureDelete.calledOnce).to.be.true;
-    });
   });
 
   describe('install', function() {

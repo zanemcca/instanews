@@ -51,9 +51,6 @@ app.service('User', [
 
     var clearData = function() {
       set();
-      if(!Platform.isBrowser()) {
-        LocalStorage.secureDelete('session');
-      }
     };
 
     var install = function() {
@@ -80,7 +77,9 @@ app.service('User', [
 
            Installation.create(appConfig, function (result, header) {
              console.log('Created a new device installation : ' , header);
-           }, function(err) {
+           },
+           // istanbul ignore next
+           function(err) {
              console.log('Error trying to install device', JSON.stringify(err));
            });
          }
@@ -102,6 +101,7 @@ app.service('User', [
     };
 
     // If a user is logged in already then request a new token
+     // istanbul ignore else 
     if(LoopBackAuth.accessTokenId && LoopBackAuth.currentUserId) {
       //Request a new token that expires in 2 weeks
       //Journalist.accessTokens.create({
@@ -110,7 +110,9 @@ app.service('User', [
         ttl: 1209600
       }, null, function(user) {
         set(user);
-      }, function(err) {
+      }, 
+      // istanbul ignore next
+      function(err) {
         console.log('Error: Cannot create token for user: ' + err);
       });
     }

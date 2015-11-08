@@ -18,6 +18,7 @@ app.controller('ArticleCtrl', [
     Maps
   ) {
 
+    /* istanbul ignore next */
     $scope.safeApply = function(fn) {
       var phase = this.$root.$$phase;
       if(phase === '$apply' || phase === '$digest') {
@@ -46,6 +47,7 @@ app.controller('ArticleCtrl', [
    //Refresh the map everytime we enter the view
    $scope.$on('$ionicView.afterEnter', function() {
       var map = Maps.getArticleMap();
+      /* istanbul ignore else */
       if(map) {
          marker = Maps.setMarker(map,$scope.article.location);
       }

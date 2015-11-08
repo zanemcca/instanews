@@ -37,6 +37,7 @@ app.controller('FeedCtrl', [
        };
        */
 
+      /*istanbul ignore next */
     $scope.safeApply = function(fn) {
       var phase = this.$root.$$phase;
       if(phase === '$apply' || phase === '$digest') {
@@ -147,6 +148,7 @@ $scope.$broadcast('scroll.refreshComplete');
       //Refresh the map everytime we enter the view
       $scope.$on('$ionicView.afterEnter', function() {
         var map = Maps.getFeedMap();
+        /* istanbul ignore else */
         if(map) {
           google.maps.event.trigger(map, 'resize');
         }

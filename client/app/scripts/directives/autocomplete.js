@@ -17,6 +17,7 @@ app.directive('inautocomplete', [
       },
       controller: function($scope) {
 
+        // istanbul ignore next
         $scope.safeApply = function(fn) {
           var phase = this.$root.$$phase;
           if(phase === '$apply' || phase === '$digest') {
@@ -35,6 +36,7 @@ app.directive('inautocomplete', [
         var service = new google.maps.places.AutocompleteService();
 
         var displaySuggestions = function(predictions, status) {
+          // istanbul ignore if
           if (status !== google.maps.places.PlacesServiceStatus.OK) {
             console.log(status);
             return;
@@ -57,12 +59,14 @@ app.directive('inautocomplete', [
           $scope.input.placeholder = defaultPlaceholder;
 
           var cb = $scope.place.localizeCallback;
+          // istanbul ignore else 
           if($scope.place.getMap instanceof Function) {
             var map;
             var delay = 100; //ms
             var timeout = 5000; // 5s
 
             var localizeMap = function (time) {
+              // istanbul ignore else 
               if(time > 0) {
                 setTimeout(function () {
                   map = $scope.place.getMap();
@@ -99,11 +103,13 @@ app.directive('inautocomplete', [
           $scope.done = true;
           if($scope.input.value) {
             service.getQueryPredictions({ input: $scope.input.value }, function (predictions, status) {
+              // istanbul ignore  if 
               if (status !== google.maps.places.PlacesServiceStatus.OK) {
                 console.log(status);
                 return;
               }
 
+              // istanbul ignore else 
               if(predictions.length) {
                 $scope.set(predictions[0]);
               } else {
@@ -121,6 +127,7 @@ app.directive('inautocomplete', [
           $scope.$watch(function (scope) {
             return scope.input.value;
           }, function (newValue, oldValue) {
+            // istanbul ignore else 
             if(newValue !== oldValue) {
               if(newValue) {
                 service.getQueryPredictions({ input: newValue }, displaySuggestions);
@@ -134,7 +141,9 @@ app.directive('inautocomplete', [
         });
 
         $scope.click = function () {
+          // istanbul ignore else 
           if($scope.done) {
+            // istanbul ignore else 
             if($scope.input.placeholder !== defaultPlaceholder) {
               $scope.input.value = $scope.input.placeholder;
             }

@@ -32,6 +32,7 @@ app.directive('incomments', [
                commentableType: instance.modelName
             }).$promise
             .then(function(res,err) {
+              // istanbul ignore if 
                if(err) {
                   console.log(err);
                }
@@ -47,6 +48,7 @@ app.directive('incomments', [
                order = 'date DESC';
             }
 
+            // istanbul ignore else 
             if(Models.hasOwnProperty(instance.modelName)) {
               Models[instance.modelName].comments({
                  id: instance.id,
