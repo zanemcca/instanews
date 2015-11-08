@@ -2,6 +2,7 @@
 
 var app = angular.module('instanews.service.user', ['ionic', 'ngResource','ngCordova']);
 
+/* jshint camelcase: false */
 app.service('User', [
   'Installation',
   'Journalist',
