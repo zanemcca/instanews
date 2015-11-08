@@ -84,6 +84,7 @@ app.directive('inListItem', [
             viewableType: $scope.item.modelName
           };
 
+          // istanbul ignore else
           if(position.coords) {
             view.location = {
               lat: position.coords.latitude,
@@ -95,13 +96,16 @@ app.directive('inListItem', [
           }
 
           View.create(view).$promise
-          .then(function() {
+          .then(
+            // istanbul ignore next 
+            function() {
             console.log('View created: ' + $scope.item.id);
-          }, function(err) {
+          }, 
+          // istanbul ignore next 
+          function(err) {
             console.log('Error: Failed to create a view');
             console.log(err);
           });
-        } else {
         }
 
         /*

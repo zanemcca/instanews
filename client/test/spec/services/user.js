@@ -3,9 +3,13 @@
 
 describe('instanews.service.user', function() {
 
-  var localStorage, platform, installation, user;
+  var localStorage, platform, installation, user, journalist, loopbackAuth;
 
+  var usr;
   beforeEach(function() {
+    usr = {
+      userId: 'sven'
+    };
 
     module('instanews.service.user');
 
@@ -33,6 +37,30 @@ describe('instanews.service.user', function() {
         };
       });
 
+      $provide.service('Journalist', function() {
+        return {
+          logout: function() {
+            return {
+              $promise: {
+                then: function (cb) {
+                  cb();
+                }
+              }
+            };
+          },
+          prototype$__create__accessTokens: function(args, dunno, succ, err) {
+            succ(usr);
+          }
+        };
+      });
+
+      $provide.service('LoopBackAuth', function() {
+        return {
+          accessTokenId: 'accessToken',
+          currentUserId: 'username'
+        };
+      });
+
       $provide.service('Installation', function() {
         return {
           create: function(conf, succ, err) {
@@ -48,17 +76,21 @@ describe('instanews.service.user', function() {
     Installation,
     LocalStorage,
     Platform,
+    Journalist,
+    LoopBackAuth,
     User
   ) {
     installation = Installation;
     localStorage = LocalStorage;
+    journalist = Journalist;
+    loopbackAuth = LoopBackAuth;
     platform = Platform;
     user = User;
   }));
 
   describe('get' , function() {
     it('should return undefined', function() {
-      expect(user.get()).to.be.undefined;
+      expect(user.get()).to.deep.equal(usr);
     });
 
     it('should return the user', function() {
@@ -135,20 +167,6 @@ describe('instanews.service.user', function() {
       user.set(usr);
       user.clearData();
       expect(user.get()).to.be.undefined;
-    });
-
-    it('should call Platform.isBrowser', function() {
-      sinon.spy(platform, 'isBrowser');
-      user.clearData();
-      expect(platform.isBrowser.calledOnce).to.be.true;
-    });
-
-    it('should call LocalStorage.secureDelete with result of Platform.getUUID', function() {
-      sinon.stub(localStorage, 'secureDelete', function(key) {
-        expect(key).to.equal('session');
-      });
-      user.clearData();
-      expect(localStorage.secureDelete.calledOnce).to.be.true;
     });
   });
 

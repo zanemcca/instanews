@@ -17,137 +17,137 @@ app.factory('Platform', [
   ) {
 
 
-   var ready = $q.defer();
+    var ready = $q.defer();
 
-   var device = {
+    var device = {
       type: '',
       token: ''
-   };
+    };
 
-   var getDevice = function() {
+    var getDevice = function() {
       return device;
-   };
+    };
 
-   var setDevice = function(dev) {
+    var setDevice = function(dev) {
       device = dev;
-   };
+    };
 
-   var setDeviceToken = function(token) {
+    var setDeviceToken = function(token) {
       device.token = token;
-   };
+    };
 
-   var getUUID = function() {
+    var getUUID = function() {
       if(ionic.Platform.isIOS() || ionic.Platform.isAndroid()) {
-         return $cordovaDevice.getUUID();
+        return $cordovaDevice.getUUID();
       }
       return;
-   };
+    };
 
-   var isIOS = function() {
+    var isIOS = function() {
       return ionic.Platform.isIOS();
-   };
+    };
 
-   var isBrowser = function() {
-     var ip = ionic.Platform;
-     if(ip.isIOS()) {
-       return false;
-     }
-     else if(ip.isAndroid()) {
-       return false;
-     }
-     else if(ip.isWindowsPhone()) {
-       return false;
-     }
-     else {
-       return true;
-     }
-   };
+    var isBrowser = function() {
+      var ip = ionic.Platform;
+      if(ip.isIOS()) {
+        return false;
+      }
+      else if(ip.isAndroid()) {
+        return false;
+      }
+      else if(ip.isWindowsPhone()) {
+        return false;
+      }
+      else {
+        return true;
+      }
+    };
 
-  var showToast = function(message) {
-    if(!isBrowser()) {
-      setTimeout( function() {
-        window.plugins.toast.showShortCenter(message);
-      }, 250);
-    }
-    console.log(message);
-  };
+    var showToast = function(message) {
+      if(!isBrowser()) {
+        setTimeout( function() {
+          window.plugins.toast.showShortCenter(message);
+        }, 250);
+      }
+      console.log(message);
+    };
 
-  var showSheet = function(sheet) {
-    $ionicActionSheet.show(sheet);
-  };
+    var showSheet = function(sheet) {
+      $ionicActionSheet.show(sheet);
+    };
 
-  var showAlert = function (message, title, cb) {
-    if(!cb) {
-      cb = function () {
-        console.log('Dialog was confirmed');
-      };
-    }
+    var showAlert = function (message, title, cb) {
+      if(!cb) {
+        cb = function () {
+          console.log('Dialog was confirmed');
+        };
+      }
 
-    $cordovaDialogs.alert(message, title, 'Ok')
-    .then(cb);
-  };
+      $cordovaDialogs.alert(message, title, 'Ok')
+      .then(cb);
+    };
 
-  var getDataDir = function() {
-    return cordova.file.dataDirectory;
-  };
+    var getDataDir = function() {
+      return cordova.file.dataDirectory;
+    };
 
-  var isCameraPresent = function () {
-    return (navigator.camera && navigator.camera.getPicture);
-  };
+    var isCameraPresent = function () {
+      return (navigator.camera && navigator.camera.getPicture);
+    };
 
-  var isVideoPresent = function () {
-    return (navigator.device && navigator.device.capture && navigator.device.capture.captureVideo);
-  };
+    var isVideoPresent = function () {
+      return (navigator.device && navigator.device.capture && navigator.device.capture.captureVideo);
+    };
 
-  var getDeviceType = function () {
-    var height = window.innerHeight;
-    var type = 'phone';
-    if( 900 <= height ) {
-      type = 'tablet';
-    }
-    return type;
-  };
+    var getDeviceType = function () {
+      var height = window.innerHeight;
+      var type = 'phone';
+      if( 900 <= height ) {
+        type = 'tablet';
+      }
+      return type;
+    };
 
-  // Screen size logic
-  var getSizeClass = function (max) {
-    var pr = window.devicePixelRatio;
-    var sizeClass;
-    switch(getDeviceType()) {
-      case 'phone':
-        sizeClass = Math.floor(pr -1);
+    // Screen size logic
+    var getSizeClass = function (max) {
+      var pr = window.devicePixelRatio;
+      var sizeClass;
+      switch(getDeviceType()) {
+        case 'phone':
+          sizeClass = Math.floor(pr -1);
         break;
-      case 'tablet':
-        sizeClass = Math.floor(pr*3/2);
+        case 'tablet':
+          sizeClass = Math.floor(pr*3/2);
         break;
-      default:
-        sizeClass = 0;
+        default:
+          sizeClass = 0;
         break;
+      }
+
+      if(max || max === 0) {
+        sizeClass = Math.min(sizeClass, max);
+      }
+      return sizeClass;
+    };
+
+    var getSizeClassPrefix = function (max) {
+      var sizes = ['XS','S','M','L'];
+      if(max) {
+        max = Math.min(sizes.length -1, max);
+      } else {
+        max = 0;
+      }
+
+      return sizes[getSizeClass(max)];
+    };
+
+    /* Initialization */
+    if(isBrowser()) {
+      console.log('App is running in the browser!');
+      ready.resolve();
     }
-
-    if(max || max === 0) {
-      sizeClass = Math.min(sizeClass, max);
-    }
-    return sizeClass;
-  };
-
-  var getSizeClassPrefix = function (max) {
-    var sizes = ['XS','S','M','L'];
-    if(max) {
-      max = Math.min(sizes.length -1, max);
-    } else {
-      max = 0;
-    }
-
-    return sizes[getSizeClass(max)];
-  };
-
-   /* Initialization */
-   if(isBrowser()) {
-     console.log('App is running in the browser!');
-     ready.resolve();
-   }
-   else {
-     ionic.Platform.ready( function( device ) {
+    else {
+      ionic.Platform.ready( function( device ) {
         /* jshint undef:false */
         if(navigator.connection && navigator.connection.type === Connection.NONE) {
           Platform.showAlert('Instanews is unavailable offline. Please try again later', 'Sorry', function () {
@@ -165,25 +165,42 @@ app.factory('Platform', [
             }
           }, 5000);
         }
-     });
-   }
+      });
+    }
 
-   var hideKeyboard = function () {
-     if(cordova && cordova.plugins && cordova.plugins.Keyboard) {
-       cordova.plugins.Keyboard.close();
-     }
-   };
+    var hideKeyboard = function () {
+      if(cordova && cordova.plugins && cordova.plugins.Keyboard) {
+        cordova.plugins.Keyboard.close();
+      }
+    };
 
-   var loading = {
-     show: function () {
-       return $ionicLoading.show({
+    var loading = {
+      show: function () {
+        return $ionicLoading.show({
           template: 'Loading...'
         });
-     },
-     hide: $ionicLoading.hide
-   };
+      },
+      hide: $ionicLoading.hide
+    };
 
-   return {
+    // Initialize the platform
+    ready.promise
+      .then(function() {
+      loading.show();
+
+      // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
+      // for form inputs)
+      if (window.cordova && window.cordova.plugins.Keyboard) {
+        cordova.plugins.Keyboard.hideKeyboardAccessoryBar(true);
+      }
+
+      if (window.StatusBar) {
+        // org.apache.cordova.statusbar required
+        StatusBar.styleDefault();
+      }
+    });
+
+    return {
       hideKeyboard: hideKeyboard,
       loading: loading,
       getUUID: getUUID,
@@ -200,6 +217,6 @@ app.factory('Platform', [
       setDeviceToken: setDeviceToken,
       getSizeClassPrefix: getSizeClassPrefix,
       ready: ready.promise
-   };
-}]);
+    };
+  }]);
 

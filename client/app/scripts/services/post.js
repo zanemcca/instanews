@@ -64,12 +64,16 @@ app.factory('Post', [
               }
               Platform.showToast(message);
             }
-          }, function(err) {
+          }, 
+          // istanbul ignore next
+          function(err) {
             failed = true;
             console.log('Failed to upload subarticle');
             console.log(err);
           });
-        }, function (err) {
+        }, 
+        // istanbul ignore next
+        function (err) {
           console.log(err);
         });
       });
@@ -77,9 +81,12 @@ app.factory('Post', [
 
     var post = function (uploads, article) {
       posting = true;
+
+      // istanbul ignore else
       if(uploads.length) {
         if(typeof article === 'string') {
           postSubarticles(uploads, article);
+        // istanbul ignore else 
         } else if(isValidArticle(article)) { 
           Article.create(article)
           .$promise

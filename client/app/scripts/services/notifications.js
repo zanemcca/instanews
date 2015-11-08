@@ -16,6 +16,98 @@ app.service('Notifications', [
          User,
          $filter
          ){
+        //NOTIFICATION STUFF FROM APP.JS
+      /*
+      $scope.notifications = [];
+
+      var updateNotifications = function() {
+         $scope.notifications = Notifications.get();
+      }; 
+
+      //Notifications.registerObserver(updateNotifications);
+      */
+      /*
+      $scope.handleNotification = function(note) {
+         if(note.notifiableType === 'article') {
+            $state.go('app.article',{ id: note.notifiableId});
+         }
+         else {
+            $state.go('app.notif', { id: note.id});
+         }
+         Navigate.toggleMenu();
+         note.seen = true;
+
+         Journalist.notifications.updateById({
+            id: $scope.user.username,
+            fk: note.id,
+         },note ).$promise
+         .then(function(res) {
+            console.log('Notification updated: ' + res);
+         });
+      };
+
+      var loadNotifications = function() {
+         if( $scope.user && $scope.user.username ){
+            var filter = {
+               limit: 25,
+               skip: 0,
+               order: 'date DESC',
+            };
+
+            Journalist.prototype$__get__notifications({
+               id: $scope.user.username,
+               filter: filter
+            }).$promise
+            .then( function(res) {
+               Notifications.set(res);
+            });
+         }
+         else {
+            console.log('Cannot load notifications because user is not set yet');
+         }
+      };
+     */
+         /*
+           var registerPush = function () {
+         var config = {};
+
+         var device = Platform.getDevice();
+
+         if( ionic.Platform.isAndroid()) {
+            config = {
+               senderID: '1081316781214'
+            };
+            device.type = 'android';
+         }
+         else if( ionic.Platform.isIOS()) {
+            config = {
+               badge: true,
+               sounde: true,
+               alert: true
+            };
+            device.type = 'ios';
+         }
+         else {
+            console.log('Cannot register! Unknown device!');
+            return;
+         }
+
+               console.log('Attempting to register device for push notifications');
+               $cordovaPush.register(config)
+               .then( function (res) {
+
+                  console.log('Registered for push notification with cordovaPush: ', res);
+                  device.token = res;
+                  Platform.setDevice(device);
+
+               }, function(err) {
+                  console.log(err);
+               });
+            }
+         });
+         };
+            */
+
 
    var notifications = [];
 
