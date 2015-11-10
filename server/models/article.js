@@ -9,6 +9,42 @@ module.exports = function(Article) {
      common.readModifyWrite(Article, query, modify, cb, options);
    };
 
+   Article.getHeatMap = function (box, cb) {
+     console.dir(box);
+     Article.find({
+       limit: 500,
+       fields: {
+         location: true,
+         rating: true
+       },
+       where: {
+         location: {
+           geoWithin: {
+             $box: box
+           }
+         }
+       },
+       order: 'rating DESC'
+     }, function (err, res) {
+       // istanbul ignore if
+       if(err) {
+         console.error('Failed to find articles for the heatmap!');
+         console.error(err.stack);
+       } else {
+         console.log('Found ' + res.length + ' articles for the heatmap');
+         cb(null, res);
+       }
+     });
+   };
+
+   Article.remoteMethod(
+     'getHeatMap',
+     {
+       accepts: { arg: 'box', type: 'array'},
+       returns: { arg: 'data', type: 'array'}
+     }
+   );
+
    var staticDisable = [
       'exists',
       'count',
