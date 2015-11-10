@@ -123,7 +123,6 @@ setupPush(app);
 //Setup all the back end hooks
 hookSetup(app);
 
-
 var onConnected = function(dataSource) {
   dataSource.autoupdate(function(err) {
     if (err) {
