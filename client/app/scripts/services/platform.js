@@ -200,8 +200,14 @@ app.factory('Platform', [
       }
     });
 
+    var getAppNameLogo = function () {
+     //return '<img src="images/favicon.ico"/>stanews'; 
+     return 'InstaNews'; 
+    };
+
     return {
       hideKeyboard: hideKeyboard,
+      getAppNameLogo: getAppNameLogo,
       loading: loading,
       getUUID: getUUID,
       getDataDir: getDataDir,

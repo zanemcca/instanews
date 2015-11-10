@@ -10,11 +10,14 @@ checkout:
       - mv Dockerfile.staging Dockerfile
 
 dependencies:
+   cache_directories:
+      - "client/app/bower_components"
+      - "node_modules"
+      - "client/node_modules"
    override:
-     #      - npm install
+      - npm install
       - cd client && bower install && npm install && npm install -g grunt grunt-cli && cd ..
       - docker build -t instanews .
-
 test:
    override:
      - cd client && grunt karma && cd ..
