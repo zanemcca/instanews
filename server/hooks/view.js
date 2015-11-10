@@ -4,6 +4,7 @@
 module.exports = function(app) {
 
   var View = app.models.view;
+  var Stat = app.models.stat;
   var loopback = require('loopback');
   var debug = app.debug('hooks:view');
 
@@ -80,20 +81,40 @@ module.exports = function(app) {
 
   View.updateViewableAttributes = function(ctx, data, next) {
     debug('updateViewableAttributes', ctx, data, next);
-    if(ctx.instance) {
-      ctx.instance.viewable(function(err, res) {
+    var inst = ctx.instance;
+    if(inst) {
+      inst.viewable(function(err, res) {
         if(err) {
           console.warn('Warning: Failed to fetch viewable');
           return next(err);
         }
 
+        // istanbul ignore else
         if(res) {
           res.updateAttributes(data, function(err,res) {
             if(err) {
               console.warn('Warning: Failed to save viewable');
               next(err);
             } else {
-              next();
+              Stat.triggerRating({
+                id: inst.viewableId
+              },
+              inst.viewableType,
+              null,
+              function(err, res) {
+                if(err) { 
+                  //Conflicts are ok because it means that 
+                  //someone else has just triggered the rating.
+                  //So we will not throw an error
+                  console.error('Error: Failed to update the rating for ' +
+                                inst.viewableType + ' - ' + inst.viewableId +
+                                ' from click ' + inst.id);
+                  console.error(err.stack);
+                  return next(err);
+                }
+                next();
+              }); 
+              //next();
             }
           });
         } else {
