@@ -61,6 +61,9 @@ describe('Feed: ', function(){
       $provide.service('Platform', function() {
         return {
           showSheet: function(sheet) {},
+          getAppNameLogo: function () {
+            return 'logoname';
+          },
           showToast: function(message) {}
         }
       });
