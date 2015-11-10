@@ -30,7 +30,7 @@ module.exports = function(app) {
 
     Journalist.afterRemoteError('login',
     function(ctx, next) {
-       debug('afterRemoteError login', ctx, instance, next);
+      debug('afterRemoteError login', ctx, instance, next);
       app.brute.prevent(ctx.req, ctx.res, function() {
              next();
       });

@@ -87,8 +87,8 @@ module.exports = function(Stat) {
   Stat.weight = {
     upVotes: 1,
     downVotes: 1,
-    subarticles: 1,
-    comments: 1
+    subarticles: 0.7, 
+    comments: 0.7
   };
 
   Stat.getRating = function(rateable) {

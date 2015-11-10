@@ -1,6 +1,6 @@
 
 /* jshint camelcase: false */
-var LIMIT = 50;
+var LIMIT = 500;
 
 module.exports = function(app) {
 

@@ -85,18 +85,18 @@ exports.run = function () {
           it('should reduce the limit to the maximum', function () {
             ctx.query.limit = 5000;
             run();
-            expect(ctx.query.limit).to.equal(50);
+            expect(ctx.query.limit).to.equal(500);
           });
 
           it('should set the limit to the maximum', function () {
             run();
-            expect(ctx.query.limit).to.equal(50);
+            expect(ctx.query.limit).to.equal(500);
           });
 
           it('should not modify the limit', function () {
-            ctx.query.limit = 49;
+            ctx.query.limit = 499;
             run();
-            expect(ctx.query.limit).to.equal(49);
+            expect(ctx.query.limit).to.equal(499);
           });
         });
 
