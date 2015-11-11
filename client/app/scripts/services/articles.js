@@ -109,7 +109,6 @@ app.service('Articles', [
       });
    };
 
-
    //Getters
    var getOne = function (id) {
       var val = $filter('filter')(Arts.inView, {id: id});
