@@ -3,11 +3,15 @@
 var app = angular.module('instanews.service.maps', ['ionic', 'ngResource','ngCordova']);
 
 app.service('Maps', [
+  'Article',
   'Articles',
   'Position',
+  'Platform',
   function(
+    Article,
     Articles,
-    Position
+    Position,
+    Platform
   ){
 
     var feedMap, postMap, articleMap;
@@ -39,19 +43,51 @@ app.service('Maps', [
     var heatmap;
 
     var createGradient = function() {
+      //Original
       var start = {
         h: 0.5,
         s: 1,
         l: 0.5,
         a: 0
       };
-
       var end = {
         h: 1,
         s: 1,
         l: 0.5,
         a: 1
       };
+
+     /*
+      var start = {
+        h: 0.53,
+        s: 1,
+        l: 0.516,
+        a: 0
+      }; 
+
+      var end = {
+        h: 0.53,
+        s: 1,
+        l: 0.90,
+        a: 0
+      };
+      */
+
+    /*
+     //Orange
+      var start = {
+        h: 0.083,
+        s: 1,
+        l: 0.8,
+        a: 0 
+      };
+      var end = {
+        h: 0.083,
+        s: 1,
+        l: 0.5,
+        a: 1
+      };
+      */
 
       var length = 100;
 
@@ -160,50 +196,70 @@ return gradient;
 */
 
     var updateHeatmap = function() {
-      var articles = Articles.get();
-      console.log('Updating map with ' + articles.length + ' articles');
+      //var articles = Articles.get();
+      var bounds = Position.getBounds();
+      if(bounds) {
+        var sw = bounds.getSouthWest();
+        var ne = bounds.getNorthEast();
+        console.log('Getting heatmap');
+        Article.getHeatMap({
+          box: [
+            [sw.lat(), sw.lng()],
+            [ne.lat(), ne.lng()]
+          ]
+        }).$promise
+        .then(function (res) {
+          var articles = res.data;
+          console.log(articles);
+          console.log('Updating map with ' + articles.length + ' articles');
 
-      var articleHeatArray = [];
+          var articleHeatArray = [];
 
-      if( !Position.getBounds()) {
-        return;
-      }
+          if( !Position.getBounds()) {
+            return;
+          }
 
-      var total = 0;
-      var avg = 0;
-      for(var i = 0; i < articles.length; i++) {
-        if( articles[i].rating > 0) {
-          total += articles[i].rating;
-          avg += articles[i].rating/articles.length;
-        }
-      }
+          var total = 0;
+          var avg = 0;
+          for(var i = 0; i < articles.length; i++) {
+            if( articles[i].rating > 0) {
+              total += articles[i].rating;
+              avg += articles[i].rating/articles.length;
+            }
+          }
 
-      for(i = 0; i < articles.length; i++) {
-        var position = Position.posToLatLng(articles[i].location);
-        var rating = articles[i].rating;
-        if(rating < 0) {
-          rating = 0.1;
-        }
+          for(i = 0; i < articles.length; i++) {
+            var position = Position.posToLatLng(articles[i].location);
+            var rating = articles[i].rating;
+            if(rating < 0) {
+              rating = 0.1;
+            }
 
-        if (Position.withinBounds(position)) {
-          articleHeatArray.push({
-            location: position,
-            //weight: 1 - Math.exp(-rating/(2*avg))
-            weight: rating*10000
-          });
-        }
-      }
+            if (Position.withinBounds(position)) {
+              articleHeatArray.push({
+                location: position,
+                //weight: 1 - Math.exp(-rating/(2*avg))
+                weight: rating*10000
+              });
+            }
+          }
 
-      if (!heatmap) {
+          if (!heatmap) {
 
-        heatmap = new google.maps.visualization.HeatmapLayer({
-          map: getFeedMap(),
-          gradient: createGradient(),
-          data: articleHeatArray
+            heatmap = new google.maps.visualization.HeatmapLayer({
+              map: getFeedMap(),
+              radius: 15,
+              gradient: createGradient(),
+              data: articleHeatArray
+            });
+          }
+          else {
+            heatmap.setData(articleHeatArray);
+          }
+        }, function (err) {
+          console.log('Error');
+          console.log(err);
         });
-      }
-      else {
-        heatmap.setData(articleHeatArray);
       }
     };
 
@@ -231,14 +287,22 @@ return gradient;
 
     var setCenter = function(map, pos) {
       if(pos) {
-        map.setCenter(Position.posToLatLng(pos));
+        map.panTo(Position.posToLatLng(pos));
         return true;
       }
       return false;
     };
 
     var fitBounds = function(map, bounds) {
-      map.fitBounds(bounds);
+      if(Platform.isBrowser()) {
+        map.panTo(bounds.getCenter());
+        var listener = google.maps.event.addListenerOnce(map, 'idle', function () {
+          google.maps.event.removeListener(listener);
+          map.fitBounds(bounds);
+        });
+      } else {
+        map.fitBounds(bounds);
+      }
     };
 
     var marker;
@@ -248,7 +312,6 @@ return gradient;
     };
 
     var setMarker = function(map, position) {
-
       if(!marker) {
         var tempMarker = {
           map: map,
@@ -343,7 +406,7 @@ $scope.mPos.radSlider = Position.radToSlide(options.radius);
 */
 
 
-//MARKERS =============================================================
+    //MARKERS =============================================================
 
 /*
    var markers = [];
@@ -397,7 +460,8 @@ markers.push(new google.maps.Marker(tempMarker));
 
 */
 
-Articles.registerObserver(updateHeatmap);
+//Articles.registerObserver(updateHeatmap);
+Position.registerBoundsObserver(updateHeatmap);
 
 return {
   localize: localize,

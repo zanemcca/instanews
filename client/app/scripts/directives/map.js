@@ -44,11 +44,35 @@ app.directive('inmap', [
             mPosition = Position.posToLatLng(position);
           }
 
+
+          var instanewsMapType = new google.maps.StyledMapType([
+            {
+              stylers: [
+                {hue: '#023E4F'},
+                {visibility: 'simplified'},
+                {gama: 0.5},
+                {weight: 0.5}
+              ]
+            },
+            {
+              featureType: 'poi',
+              elementType: 'labels',
+              stylers: [{visibility: 'off'}]
+            },
+            {
+              featureType: 'water',
+              stylers: [{color: '#023E4F'}]
+            }
+          ], {
+            name: 'Instanews Style'
+          });
+          var instanewsMapTypeId = 'instanews_style';
+
           var mapOptions = {
             center: mPosition,
             zoom: 12,
-            disableDefaultUI: true,
-            mapTypeId: google.maps.MapTypeId.ROADMAP
+            minZoom: 3,
+            disableDefaultUI: true, 
           };
 
           // Load the maps and check to make sure there is not already a map
@@ -57,8 +81,11 @@ app.directive('inmap', [
           if ( element && element.textContent.indexOf('Map') === -1) {
             var map;
             switch(scope.map.id) {
-              case 'feedMap':
+              case 'feedMap': {
+                mapOptions.maxZoom = 17;
                 map = new google.maps.Map(element, mapOptions);
+                map.mapTypes.set(instanewsMapTypeId, instanewsMapType);
+                map.setMapTypeId(instanewsMapTypeId);
 
                 // istanbul ignore else
                 if(navigator.splashscreen) {
@@ -75,39 +102,88 @@ app.directive('inmap', [
 
                 Maps.setFeedMap(map);
                 break;
-              case 'postMap':
+              }
+              case 'postMap': {
                 mapOptions.zoom = 18;
+                mapOptions.maxZoom = 18;
+                mapOptions.minZoom = 9;
                 mapOptions.mapTypeId = google.maps.MapTypeId.HYBRID;
-                //var marker;
+                mapOptions.styles = [
+                  {
+                    featureType: 'poi',
+                    elementType: 'labels',
+                    stylers: [{visibility: 'off'}]
+                  }
+                ];
 
                 map = new google.maps.Map(element, mapOptions);
-                Maps.setPostMap(map);
+                map.mapTypes.set(instanewsMapTypeId, instanewsMapType);
+                map.setTilt(45);
+
+                google.maps.event.addDomListener(map, 'zoom_changed', function () {
+                  var zoom = map.getZoom();
+                  if(zoom < 16) {
+                    map.setMapTypeId(instanewsMapTypeId);
+                  } else {
+                    map.setMapTypeId(google.maps.MapTypeId.HYBRID);
+                  }
+                });
 
                 google.maps.event.addListener(map, 'click', function(event) {
                   Maps.setMarker(Maps.getPostMap(), event.latLng);
                 });
 
+                Maps.setPostMap(map);
                 Maps.setMarker(map, mPosition);
                 break;
-              case 'articleMap':
+              }
+              case 'articleMap': {
                 // istanbul ignore else
                 if ( $stateParams.id) {
                   scope.article = Articles.getOne($stateParams.id);
                   mapOptions.center = new google.maps.LatLng(scope.article.location.lat, scope.article.location.lng);
                   mapOptions.zoom = 18;
+                  mapOptions.minZoom = 9;
                   mapOptions.mapTypeId = google.maps.MapTypeId.HYBRID;
+                  mapOptions.styles = [
+                    {
+                      featureType: 'poi',
+                      elementType: 'labels',
+                      stylers: [{visibility: 'off'}]
+                    }
+                  ];
                 }
                 else {
-                  console.log('Not id given! The article map is dependent on knowing the article location!');
+                  console.log('No id given! The article map is dependent on knowing the article location!');
                 }
                 map = new google.maps.Map(element, mapOptions);
+                map.mapTypes.set(instanewsMapTypeId, instanewsMapType);
+                map.setTilt(45);
+
+                google.maps.event.addDomListener(map, 'zoom_changed', function () {
+                  var zoom = map.getZoom();
+                  if(zoom < 16) {
+                    map.setMapTypeId(instanewsMapTypeId);
+                  } else {
+                    map.setMapTypeId(google.maps.MapTypeId.HYBRID);
+                  }
+                });
+
+                google.maps.event.addDomListener(map, 'center_changed', _.debounce(function() {
+                  if(!map.getBounds().contains(mapOptions.center)) {
+                    console.log('setting center');
+                    map.panTo(mapOptions.center);
+                  }
+                }, 50));
 
                 Maps.setArticleMap(map);
 
                 break;
-              default:
+              }
+              default: {
                 // istanbul ignore next
                 console.log('Unknown map Id: ' + map.id);
+              }
             }
           } else {
             console.log('Map directive is broken!');
