@@ -42,6 +42,7 @@ app.controller('PostCtrl', [
 
     $scope.place = {
       getMap: Maps.getPostMap,
+      ignore: ['country', 'administrative_area_level_1'],
       localizeCallback: function (err, pos) {
         if(err) {
           console.log('Error: ' + err);

@@ -65,6 +65,7 @@ app.controller('FeedCtrl', [
     });
 
     $scope.place = {
+      //types: ['(regions)'],
       getMap: Maps.getFeedMap
     };
 

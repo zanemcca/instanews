@@ -1,5 +1,3 @@
-/* istanbul ignore next */
-
 (function(window, angular, undefined) {'use strict';
 
 var urlBase = "/api";
@@ -313,6 +311,45 @@ module.factory(
           isArray: true,
           url: urlBase + "/articles",
           method: "GET"
+        },
+
+        /**
+         * @ngdoc method
+         * @name lbServices.Article#getHeatMap
+         * @methodOf lbServices.Article
+         *
+         * @description
+         *
+         * <em>
+         * (The remote method definition does not provide any description.)
+         * </em>
+         *
+         * @param {Object=} parameters Request parameters.
+         *
+         *   This method does not accept any parameters.
+         *   Supply an empty object or omit this argument altogether.
+         *
+         * @param {Object} postData Request data.
+         *
+         *  - `box` – `{*=}` - 
+         *
+         * @param {function(Object,Object)=} successCb
+         *   Success callback with two arguments: `value`, `responseHeaders`.
+         *
+         * @param {function(Object)=} errorCb Error callback with one argument:
+         *   `httpResponse`.
+         *
+         * @returns {Object} An empty reference that will be
+         *   populated with the actual data once the response is returned
+         *   from the server.
+         *
+         * Data properties:
+         *
+         *  - `data` – `{*=}` - 
+         */
+        "getHeatMap": {
+          url: urlBase + "/articles/getHeatMap",
+          method: "POST"
         },
 
         // INTERNAL. Use Journalist.articles() instead.
@@ -1312,6 +1349,41 @@ module.factory(
         "download": {
           url: urlBase + "/storages/:container/download/:file",
           method: "GET"
+        },
+
+        /**
+         * @ngdoc method
+         * @name lbServices.Storage#transcodingComplete
+         * @methodOf lbServices.Storage
+         *
+         * @description
+         *
+         * Handles job completion notifications passed from the transcoder
+         *
+         * @param {Object=} parameters Request parameters.
+         *
+         *   This method does not accept any parameters.
+         *   Supply an empty object or omit this argument altogether.
+         *
+         * @param {Object} postData Request data.
+         *
+         *  - `ctx` – `{object=}` - 
+         *
+         * @param {function(Object,Object)=} successCb
+         *   Success callback with two arguments: `value`, `responseHeaders`.
+         *
+         * @param {function(Object)=} errorCb Error callback with one argument:
+         *   `httpResponse`.
+         *
+         * @returns {Object} An empty reference that will be
+         *   populated with the actual data once the response is returned
+         *   from the server.
+         *
+         * This method returns no data.
+         */
+        "transcodingComplete": {
+          url: urlBase + "/storages/transcodingComplete",
+          method: "POST"
         },
       }
     );
