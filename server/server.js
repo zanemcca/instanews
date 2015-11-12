@@ -12,6 +12,13 @@ var https = require('https');
 var http = require('http');
 var fs = require('fs');
 
+var datadog = require('connect-datadog')({
+  response_code: true,
+  method: true,
+  protocol: true,
+  tags: ['app:instanews']
+});
+
 var cred = require('./conf/credentials');
 
 var app = loopback();
@@ -62,7 +69,7 @@ if( process.env.NODE_ENV === 'production') {
 
   app.use(loopback.logger(loggerFmt));
 } else {
-//} else if( process.env.NODE_ENV !== 'staging') {
+  //} else if( process.env.NODE_ENV !== 'staging') {
   app.use(loopback.logger('dev'));
 }
 
@@ -70,35 +77,35 @@ if( process.env.NODE_ENV === 'production') {
 app.use(loopback.context());
 app.use(loopback.token());
 /*
-app.use(function setCurrentUser(req, res, next) {
-  var where;
-  if (!req.accessToken) {
-    where = {
-      id: 'averageJoe'
-    };
-  }
-  else {
-    where = {
-      username: req.accessToken.userId
-    };
-  }
+   app.use(function setCurrentUser(req, res, next) {
+   var where;
+   if (!req.accessToken) {
+   where = {
+id: 'averageJoe'
+};
+}
+else {
+where = {
+username: req.accessToken.userId
+};
+}
 
-  app.models.Stat.findOne({
-    where: where
-  }, function(err, stat) {
-    if (err) {
-      return next(err);
-    }
-    if (!stat) {
-      return next(new Error('No user with this access token was found.'));
-    }
-    var loopbackContext = loopback.getCurrentContext();
-    if (loopbackContext) {
-      loopbackContext.set('currentStat', stat);
-      //      console.log('Current user stat is set to ' + stat.id);
-    }
-    next();
-  });
+app.models.Stat.findOne({
+where: where
+}, function(err, stat) {
+if (err) {
+return next(err);
+}
+if (!stat) {
+return next(new Error('No user with this access token was found.'));
+}
+var loopbackContext = loopback.getCurrentContext();
+if (loopbackContext) {
+loopbackContext.set('currentStat', stat);
+//      console.log('Current user stat is set to ' + stat.id);
+}
+next();
+});
 });
 */
 
@@ -107,6 +114,8 @@ app.use(helmet());
 
 // Compress everything
 app.use(loopback.compress());
+
+app.use(datadog);
 
 if( process.env.NODE_ENV && process.env.NODE_ENV === 'production') {
   app.use(loopback.static(path.resolve(__dirname, '../common/')));
