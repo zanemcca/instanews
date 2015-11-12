@@ -263,6 +263,7 @@ module.exports = function(app) {
       Click.updateClickableAttributes(ctx, { 
         '$inc': ctx.inc 
       }, function(err) {
+        console.error('Failed to update clickableAttributes');
         next(err);
       });
     }
