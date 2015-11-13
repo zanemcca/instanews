@@ -1,6 +1,6 @@
 
 /* jshint camelcase: false */
-var LIMIT = 500;
+var LIMIT = 300;
 
 module.exports = function(app) {
 
@@ -79,12 +79,12 @@ module.exports = function(app) {
       if(context) {
         var token = context.get('accessToken');
         var username;
-        /* istanbul ignore else */
+        // istanbul ignore else 
         if(token) {
           username =  token.userId;
         }
 
-        /* istanbul ignore else */
+        // istanbul ignore else
         if(username) {
           ctx.query.include.push({
             relation: 'upVotes',
@@ -105,7 +105,6 @@ module.exports = function(app) {
         }
       }
     }
-
     next();
   });
 

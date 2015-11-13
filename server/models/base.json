@@ -3,6 +3,11 @@
   "base": "PersistedModel",
   "strict": false,
   "idInjection": true,
+  "indexes": {
+    "rating_index": {
+      "rating": -1
+    }
+  },
   "hidden": [
     "ratingModified",
     "ratingVersion",
@@ -10,15 +15,14 @@
     "notCommentRating",
     "notSubarticleRating",
     "getSubarticlesCount",
+    "createSubarticleCount",
+    "isPrivate",
+    "clickCount",
     "viewCount"
   ],
   "properties": {
     "modelName": {
       "type": "string",
-      "required": true
-    },
-    "rating": {
-      "type": "number",
       "required": true
     },
     "ratingModified": {
@@ -45,6 +49,10 @@
     },
     "modified": {
       "type": "date"
+    },
+    "rating": {
+      "type": "number",
+      "required": true
     }
   },
   "validations": [],
