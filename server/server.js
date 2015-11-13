@@ -86,8 +86,11 @@ if( process.env.NODE_ENV === 'production') {
 app.use(loopback.context());
 app.use(loopback.token());
 
+// istanbul ignore next
 var logConnections = debounce(function () {
-  app.dd.histogram('app.connections', http.connections);
+  if(app.dd && http) {
+    app.dd.histogram('app.connections', http.connections);
+  }
 }, 10);
 
 app.use(function log (req, res, next) {
@@ -103,6 +106,7 @@ app.use(loopback.compress());
 
 app.use(datadog);
 
+// istanbul ignore if
 if( process.env.NODE_ENV && process.env.NODE_ENV === 'production') {
   app.use(loopback.static(path.resolve(__dirname, '../common/')));
 } else {
@@ -120,6 +124,7 @@ hookSetup(app);
 
 var onConnected = function(dataSource) {
   dataSource.autoupdate(function(err) {
+    // istanbul ignore if
     if (err) {
       console.error('Database could not be autoupdated');
       console.error(err);
@@ -143,6 +148,7 @@ app.start = function() {
 
   var server;
   var httpOnly = true;
+  // istanbul ignore if
   if( process.env.NODE_ENV && process.env.NODE_ENV !== 'development') {
     httpOnly = false;
     //Staging and production are done over https

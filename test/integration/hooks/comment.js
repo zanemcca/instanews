@@ -28,6 +28,8 @@ exports.run = function () {
       });
     });
 
+    /*
+     * TODO Re-enable these once notifications are finished
     on.comment().by('bob').describe('create comment', function() {
       it('should create a notification for bob', function(done) {
         Comment.create(function(err, comment) {
@@ -59,9 +61,6 @@ exports.run = function () {
         });
       });
     });
-
-    /*
-     * TODO Re-enable these once notifications are finished
     on.subarticle().describe('create comment', function() {
       it('should create a notification for the author', function(done) {
         //Create the comment that will trigger a notification

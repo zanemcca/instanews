@@ -16,7 +16,8 @@ module.exports = function(Stat) {
         var arg;
         try {
           arg = Number(res);
-        } catch(e) {
+        } // istanbul ignore next 
+        catch(e) {
           console.warn('Cannot calculate union of non-numbers');
           return NaN;
         }
@@ -32,7 +33,8 @@ module.exports = function(Stat) {
         var subArgs = args.slice(1);
         var subUnion = Stat.getUnion.apply(Stat, subArgs);
         return subUnion + res*(1-subUnion);
-      } else if(args.length === 1) {
+      } // istanbul ignore else 
+      else if(args.length === 1) {
         return res;
       }
     } else {
@@ -49,7 +51,8 @@ module.exports = function(Stat) {
         var arg;
         try {
           arg = Number(res);
-        } catch(e) {
+        } // istanbul ignore next 
+        catch(e) {
           console.warn('Cannot calculate union of non-numbers');
           return NaN;
         }
@@ -65,7 +68,8 @@ module.exports = function(Stat) {
         var subArgs = args.slice(1);
         var subRes = Stat.getIntersection.apply(Stat, subArgs);
         return res*subRes;
-      } else if(args.length === 1) {
+      } // istanbul ignore else 
+      else if(args.length === 1) {
         return res;
       }
     } else {
@@ -98,15 +102,19 @@ module.exports = function(Stat) {
     var getSubarticlesCount = Stat.bonus.getSubarticlesCount;
     var viewCount = Stat.bonus.viewCount;
 
-
+    // istanbul ignore else
     if(typeof(rateable.upVoteCount) === 'number') {
       upVoteCount += rateable.upVoteCount;
     }
+    // istanbul ignore else
     if(typeof(rateable.downVoteCount) === 'number') {
       downVoteCount += rateable.downVoteCount;
     }
+    
     if(typeof(rateable.viewCount) === 'number') {
       viewCount += rateable.viewCount;
+    } else {
+      console.error('Rateable item does not have a viewCount!');
     }
 
     var clickCount =
@@ -168,8 +176,9 @@ module.exports = function(Stat) {
     '\tPsub: ' + Psub
     );
 
+
     if(rating > 1 || rating < 0 || isNaN(rating)) {
-      console.warn('The probability is not unitary!: ' + rating);
+      console.warn('The returned probability is not unitary!: ' + rating);
       return rateable.rating;
     }
 
