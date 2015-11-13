@@ -67,8 +67,9 @@ module.exports = function(app) {
   });
 
   //Send notifications
-  /* istanbul ignore next */
-   UpVote.observe('after save', function(ctx, next) {
+  /*
+  // istanbul ignore next
+   UpVote.observe('after  save', function(ctx, next) {
     debug('after save', ctx, next);
       var inst = ctx.instance;
       if (inst && ctx.isNewInstance) {
@@ -91,6 +92,7 @@ module.exports = function(app) {
                   }
                });
                */
+              /*
                //Notify the top contributer
                app.models.Subarticle.find({
                   limit: 1,
@@ -180,4 +182,5 @@ module.exports = function(app) {
       }
       next();
    });
+   */
 };
