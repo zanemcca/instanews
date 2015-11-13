@@ -1,8 +1,14 @@
 {
   "name": "journalist",
-  "base": "voteUser",
+  "base": "User",
   "strict": false,
   "idInjection": false,
+  "indexes": {
+    "unique_index": {
+      "username": 1,
+      "email": 1
+    }
+  },
   "properties": {
     "firstName": {
       "type": "string"
