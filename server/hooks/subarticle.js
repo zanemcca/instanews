@@ -122,6 +122,7 @@ module.exports = function(app) {
   });
 
   /* istanbul ignore next */
+  /*
    Subarticle.observe('after save', function(ctx, next) {
     debug('after save', ctx, next);
      
@@ -173,4 +174,5 @@ module.exports = function(app) {
       }
       next();
    });
+  */
 };

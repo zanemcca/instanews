@@ -64,6 +64,8 @@ next();
 
 
   /* istanbul ignore next */
+
+  /*
   Comment.observe('after save', function(ctx, next) {
     debug('ater save', ctx, next);
     //TODO Rewrite notifications
@@ -199,6 +201,7 @@ next();
     next();
 
   });
+  */
 
   Comment.triggerRating = function(where, modify, cb) {
     debug('triggerRating', where, modify, cb);

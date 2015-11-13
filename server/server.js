@@ -9,19 +9,25 @@ var ExpressBrute = require('express-brute');
 var MongoStore = require('express-brute-mongo');
 var MongoClient = require('mongodb').MongoClient;
 var https = require('https');
-var http = require('http');
 var fs = require('fs');
+var debounce = require('debounce');
+var http;
 
-var datadog = require('connect-datadog')({
-  response_code: true,
-  method: true,
-  protocol: true,
-  tags: ['app:instanews']
-});
+var dd = require('node-dogstatsd').StatsD;
 
 var cred = require('./conf/credentials');
 
 var app = loopback();
+app.dd = new dd();
+
+var datadog = require('connect-datadog')({ 
+  dogstatsd: app.dd,
+  response_code: true,
+  method: true,
+  protocol: true,
+  base_url: true,
+  tags: ['app:instanews']
+});
 
 var store = new MongoStore(function (ready) {
   var mongo = cred.get('mongoEast');
@@ -43,10 +49,13 @@ var store = new MongoStore(function (ready) {
       mongodb += '?replicaSet=' + mongo.replicaSet;
     }
 
-    //	 console.log('Connecting to ' + mongodb);
+    console.log('Connecting to ' + mongodb);
 
     MongoClient.connect(mongodb, function(err, db) {
-      if (err) return console.error(err);
+      if (err) {
+        console.log('Brute has failed to connect to mongo');
+        return console.error(err);
+      }
       app.bruteDB = db; 
       ready(db.collection('store'));
     });
@@ -70,44 +79,21 @@ if( process.env.NODE_ENV === 'production') {
   app.use(loopback.logger(loggerFmt));
 } else {
   //} else if( process.env.NODE_ENV !== 'staging') {
-  app.use(loopback.logger('dev'));
+ // app.use(loopback.logger('dev'));
 }
 
 //context for use in hooks
 app.use(loopback.context());
 app.use(loopback.token());
-/*
-   app.use(function setCurrentUser(req, res, next) {
-   var where;
-   if (!req.accessToken) {
-   where = {
-id: 'averageJoe'
-};
-}
-else {
-where = {
-username: req.accessToken.userId
-};
-}
 
-app.models.Stat.findOne({
-where: where
-}, function(err, stat) {
-if (err) {
-return next(err);
-}
-if (!stat) {
-return next(new Error('No user with this access token was found.'));
-}
-var loopbackContext = loopback.getCurrentContext();
-if (loopbackContext) {
-loopbackContext.set('currentStat', stat);
-//      console.log('Current user stat is set to ' + stat.id);
-}
-next();
+var logConnections = debounce(function () {
+  app.dd.histogram('app.connections', http.connections);
+}, 10);
+
+app.use(function log (req, res, next) {
+  logConnections();
+  next();
 });
-});
-*/
 
 //Security module
 app.use(helmet());
@@ -135,7 +121,9 @@ hookSetup(app);
 var onConnected = function(dataSource) {
   dataSource.autoupdate(function(err) {
     if (err) {
-      console.error('Database could not be autoupdated', err);
+      console.error('Database could not be autoupdated');
+      console.error(err);
+      process.exit(-1);
       //      dataSource.disconnect();
       return;
     }
@@ -175,7 +163,7 @@ app.start = function() {
     });
   }
 
-  app.listen(app.get('port'), function() {
+  http = app.listen(app.get('port'), function() {
     var baseUrl = 'http://' + app.get('host') + ':' + app.get('port'); 
     console.log('Web server listening @ %s%s', baseUrl, '/');
     app.emit('started');
