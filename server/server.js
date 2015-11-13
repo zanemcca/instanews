@@ -66,6 +66,7 @@ app.brute =  new ExpressBrute(store);
 app.debug = require('./logging.js').debug;
 
 if( process.env.NODE_ENV === 'production') {
+  /*
   var loggerFmt = 'method: :method,,' +
     'url: :url,,' +
     'status: :status,,' +
@@ -77,9 +78,10 @@ if( process.env.NODE_ENV === 'production') {
     'user-agent: :user-agent';
 
   app.use(loopback.logger(loggerFmt));
-} else {
-  //} else if( process.env.NODE_ENV !== 'staging') {
- // app.use(loopback.logger('dev'));
+  */
+//} else {
+} else if( process.env.NODE_ENV !== 'staging') {
+ app.use(loopback.logger('dev'));
 }
 
 //context for use in hooks
