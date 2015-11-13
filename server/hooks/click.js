@@ -184,7 +184,7 @@ module.exports = function(app) {
 
               next(err);
             } else {
-              console.log('View created and click about to be created');
+              //console.log('View created and click about to be created');
               inst.viewId = res.id;
               inst.clickableType = res.viewableType;
               inst.clickableId = res.viewableId;
@@ -263,7 +263,7 @@ module.exports = function(app) {
       Click.updateClickableAttributes(ctx, { 
         '$inc': ctx.inc 
       }, function(err) {
-        console.error('Failed to update clickableAttributes');
+        //console.error('Failed to update clickableAttributes');
         next(err);
       });
     }

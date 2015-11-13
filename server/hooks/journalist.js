@@ -3,14 +3,13 @@ var LIMIT = 10;
 
 module.exports = function(app) {
 
-   var Journalist = app.models.journalist;
-   var Stat = app.models.stat;
+  var Journalist = app.models.journalist;
+  var Stat = app.models.stat;
   var debug = app.debug('hooks:journalist');
 
    Journalist.afterRemote('prototype.__get__articles',
    function(ctx, instance, next) {
      debug('afterRemote __get__articles', ctx, instance, next);
-
       //Automatically remove all duplicate articles
       //Duplicates can be present since the articles associated
       //with a journalist come through their subarticles
@@ -30,14 +29,22 @@ module.exports = function(app) {
 
     Journalist.afterRemoteError('login',
     function(ctx, next) {
+      app.dd.increment('journalist.login.error');
       debug('afterRemoteError login', ctx, instance, next);
       app.brute.prevent(ctx.req, ctx.res, function() {
-             next();
+         next();
       });
     });
 
-    Journalist.beforeRemote('create', function(ctx, instance, next) {
-       debug('beforeRemote create', ctx, instance, next);
+    Journalist.beforeRemote('create', function(ctx, instance, done) {
+       debug('beforeRemote create', ctx, instance, done);
+      // var excTime = Date.now();
+       var next = function (err) {
+        // excTime = Date.now() - excTime;
+     //    app.dd.timing('journalist.create.timing',excTime); //Execution time in ms
+         done(err);
+       };
+
       var user;
       if( ctx && ctx.req && ctx.req.body) {
         user = ctx.req.body;
@@ -126,16 +133,16 @@ module.exports = function(app) {
   });
  */
 
-   Journalist.observe('access', function(ctx, next) {
+  Journalist.observe('access', function(ctx, next) {
      debug('access', ctx, next);
       //Reserved contents for the owner only
       ctx.query.fields = {
-         email: false,
+         email: false
       };
 
      //Limit the queries to LIMIT per request
      if( !ctx.query.limit || ctx.query.limit > LIMIT) {
-            ctx.query.limit = LIMIT;
+        ctx.query.limit = LIMIT;
      }
       next();
    });

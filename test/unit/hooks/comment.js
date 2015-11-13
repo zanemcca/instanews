@@ -245,7 +245,7 @@ exports.run = function () {
       });
 
       afterEach(function() {
-        expect(next.calledTwice).to.be.true;
+        expect(next.calledOnce).to.be.true;
       });
 
       describe('after save', function() {
@@ -307,7 +307,7 @@ exports.run = function () {
               };
 
               run();
-              expect(next.calledTwice).to.be.true;
+              expect(next.calledOnce).to.be.true;
             });
           });
         });

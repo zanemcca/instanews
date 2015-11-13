@@ -13,7 +13,7 @@ var runTillDone = common.runTillDone;
 var Notifications = app.models.notif;
 
 exports.run = function() {
-  describe('Subarticle', function() {
+  describe.skip('Subarticle', function() {
     on.article().plus.subarticle().by('bob').describe('Create a subarticle', function () {
       it('should send a notification to other users who have contributed to the same article', function(done) {
         Subarticle.create(function(err, sub) {

@@ -17,8 +17,9 @@ module.exports = function(app) {
       clickType: 'getComments'
     };
     debug('afterRemote __get__comments', ctx, inst, next);
-    Base.createClickAfterRemote(ctx, function (err) {
-      /* istanbul ignore next */
+    Base.createClickAfterRemote(
+      // istanbul ignore next
+      ctx, function (err) {
       if(err) {
         console.error(err.stack);
       }
@@ -122,6 +123,7 @@ module.exports = function(app) {
   });
 
   /* istanbul ignore next */
+  /*
    Subarticle.observe('after save', function(ctx, next) {
     debug('after save', ctx, next);
      
@@ -173,4 +175,5 @@ module.exports = function(app) {
       }
       next();
    });
+  */
 };
