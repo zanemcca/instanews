@@ -12,7 +12,7 @@ var runTillDone = common.runTillDone;
 var Notifications = app.models.notif;
 
 exports.run = function() {
-  describe('vote', function() {
+  describe.skip('vote', function() {
     on.upVote().on.article().plus.subarticle().by('bob').describe('Check for notification', function () {
       it('should create a notification for the top contributor for voting on an article', function(done) {
         var vote = on.Instances.getActionableInstance();

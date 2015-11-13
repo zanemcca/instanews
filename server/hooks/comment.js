@@ -25,12 +25,15 @@ next();
       clickType: 'getComments'
     };
     debug('aterRemote __get__comments', ctx, instance, next);
-    Base.createClickAfterRemote(ctx, function (err) {
-      /* istanbul ignore next */
-      if(err) {
-        console.error(err.stack);
+    Base.createClickAfterRemote(
+      ctx,
+      // istanbul ignore next
+      function (err) {
+        if(err) {
+          console.error(err.stack);
+        }
       }
-    });
+    );
     next();
   });
 

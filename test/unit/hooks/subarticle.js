@@ -242,7 +242,7 @@ exports.run = function () {
       });
 
       afterEach(function() {
-        expect(next.calledTwice).to.be.true;
+        expect(next.calledOnce).to.be.true;
       });
 
       /*
@@ -355,7 +355,7 @@ exports.run = function () {
               };
 
               run();
-              expect(next.calledTwice).to.be.true;
+              expect(next.calledOnce).to.be.true;
             });
           });
         });

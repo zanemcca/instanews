@@ -110,7 +110,7 @@ exports.run = function() {
         });
 
         afterEach(function() {
-          expect(next.calledTwice).to.be.true;
+          expect(next.calledOnce).to.be.true;
         });
 
         it('should call Click.updateVoteParent with the proper arguments', function() {
