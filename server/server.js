@@ -25,7 +25,6 @@ for(var i in process.env) {
     if(process.env[i] === process.env.TUTUM_NODE_HOSTNAME) {
       var num = i[8];
       var env = 'DATADOG_' + num + '_ENV_TUTUM_CONTAINER_HOSTNAME';
-      console.log(env);
       env  = process.env[env];
 
       if(env) {
@@ -70,7 +69,7 @@ var store = new MongoStore(function (ready) {
       mongodb += '?replicaSet=' + mongo.replicaSet;
     }
 
-    console.log('Connecting to ' + mongodb);
+    //console.log('Connecting to ' + mongodb);
 
     MongoClient.connect(mongodb, function(err, db) {
       if (err) {
