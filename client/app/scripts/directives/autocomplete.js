@@ -4,11 +4,9 @@ var app = angular.module('instanews.directive.autocomplete', ['ionic', 'ngResour
 
 app.directive('inautocomplete', [
   'Platform',
-  'Position',
   'Maps',
   function (
     Platform,
-    Position,
     Maps
   ) {
 
@@ -35,43 +33,6 @@ app.directive('inautocomplete', [
 
         $scope.place.predictions = [];
 
-        var service = new google.maps.places.AutocompleteService();
-
-        var filterPredictions = function (predictions) {
-          if( $scope.place.ignore && $scope.place.ignore.length) {
-            var output = [];
-            for(var i in predictions) {
-              var pred = predictions[i];
-              var include = true;
-              for(var j in $scope.place.ignore) {
-                var ignore = $scope.place.ignore[j];
-                if(pred.types.indexOf(ignore) > -1) {
-                  include = false;
-                  //console.log('Exluding the ' + ignore + ' ' + pred.description);
-                  break;
-                }
-              }
-              if(include) {
-                output.push(pred);
-              }
-            }
-            return output;
-          } else {
-            return predictions;
-          }
-        };
-
-        var displaySuggestions = function(predictions, status) {
-          // istanbul ignore if
-          if (status !== google.maps.places.PlacesServiceStatus.OK) {
-            console.log(status);
-            return;
-          }
-
-          $scope.place.predictions = filterPredictions(predictions);
-
-          $scope.safeApply();
-        };
 
         var defaultPlaceholder = 'Search for a location';
 
@@ -126,30 +87,12 @@ app.directive('inautocomplete', [
 
         $scope.done = true;
 
-        var getQuery = function (input) {
-          return {
-            input: input,
-            componentRestrictions: {country: 'ca'},
-            types: $scope.place.types,
-            radius: 100000,
-            location: Position.posToLatLng(Position.getPosition())
-          };
-        };
-
         $scope.search = function () {
           $scope.done = true;
           if($scope.input.value) {
-            service.getPlacePredictions(getQuery($scope.input.value),
-            function (predictions, status) {
-              // istanbul ignore  if 
-              if (status !== google.maps.places.PlacesServiceStatus.OK) {
-                console.log(status);
-                return;
-              }
-
-              predictions = filterPredictions(predictions);
+            Maps.autocomplete($scope.input.value, $scope.place, function (predictions) {
               // istanbul ignore else 
-              if(predictions.length) {
+              if(predictions && predictions.length) {
                 $scope.set(predictions[0]);
               } else {
                 console.log('Invalid location. Please try again');
@@ -168,11 +111,21 @@ app.directive('inautocomplete', [
             // istanbul ignore else 
             if(newValue !== oldValue) {
               if(newValue) {
-                service.getPlacePredictions( getQuery(newValue), displaySuggestions);
-                $scope.done = false;
+                Maps.autocomplete($scope.input.value, $scope.place, function (predictions){
+                  if(predictions) {
+                    $scope.place.predictions = predictions;
+                    $scope.done = false;
+                    $scope.safeApply();
+                  } else {
+                    $scope.place.predictions = [];
+                    $scope.done = true;
+                    $scope.safeApply();
+                  }
+                });
               } else {
+                $scope.place.predictions = [];
                 $scope.done = true;
-                $scope.place.predictions.length = 0;
+                $scope.safeApply();
               }
             }
           });

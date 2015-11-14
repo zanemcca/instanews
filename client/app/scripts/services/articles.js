@@ -27,16 +27,6 @@ app.service('Articles', [
    var defaultFilter = {
       limit: 50,
       skip: 0,
-      /*
-      include: [{
-         relation: 'subarticles',
-         scope: {
-            limit: 1,
-            order: 'rating DESC'
-         }
-      }],
-      rate: true,
-     */
       order: 'rating DESC'
    };
 
