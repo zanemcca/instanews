@@ -57,37 +57,37 @@ app.service('Maps', [
         a: 1
       };
 
-     /*
-      var start = {
-        h: 0.53,
-        s: 1,
-        l: 0.516,
-        a: 0
-      }; 
+      /*
+         var start = {
+h: 0.53,
+s: 1,
+l: 0.516,
+a: 0
+}; 
 
-      var end = {
-        h: 0.53,
-        s: 1,
-        l: 0.90,
-        a: 0
-      };
-      */
+var end = {
+h: 0.53,
+s: 1,
+l: 0.90,
+a: 0
+};
+*/
 
-    /*
-     //Orange
-      var start = {
-        h: 0.083,
-        s: 1,
-        l: 0.8,
-        a: 0 
-      };
-      var end = {
-        h: 0.083,
-        s: 1,
-        l: 0.5,
-        a: 1
-      };
-      */
+/*
+//Orange
+var start = {
+h: 0.083,
+s: 1,
+l: 0.8,
+a: 0 
+};
+var end = {
+h: 0.083,
+s: 1,
+l: 0.5,
+a: 1
+};
+*/
 
       var length = 100;
 
@@ -338,6 +338,64 @@ return gradient;
       return;
     };
 
+    var autocompleteService = new google.maps.places.AutocompleteService();
+
+    var autocomplete = function (input, options, cb) {
+      if(!cb) {
+        cb = options;
+        options = {};
+      }
+      var ignore = options.ignore;
+
+      //Setup the search query
+      var query = {
+        input: input,
+        componentRestrictions: {country: 'ca'}
+      };
+
+      if(options.types) {
+        //Add type restrictions if applicable
+        query.types = options.types;
+      }
+
+      var pos = Position.getPosition();
+      if(pos) {
+        //Bias to within 100km of the person
+        query.location = Position.posToLatLng(pos);
+        query.radius = 100000;
+      }
+
+      autocompleteService.getPlacePredictions(query, function (predictions, status) {
+        // istanbul ignore  if 
+        if (status !== google.maps.places.PlacesServiceStatus.OK) {
+          console.log(status);
+          cb();
+        } else {
+          // Filter the results
+          if( ignore && ignore.length) {
+            var output = [];
+            for(var i in predictions) {
+              var pred = predictions[i];
+              var include = true;
+              for(var j in ignore) {
+                if(pred.types.indexOf(ignore[j]) > -1) {
+                  include = false;
+                  //console.log('Exluding the ' + ignore + ' ' + pred.description);
+                  break;
+                }
+              }
+              if(include) {
+                output.push(pred);
+              }
+            }
+            cb(output);
+          } else {
+            cb(predictions);
+          }
+        }
+      });
+    };
+
     //My Circle =============================================================
 
     /*
@@ -464,6 +522,7 @@ markers.push(new google.maps.Marker(tempMarker));
 Position.registerBoundsObserver(updateHeatmap);
 
 return {
+  autocomplete: autocomplete,
   localize: localize,
   setCenter: setCenter,
   setMarker: setMarker,
