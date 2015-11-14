@@ -18,7 +18,12 @@ var dd = require('node-dogstatsd').StatsD;
 var cred = require('./conf/credentials');
 
 var app = loopback();
-app.dd = new dd();
+
+if( process.env.NODE_ENV === 'production' && process.env.DATADOG_ENV_HOSTNAME ) {
+  app.dd = new dd(process.env.DATADOG_ENV_HOSTNAME, 8125);
+} else {
+  app.dd = new dd();
+}
 
 var datadog = require('connect-datadog')({ 
   dogstatsd: app.dd,
