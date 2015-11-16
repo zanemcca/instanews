@@ -14,7 +14,7 @@ var Notifications = app.models.notif;
 var genericModels = require('../../genericModels');
 
 exports.run = function() {
-   describe('Notification', function() {
+   describe.skip('Notification', function() {
 
       before(function(done) {
          Notifications.destroyAll( function(err) {
