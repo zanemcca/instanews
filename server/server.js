@@ -5,7 +5,7 @@ var loopback = require('loopback');
 var http,
 datadog;
 
-// Functions 
+// istanbul ignore next 
 var setupMonitoring = function () {
   // Monitoring only necessary when in production
   if(process.env.NODE_ENV === 'production') {
@@ -136,6 +136,7 @@ if(cluster.isMaster && numCPUs > 1 && process.env.NODE_ENV === 'production') {
   var setupBrute = function () {
     var store = new MongoStore(function (ready) {
       var mongo = cred.get('mongoEast');
+      // istanbul ignore if
       if(!mongo) {
         console.error(new Error('No database found!'));
         process.exit(1);
@@ -157,6 +158,7 @@ if(cluster.isMaster && numCPUs > 1 && process.env.NODE_ENV === 'production') {
         //console.log('Connecting to ' + mongodb);
 
         MongoClient.connect(mongodb, function(err, db) {
+          // istanbul ignore if
           if (err) {
             console.log('Brute has failed to connect to mongo');
             return console.error(err);
@@ -172,6 +174,7 @@ if(cluster.isMaster && numCPUs > 1 && process.env.NODE_ENV === 'production') {
 
   var setupLogging = function () {
     app.debug = require('./logging.js').debug;
+    // istanbul ignore if
     if( process.env.NODE_ENV !== 'production') {
       /*
          var loggerFmt = 'method: :method,,' +

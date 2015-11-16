@@ -48,9 +48,11 @@ exports.run = function () {
       var cred = common.req('conf/credentials');
       var err, res, credentials;
       var createJob,
+      invoke,
       confirmSubscription;
 
       beforeEach(function () {
+        err = null;
         credentials = {
           key: 'key',
           keyId: 'keyId'
@@ -61,6 +63,10 @@ exports.run = function () {
         };
 
         confirmSubscriptions = function(params, cb) {
+          cb(err, res);
+        };
+
+        invoke = function(params, cb) {
           cb(err, res);
         };
 
@@ -95,6 +101,21 @@ exports.run = function () {
 
           return this;
         });
+
+        sandbox.stub(aws, 'Lambda', function(options) {
+          expect(options).to.deep.equal({
+            region: 'us-east-1',
+            apiVersion: '2015-03-31',
+            accessKeyId: credentials.keyId,
+            secretAccessKey: credentials.key
+          });
+
+          this.invoke = function(params, cb) {
+            invoke(params, cb);
+          };
+
+          return this;
+        });
       });
 
       describe('triggerTranscoding', function () {
@@ -114,81 +135,120 @@ exports.run = function () {
           };
         });
 
-        it('should get the transcoder paramaters', function (done) {
+        describe('photo', function () {
+          beforeEach(function () {
+            containerName = 'instanews-photos-in';
+          });
 
-          createJob = function (params, cb) {
-            expect(params).to.exist;
-            expect(params.PipelineId).to.exist;
-            done();
-          };
+          it('should get the photo transcoder paramaters', function (done) {
+            invoke = function (params, cb) {
+              expect(params).to.exist;
+              expect(params.Payload).to.exist;
+              done();
+            };
 
-          run();
-        }); 
+            run();
+          }); 
 
-        it('should not cause a problem if there are not params', function (done) {
-          containerName = 'videos.container';
+            it('should propogate the error', function (done) {
+              err = 'error';
 
-          cb = function (params, cb) {
-            expect(params).to.not.exist;
-            expect(cb).to.not.exist;
-            done();
-          };
+              cb = function (error, obj) {
+                expect(error).to.equal(err);
+                done();
+              };
 
-          run();
+              run();
+            });
+
+            it('should call the callback after success', function (done) {
+              cb = function (error, obj) {
+                expect(error).to.not.exist;
+                done();
+              };
+
+              run();
+            });
         });
 
-        describe('createJob', function () {
-          var err, res;
-          beforeEach(function () {
-            res = {
-              Job: {
-                Id: 'id',
-                Outputs: [{
-                  Key: 'key1.mp4',
-                  ThumbnailPattern: 'key1-{count}'
-                },
-                {
-                  Key: 'key2',
-                  SegmentDuration: '2'
-                }]
-              }
-            };
+        describe('video', function () {
+          it('should get the video transcoder paramaters', function (done) {
 
             createJob = function (params, cb) {
-              cb(err, res);
+              expect(params).to.exist;
+              expect(params.PipelineId).to.exist;
+              done();
             };
-          });
 
-          it('should successuflly convert the result', function (done) {
-            cb = function (err, obj) {
-              expect(obj).to.deep.equal({
-                id: res.Job.Id,
-                container: 'instanews-videos',
-                outputs: [
-                  'key1.mp4',
-                  'key2.m3u8'
-                ],
-                posters: [
-                  'key1-00001.png'
-                ]
-              });
+            run();
+          }); 
+
+
+          it('should not cause a problem if there are not params', function (done) {
+            containerName = 'videos.container';
+
+            cb = function (params, cb) {
+              expect(params).to.not.exist;
+              expect(cb).to.not.exist;
               done();
             };
 
             run();
           });
 
-          it('should propogate the errror', function (done) {
-            err = 'error';
+          describe('createJob', function () {
+            var err, res;
+            beforeEach(function () {
+              res = {
+                Job: {
+                  Id: 'id',
+                  Outputs: [{
+                    Key: 'key1.mp4',
+                    ThumbnailPattern: 'key1-{count}'
+                  },
+                  {
+                    Key: 'key2',
+                    SegmentDuration: '2'
+                  }]
+                }
+              };
 
-            cb = function (error, obj) {
-              expect(error).to.equal(err);
-              done();
-            };
+              createJob = function (params, cb) {
+                cb(err, res);
+              };
+            });
 
-            run();
+            it('should successuflly convert the result', function (done) {
+              cb = function (err, obj) {
+                expect(obj).to.deep.equal({
+                  id: res.Job.Id,
+                  container: 'instanews-videos',
+                  outputs: [
+                    'key1.mp4',
+                    'key2.m3u8'
+                  ],
+                  posters: [
+                    'key1-00001.png'
+                  ]
+                });
+                done();
+              };
+
+              run();
+            });
+
+            it('should propogate the errror', function (done) {
+              err = 'error';
+
+              cb = function (error, obj) {
+                expect(error).to.equal(err);
+                done();
+              };
+
+              run();
+            });
+
           });
-
         });
       }) ;
 
