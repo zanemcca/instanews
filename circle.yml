@@ -21,7 +21,7 @@ dependencies:
 test:
    override:
      - cd client && grunt karma && cd ..
-     - docker run -t instanews /bin/bash -c "npm install && npm install -g grunt-cli && grunt coverage"
+     - docker run -e "NODE_ENV=staging" -e "ENCRYPT_PASSWORD=couchesareabit2fly4me" -t instanews /bin/bash -c "npm install && npm install -g grunt-cli && grunt coverage"
 
 #deployment:
 #   staging:
