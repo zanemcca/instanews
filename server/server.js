@@ -1,25 +1,126 @@
+
 var cluster = require('cluster');
 var numCPUs = require('os').cpus().length;
+var loopback = require('loopback');
+var http,
+datadog;
+
+// Functions 
+var setupMonitoring = function () {
+  // Monitoring only necessary when in production
+  if(process.env.NODE_ENV === 'production') {
+    var dd = require('node-dogstatsd').StatsD;
+    var datadogHost = 'localhost';
+    for(var i in process.env) {
+      if(i.match(/^DATADOG_\d_ENV_TUTUM_NODE_HOSTNAME$/)) {
+        if(process.env[i] === process.env.TUTUM_NODE_HOSTNAME) {
+          var num = i[8];
+          var env = 'DATADOG_' + num + '_ENV_TUTUM_CONTAINER_HOSTNAME';
+          env  = process.env[env];
+
+          if(env) {
+            datadogHost = env;
+            break;
+          } else {
+            console.error('Environment variable ' + env + ' not valid!');
+          }
+        }
+      }
+    }
+
+    console.log('Connecting statsd to ' + datadogHost);
+    app.dd = new dd(datadogHost, 8125);
+
+    datadog = require('connect-datadog')({ 
+      dogstatsd: app.dd,
+      response_code: true,
+      method: true,
+      protocol: true,
+      base_url: true,
+      tags: ['app:instanews']
+    });
+  } else {
+    app.dd = {
+      histogram: function () {},
+      timing: function () {},
+      increment: function () {},
+      decrement: function () {}
+    };
+  }
+};
+
+var app = loopback();
+setupMonitoring();
+
+var tooManyDead = numCPUs*3; //Basically 3 tries for each child process 
 
 if(cluster.isMaster && numCPUs > 1 && process.env.NODE_ENV === 'production') {
+  var dead = 0;
+
+
+  var createWorkers = function () {
+    var workers = [];
+    function find(worker) {
+      workers.forEach(function(wrkr) {
+        if(wrkr.process.pid === worker.process.pid) {
+          return wrkr;
+        }
+      });
+    }
+    function add(worker) {
+      workers.push(worker);
+    }
+    function remove(worker) {
+      for(var i in workers) {
+        if(workers[i].process.pid === worker.process.pid) {
+          workers = workers.splice(i,1);
+          break;
+        }
+      }
+    }
+
+    return {
+      find: find,
+      remove: remove,
+      add: add
+    };
+  };
+
+  var workers = createWorkers();
+
   // Start instance per cpu
   for(var i = 0; i < numCPUs; i++) {
-    cluster.fork();
+    workers.add(cluster.fork());
   }
 
   cluster.on('exit', function (worker, code, signal) {
+    dead++;
+    workers.remove(worker);
     if(['SIGKILL', 'SIGTERM'].indexOf(signal) === -1) {
       console.warn('worker ' + worker.process.pid + ' died (' + code + '). Restarting...');
-      cluster.fork();
+      app.dd.increment('cluster.worker.died');
+
+      if(dead < tooManyDead) {
+        workers.add(cluster.fork());
+      } else {
+        console.log('\n\n************************************************\n');
+        console.log('CRITICAL: Too many (' + dead + ') dead nodes!');
+        console.log('Killing Cluster...');
+        console.log('\n************************************************\n');
+
+        //TODO Notify nodes to gracefully shutdown
+        app.dd.increment('cluster.master.died');
+        process.exit(1);
+      }
     } else {
       console.log('worker ' + worker.process.pid + ' was killed (' + signal + ')!');
+      app.dd.increment('cluster.worker.killed');
     }
   });
 } else {
 
   var setupPush = require('./pushSetup.js');
   var hookSetup = require('./hooks/hookSetup.js');
-  var loopback = require('loopback');
   var boot = require('loopback-boot');
   var path = require('path');
   var pem = require('pem');
@@ -31,61 +132,13 @@ if(cluster.isMaster && numCPUs > 1 && process.env.NODE_ENV === 'production') {
   var fs = require('fs');
   var debounce = require('debounce');
   var cred = require('./conf/credentials');
-  var app = loopback();
-
-  var http,
-  datadog;
-
-  // Functions 
-  var setupMonitoring = function () {
-    // Monitoring only necessary when in production
-    if(process.env.NODE_ENV === 'production') {
-      var dd = require('node-dogstatsd').StatsD;
-      var datadogHost = 'localhost';
-      for(var i in process.env) {
-        if(i.match(/^DATADOG_\d_ENV_TUTUM_NODE_HOSTNAME$/)) {
-          if(process.env[i] === process.env.TUTUM_NODE_HOSTNAME) {
-            var num = i[8];
-            var env = 'DATADOG_' + num + '_ENV_TUTUM_CONTAINER_HOSTNAME';
-            env  = process.env[env];
-
-            if(env) {
-              datadogHost = env;
-              break;
-            } else {
-              console.error('Environment variable ' + env + ' not valid!');
-            }
-          }
-        }
-      }
-
-      console.log('Connecting statsd to ' + datadogHost);
-      app.dd = new dd(datadogHost, 8125);
-
-      datadog = require('connect-datadog')({ 
-        dogstatsd: app.dd,
-        response_code: true,
-        method: true,
-        protocol: true,
-        base_url: true,
-        tags: ['app:instanews']
-      });
-    } else {
-      app.dd = {
-        histogram: function () {},
-        timing: function () {},
-        increment: function () {},
-        decrement: function () {}
-      };
-    }
-  };
 
   var setupBrute = function () {
     var store = new MongoStore(function (ready) {
       var mongo = cred.get('mongoEast');
       if(!mongo) {
         console.error(new Error('No database found!'));
-        //TODO Exit the application
+        process.exit(1);
       }
       else {
         var mongodb = 'mongodb://';
@@ -176,7 +229,7 @@ if(cluster.isMaster && numCPUs > 1 && process.env.NODE_ENV === 'production') {
 
   var setupMiddleware = function () {
     // Setup 
-    setupMonitoring();
+  //  setupMonitoring();
     setupBrute();
     setupLogging();
 
