@@ -159,7 +159,7 @@ var verifyPurge = function(done) {
 describe('Depend', function () {
   before(function(done) {
     this.timeout(10000);
-    setTimeout(done, 5000);
+    setTimeout(done, 7000);
   });
 
   describe('on', function () {

@@ -12,10 +12,12 @@ if( mongo.username && mongo.password) {
 
 mongodb  += mongo.url;
 
-var mongoReplica = '';
+var options = '?connectTimeoutMS=30000';
 if(mongo.replicaSet) {
-  mongoReplica = '?replicaSet=' + mongo.replicaSet;
+  options += '&replicaSet=' + mongo.replicaSet;
 }
+
+
 
 var maxFileSize = 1024*1024*1024; //1Gb
 
@@ -25,35 +27,37 @@ module.exports = {
     connector: 'memory'
   },
   Installations: {
-    url: mongodb + 'installations' + mongoReplica,
+    url: mongodb + 'installations' + options,
     database: 'installations',
     name: 'Installations',
     connector: 'mongodb',
     debug: true
   },
   Interactions: {
-    url: mongodb + 'interactions' + mongoReplica,
+    url: mongodb + 'interactions' + options,
     database: 'interactions',
     name: 'Interactions',
     connector: 'mongodb',
     debug: true
   },
+  /*
   Notifications: {
-    url: mongodb + 'notifications' + mongoReplica,
+    url: mongodb + 'notifications' + options,
     database: 'notifications',
     name: 'Notifications',
     connector: 'mongodb',
     debug: true
   },
+ */
   Articles: {
-    url: mongodb + 'articles' + mongoReplica,
+    url: mongodb + 'articles' + options,
     database: 'articles',
     name: 'Articles',
     connector: 'mongodb',
     debug: true
   },
   Users: {
-    url: mongodb + 'users' + mongoReplica,
+    url: mongodb + 'users' + options,
     database: 'users',
     name: 'Users',
     connector: 'mongodb'

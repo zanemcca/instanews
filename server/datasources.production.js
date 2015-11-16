@@ -38,6 +38,7 @@ module.exports = {
     connector: 'mongodb',
     debug: false
   },
+  /*
   Notifications: {
     url: mongodb + 'notifications' + mongoReplica,
     database: 'notifications',
@@ -45,6 +46,7 @@ module.exports = {
     connector: 'mongodb',
     debug: false
   },
+ */
   Articles: {
     url: mongodb + 'articles' + mongoReplica,
     database: 'articles',
