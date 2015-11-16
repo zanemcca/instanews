@@ -12,11 +12,11 @@ machine:
 dependencies:
    cache_directories:
       - "client/app/bower_components"
-      - "node_modules"
       - "client/node_modules"
+      - "/var/lib/docker"
    override:
       - docker build -t instanews .
-      - npm install -g grunt grunt-cli
+      - npm install -g grunt-cli
       - cd client && bower install && npm install && cd ..
 test:
    override:
