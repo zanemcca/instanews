@@ -63,10 +63,6 @@
     "dataSource": "Interactions",
     "public": true
   },
-  "notif": {
-    "dataSource": "Notifications",
-    "public": false
-  },
   "installation": {
     "dataSource": "Installations",
     "public": true
