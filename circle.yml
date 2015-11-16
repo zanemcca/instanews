@@ -5,9 +5,9 @@ machine:
       NODE_ENV: staging
 
 # Replace the Dockerfile with a staging version 
-checkout:
-   post: 
-       - mv Dockerfile.staging Dockerfile
+#checkout:
+  #   post: 
+     #       - mv Dockerfile.staging Dockerfile
 
 dependencies:
    cache_directories:
@@ -21,7 +21,7 @@ dependencies:
 test:
    override:
      - cd client && grunt karma && cd ..
-     - docker run -t instanews
+     - docker run -t instanews /bin/bash -c "npm install && npm install -g grunt-cli && grunt coverage"
 
 #deployment:
 #   staging:
