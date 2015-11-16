@@ -4,6 +4,10 @@ var cred = require('./conf/credentials');
 var mongo = cred.get('mongoEast');
 var aws = cred.get('aws');
 
+if( !mongo ) {
+  return process.exit(1);
+}
+
 var mongodb = 'mongodb://';
 if( mongo.username && mongo.password) {
   mongodb += mongo.username +
