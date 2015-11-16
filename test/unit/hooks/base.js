@@ -484,7 +484,7 @@ exports.run = function () {
     });
 
     describe('createClickAfterRemote', function() {
-      var click, clickCb, stat, context;
+      var run, click, clickCb, stat, context;
       beforeEach(function () {
         ctx.req = {
           remotingContext: {

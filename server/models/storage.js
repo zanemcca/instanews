@@ -260,7 +260,7 @@ module.exports = function(Storage) {
                 message = JSON.parse(message);
                 console.dir(message, { colors: true });
               } catch(e) {
-                var err = new Error('Failed to parse the notification message');
+                err = new Error('Failed to parse the notification message');
                 console.log(e);
                 return next(err);
               }
