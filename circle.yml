@@ -12,18 +12,19 @@ checkout:
 dependencies:
    cache_directories:
       - "client/app/bower_components"
-      - "node_modules"
       - "client/node_modules"
+      - "~/docker"
    override:
-      - npm install
-      - cd client && bower install && npm install && npm install -g grunt grunt-cli && cd ..
+      - if [[ -e ~/docker/instanews.tar ]]; then docker load -i ~/docker/instanews.tar; fi
       - docker build -t instanews .
+      - mkdir -p ~/docker; docker save instanews > ~/docker/instanews.tar
+      - npm install -g grunt-cli
+      - cd client && bower install && npm install && cd ..
 test:
    override:
      - cd client && grunt karma && cd ..
      - docker run -t instanews
-       #- docker run -t -p 3000:3000 instanews
-#      - npm test
+       #- docker run -e "NODE_ENV=staging" -e "ENCRYPT_PASSWORD=couchesareabit2fly4me" -t instanews /bin/bash -c "npm install && npm install -g grunt-cli && grunt coverage"
 
 #deployment:
 #   staging:

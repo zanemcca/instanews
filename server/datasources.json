@@ -19,14 +19,6 @@
     "connector": "mongodb",
     "debug": true
   },
-  "Notifications": {
-    "host": "localhost",
-    "port": 27017,
-    "database": "notifications",
-    "name": "Notifications",
-    "connector": "mongodb",
-    "debug": true
-  },
   "Articles": {
     "host": "localhost",
     "port": 27017,
