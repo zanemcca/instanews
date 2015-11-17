@@ -13,9 +13,11 @@ dependencies:
    cache_directories:
       - "client/app/bower_components"
       - "client/node_modules"
-      - "/var/lib/docker"
+      - "~/docker"
    override:
+      - if [[ -e ~/docker/instanews.tar ]]; then docker load -i ~/docker/instanews.tar; fi
       - docker build -t instanews .
+      - mkdir -p ~/docker; docker save instanews > ~/docker/instanews.tar
       - npm install -g grunt-cli
       - cd client && bower install && npm install && cd ..
 test:
