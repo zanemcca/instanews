@@ -54,6 +54,8 @@ Local Citizen Journalism in an elegant simple platform
 #### Frontend
 - ```cd client```
 - ```grunt serve``` (Builds the client from app to www and serves it)
+NOTE: grunt serve does not seem to be working, use the backend to serve for now with
+- ```grunt init```
 
 #### Full site (livereload backend)
 - ```cd client```

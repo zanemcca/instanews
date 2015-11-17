@@ -11,6 +11,7 @@ var keys = [];
 /*
  * Decrypt the text and pass back the object
  */
+// istanbul ignore next
 var decrypt = function decrypt(text) {
 
   var decipher = crypto.createDecipher(algorithm, password);
@@ -33,6 +34,7 @@ var decrypt = function decrypt(text) {
 /*
  * Read the contents of the given file
  */
+// istanbul ignore next
 function readFile(name) {
   return fs.readFileSync(
     path.resolve(__dirname, name),
@@ -43,6 +45,7 @@ function readFile(name) {
 /*
  * Read and decrypt a given file and return its object
  */
+// istanbul ignore next
 function decryptFile(filename) {
 
   var cipher = readFile(filename);
@@ -74,6 +77,7 @@ var get = function(key) {
 
 
 // Read the keys and decrypt them
+// istanbul ignore if 
 if( process.env.NODE_ENV === 'production' ||
    process.env.NODE_ENV === 'staging') {
   if(!password) {

@@ -4,6 +4,10 @@ var cred = require('./conf/credentials');
 var mongo = cred.get('mongoEast');
 var aws = cred.get('aws');
 
+if( !mongo ) {
+  return process.exit(1);
+}
+
 var mongodb = 'mongodb://';
 if( mongo.username && mongo.password) {
   mongodb += mongo.username +
@@ -38,6 +42,7 @@ module.exports = {
     connector: 'mongodb',
     debug: false
   },
+  /*
   Notifications: {
     url: mongodb + 'notifications' + mongoReplica,
     database: 'notifications',
@@ -45,6 +50,7 @@ module.exports = {
     connector: 'mongodb',
     debug: false
   },
+ */
   Articles: {
     url: mongodb + 'articles' + mongoReplica,
     database: 'articles',
