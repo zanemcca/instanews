@@ -18,4 +18,4 @@ RUN npm install --production
 COPY . /usr/src/app
 
 # Run the application
-CMD env && node server/server.js 2>&1
+CMD npm start 
