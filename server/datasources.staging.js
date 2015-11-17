@@ -21,8 +21,6 @@ if(mongo.replicaSet) {
   options += '&replicaSet=' + mongo.replicaSet;
 }
 
-
-
 var maxFileSize = 1024*1024*1024; //1Gb
 
 module.exports = {
