@@ -19,13 +19,6 @@ app.service('Articles', [
     Position
   ){
 
-    var options = {
-      filter: {
-       skip: 0,
-       order: 'rating DESC'
-      }
-    };
-
     // Triggered when an item in the list wants to be updated
     var update = function (newValue, oldValue) {
       if( newValue.modified >= oldValue.modified ) {
@@ -44,8 +37,8 @@ app.service('Articles', [
     // Triggered when a new batch of articles wants to be added to the list
     // allows for additional filtering
     var addFilter = function(arts) {
-      var hidden = [],
-        inView = [];
+      var hidden = [];
+      var inView = [];
 
       arts.forEach(function(article) {
         var position = Position.posToLatLng(article.location);
@@ -56,18 +49,21 @@ app.service('Articles', [
         }
       });
 
-      console.log('hidden:');
-      console.log(hiddenArticles.add(hidden));
+ //     console.log(inView.length + ' added to inView and ' + hidden.length + ' added to hidden');
+      if(hidden.length) {
+        hiddenArticle.add(hidden);
+      }
       return inView;
     };
 
+    var spec = {};
+    spec.find = Article.find;
+    spec.update = update;
+    spec.addFilter = spec.addFilter || addFilter;
+    spec.options = spec.options || {};
+
     // Create a list for articles within view
-    var articles = list({
-      find: Article.find,
-      update: update,
-      addFilter: addFilter,
-      options: options
-    });
+    var articles = list(spec);
 
     // Create a headless list for out of view articles
     var hiddenArticles = list({
@@ -86,7 +82,7 @@ app.service('Articles', [
         return Position.withinBounds(position);
       });
 
-      console.log(toOutView.length + ' going out of view and ' + toInView.length + ' going into the view');
+//      console.log(toOutView.length + ' going out of view and ' + toInView.length + ' going into the view');
       articles.add(toInView);
       hiddenArticles.add(toOutView);
     };
@@ -99,7 +95,7 @@ app.service('Articles', [
       if(bounds) {
         var sw = bounds.getSouthWest();
         var ne = bounds.getNorthEast();
-        options.filter.where = {
+        spec.options.filter.where = {
           location: {
             geoWithin: {
               $box: [
@@ -114,7 +110,7 @@ app.service('Articles', [
         console.log('Bounds not set yet!');
       }
 
-      options.filter.skip = 0;
+      spec.options.filter.skip = 0;
 
       console.log('UpateBounds');
 

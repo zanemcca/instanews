@@ -4,14 +4,15 @@
 
 <div ng-transclude></div>
 <ul class="list">
-  <ion-item ng-repeat="item in items track by item.id"
+  <ion-item ng-repeat="item in list.get() track by item.id"
     class="no-padding card">
     <in-list-item item="item"></in-list-item>
   </ion-item>
 </ul>
-<ion-infinite-scroll
-   immediate-check="false"
-   ng-if="itemsAvailable()"
-   on-infinite="LoadMore()"
-   distance="10%">
-</ion-infinite-scroll>
+      <ion-infinite-scroll
+         immediate-check="false"
+         ng-if="list.areItemsAvailable()"
+         on-infinite="onInfinite()"
+         distance="10%">
+      </ion-infinite-scroll>
+

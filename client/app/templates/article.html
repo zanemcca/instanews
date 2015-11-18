@@ -6,11 +6,20 @@
          ui-sref="subarticlePost({id: article.id})">
       </a>
    </ion-nav-buttons>
-   <ion-content overflow-scroll="true" class="gpu">
-      <!--ion-refresher pulling-text="Fresh Stuff" on-refresh="onRefresh()">
-      </ion-refresher-->
-      <inMap map="map"></inMap>
+   <ion-content on-swipe-down="onSwipeDown()" overflow-scroll="true" class="gpu">
+      <in-list list="Subarticles"> 
+        <inMap map="map"></inMap>
+        <div class="item" style="border:0px;padding-top:0px;padding-bottom:0px">
+           <inVotes style="border: transparent"
+              votable="article">
+           </inVotes>
+           <inComments owner="article"></inComments>
+        </div>
+      </in-list>
+   </ion-content>
 
+   <!--ion-content overflow-scroll="true" class="gpu">
+      <inMap map="map"></inMap>
       <div class="item" style="border:0px;padding-top:0px;padding-bottom:0px">
          <inVotes style="border: transparent"
             votable="article">
@@ -29,5 +38,5 @@
          on-infinite="loadMore()"
          distance="10%">
       </ion-infinite-scroll>
-   </ion-content>
+   </ion-content-->
 </ion-view>

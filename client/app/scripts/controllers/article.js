@@ -18,79 +18,39 @@ app.controller('ArticleCtrl', [
     Maps
   ) {
 
-    /* istanbul ignore next */
-    $scope.safeApply = function(fn) {
-      var phase = this.$root.$$phase;
-      if(phase === '$apply' || phase === '$digest') {
-        if(fn && (typeof(fn) === 'function')) {
-          fn();
-        }
-      } else {
-        this.$apply(fn);
-      }
+    $scope.Subarticles = Subarticles.findOrCreate($stateParams.id);
+
+    //Scope variables
+    $scope.article = Articles.findById($stateParams.id);
+
+    $scope.map = {
+      id: 'articleMap'
     };
 
-   //TODO Create a click for the article $stateParams.id
+    var marker;
 
-   //TODO OnScroll create new view for items scrolled past
-
-   //Scope variables
-   $scope.article = Articles.findById($stateParams.id);
-   $scope.areItemsAvailable = Subarticles.areItemsAvailable;
-
-   $scope.map = {
-     id: 'articleMap'
-   };
-
-   var marker;
-
-   //Refresh the map everytime we enter the view
-   $scope.$on('$ionicView.afterEnter', function() {
+    //Refresh the map everytime we enter the view
+    $scope.$on('$ionicView.afterEnter', function() {
       var map = Maps.getArticleMap();
       /* istanbul ignore else */
       if(map) {
-         marker = Maps.setMarker(map,$scope.article.location);
+        marker = Maps.setMarker(map,$scope.article.location);
       }
-   });
-
-   $scope.$on('$ionicView.afterLeave', function() {
-      marker = Maps.deleteMarker(marker);
-      Subarticles.deleteAll();
-      Subarticles.unregisterObserver(updateSubarticles);
-   });
-
-  $scope.onRefresh = function () {
-    console.log('Refresh');
-    Subarticles.deleteAll($stateParams.id);
-    Subarticles.load($stateParams.id, function() {
-      $scope.$broadcast('scroll.refreshComplete');
     });
-  };
 
- $scope.loadMore = function() {
-   /*
-   var temp = $scope.areItemsAvailable;
-   $scope.areItemsAvailable = function () { return false; };
-   */
-   console.log('Loading more subarticles');
-   Subarticles.load($stateParams.id, function() {
-     $scope.safeApply(function(){
-       $scope.$broadcast('scroll.infiniteScrollComplete');
-       /*
-       setTimeout(function () {
-         $scope.itemsAvailable = temp;
-       }, 5000);
-      */
-     });
-   });
- };
+    $scope.$on('$ionicView.afterLeave', function() {
+      marker = Maps.deleteMarker(marker);
+    });
 
-   var updateSubarticles = function() {
-     $scope.subarticles = Subarticles.get($stateParams.id);
-   };
+    /*
+       $scope.onRefresh = function () {
+       console.log('Refresh');
+       Subarticles.deleteAll($stateParams.id);
+       Subarticles.load($stateParams.id, function() {
+       $scope.$broadcast('scroll.refreshComplete');
+       });
+       };
+       */
 
-   Subarticles.registerObserver(updateSubarticles);
-
-   $scope.loadMore();
-}]);
+  }]);
 
