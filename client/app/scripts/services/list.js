@@ -3,178 +3,183 @@
 var app = angular.module('instanews.service.list', ['ionic', 'ngCordova']);
 
 function ListFactory (Platform) {
-  // Initialization function
-  // Find: Loopback find command for the model 
-  // Update: Takes in the new and old value of the model that is being updated
-  //        It must update the item inplace  to avoid extra computation
-  // Options: The query to be passed to the find command. The limit amount is automatically
-  //        taken care of. To reset perform a load with Options.filter.skip = 0;
-  var init = function (find, update, addFilter, options) {
-    this._Find = find;
-    this._AddFilter = addFilter;
-    this._Update = update;
-    this._Options = options;
-    // Ensure the find filter is initialized
-    if(!this._Options) {
-      this._Options = {};
-    }
-    if(!this._Options.filter) {
-      this._Options.filter = {};
-    }
-    if(!this._Options.filter.limit) {
-      this._Options.filter.limit = 5;
-    }
-  };
+  //var list = function (spec, my) {
+  var list = function (spec) {
+    console.log(spec);
+    var that;
+    // my is for shared secret variables and functions
+//    my = my || {};
 
-  // Items are initially not available
-  var itemsAvailable = false;
+    // Retreives the list of items
+    var get = function () {
+      return spec.items;
+    };
 
-  // Retreives the list of items
-  var get = function () {
-    return this._items;
-  };
+    // Sorts the items in the list
+    var sortingFunction = function(a,b) {
+      return b.rating - a.rating;
+    };
 
-  // Sorts the items in the list
-  var sortingFunction = function(a,b) {
-    return b.rating - a.rating;
-  };
+    // Add or update items in the list
+    var add = function (newItems, cb) {
+      if(!Array.isArray(newItems)) {
+        newItems = [newItems];
+      }
 
-  // Add or update items in the list
-  var add = function (newItems, cb) {
-    if(!Array.isArray(newItems)) {
-      newItems = [newItems];
-    }
+      newItems = spec.addFilter(newItems);
 
-    newItems = this._AddFilter(newItems);
+      if(newItems.length) {
 
-    if(newItems.length) {
-      var self = this;
-      newItems.forEach(function (newItem) {
-        var update = false;
-        for(var i = self._items.length - 1; i >= 0; i--) {
-          if(self._items[i].id === newItem.id) {
-            self._Update(newItem, self._items[i]);
-            update = true;
-            break;
+        newItems.forEach(function (newItem) {
+          var update = false;
+          for(var i = spec.items.length - 1; i >= 0; i--) {
+            if(spec.items[i].id === newItem.id) {
+              spec.update(newItem, spec.items[i]);
+              update = true;
+              break;
+            }
           }
-        }
-        if(!update) {
-          self._items.push(newItem);
+          if(!update) {
+            spec.items.push(newItem);
+          }
+        });
+        spec.items.sort(spec.sortingFunction);
+        notifyObservers();
+      } else {
+        console.log('No items pased to list.add');
+      }
+
+      if(cb) {
+        cb(get());
+      } else {
+        return get();
+      }
+    };
+
+    // Load more items using the given Find function
+    var load = function (cb) {
+      if(!spec.options.filter.skip) {
+        spec.itemsAvailable = true;
+        spec.options.filter.limit = 5;
+      } else {
+        spec.options.filter.skip = spec.items.length;
+      }
+
+      Platform.ready
+      .then( function () {
+        if(spec.find instanceof Function) {
+          /* TODO Take into account fringe cases where content crosses pages.
+           * Only dealing with duplicates for the moment
+           */
+          spec.find(spec.options).$promise.then(function (items) {
+            if(!items || !items.length) {
+              spec.itemsAvailable = false;
+              add([], cb);
+            } else {
+              spec.options.filter.limit *= 2;  
+              add(items, cb);
+            }
+          }, function (err) {
+            console.log('Failed to load more items!');
+            console.log(err);
+            add([], cb);
+          });
+        } else {
+          console.log('Invalid find function!');
+          add([], cb);
         }
       });
-      self._items.sort(sortingFunction);
-      self.notifyObservers();
-    } else {
-      console.log('No items pased to list.add');
-    }
+    };
 
-    if(cb) {
-      cb(this.get());
-    } else {
-      return this.get();
-    }
-  };
+    // Remove a subset based on a comparison function
+    var remove = function (comparator) {
+      var removed = [];
+      var remaining = [];
+      spec.items.forEach(function (item) {
+        if(comparator(item)) {
+          removed.push(item);
+        } else {
+          remaining.push(item);
+        }
+      });
 
-  // Load more items using the given Find function
-  var load = function (cb) {
-    var self = this;
-    if(!self._Options.filter.skip) {
-      itemsAvailable = true;
-      self._Options.filter.limit = 5;
-    } else {
-      self._Options.filter.skip = self._items.length;
-    }
-
-    Platform.ready
-    .then( function () {
-      if(self._Find instanceof Function) {
-        /* TODO Take into account fringe cases where content crosses pages.
-         * Only dealing with duplicates for the moment
-         */
-        self._Find(self._Options).$promise.then(function (items) {
-          if(!items || !items.length) {
-            itemsAvailable = false;
-            self.add([], cb);
-          } else {
-            self._Options.filter.limit *= 2;  
-            self.add(items, cb);
-          }
-        }, function (err) {
-          console.log('Failed to load more items!');
-          console.log(err);
-          self.add([], cb);
-        });
-      } else {
-        console.log('Invalid find function!');
-        self.add([], cb);
+      if(removed.length) {
+        spec.items = remaining;
+        notifyObservers();
       }
-    });
-  };
+      return removed;
+    };
 
-  // Remove a subset based on a comparison function
-  var remove = function (comparator, idx) {
-    var self = this;
-    var removed = [];
-    var remaining = [];
-    self._items.forEach(function (item) {
-      if(comparator(item)) {
-        removed.push(item);
-      } else {
-        remaining.push(item);
+    // Find by id
+    var findById = function (id) {
+      for(var i in spec.items) {
+        if(spec.items[i].id === id) {
+          return spec.items[i];
+        }
       }
-    });
+    };
 
-    if(removed.length) {
-      self._items = remaining;
-      self.notifyObservers();
+    // Register and notify observers of the list
+    var registerObserver = function(cb) {
+      spec.observerCallbacks.push(cb);
+    };
+
+    var notifyObservers = function() {
+      angular.forEach(spec.observerCallbacks, function(cb) {
+        cb();
+      });
+    };
+
+    var areItemsAvailable = function () {
+      return spec.itemsAvailable;
     }
-    return removed;
-  };
 
-  // Find by id
-  var findById = function (id) {
-    for(var i in this._items) {
-      if(this._items[i].id === id) {
-        return this._items[i];
+
+
+    // Optional
+    spec.addFilter = spec.addFilter || function (input) { return input;};
+
+    spec.sortingFunction = spec.sortingFunction || sortingFunction;
+
+    //For simple cases this will do but the update function should
+    //have a smarter version given 
+    spec.update = spec.update || function (newVal, oldVal) {
+      for(var i in newVal) {
+        oldVal[i] = newVal[i];
       }
-    }
+    };
+
+    spec.options = spec.options || {};
+    spec.options.filter = spec.options.filter || {};
+    spec.options.filter.order = spec.options.filter.order || 'rating DESC';
+    spec.options.filter.skip = spec.options.filter.skip || 0;
+    spec.options.filter.limit = spec.options.filter.limit || 5;
+
+    // New
+    spec.items = [];
+    spec.observerCallbacks = [];
+    spec.itemsAvailable = false;
+
+    // That is the object to be constructed
+    // it has privlidged access to my, and spec
+    that = {
+      get: get, 
+      findById: findById,
+      load: load, 
+      add: add,
+      remove: remove,
+      registerObserver: registerObserver,
+      notifyObservers: notifyObservers,
+      areItemsAvailable: areItemsAvailable
+    };
+
+    return that;
   };
 
-  // Register and notify observers of the list
-  var registerObserver = function(cb) {
-    this._observerCallbacks.push(cb);
-  };
-  var notifyObservers = function() {
-    var self = this;
-    angular.forEach(self._observerCallbacks, function(cb) {
-      cb();
-    });
-  };
-
-  var List = {
-    _items: [], 
-    _Find: function () {},
-    _Update: function (newVal, oldVal) {},
-    _AddFilter: function (input) { return input;},
-    _Options: {}, 
-    _observerCallbacks: [],
-    init: init,
-    get: get, 
-    findById: findById,
-    load: load, 
-    add: add,
-    remove: remove,
-    registerObserver: registerObserver,
-    notifyObservers: notifyObservers,
-    areItemsAvailable: function () {
-      return itemsAvaialble;
-    }
-  };
-
-  return List;
+  return list;
 }
 
-app.factory('List', [
+app.factory('list', [
   'Platform',
   ListFactory
 ]);

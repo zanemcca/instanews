@@ -6,32 +6,27 @@ var app = angular.module('instanews.service.articles', ['ionic', 'ngResource','n
 app.service('Articles', [
   '$filter',
   'Article',
-  'List',
+  'list',
   'Subarticles',
   'Platform',
   'Position',
   function(
     $filter,
     Article,
-    List,
+    list,
     Subarticles,
     Platform,
     Position
   ){
-    var Arts = {
-      inView: [],
-      outView: []
-    };
-
-    var defaultFilter = {
-      skip: 0,
-      order: 'rating DESC'
-    };
 
     var options = {
-      filter: defaultFilter
+      filter: {
+       skip: 0,
+       order: 'rating DESC'
+      }
     };
 
+    // Triggered when an item in the list wants to be updated
     var update = function (newValue, oldValue) {
       if( newValue.modified >= oldValue.modified ) {
         oldValue.rating = newValue.rating;
@@ -46,8 +41,10 @@ app.service('Articles', [
       }
     };
 
+    // Triggered when a new batch of articles wants to be added to the list
+    // allows for additional filtering
     var addFilter = function(arts) {
-      var outView = [],
+      var hidden = [],
         inView = [];
 
       arts.forEach(function(article) {
@@ -55,35 +52,43 @@ app.service('Articles', [
         if(Position.withinBounds(position)) {
           inView.push(article);
         } else {
-          outView.push(article);
+          hidden.push(article);
         }
       });
 
-      console.log('outView:');
-      console.log(otherArticles.add(outView));
+      console.log('hidden:');
+      console.log(hiddenArticles.add(hidden));
       return inView;
     };
 
-    var ArticleList = Object.create(List);
-    var otherArticles = Object.create(List);
-    //ArticleList._items = [];
-    ArticleList.init(Article.find, update, addFilter, options);
+    // Create a list for articles within view
+    var articles = list({
+      find: Article.find,
+      update: update,
+      addFilter: addFilter,
+      options: options
+    });
+
+    // Create a headless list for out of view articles
+    var hiddenArticles = list({
+      update: update
+    });
 
     // Reorganize the articles into the viewable array and the hidden array
     var reorganize = function() {
-      var toOutView = ArticleList.remove(function (article) {
+      var toOutView = articles.remove(function (article) {
         var position = Position.posToLatLng(article.location);
         return !Position.withinBounds(position);
       });
 
-      var toInView = otherArticles.remove(function (article) {
+      var toInView = hiddenArticles.remove(function (article) {
         var position = Position.posToLatLng(article.location);
         return Position.withinBounds(position);
       });
 
       console.log(toOutView.length + ' going out of view and ' + toInView.length + ' going into the view');
-      ArticleList.add(toInView);
-      otherArticles.add(toOutView);
+      articles.add(toInView);
+      hiddenArticles.add(toOutView);
     };
 
     //Update the filter bounds 
@@ -115,7 +120,7 @@ app.service('Articles', [
 
       Platform.loading.show();
 
-      ArticleList.load(function () {
+      articles.load(function () {
         //TODO Lets rethink this potentially unnecessary reorganize
         reorganize();
         Platform.loading.hide();
@@ -124,6 +129,6 @@ app.service('Articles', [
 
     Position.registerBoundsObserver(updateBounds);
 
-    return ArticleList;
+    return articles;
   }
 ]);
