@@ -7,26 +7,12 @@
    <ion-nav-buttons side="primary">
       <button ng-click="toggleMenu()" class="button button-icon icon ion-ios-gear-outline"></button>
    </ion-nav-buttons>
+
    <ion-content on-swipe-down="onSwipeDown()" overflow-scroll="true" class="gpu">
-      <!--ion-refresher pulling-text="Fresh Stuff" on-refresh="onRefresh()">
-      </ion-refresher-->
-
-      <inAutocomplete place="place"></inAutocomplete>
-      <inMap map="map"></inMap>
-
-      <ul class="list">
-        <ion-item ng-repeat="article in articles track by article.id"
-          class="no-padding card">
-          <in-list-item item="article"></in-list-item>
-        </ion-item>
-      </ul>
-
-      <ion-infinite-scroll
-         immediate-check="false"
-         ng-if="itemsAvailable()"
-         on-infinite="loadMore()"
-         distance="10%">
-      </ion-infinite-scroll>
+      <in-list items="articles"> 
+        <inAutocomplete place="place"></inAutocomplete>
+        <inMap map="map"></inMap>
+      </in-list>
    </ion-content>
 
   <!--button class="float-button button button-dark icon ion-chevron-up"
