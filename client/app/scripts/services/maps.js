@@ -106,7 +106,7 @@ a: 1
         gradient.push(rgbaToString(rgba));
       }
 
-      console.log(gradient);
+      //console.log(gradient);
       return gradient;
     };
 
@@ -210,7 +210,7 @@ return gradient;
         }).$promise
         .then(function (res) {
           var articles = res.data;
-          console.log(articles);
+          //console.log(articles);
           console.log('Updating map with ' + articles.length + ' articles');
 
           var articleHeatArray = [];

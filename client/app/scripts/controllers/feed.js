@@ -20,50 +20,10 @@ app.controller('FeedCtrl', [
     Navigate
   ) {
 
-    $scope.articles = Articles.get();
+    $scope.Articles = Articles;
+
+   // $scope.articles = $scope.Articles.get();
     $scope.toggleMenu = Navigate.toggleMenu;
-    /*
-       $scope.scrollTop = Navigate.scrollTop;
-
-       $scope.scrollTopVisible = false;
-
-       $scope.onSwipeDown = function () {
-       $scope.scrollTopVisible = true;
-       setTimeout(function () {
-       $scope.$apply(function () {
-       $scope.scrollTopVisible = false;
-       });
-       }, 2000);
-       };
-       */
-
-    /*istanbul ignore next */
-    $scope.safeApply = function(fn) {
-      var phase = this.$root.$$phase;
-      if(phase === '$apply' || phase === '$digest') {
-        if(fn && (typeof(fn) === 'function')) {
-          fn();
-        }
-      } else {
-        this.$apply(fn);
-      }
-    };
-
-    var items = {
-      available: function () {
-        return false;
-      }
-    }; 
-
-    $scope.itemsAvailable = function () { 
-      return items.available();
-    };
-
-    Position.boundsReady
-    .then(function () {
-      items.available = Articles.areItemsAvailable;
-    });
-
     $scope.place = {
       //types: ['(regions)'],
       getMap: Maps.getFeedMap
@@ -109,15 +69,31 @@ app.controller('FeedCtrl', [
 
     $scope.title = Platform.getAppNameLogo();
 
-    //TODO Only keep a subset of the articles and load them one at a time from articles
-    //we need this so that all of the articles do not render at the same time
+    //Refresh the map everytime we enter the view
+    $scope.$on('$ionicView.afterEnter', function() {
+      var map = Maps.getFeedMap();
+      /* istanbul ignore else */
+      if(map) {
+        google.maps.event.trigger(map, 'resize');
+      }
+     });
 
-    //Update our local articles
-    //var first = true;
-    var updateArticles = function() {
-      $scope.articles = Articles.get();
-    };
 
+
+    /*
+       $scope.scrollTop = Navigate.scrollTop;
+
+       $scope.scrollTopVisible = false;
+
+       $scope.onSwipeDown = function () {
+       $scope.scrollTopVisible = true;
+       setTimeout(function () {
+       $scope.$apply(function () {
+       $scope.scrollTopVisible = false;
+       });
+       }, 2000);
+       };
+       */
     /*
     // Refresh the articles completely
     $scope.onRefresh = function () {
@@ -132,32 +108,55 @@ $scope.$broadcast('scroll.refreshComplete');
 });
 };
 */
+    /*istanbul ignore next */
+    /*
+    $scope.safeApply = function(fn) {
+      var phase = this.$root.$$phase;
+      if(phase === '$apply' || phase === '$digest') {
+        if(fn && (typeof(fn) === 'function')) {
+          fn();
+        }
+      } else {
+        this.$apply(fn);
+      }
+    };
 
+    var items = {
+      available: function () {
+        return false;
+      }
+    }; 
+
+    $scope.itemsAvailable = function () { 
+      return items.available();
+    };
+
+    Position.boundsReady
+    .then(function () {
+      items.available = Articles.areItemsAvailable;
+    });
+   */
     // This is called when the bottom of the feed is reached
+    /*
     $scope.loadMore = function() {
-      var temp = items.available;
-      items.available = function () { return false; };
       console.log('Loading more articles');
       Articles.load( function() {
         $scope.safeApply(function(){
           $scope.$broadcast('scroll.infiniteScrollComplete');
-          setTimeout(function () {
-            items.available = temp;
-          }, 5000);
         });
       });
     };
 
-    //Refresh the map everytime we enter the view
-    $scope.$on('$ionicView.afterEnter', function() {
-      var map = Maps.getFeedMap();
-      /* istanbul ignore else */
-      if(map) {
-        google.maps.event.trigger(map, 'resize');
-      }
-    });
+    */
+    //Update our local articles
+    //var first = true;
+    /*
+    var updateArticles = function() {
+      $scope.articles = Articles.get();
+    };
 
     //Update the map if the articles are updated
     Articles.registerObserver(updateArticles);
+   */
   }
 ]);

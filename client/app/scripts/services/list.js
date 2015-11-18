@@ -5,10 +5,9 @@ var app = angular.module('instanews.service.list', ['ionic', 'ngCordova']);
 function ListFactory (Platform) {
   //var list = function (spec, my) {
   var list = function (spec) {
-    console.log(spec);
     var that;
     // my is for shared secret variables and functions
-//    my = my || {};
+    //    my = my || {};
 
     // Retreives the list of items
     var get = function () {
@@ -44,6 +43,9 @@ function ListFactory (Platform) {
           }
         });
         spec.items.sort(spec.sortingFunction);
+
+        spec.options.filter.skip = spec.items.length;
+
         notifyObservers();
       } else {
         console.log('No items pased to list.add');
@@ -61,12 +63,11 @@ function ListFactory (Platform) {
       if(!spec.options.filter.skip) {
         spec.itemsAvailable = true;
         spec.options.filter.limit = 5;
-      } else {
-        spec.options.filter.skip = spec.items.length;
       }
 
       Platform.ready
       .then( function () {
+        var modified = false;
         if(spec.find instanceof Function) {
           /* TODO Take into account fringe cases where content crosses pages.
            * Only dealing with duplicates for the moment
@@ -74,19 +75,29 @@ function ListFactory (Platform) {
           spec.find(spec.options).$promise.then(function (items) {
             if(!items || !items.length) {
               spec.itemsAvailable = false;
-              add([], cb);
             } else {
+              if(items.length < spec.options.filter.limit) {
+                spec.itemsAvailable = false;
+              }
               spec.options.filter.limit *= 2;  
+              spec.options.filter.limit = Math.min(spec.options.filter.limit, 100);
+              modified = true;
               add(items, cb);
             }
           }, function (err) {
             console.log('Failed to load more items!');
             console.log(err);
-            add([], cb);
           });
         } else {
           console.log('Invalid find function!');
-          add([], cb);
+        }
+
+        if(!modified) {
+          if(cb) {
+            cb(get());
+          } else {
+            return get();
+          }
         }
       });
     };
@@ -105,6 +116,7 @@ function ListFactory (Platform) {
 
       if(removed.length) {
         spec.items = remaining;
+        spec.options.filter.skip = spec.items.length;
         notifyObservers();
       }
       return removed;
@@ -134,9 +146,6 @@ function ListFactory (Platform) {
       return spec.itemsAvailable;
     }
 
-
-
-    // Optional
     spec.addFilter = spec.addFilter || function (input) { return input;};
 
     spec.sortingFunction = spec.sortingFunction || sortingFunction;
@@ -158,7 +167,7 @@ function ListFactory (Platform) {
     // New
     spec.items = [];
     spec.observerCallbacks = [];
-    spec.itemsAvailable = false;
+    spec.itemsAvailable = true;
 
     // That is the object to be constructed
     // it has privlidged access to my, and spec

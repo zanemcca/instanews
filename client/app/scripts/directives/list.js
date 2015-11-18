@@ -10,9 +10,27 @@ app.directive('inList', [
       restrict: 'E',
       transclude: true,
       scope: {
-        items: '='
+        list: '='
       },
       controller: function($scope) {
+        $scope.safeApply  = function(fn) {
+          var phase = this.$root.$$phase;
+          if(phase === '$apply' || phase === '$digest') {
+            if(fn && (typeof(fn) === 'function')) {
+              fn();
+            }
+          } else {
+            this.$apply(fn);
+          }
+        };
+
+        $scope.onInfinite = function() {
+          $scope.list.load( function() {
+            $scope.safeApply(function(){
+              $scope.$broadcast('scroll.infiniteScrollComplete');
+            });
+          });
+        };
       },
       templateUrl: 'templates/directives/list.html',
       link: function($scope, element, attributes) {
