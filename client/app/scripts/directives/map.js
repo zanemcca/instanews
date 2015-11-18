@@ -140,7 +140,7 @@ app.directive('inmap', [
               case 'articleMap': {
                 // istanbul ignore else
                 if ( $stateParams.id) {
-                  scope.article = Articles.getOne($stateParams.id);
+                  scope.article = Articles.findById($stateParams.id);
                   mapOptions.center = new google.maps.LatLng(scope.article.location.lat, scope.article.location.lng);
                   mapOptions.zoom = 18;
                   mapOptions.minZoom = 9;

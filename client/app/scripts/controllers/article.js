@@ -35,7 +35,7 @@ app.controller('ArticleCtrl', [
    //TODO OnScroll create new view for items scrolled past
 
    //Scope variables
-   $scope.article = Articles.getOne($stateParams.id);
+   $scope.article = Articles.findById($stateParams.id);
    $scope.areItemsAvailable = Subarticles.areItemsAvailable;
 
    $scope.map = {

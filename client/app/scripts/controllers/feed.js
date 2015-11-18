@@ -37,7 +37,7 @@ app.controller('FeedCtrl', [
        };
        */
 
-      /*istanbul ignore next */
+    /*istanbul ignore next */
     $scope.safeApply = function(fn) {
       var phase = this.$root.$$phase;
       if(phase === '$apply' || phase === '$digest') {
@@ -115,13 +115,13 @@ app.controller('FeedCtrl', [
     //Update our local articles
     //var first = true;
     var updateArticles = function() {
-        $scope.articles = Articles.get();
-      };
+      $scope.articles = Articles.get();
+    };
 
-      /*
-      // Refresh the articles completely
-      $scope.onRefresh = function () {
-      console.log('Refresh');
+    /*
+    // Refresh the articles completely
+    $scope.onRefresh = function () {
+    console.log('Refresh');
 
 //Reset all necessary values
 //Articles.deleteAll();
@@ -133,30 +133,31 @@ $scope.$broadcast('scroll.refreshComplete');
 };
 */
 
-      // This is called when the bottom of the feed is reached
-      $scope.loadMore = function() {
-        var temp = items.available;
-        items.available = function () { return false; };
-        console.log('Loading more articles');
-        Articles.load( function() {
-          $scope.safeApply(function(){
-            $scope.$broadcast('scroll.infiniteScrollComplete');
-            setTimeout(function () {
-              items.available = temp;
-            }, 5000);
-          });
+    // This is called when the bottom of the feed is reached
+    $scope.loadMore = function() {
+      var temp = items.available;
+      items.available = function () { return false; };
+      console.log('Loading more articles');
+      Articles.load( function() {
+        $scope.safeApply(function(){
+          $scope.$broadcast('scroll.infiniteScrollComplete');
+          setTimeout(function () {
+            items.available = temp;
+          }, 5000);
         });
-      };
-
-      //Refresh the map everytime we enter the view
-      $scope.$on('$ionicView.afterEnter', function() {
-        var map = Maps.getFeedMap();
-        /* istanbul ignore else */
-        if(map) {
-          google.maps.event.trigger(map, 'resize');
-        }
       });
+    };
 
-      //Update the map if the articles are updated
-      Articles.registerObserver(updateArticles);
-    }]);
+    //Refresh the map everytime we enter the view
+    $scope.$on('$ionicView.afterEnter', function() {
+      var map = Maps.getFeedMap();
+      /* istanbul ignore else */
+      if(map) {
+        google.maps.event.trigger(map, 'resize');
+      }
+    });
+
+    //Update the map if the articles are updated
+    Articles.registerObserver(updateArticles);
+  }
+]);

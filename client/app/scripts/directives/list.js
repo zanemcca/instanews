@@ -2,6 +2,25 @@
 'use strict';
 var app = angular.module('instanews.directive.list', ['ionic']);
 
+app.directive('inList', [
+  function (
+  ) {
+
+    return {
+      restrict: 'E',
+      transclude: true,
+      scope: {
+        items: '='
+      },
+      controller: function($scope) {
+      },
+      templateUrl: 'templates/directives/list.html',
+      link: function($scope, element, attributes) {
+      }
+    };
+  }
+]);
+
 app.directive('inListItem', [
   '$timeout',
   'Position',
@@ -19,17 +38,17 @@ app.directive('inListItem', [
       switch(item.modelName) {
         case 'article':
           template = template.concat('articlePreview.html'); 
-          break;
+        break;
         case 'subarticle':
           template = template.concat('subarticle.html'); 
-          break;
+        break;
         case 'comment':
           template = template.concat('comment.html'); 
-          break;
+        break;
         default: 
           template = '';
-          console.log('Error: Unknown model name: ' + item.modelName);
-          break;
+        console.log('Error: Unknown model name: ' + item.modelName);
+        break;
       }
       return template;
     };
@@ -99,13 +118,13 @@ app.directive('inListItem', [
           .then(
             // istanbul ignore next 
             function() {
-            console.log('View created: ' + $scope.item.id);
-          }, 
-          // istanbul ignore next 
-          function(err) {
-            console.log('Error: Failed to create a view');
-            console.log(err);
-          });
+              console.log('View created: ' + $scope.item.id);
+            }, 
+            // istanbul ignore next 
+            function(err) {
+              console.log('Error: Failed to create a view');
+              console.log(err);
+            });
         }
 
         /*
@@ -122,4 +141,5 @@ app.directive('inListItem', [
            */
       }
     };
-  }]);
+  }
+]);
