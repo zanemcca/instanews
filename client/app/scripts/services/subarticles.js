@@ -13,9 +13,9 @@ app.service('Subarticles', [
     var articles = [];
 
     var findOrCreate = function (parentId) {
-      var parent
+      var parent;
       articles.forEach(function(article) {
-        if(article.id === parentId) {
+        if(article.spec.options.id === parentId) {
           console.log('Found cached copy of subarticles');
           parent = article;
         }
@@ -23,13 +23,18 @@ app.service('Subarticles', [
 
       if(!parent) {
         parent = {
-          id: parentId,
-          subarticles: subarticleList({
+          spec: {
             options: {
               id: parentId
             }
-          })
+          }
         };
+        parent.subarticles = subarticleList(parent.spec)
+
+        parent.subarticles.getSpec = function () {
+          return parent.spec;
+        };
+
         articles.push(parent);
       }
 
@@ -53,6 +58,7 @@ app.service('Subarticles', [
 
       var filter = {
         skip: 0,
+        limit: 1,
         where: {
           pending: {
             exists: false
@@ -66,7 +72,11 @@ app.service('Subarticles', [
         console.log('Please set spec.options.id');
         return;
       }
+
       spec.options.filter = spec.options.filter || filter;
+      spec.options.filter.where = spec.options.filter.where || filter.where;
+      spec.options.filter.order = spec.options.filter.order || filter.order;
+      spec.options.filter.limit = spec.options.filter.limit || filter.limit;
 
       spec.find = Article.subarticles;
       spec.update = spec.update || update;

@@ -6,12 +6,17 @@ function ListFactory (Platform) {
   //var list = function (spec, my) {
   var list = function (spec) {
     var that;
-    // my is for shared secret variables and functions
-    //    my = my || {};
+    var ogFilter = {}; // A place to keep the original filter for resets
 
     // Retreives the list of items
     var get = function () {
       return spec.items;
+    };
+
+    var getTop = function () {
+      if(spec.items.length) {
+        return spec.items[0];
+      }
     };
 
     // Sorts the items in the list
@@ -62,7 +67,7 @@ function ListFactory (Platform) {
     var load = function (cb) {
       if(!spec.options.filter.skip) {
         spec.itemsAvailable = true;
-        spec.options.filter.limit = 5;
+        //spec.options.filter.limit = ogFilter.limit;
       }
 
       Platform.ready
@@ -94,6 +99,7 @@ function ListFactory (Platform) {
 
         if(!modified) {
           if(cb) {
+            console.log('Calling callback!');
             cb(get());
           } else {
             return get();
@@ -146,7 +152,16 @@ function ListFactory (Platform) {
       return spec.itemsAvailable;
     }
 
+    var preLoad = function (item, cb) {
+      //TODO Add up/downvote retrieval 
+      spec.preLoad(item, cb);
+    };
+
     spec.addFilter = spec.addFilter || function (input) { return input;};
+
+    spec.preLoad = spec.preLoad || function(item, cb) {
+      cb(item);
+    };
 
     spec.sortingFunction = spec.sortingFunction || sortingFunction;
 
@@ -164,6 +179,10 @@ function ListFactory (Platform) {
     spec.options.filter.skip = spec.options.filter.skip || 0;
     spec.options.filter.limit = spec.options.filter.limit || 5;
 
+    for(var i in spec.options.filter) {
+      ogFilter[i] = spec.options.filter[i];
+    }
+
     // New
     spec.items = [];
     spec.observerCallbacks = [];
@@ -173,10 +192,12 @@ function ListFactory (Platform) {
     // it has privlidged access to my, and spec
     that = {
       get: get, 
+      getTop: getTop, 
       findById: findById,
       load: load, 
       add: add,
       remove: remove,
+      preLoad: preLoad,
       registerObserver: registerObserver,
       notifyObservers: notifyObservers,
       areItemsAvailable: areItemsAvailable

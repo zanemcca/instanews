@@ -78,8 +78,6 @@ app.controller('FeedCtrl', [
       }
      });
 
-
-
     /*
        $scope.scrollTop = Navigate.scrollTop;
 
