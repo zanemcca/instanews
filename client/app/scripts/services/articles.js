@@ -51,7 +51,7 @@ app.service('Articles', [
 
       //     console.log(inView.length + ' added to inView and ' + hidden.length + ' added to hidden');
       if(hidden.length) {
-        hiddenArticle.add(hidden);
+        hiddenArticles.add(hidden);
       }
       return inView;
     };
@@ -83,6 +83,13 @@ app.service('Articles', [
     spec.update = update;
     spec.addFilter = spec.addFilter || addFilter;
     spec.options = spec.options || {};
+    spec.options.filter = {
+      where: {
+        pending: {
+          exists: false
+        }
+      }
+    };
 
     // Create a list for articles within view
     var articles = list(spec);
@@ -119,14 +126,12 @@ app.service('Articles', [
       if(bounds) {
         var sw = bounds.getSouthWest();
         var ne = bounds.getNorthEast();
-        spec.options.filter.where = {
-          location: {
-            geoWithin: {
-              $box: [
-                [sw.lat(), sw.lng()],
-                [ne.lat(), ne.lng()]
-              ]
-            }
+        spec.options.filter.where.location = {
+          geoWithin: {
+            $box: [
+              [sw.lat(), sw.lng()],
+              [ne.lat(), ne.lng()]
+            ]
           }
         };
       }

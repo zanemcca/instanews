@@ -29,7 +29,7 @@ app.service('Subarticles', [
             }
           }
         };
-        parent.subarticles = subarticleList(parent.spec)
+        parent.subarticles = subarticleList(parent.spec);
 
         parent.subarticles.getSpec = function () {
           return parent.spec;

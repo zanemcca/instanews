@@ -31,9 +31,7 @@ app.directive('inList', [
           });
         };
       },
-      templateUrl: 'templates/directives/list.html',
-      link: function($scope, element, attributes) {
-      }
+      templateUrl: 'templates/directives/list.html'
     };
   }
 ]);
@@ -122,7 +120,7 @@ app.directive('inListItem', [
         // view still has to go through even if its a cache hit
         //    Because of above assertion we need to wait to replace this till we have
         //    proper refreshing reinstated in the lists. 
-        var createView = function (res) {
+        var createView = function () {
           if(User.get()) {
             var position = Position.getPosition();
 
