@@ -34,7 +34,6 @@ function start() {
   return common.req('models/storage')(Storage);
 }
 
-
 exports.run = function () {
   describe('Storage', function () {
 

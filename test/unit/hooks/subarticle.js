@@ -339,7 +339,7 @@ exports.run = function () {
                 cb();
               };
               run();
-              expect(click.calledOnce).to.be.true;
+              expect(click.callCount).to.equal(1);
             });
 
             it('should propgate the error', function() {
