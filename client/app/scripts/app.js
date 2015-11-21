@@ -26,6 +26,7 @@ angular.module('instanews', [
   'instanews.service.articles',
   'instanews.service.camera',
   'instanews.service.fileTransfer',
+  'instanews.service.list',
   'instanews.service.localStorage',
   'instanews.service.maps',
   'instanews.service.navigate',

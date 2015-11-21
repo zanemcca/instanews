@@ -176,11 +176,20 @@ app.factory('Platform', [
 
     var loading = {
       show: function () {
-        return $ionicLoading.show({
-          template: 'Loading...'
-        });
+        if(!loading.loader ) {
+           loading.loader = $ionicLoading.show({
+            delay: 100,
+            template: 'Loading...'
+          });
+          return loading.loader;
+        }
       },
-      hide: $ionicLoading.hide
+      hide: function () {
+        if(loading.loader) {
+          $ionicLoading.hide();
+          loading.loader = null;
+        }
+      }
     };
 
     // Initialize the platform

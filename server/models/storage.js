@@ -222,7 +222,7 @@ module.exports = function(Storage) {
   //Recieves the transcoding message as the input
   Storage.clearPending = function (message, next) {
     var Subarticle = Storage.app.models.Subarticle;
-    var Article = Subarticle.app.models.Article;
+    var Article = Storage.app.models.Article;
 
     Subarticle.findOne({
       where: {
@@ -334,6 +334,8 @@ module.exports = function(Storage) {
                     console.error(err.stack);
                     next(err);
                   } else {
+                    // TODO Set pending flag
+                    //TODO Clear pending flag from subarticle and article
                     console.dir(data, {colors: true});
                     next();
                   }

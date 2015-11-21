@@ -131,21 +131,22 @@ describe('Feed: ', function(){
 
   describe('initialization', function() {
 
-    it('should call Articles.get', function() {
-      sinon.spy(articles, 'get');
+    it('should set $scope.Articles to Articles', function() {
       initController();
 
-      expect(articles.get.calledOnce).to.be.true;
+      expect(scope.Articles).to.deep.equal(articles);
     });
 
-    it('should call Articles.registerObserver', function() {
+    // Not needed with new list service
+    it.skip('should call Articles.registerObserver', function() {
       sinon.spy(articles, 'registerObserver');
       initController();
 
       expect(articles.registerObserver.calledOnce).to.be.true;
     });
 
-    it('should set a local copy of areItemsAvailable', function() {
+    // Not needed with new list service
+    it.skip('should set a local copy of areItemsAvailable', function() {
       sinon.spy(articles, 'areItemsAvailable');
       initController();
 
@@ -160,8 +161,8 @@ describe('Feed: ', function(){
     });
   });
 
-  describe('updateArticles', function() {
-
+  // Not needed with new list service
+  describe.skip('updateArticles', function() {
     beforeEach( function() {
       //NOTE: I am forcing registerObserver to call the cb which should
       //be updateArticles
@@ -178,7 +179,6 @@ describe('Feed: ', function(){
       expect(articles.get.calledTwice).to.be.true;
     });
   });
-
 
   //TODO Move this to autocomplete
   /*
@@ -204,7 +204,8 @@ describe('Feed: ', function(){
   });
  */
 
-  describe('load callers', function() {
+  // Not needed with new list service
+  describe.skip('load callers', function() {
 
     var arts = [];
 
@@ -230,8 +231,7 @@ describe('Feed: ', function(){
 
     });
 
-    // onRefresh has been disabled
-    describe.skip('onRefresh', function() {
+    describe('onRefresh', function() {
 
       beforeEach(function() { 
         sinon.stub(articles, 'getOne', function(id) {

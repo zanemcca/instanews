@@ -5,137 +5,92 @@ var app = angular.module('instanews.service.subarticles', ['ionic', 'ngResource'
 
 app.service('Subarticles', [
   'Article',
+  'list',
   function(
-    Article
+    Article,
+    list
   ){
+    var articles = [];
 
-   var filter = {
-      limit: 50,
-      skip: 0,
-      where: {
-        pending: {
-         exists: false
-        } 
-      },
-      order: 'rating DESC'
-   };
-
-   var subarticles = [];
-   var itemsAvailable = true;
-   var observers = [];
-
-   var loadBest = function(id, cb) {
-      Article.subarticles({
-        id: id,
-        filter: {
-          skip: 0,
-          limit: 1,
-          where: {
-            pending: {
-             exists: false
-            } 
-          },
-          order: 'rating DESC'
+    var findOrCreate = function (parentId) {
+      var parent;
+      articles.forEach(function(article) {
+        if(article.spec.options.id === parentId) {
+          console.log('Found cached copy of subarticles');
+          parent = article;
         }
-      })
-      .$promise
-      .then( function (subs) {
-        if(subs.length < 1) {
-          console.log('No subarticles found for ' + id);
-          cb();
-        } else {
-          cb(subs[0]);
-        }
-      }, function (err) {
-        console.log('Error something with the subarticles failed');
-        console.log(err);
-        cb();
       });
-   };
 
-   var load = function(id, cb) {
-      Article.subarticles({id: id, filter: filter })
-      .$promise
-      .then( function (subs) {
-         if ( subs.length <= 0 ) {
-            itemsAvailable = false;
-         }
-         else {
-            //Update our skip amount
-            filter.skip += subs.length;
-
-            //Set the top article and remove duplicates
-            for( var i = 0; i < subarticles.length; i++) {
-               var subarticle = subarticles[i];
-
-               //Remove duplicates
-               for(var j = 0; j < subs.length; j++ ) {
-                  var sub = subs[j];
-                  // istanbul ignore else
-                  if( sub.id === subarticle.id) {
-                     subs.splice(j,1);
-                     break;
-                  }
-               }
+      if(!parent) {
+        parent = {
+          spec: {
+            options: {
+              id: parentId
             }
+          }
+        };
+        parent.subarticles = subarticleList(parent.spec);
 
-            //Update our local subarticles
-            subarticles = subarticles.concat(subs);
-            notifyObservers();
-         }
-         cb();
-      },
-      // istanbul ignore next 
-      function (err) {
-        console.log('Error something with the subarticles failed');
-        console.log(err);
-        cb();
-      });
-   };
+        parent.subarticles.getSpec = function () {
+          return parent.spec;
+        };
 
-   var deleteAll = function() {
-     subarticles = [];
-     itemsAvailable = true;
-     filter.skip = 0;
-     notifyObservers();
-   };
+        articles.push(parent);
+      }
 
-   var areItemsAvailable = function() {
-     return itemsAvailable;
-   };
+      return parent.subarticles;
+    };
 
-   var registerObserver = function(cb) {
-     observers.push(cb);
-   };
+    var subarticleList = function (spec) {
+      // Triggered when an item in the list wants to be updated
+      var update = function (newValue, oldValue) {
+        if( newValue.modified >= oldValue.modified ) {
+          oldValue.rating = newValue.rating;
+          oldValue.modified = newValue.modified;
+          oldValue.downVoteCount = newValue.downVoteCount;
+          oldValue.upVoteCount = newValue.upVoteCount;
+          oldValue.upVotes = newValue.upVotes;
+          oldValue.version = newValue.version;
+          oldValue.text = newValue.text;
+          oldValue._file = newValue._file;
+        }
+      };
 
-   var unregisterObserver = function(cb) {
-     for(var i = 0; i < observers.length; i++) {
-       // istanbul ignore else
-       if(observers[i] === cb) {
-         observers.splice(i,1);
-         break;
-       }
-     }
-   };
+      var filter = {
+        skip: 0,
+        limit: 1,
+        where: {
+          pending: {
+            exists: false
+          } 
+        },
+        order: 'rating DESC'
+      };
 
-   var notifyObservers = function() {
-     observers.forEach(function(cb) {
-       cb();
-     });
-   };
+      if(!spec || !spec.options || !spec.options.id) {
+        console.log('Cannot create a subarticle list without the parent id!');
+        console.log('Please set spec.options.id');
+        return;
+      }
 
-   //TODO var get = function(id) {
-   var get = function() {
-     return subarticles;
-   };
+      spec.options.filter = spec.options.filter || filter;
+      spec.options.filter.where = spec.options.filter.where || filter.where;
+      spec.options.filter.order = spec.options.filter.order || filter.order;
+      spec.options.filter.limit = spec.options.filter.limit || filter.limit;
 
-   return {
-     get: get,
-     load: load,
-     loadBest: loadBest,
-     deleteAll: deleteAll,
-     registerObserver: registerObserver,
-     unregisterObserver: unregisterObserver,
-     areItemsAvailable: areItemsAvailable
-   };
-}]);
+      spec.find = Article.subarticles;
+      spec.update = spec.update || update;
+
+      // Create a list for articles within view
+      var subarticles = list(spec);
+
+      subarticles.load();
+
+      return subarticles;
+    };
+
+    return {
+      findOrCreate: findOrCreate 
+    };
+  }
+]);

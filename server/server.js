@@ -57,7 +57,6 @@ var tooManyDead = numCPUs*3; //Basically 3 tries for each child process
 if(cluster.isMaster && numCPUs > 1 && process.env.NODE_ENV === 'production') {
   var dead = 0;
 
-
   var createWorkers = function () {
     var workers = [];
     function find(worker) {

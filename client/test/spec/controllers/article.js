@@ -26,6 +26,20 @@ describe('Article controller: ', function(){
             cb();
           },
           unregisterObserver: function() {},
+          findOrCreate: function () {
+            return {
+              getSpec: function () {
+                return { 
+                  options: {
+                    filter: {}
+                  }
+                };
+              },
+              load: function () {
+              }
+            };
+          },
+          getSpec: function () {},
           deleteAll: function() {},
           get: function(id) {
             return [1,2,3];
@@ -58,7 +72,7 @@ describe('Article controller: ', function(){
           },
           add: function(articles) {
           },
-          getOne: function(articles) {
+          findById: function(articles) {
           },
           deleteAll: function() {},
           areItemsAvailable: function() {
@@ -109,17 +123,18 @@ describe('Article controller: ', function(){
   };
 
   describe('initialization: ', function() {
-    it('should call Articles.getOne', function() {
-      sinon.stub(articles, 'getOne', function(id) {
+    it('should call Articles.findById', function() {
+      sinon.stub(articles, 'findById', function(id) {
         expect(id).to.equal(stateParams.id);
       });
 
       initController();
 
-      expect(articles.getOne.calledOnce).to.be.true;
+      expect(articles.findById.calledOnce).to.be.true;
     });
 
-    it('should call Subarticles.registerObserver', function() {
+    // This is not necessary using the new list
+    it.skip('should call Subarticles.registerObserver', function() {
       sinon.spy(subarticles, 'registerObserver');
       sinon.spy(subarticles, 'get');
 
@@ -129,7 +144,8 @@ describe('Article controller: ', function(){
       expect(subarticles.get.calledOnce).to.be.true;
     });
 
-    it('should call updateSubarticles when Subarticles updates', function() {
+    // This is irrelevant under the new list servic
+    it.skip('should call updateSubarticles when Subarticles updates', function() {
       sinon.spy(subarticles, 'get');
 
       initController();
@@ -177,21 +193,25 @@ describe('Article controller: ', function(){
       expect(maps.deleteMarker.calledOnce).to.be.true;
     });
 
-    it('should call Subarticles.unregisterObserver', function() {
+    // Not needed with new list structure
+    it.skip('should call Subarticles.unregisterObserver', function() {
       sinon.spy(subarticles, 'unregisterObserver');
       scope.$broadcast('$ionicView.afterLeave');
       expect(subarticles.unregisterObserver.calledOnce).to.be.true;
     });
 
-    it('should call Subarticles.deleteAll', function() {
+    // Not needed with new list structure
+    it.skip('should call Subarticles.deleteAll', function() {
       sinon.spy(subarticles, 'deleteAll');
       scope.$broadcast('$ionicView.afterLeave');
       expect(subarticles.deleteAll.calledOnce).to.be.true;
     });
   });
 
-  describe('onRefresh', function() {
-    it('should call Subarticles.deleteAll', function() {
+  // OnRefresh is disabled for now
+  describe.skip('onRefresh', function() {
+    // Not needed with new list structure
+    it.skip('should call Subarticles.deleteAll', function() {
       initController();
       sinon.spy(subarticles, 'deleteAll');
       scope.onRefresh();
@@ -211,7 +231,8 @@ describe('Article controller: ', function(){
     });
   });
 
-  describe('loadMore', function() {
+  // This is done internally in the list service
+  describe.skip('loadMore', function() {
     it('should call Subarticles.load', function() {
       initController();
       sinon.spy(subarticles, 'load');
