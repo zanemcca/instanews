@@ -58,6 +58,7 @@ module.exports = function(app) {
   Subarticle.triggerRating = function(where, modify, cb) {
     debug('triggerRating', where, modify, cb);
     if(where && Object.getOwnPropertyNames(where).length > 0) {
+      // Update rating updates the subarticles rating value in the db
       Stat.updateRating(where, Subarticle.modelName, modify,
       function(err, count) {
         if(err) {

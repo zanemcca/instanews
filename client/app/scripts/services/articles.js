@@ -4,276 +4,158 @@
 var app = angular.module('instanews.service.articles', ['ionic', 'ngResource','ngCordova']);
 
 app.service('Articles', [
-      '$filter',
-      'Article',
-      'Subarticles',
-      'Platform',
-      'Position',
-      function(
-         $filter,
-         Article,
-         Subarticles,
-         Platform,
-         Position
-      ){
+  '$filter',
+  'Article',
+  'list',
+  'Subarticles',
+  'Platform',
+  'Position',
+  function(
+    $filter,
+    Article,
+    list,
+    Subarticles,
+    Platform,
+    Position
+  ){
 
-   var Arts = {
-     inView: [],
-     outView: []
-   };
+    // Triggered when an item in the list wants to be updated
+    var update = function (newValue, oldValue) {
+      if( newValue.modified >= oldValue.modified ) {
+        oldValue.rating = newValue.rating;
+        oldValue.title = newValue.title;
+        oldValue.modified = newValue.modified;
+        oldValue.downVoteCount = newValue.downVoteCount;
+        oldValue.upVoteCount = newValue.upVoteCount;
+        oldValue.verified = newValue.verified;
+        oldValue.version = newValue.version;
+        //TODO Remove once the vote service is completed
+        oldValue.downVotes = newValue.downVotes;
+        oldValue.upVotes = newValue.upVotes;
+      }
+    };
 
-   var itemsAvailable = true;
+    // Triggered when a new batch of articles wants to be added to the list
+    // allows for additional filtering
+    var addFilter = function(arts) {
+      var hidden = [];
+      var inView = [];
 
-   var defaultFilter = {
-      limit: 50,
-      skip: 0,
-      order: 'rating DESC'
-   };
+      arts.forEach(function(article) {
+        var position = Position.posToLatLng(article.location);
+        if(Position.withinBounds(position)) {
+          inView.push(article);
+        } else {
+          hidden.push(article);
+        }
+      });
 
-   var filter = defaultFilter;
+      //     console.log(inView.length + ' added to inView and ' + hidden.length + ' added to hidden');
+      if(hidden.length) {
+        hiddenArticles.add(hidden);
+      }
+      return inView;
+    };
 
-   var areItemsAvailable = function() {
-     return itemsAvailable;
-   };
+    var preLoad = function (article, cb) {
+      var update = function () {
+        //console.log('Trying to get topSubarticle');
+        var subarticle = article.Subarticles.getTop();
+        if(subarticle) {
+          article.topSub = subarticle;
+        }
+      };
 
-   //Update the filter bounds 
-   var updateBounds = function() {
-     var bounds = Position.getBounds();
+      if(!article.Subarticles) {
+        article.Subarticles = Subarticles.findOrCreate(article.id);
+        article.Subarticles.registerObserver(update);
+      }
 
-     // istanbul ignore else
-     if(bounds) {
+      var spec = article.Subarticles.getSpec();
+      spec.options.filter.skip = 0;
+      spec.options.filter.limit = 1;
+      article.Subarticles.load();
+      cb(article);
+    };
+
+    var spec = {};
+    spec.preLoad = preLoad;
+    spec.find = Article.find;
+    spec.update = update;
+    spec.addFilter = spec.addFilter || addFilter;
+    spec.options = spec.options || {};
+    spec.options.filter = {
+      where: {
+        pending: {
+          exists: false
+        }
+      }
+    };
+
+    // Create a list for articles within view
+    var articles = list(spec);
+
+    // Create a headless list for out of view articles
+    var hiddenArticles = list({
+      update: update
+    });
+
+    // Reorganize the articles into the viewable array and the hidden array
+    var reorganize = function() {
+      var total = articles.get().length + hiddenArticles.get().length;
+      console.log('Reorganizing ' + total + ' articles!');
+      var toOutView = articles.remove(function (article) {
+        var position = Position.posToLatLng(article.location);
+        return !Position.withinBounds(position);
+      });
+
+      var toInView = hiddenArticles.remove(function (article) {
+        var position = Position.posToLatLng(article.location);
+        return Position.withinBounds(position);
+      });
+
+      //      console.log(toOutView.length + ' going out of view and ' + toInView.length + ' going into the view');
+      articles.add(toInView);
+      hiddenArticles.add(toOutView);
+    };
+
+    //Update the filter bounds 
+    var updateBounds = function() {
+      var bounds = Position.getBounds();
+
+      // istanbul ignore else
+      if(bounds) {
         var sw = bounds.getSouthWest();
         var ne = bounds.getNorthEast();
-        filter.where = {
-           location: {
-              geoWithin: {
-                 $box: [
-                    [sw.lat(), sw.lng()],
-                    [ne.lat(), ne.lng()]
-                 ]
-              }
-           }
+        spec.options.filter.where.location = {
+          geoWithin: {
+            $box: [
+              [sw.lat(), sw.lng()],
+              [ne.lat(), ne.lng()]
+            ]
+          }
         };
       }
       else {
-         console.log('Bounds not set yet!');
+        console.log('Bounds not set yet!');
       }
 
-      filter.skip = 0;
+      spec.options.filter.skip = 0;
+      spec.options.filter.limit = 5;
 
       console.log('UpateBounds');
-      itemsAvailable = true;
 
       Platform.loading.show();
 
-      load(function () {
+      articles.load(function () {
+        //TODO Lets rethink this potentially unnecessary reorganize
         reorganize();
         Platform.loading.hide();
       });
-   };
+    };
 
-   //Load new articles from the server
-   var load = function(cb) {
-      /* TODO Take into account fringe cases where content crosses pages.
-       * Only dealing with duplicates for the moment
-       */
-      Platform.ready.then( function () {
-        Article.find({filter: filter })
-        .$promise
-        .then( function (articles) {
-          console.log('Loaded new articles');
-          console.log(articles);
-           if ( articles.length <= 0 ) {
-              itemsAvailable = false;
+    Position.registerBoundsObserver(updateBounds);
 
-              // istanbul ignore else
-              if(cb instanceof Function) {
-                cb();
-              }
-           }
-           else {
-              //Update the global articles list
-              add(articles, cb);
-           }
-        });
-      });
-   };
-
-   //Getters
-   var getOne = function (id) {
-      var val = $filter('filter')(Arts.inView, {id: id});
-      if (val.length > 0) {
-         return val[0];
-      }
-      else {
-        val = $filter('filter')(Arts.outView, {id: id});
-        // istanbul ignore else
-        if (val.length > 0) {
-           return val[0];
-        }
-      }
-   };
-
-   // Find the index of the article if it exists
-   // on the array
-   var getArticle = function(articles, article) {
-     for( var i = 0; i < articles.length; i++) {
-       if( articles[i].id === article.id ) {
-         return articles[i];
-       }
-     }
-   };
-
-   //Compare function for sorting the articles
-  var compareFunction = function(a,b) {
-    return b.rating - a.rating;
-  };
-
-   // Update or add a new article
-   var addOne = function(articles, article, done) {
-      var finish = function () {
-        var a = getArticle(articles, article);
-        if( a ) {
-          if( article.modified >= a.modified ) {
-            a.rating = article.rating;
-            a.title = article.title;
-            a.modified = article.modified;
-            a.downVoteCount = article.downVoteCount;
-            a.upVoteCount = article.upVoteCount;
-            a.topSub = article.topSub;
-            a.upVotes = article.upVotes;
-            a.verified = article.verified;
-            a.version = article.version;
-          }
-        }
-        else {
-          articles.push(article);
-        }
-        articles.sort(compareFunction);
-        done();
-      };
-
-     //Set the top subarticle
-      if( article.subarticles && article.subarticles.length > 0 ) {
-        article.topSub = article.subarticles[0];
-        finish();
-      } else {
-        Subarticles.loadBest(article.id, function (sub) {
-          // istanbul ignore else
-          if(sub) {
-            article.topSub = sub;
-            finish();
-          } else {
-            console.log('Warning: An Article without any subarticles has been ignored: ' + article.id);
-            done();
-          }
-        });
-      }
-   };
-
-   var get = function() {
-      return Arts.inView;
-   };
-
-   // Add the given articles
-   var add = function(arts, cb) {
-     var total = arts.length;
-      // istanbul ignore else
-     if(total) {
-       var completed = 0;
-       var done = function () {
-         completed++;
-         if(completed === total) {
-          //Update our skip amount
-          filter.skip = Arts.inView.length;
-          notifyObservers();
-
-          if(cb instanceof Function) {
-            cb();
-          }
-         }
-       };
-
-        for(var i = 0; i < arts.length; i++) {
-          var position = Position.posToLatLng(arts[i].location);
-          if(Position.withinBounds(position)) {
-            addOne(Arts.inView, arts[i], done);
-          }
-          else {
-            addOne(Arts.outView, arts[i], done);
-          }
-        }
-     } else {
-       cb();
-     }
-   };
-
-   // Deletes the local articles
-   var deleteAll = function() {
-     Arts.inView = [];
-     filter.skip = 0;
-     notifyObservers();
-   };
-
-   // Reorganize the articles into the viewable array and the hidden array
-   var reorganize = function() {
-     var total = Arts.inView.length + Arts.outView.length;
-     var completed = 0;
-     var done = function () {
-       completed++;
-       if(completed === total) {
-        //Update our skip amount
-        Arts.inView = inView;
-        Arts.outView = outView;
-        filter.skip = Arts.inView.length;
-        notifyObservers();
-       }
-     };
-
-     var inView = [];
-     var outView = [];
-
-     var organize = function(arts) {
-       for(var i = 0; i < arts.length; i++) {
-          var position = Position.posToLatLng(arts[i].location);
-          if(Position.withinBounds(position)) {
-            addOne(inView,arts[i], done);
-          }
-          else {
-            addOne(outView, arts[i], done);
-          }
-       }
-     };
-
-     organize(Arts.inView);
-     organize(Arts.outView);
-   };
-
-   var observerCallbacks = [];
-
-   var registerObserver = function(cb) {
-      observerCallbacks.push(cb);
-   };
-
-   var notifyObservers = function() {
-      angular.forEach(observerCallbacks, function(cb) {
-         cb();
-      });
-   };
-
-   // Call reorganize every time the bounds change
-//   Position.registerBoundsObserver(reorganize);
-   Position.registerBoundsObserver(updateBounds);
-
-   return {
-      get: get,
-      add: add,
-      load: load,
-      deleteAll: deleteAll,
-      reorganize: reorganize,
-      updateBounds: updateBounds,
-      areItemsAvailable: areItemsAvailable,
-      registerObserver: registerObserver,
-      getOne: getOne
-   };
-}]);
+    return articles;
+  }
+]);

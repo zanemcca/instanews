@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<!--ion-refresher pulling-text="Fresh Stuff" on-refresh="onRefresh()">
+</ion-refresher-->
+
+<div ng-transclude></div>
+<ul class="list">
+  <ion-item ng-repeat="item in list.get() track by item.id"
+    class="no-padding card">
+    <in-list-item item="item"
+      pre-load="list.preLoad">
+    </in-list-item>
+  </ion-item>
+</ul>
+<ion-infinite-scroll
+   immediate-check="false"
+   ng-if="list.areItemsAvailable()"
+   on-infinite="onInfinite()"
+   distance="10%">
+</ion-infinite-scroll>
