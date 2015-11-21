@@ -82,11 +82,19 @@ app.directive('invotes', [
                     }
                   };
 
-
                   $scope.upvote = function () {
-                    //TODO Delete the vote if it already exists
-                    $scope.votable.upVoted = true;
-                    $scope.votable.downVoted = false;
+                    if($scope.votable.upVoted) {
+                      //TODO Delete the vote if it already exists
+                    } else {
+                      $scope.votable.upVoteCount++;
+                      $scope.votable.upVoted = true;
+                    }
+
+                    if($scope.votable.downVoted) {
+                      $scope.votable.downVotes = [];
+                      $scope.votable.downVoteCount--;
+                      $scope.votable.downVoted = false;
+                    }
 
                     var position = Position.getPosition();
                     var vote = {
@@ -117,9 +125,18 @@ app.directive('invotes', [
                   };
 
                   $scope.downvote = function () {
-                    //TODO Delete the vote if it already exists
-                    $scope.votable.upVoted = false;
-                    $scope.votable.downVoted = true;
+                    if($scope.votable.downVoted) {
+                      //TODO Delete the vote if it already exists
+                    } else {
+                      $scope.votable.downVoteCount++;
+                      $scope.votable.downVoted = true;
+                    }
+
+                    if($scope.votable.upVoted) {
+                      $scope.votable.upVotes = [];
+                      $scope.votable.upVoteCount--;
+                      $scope.votable.upVoted = false;
+                    }
 
                     var position = Position.getPosition();
                     var vote = {
