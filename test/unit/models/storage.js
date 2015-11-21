@@ -313,6 +313,7 @@ exports.run = function () {
             };
 
             sub = {
+              parentId: 'id',
               updateAttributes: function(attr, cb) {
                 update(attr, cb);
               }
@@ -347,6 +348,20 @@ exports.run = function () {
               expect(error).to.equal(err);
               done();
             });
+          });
+
+          it('should call Article.clearPending with the proper arguments', function (done) {
+            update = function(attr, cb) {
+              cb();
+            };
+
+            start();
+            sandbox.stub(Storage.app.models.Article, 'clearPending', function (id,cb) {
+              expect(id).to.deep.equal(sub.parentId);
+              cb();
+            });
+
+            Storage.clearPending(message,done);
           });
         });
       });
@@ -518,10 +533,25 @@ exports.run = function () {
               start();
               sandbox.stub(Storage, 'clearPending', function (message, cb) {
                 expect(message).to.deep.equal(JSON.parse(job.Message));
-                done();
+                cb();
               });
 
-              Storage.transcodingComplete(ctx, next);
+              Storage.transcodingComplete(ctx, function () {
+                done();
+              });
+            });
+
+            it('should propogate the error from Storage.clearPending', function (done) {
+              var error = 'errrr';
+              start();
+              sandbox.stub(Storage, 'clearPending', function (message, cb) {
+                cb(error);
+              });
+
+              Storage.transcodingComplete(ctx, function (err) {
+                expect(err).to.equal(error);
+                done();
+              });
             });
           });
 
