@@ -38,8 +38,8 @@ module.exports = function(app) {
              if(err) {
                return next(err);
              } else {
-               //TODO set the pending flag no matter what
-               // Photos have to clear the pending flag from storage first though
+               // Set the pending flag on the photo or video subarticle until 
+               // completion of the transcoding
                if(inst._file.jobId) {
                  inst.pending = inst._file.jobId;
                  inst._file.unsetAttribute('jobId');
@@ -113,8 +113,16 @@ module.exports = function(app) {
         if(err) {
           console.error(
             'Error: Failed to create a click for subarticle creation');
+          next(err);
+        } else if(!inst._file) {
+          Article.clearPending(inst.parentId, function(err) {
+            if(err) {
+              console.log('Failed to clear pending flag on article ' + inst.parentId);
+              console.error(err);
+            }
+            next(err);
+          });
         }
-        next(err);
       });
     }
     else {
