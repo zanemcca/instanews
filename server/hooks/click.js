@@ -308,6 +308,7 @@ module.exports = function(app) {
               data.$mul = {};
             }
             data.$mul[variable] = (1 - Stat.getDefaultRating(modelName));
+            //console.log('Click ' + variable + ': ' + data.$mul[variable]);
           }
 
           res.updateAttributes(data, function(err,res) {
