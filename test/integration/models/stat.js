@@ -29,7 +29,10 @@ exports.run = function() {
           });
         });
       });
-
+/*
+ * Not neccessarily true with the new bonus system
+ * after the ranking settles this is accurate though
+ *
       on[type]().plus.comment().describe(type, function() {
         it('should increase the rating', function(done) {
           var model = on.Instances.getActionableInstance();
@@ -42,6 +45,7 @@ exports.run = function() {
           });
         });
       });
+     */
 
       on[type]().plus.downVote().describe(type, function() {
         it('should decrease the rating', function(done) {
