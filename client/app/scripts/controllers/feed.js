@@ -22,7 +22,7 @@ app.controller('FeedCtrl', [
 
     $scope.Articles = Articles;
 
-   // $scope.articles = $scope.Articles.get();
+    // $scope.articles = $scope.Articles.get();
     $scope.toggleMenu = Navigate.toggleMenu;
     $scope.place = {
       //types: ['(regions)'],
@@ -76,7 +76,7 @@ app.controller('FeedCtrl', [
       if(map) {
         google.maps.event.trigger(map, 'resize');
       }
-     });
+    });
 
     /*
        $scope.scrollTop = Navigate.scrollTop;
@@ -108,53 +108,53 @@ $scope.$broadcast('scroll.refreshComplete');
 */
     /*istanbul ignore next */
     /*
-    $scope.safeApply = function(fn) {
-      var phase = this.$root.$$phase;
-      if(phase === '$apply' || phase === '$digest') {
-        if(fn && (typeof(fn) === 'function')) {
-          fn();
-        }
-      } else {
-        this.$apply(fn);
-      }
-    };
+       $scope.safeApply = function(fn) {
+       var phase = this.$root.$$phase;
+       if(phase === '$apply' || phase === '$digest') {
+       if(fn && (typeof(fn) === 'function')) {
+       fn();
+       }
+       } else {
+       this.$apply(fn);
+       }
+       };
 
-    var items = {
-      available: function () {
-        return false;
-      }
-    }; 
+       var items = {
+available: function () {
+return false;
+}
+}; 
 
-    $scope.itemsAvailable = function () { 
-      return items.available();
-    };
+$scope.itemsAvailable = function () { 
+return items.available();
+};
 
-    Position.boundsReady
-    .then(function () {
-      items.available = Articles.areItemsAvailable;
-    });
-   */
+Position.boundsReady
+.then(function () {
+items.available = Articles.areItemsAvailable;
+});
+*/
     // This is called when the bottom of the feed is reached
-    /*
-    $scope.loadMore = function() {
-      console.log('Loading more articles');
-      Articles.load( function() {
-        $scope.safeApply(function(){
-          $scope.$broadcast('scroll.infiniteScrollComplete');
-        });
-      });
-    };
+/*
+   $scope.loadMore = function() {
+   console.log('Loading more articles');
+   Articles.load( function() {
+   $scope.safeApply(function(){
+   $scope.$broadcast('scroll.infiniteScrollComplete');
+   });
+   });
+   };
 
-    */
+*/
     //Update our local articles
     //var first = true;
-    /*
-    var updateArticles = function() {
-      $scope.articles = Articles.get();
-    };
+/*
+   var updateArticles = function() {
+   $scope.articles = Articles.get();
+   };
 
-    //Update the map if the articles are updated
-    Articles.registerObserver(updateArticles);
-   */
+//Update the map if the articles are updated
+Articles.registerObserver(updateArticles);
+*/
   }
 ]);

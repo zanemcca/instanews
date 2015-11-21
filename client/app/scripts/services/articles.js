@@ -27,10 +27,11 @@ app.service('Articles', [
         oldValue.modified = newValue.modified;
         oldValue.downVoteCount = newValue.downVoteCount;
         oldValue.upVoteCount = newValue.upVoteCount;
-        oldValue.topSub = newValue.topSub;
-        oldValue.upVotes = newValue.upVotes;
         oldValue.verified = newValue.verified;
         oldValue.version = newValue.version;
+        //TODO Remove once the vote service is completed
+        oldValue.downVotes = newValue.downVotes;
+        oldValue.upVotes = newValue.upVotes;
       }
     };
 
