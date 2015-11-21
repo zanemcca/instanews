@@ -19,6 +19,11 @@ function start() {
       models: {
         Subarticle: {
           findOne: findOne 
+        },
+        Article: {
+          clearPending: function (id, next) {
+            next();
+          }
         }
       }
     },
@@ -150,25 +155,25 @@ exports.run = function () {
             run();
           }); 
 
-            it('should propogate the error', function (done) {
-              err = 'error';
+          it('should propogate the error', function (done) {
+            err = 'error';
 
-              cb = function (error, obj) {
-                expect(error).to.equal(err);
-                done();
-              };
+            cb = function (error, obj) {
+              expect(error).to.equal(err);
+              done();
+            };
 
-              run();
-            });
+            run();
+          });
 
-            it('should call the callback after success', function (done) {
-              cb = function (error, obj) {
-                expect(error).to.not.exist;
-                done();
-              };
+          it('should call the callback after success', function (done) {
+            cb = function (error, obj) {
+              expect(error).to.not.exist;
+              done();
+            };
 
-              run();
-            });
+            run();
+          });
         });
 
         describe('video', function () {
@@ -252,6 +257,100 @@ exports.run = function () {
         });
       }) ;
 
+      describe('clearPending', function () {
+        var message;
+        var run;
+        beforeEach(function () {
+          run = function (next) {
+            start();
+            if(!next) {
+              next = function () {};
+            }
+            Storage.clearPending(message, next);
+          };
+
+          message =  {
+            jobId: 'id',
+            sources: [0 ,1 ,2]
+          };
+        });
+
+        it('should call Subarticle.findOne with the proper arguments', function (done) {
+          findOne = function (query, cb) {
+            expect(query).to.deep.equal({
+              where: {
+                pending: message.jobId
+              }
+            });
+            done();
+          };
+
+          run();
+        });
+
+        it('should propogate errors from Subarticle.findOne', function (done) {
+          var err = 'error';
+
+          findOne = function (query, cb) {
+            cb(err);
+          };
+
+          run(function (error) {
+            expect(error).to.equal(err);
+            done();
+          });
+        });
+
+        describe('updateAttributes', function () {
+          var sub, err, update;
+
+          beforeEach(function () {
+            update = function(attr, cb) {
+            };
+
+            findOne = function (query, cb) {
+              cb(null, sub);
+            };
+
+            sub = {
+              updateAttributes: function(attr, cb) {
+                update(attr, cb);
+              }
+            };
+          });
+
+          it('should not create an error if the subarticle is not found', function (done) {
+            sub = null;
+
+            run(function (error) {
+              expect(error).to.not.exist;
+              done();
+            });
+          });
+
+          it('should call updateAttributes on the result from subarticle.findOne with the proper arguments and it should also propogate errors', function (done) {
+            err = 'error';
+
+            update = function(attr, cb) {
+              expect(attr).to.deep.equal({
+                $unset: {
+                  pending: ''
+                },
+                $set: {
+                  '_file.sources': [0,1,2]
+                }
+              });
+              cb(err);
+            };
+
+            run(function (error) {
+              expect(error).to.equal(err);
+              done();
+            });
+          });
+        });
+      });
+
       describe('transcodingComplete', function () {
         var run,
         on,
@@ -261,7 +360,6 @@ exports.run = function () {
         next;
 
         var MV = require('sns-validator');
-
 
         beforeEach(function () {
           chunk = '{ "Type": "SubscriptionConfirmation" }';
@@ -416,85 +514,14 @@ exports.run = function () {
               run();
             });
 
-            it('should call Subarticle.findOne with the proper arguments', function (done) {
-              findOne = function (query, cb) {
-                expect(query).to.deep.equal({
-                  where: {
-                    pending: JSON.parse(job.Message).jobId
-                  }
-                });
+            it('should call Storage.clearPending with the proper arguments', function (done) {
+              start();
+              sandbox.stub(Storage, 'clearPending', function (message, cb) {
+                expect(message).to.deep.equal(JSON.parse(job.Message));
                 done();
-              };
-
-              run();
-            });
-
-            it('should propogate errors from Subarticle.findOne', function (done) {
-              var err = 'error';
-
-              findOne = function (query, cb) {
-                cb(err);
-              };
-
-              next = function (error) {
-                expect(error).to.equal(err);
-                done();
-              };
-
-              run();
-            });
-
-            describe('updateAttributes', function () {
-              var sub, err, update;
-
-              beforeEach(function () {
-                update = function(attr, cb) {
-                };
-
-                findOne = function (query, cb) {
-                  cb(null, sub);
-                };
-
-                sub = {
-                  updateAttributes: function(attr, cb) {
-                    update(attr, cb);
-                  }
-                };
               });
 
-              it('should not create an error if the subarticle is not found', function (done) {
-                sub = null;
-
-                next = function (error) {
-                  expect(error).to.not.exist;
-                  done();
-                };
-
-                run();
-              });
-
-              it('should call updateAttributes on the result from subarticle.findOne with the proper arguments and it should also propogate errors', function (done) {
-                err = 'error';
-
-                update = function(attr, cb) {
-                  expect(attr).to.deep.equal({
-                    $unset: {
-                      pending: ''
-                    },
-                    $set: {
-                      '_file.sources': [0,1,2]
-                    }
-                  });
-                  cb(err);
-                };
-
-                next = function (error) {
-                  expect(error).to.equal(err);
-                  done();
-                };
-
-                run();
-              });
+              Storage.transcodingComplete(ctx, next);
             });
           });
 

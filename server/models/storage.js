@@ -222,7 +222,7 @@ module.exports = function(Storage) {
   //Recieves the transcoding message as the input
   Storage.clearPending = function (message, next) {
     var Subarticle = Storage.app.models.Subarticle;
-    var Article = Subarticle.app.models.Article;
+    var Article = Storage.app.models.Article;
 
     Subarticle.findOne({
       where: {
