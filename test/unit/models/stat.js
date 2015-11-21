@@ -68,21 +68,21 @@ exports.run = function () {
 
       beforeEach(function () {
         rateable = {
-          upVoteCount: 0,
-          downVoteCount: 0,
-          viewCount: 0,
-          getCommentsCount: 0,
-          getSubarticlesCount: 0,
+          upVoteCount: 24,
+          downVoteCount: 20,
+          viewCount: 118,
+          getCommentsCount: 27,
+          getSubarticlesCount: 28,
           notSubarticleRating: 1,
           notCommentRating: 1
         };
 
         bonus = {
-          upVoteCount: 25,
-          downVoteCount: 20,
-          viewCount: 120,
-          getCommentsCount: 27,
-          getSubarticlesCount: 28,
+          upVoteCount: 1,
+          downVoteCount: 0,
+          viewCount: 2,
+          getCommentsCount: 1,
+          getSubarticlesCount: 1,
         };
 
         weight = {
@@ -98,19 +98,20 @@ exports.run = function () {
         notSubarticleRating: 0.75,
         notCommentRating: 0.25,
         message: 'should use all available data',
-        // P( up U comments U subarticles ) - P((comments U subarticles) & downvotes)
-        result: 0.32586628401360546
+        // (1 - P(down))*P( up U comments U subarticles ) - P((comments U subarticles) & downvotes)
+        result: 0.3747112531371301
       },
       {
         notCommentRating: 0.25,
         message: 'should use the upvote, comment and downvote data',
-        // P( up U comments ) - P(comments & downvotes)
-        result: 0.29443027210884354 
+        // (1 - P(down))*(P( up U comments ) - P(comments & downvotes))
+        result: 0.3411077483004532
+        //result: 0.04211514429675238 
       },
       {
         message: 'should only use the upvote data',
-        // P( up )
-        result: 25/120 
+        // (1 - P(down))*P( up )
+        result: 0.22208707001234146 
       }];
 
       /*
@@ -147,6 +148,7 @@ exports.run = function () {
           if(test.notSubarticleRating) {
             rateable.getSubarticlesCount = 0;
             rateable.notSubarticleRating = test.notSubarticleRating;
+            rateable.modelName = 'article';
           }
           if(test.notCommentRating) {
             rateable.getCommentsCount = 0;
@@ -174,7 +176,7 @@ exports.run = function () {
         Stat.bonus = bonus;
         Stat.weight = weight;
         var rating = run();
-        expect(rating).to.almost.equal(0.600107246253406, 5);
+        expect(rating).to.almost.equal(0.7563096114842024, 5);
 
         //With clickthru
         //expect(rating).to.almost.equal(0.26613451790368436, 5);
