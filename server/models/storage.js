@@ -23,7 +23,7 @@ module.exports = function(Storage) {
   var validator = new MessageValidator();
 
   var transcoder,
-    lambda;
+  lambda;
 
   var credentials = cred.get('aws');
   if(credentials) {
@@ -46,7 +46,7 @@ module.exports = function(Storage) {
       secretAccessKey: credentials.key
     });
   }
- 
+
   var containers = [{
     Name: 'instanews-videos-in',
     Type: 'video',
@@ -62,27 +62,27 @@ module.exports = function(Storage) {
         Interlaced: 'auto'
       },
       Outputs: [
-      {
-        Key: '2M',
-        SegmentDuration: '5', //Seconds/segment
-        Rotate: 'auto',
-        //HLS 2M
-        PresetId: '1351620000001-200010' 
-      },
-      {
-        Key: 'HD.mp4',
-        Rotate: 'auto',
-        //iPhone4S+ (1920x1080 Mp4 High-profile AAC)
-        PresetId: '1351620000001-100020' 
-      },
-      {
-        Key: 'SD.mp4',
-        Rotate: 'auto',
-        ThumbnailPattern: '-SD-{count}',
-        //iPhone1-3 (640x480 Mp4 baseline AAC)
-        PresetId: '1445198308687-fnaxk5' 
-      }]
-      //TODO webM
+        {
+          Key: '2M',
+          SegmentDuration: '5', //Seconds/segment
+          Rotate: 'auto',
+          //HLS 2M
+          PresetId: '1351620000001-200010' 
+        },
+        {
+          Key: 'HD.mp4',
+          Rotate: 'auto',
+          //iPhone4S+ (1920x1080 Mp4 High-profile AAC)
+          PresetId: '1351620000001-100020' 
+        },
+        {
+          Key: 'SD.mp4',
+          Rotate: 'auto',
+          ThumbnailPattern: '-SD-{count}',
+          //iPhone1-3 (640x480 Mp4 baseline AAC)
+          PresetId: '1445198308687-fnaxk5' 
+        }]
+        //TODO webM
     }
   },
   {
@@ -160,39 +160,39 @@ module.exports = function(Storage) {
 
     if(params) {
       if(type === 'video') {
-          if( transcoder) {
-            transcoder.createJob(params, function (err, res) {
-              if(err) {
-                console.error('Failed to create transcoding job');
-                console.error(err.stack);
-                return cb(err);
-              } 
+        if( transcoder) {
+          transcoder.createJob(params, function (err, res) {
+            if(err) {
+              console.error('Failed to create transcoding job');
+              console.error(err.stack);
+              return cb(err);
+            } 
 
-              var id = res.Job.Id;
-              var obj = {
-                id: id,
-                container: getOutputContainerName(containerName),
-                outputs: [],
-                posters: []
-              };
+            var id = res.Job.Id;
+            var obj = {
+              id: id,
+              container: getOutputContainerName(containerName),
+              outputs: [],
+              posters: []
+            };
 
-              var outputs = res.Job.Outputs;
-              for(var i in outputs) {
-                var key = outputs[i].Key;
-                if(outputs[i].SegmentDuration) {
-                  key += '.m3u8';
-                }
-                var poster = outputs[i].ThumbnailPattern;
-                if(poster) {
-                  poster = poster.replace(/{count}/, '00001.png');
-                  obj.posters.push(poster);
-                }
-                obj.outputs.push(key);
+            var outputs = res.Job.Outputs;
+            for(var i in outputs) {
+              var key = outputs[i].Key;
+              if(outputs[i].SegmentDuration) {
+                key += '.m3u8';
               }
+              var poster = outputs[i].ThumbnailPattern;
+              if(poster) {
+                poster = poster.replace(/{count}/, '00001.png');
+                obj.posters.push(poster);
+              }
+              obj.outputs.push(key);
+            }
 
-              console.log('Transcoding Job ' + id + ' has started!');
-              cb(null, obj);
-            });
+            console.log('Transcoding Job ' + id + ' has started!');
+            cb(null, obj);
+          });
         } else {
           console.warn('No transcoder established!');
           cb();
@@ -219,9 +219,52 @@ module.exports = function(Storage) {
     }
   };
 
-  Storage.transcodingComplete = function (ctx, next) {
+  //Recieves the transcoding message as the input
+  Storage.clearPending = function (message, next) {
     var Subarticle = Storage.app.models.Subarticle;
+    var Article = Subarticle.app.models.Article;
 
+    Subarticle.findOne({
+      where: {
+        pending: message.jobId
+      }
+    }, function (err, res) {
+      if(err) {
+        console.log('Failed to find the subarticle');
+        return next(err);
+      }
+
+      if(res) {
+
+        var query = {
+          $unset: {
+            pending: ''
+          }
+        };
+
+        console.log(res);
+        if(message.sources) {
+          query.$set = {
+            '_file.sources': message.sources 
+          };
+        }
+
+        var parentId = res.parentId;
+
+        res.updateAttributes(query, function (err, res) {
+          if(err) {
+            return next(err);
+          }
+          Article.clearPending(parentId, next);
+        });
+      } else {
+        console.log('No Subarticle found with pending: ' + message.jobId);
+        return next();
+      }
+    });
+  };
+
+  Storage.transcodingComplete = function (ctx, next) {
     var req = ctx.req;
 
     var chunks = [];
@@ -272,39 +315,12 @@ module.exports = function(Storage) {
                 return next(e);
               }
 
-              Subarticle.findOne({
-                where: {
-                  pending: message.jobId
-                }
-              }, function (err, res) {
+              Storage.clearPending(message, function (err) {
+                console.log('Transcoding Job ' + message.jobId + ' has finished!');
                 if(err) {
-                  console.log('Failed to find the subarticle');
-                  return next(err);
+                  console.error(err);
                 }
-
-                if(res) {
-
-                  var query = {
-                    $unset: {
-                      pending: ''
-                    }
-                  };
-
-                  console.log(res);
-                  if(message.sources) {
-                    query.$set = {
-                      '_file.sources': message.sources 
-                    };
-                  }
-
-                  res.updateAttributes(query, function (err, res) {
-                    console.log('Transcoding Job ' + message.jobId + ' has finished!');
-                    next(err);
-                  });
-                } else {
-                  console.log('No Subarticle found with pending: ' + message.jobId);
-                  return next();
-                }
+                next(err);
               });
 
               break;
@@ -329,8 +345,8 @@ module.exports = function(Storage) {
               break;
               default:
                 var er = new Error('Unknown message type ' + job.Type);
-                er.status = 403;
-                next(er);
+              er.status = 403;
+              next(er);
               break;
             }
           }
