@@ -150,7 +150,7 @@ function ListFactory (Platform) {
 
     var areItemsAvailable = function () {
       return spec.itemsAvailable;
-    }
+    };
 
     var preLoad = function (item, cb) {
       //TODO Add up/downvote retrieval 
