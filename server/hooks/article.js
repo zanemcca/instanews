@@ -53,6 +53,20 @@ module.exports = function(app) {
     next();
   });
 
+  Article.observe('before save', function(ctx, next) {
+    debug('observe before save', ctx);
+    var inst = ctx.instance;
+    if(!inst) {
+      inst = ctx.data;
+    }
+
+    if(inst && ctx.isNewInstance) {
+      inst.pending = true;
+    }
+
+    next();
+  });
+
   Article.observe('after save', function(ctx, next) {
     debug('observe after save', ctx);
     var inst = ctx.instance;
