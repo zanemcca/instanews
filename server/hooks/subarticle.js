@@ -38,6 +38,8 @@ module.exports = function(app) {
              if(err) {
                return next(err);
              } else {
+               //TODO set the pending flag no matter what
+               // Photos have to clear the pending flag from storage first though
                if(inst._file.jobId) {
                  inst.pending = inst._file.jobId;
                  inst._file.unsetAttribute('jobId');
@@ -56,6 +58,7 @@ module.exports = function(app) {
   Subarticle.triggerRating = function(where, modify, cb) {
     debug('triggerRating', where, modify, cb);
     if(where && Object.getOwnPropertyNames(where).length > 0) {
+      // Update rating updates the subarticles rating value in the db
       Stat.updateRating(where, Subarticle.modelName, modify,
       function(err, count) {
         if(err) {

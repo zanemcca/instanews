@@ -272,6 +272,8 @@ module.exports = function(Storage) {
                 return next(e);
               }
 
+              //TODO Turn this into a function that will
+              //turn pending off on the article and subarticle
               Subarticle.findOne({
                 where: {
                   pending: message.jobId
@@ -318,6 +320,8 @@ module.exports = function(Storage) {
                     console.error(err.stack);
                     next(err);
                   } else {
+                    // TODO Set pending flag
+                    //TODO Clear pending flag from subarticle and article
                     console.dir(data, {colors: true});
                     next();
                   }

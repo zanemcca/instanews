@@ -1,4 +1,7 @@
 
+
+var PRELOAD_LIMIT = 1; //WARNING: Changing this could break the ranking algorithm
+
 /* jshint camelcase: false */
 
 var loopback = require('loopback');
@@ -38,7 +41,7 @@ module.exports = function(app) {
     /* istanbul ignore else */
     if(ctx.req.query && ctx.req.query.filter) {
       var filter = JSON.parse(ctx.req.query.filter);
-      if(filter.limit && filter.limit < 2) {
+      if(filter.limit && filter.limit <= PRELOAD_LIMIT) {
         return next();
       }
     }
