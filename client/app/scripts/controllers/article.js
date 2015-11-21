@@ -20,6 +20,11 @@ app.controller('ArticleCtrl', [
 
     $scope.Subarticles = Subarticles.findOrCreate($stateParams.id);
 
+    var spec = $scope.Subarticles.getSpec();
+    spec.options.filter.limit = 5;
+    spec.options.filter.skip = 0;
+    $scope.Subarticles.load();
+
     //Scope variables
     $scope.article = Articles.findById($stateParams.id);
 

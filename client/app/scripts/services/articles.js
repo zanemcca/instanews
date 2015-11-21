@@ -49,14 +49,36 @@ app.service('Articles', [
         }
       });
 
- //     console.log(inView.length + ' added to inView and ' + hidden.length + ' added to hidden');
+      //     console.log(inView.length + ' added to inView and ' + hidden.length + ' added to hidden');
       if(hidden.length) {
         hiddenArticle.add(hidden);
       }
       return inView;
     };
 
+    var preLoad = function (article, cb) {
+      var update = function () {
+        //console.log('Trying to get topSubarticle');
+        var subarticle = article.Subarticles.getTop();
+        if(subarticle) {
+          article.topSub = subarticle;
+        }
+      };
+
+      if(!article.Subarticles) {
+        article.Subarticles = Subarticles.findOrCreate(article.id);
+        article.Subarticles.registerObserver(update);
+      }
+
+      var spec = article.Subarticles.getSpec();
+      spec.options.filter.skip = 0;
+      spec.options.filter.limit = 1;
+      article.Subarticles.load();
+      cb(article);
+    };
+
     var spec = {};
+    spec.preLoad = preLoad;
     spec.find = Article.find;
     spec.update = update;
     spec.addFilter = spec.addFilter || addFilter;
@@ -72,6 +94,8 @@ app.service('Articles', [
 
     // Reorganize the articles into the viewable array and the hidden array
     var reorganize = function() {
+      var total = articles.get().length + hiddenArticles.get().length;
+      console.log('Reorganizing ' + total + ' articles!');
       var toOutView = articles.remove(function (article) {
         var position = Position.posToLatLng(article.location);
         return !Position.withinBounds(position);
@@ -82,7 +106,7 @@ app.service('Articles', [
         return Position.withinBounds(position);
       });
 
-//      console.log(toOutView.length + ' going out of view and ' + toInView.length + ' going into the view');
+      //      console.log(toOutView.length + ' going out of view and ' + toInView.length + ' going into the view');
       articles.add(toInView);
       hiddenArticles.add(toOutView);
     };
@@ -111,6 +135,7 @@ app.service('Articles', [
       }
 
       spec.options.filter.skip = 0;
+      spec.options.filter.limit = 5;
 
       console.log('UpateBounds');
 

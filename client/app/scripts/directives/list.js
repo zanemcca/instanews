@@ -5,7 +5,6 @@ var app = angular.module('instanews.directive.list', ['ionic']);
 app.directive('inList', [
   function (
   ) {
-
     return {
       restrict: 'E',
       transclude: true,
@@ -74,75 +73,94 @@ app.directive('inListItem', [
     return {
       restrict: 'E',
       scope: {
-        item: '='
+        item: '=',
+        preLoad: '='
       },
       controller: function() {},
       templateUrl: 'templates/directives/listItem.html',
       //link: function($scope,element, attributes) {
       link: function($scope) {
 
-        var date = Date.parse($scope.item.created);
-        var age = Date.now() - date; 
-        age /= 1000;
-        var unit = 'seconds';
-        if(age > 60) {
-          age /= 60;
-          unit = 'minutes';
+        var getAgeString = function (created) {
+          var date = Date.parse(created);
+          var age = Date.now() - date; 
+          age /= 1000;
+          var unit = 'seconds';
           if(age > 60) {
             age /= 60;
-            unit = 'hours';
-            if(age > 24) {
-              age /= 24;
-              unit = 'days';
-              if(age > 7) {
-                age /= 7;
-                unit = 'weeks';
-                if(age > 52) {
-                  age /= 52;
-                  unit = 'years';
+            unit = 'minutes';
+            if(age > 60) {
+              age /= 60;
+              unit = 'hours';
+              if(age > 24) {
+                age /= 24;
+                unit = 'days';
+                if(age > 7) {
+                  age /= 7;
+                  unit = 'weeks';
+                  if(age > 52) {
+                    age /= 52;
+                    unit = 'years';
+                  }
                 }
               }
             }
           }
-        }
 
-        $scope.age = {
-          age: Math.round(age),
-          unit: unit
+          return {
+            age: Math.round(age),
+            unit: unit
+          };
         };
+
+        $scope.age = getAgeString($scope.item.created);
 
         $scope.getItemTemplate = getItemTemplate;
 
-        if(User.get()) {
-          var position = Position.getPosition();
+        // TODO Use the new subarticle retrieval to trigger views instead of using an api
+        // But we have to be careful because we are caching things so the
+        // view still has to go through even if its a cache hit
+        //    Because of above assertion we need to wait to replace this till we have
+        //    proper refreshing reinstated in the lists. 
+        var createView = function (res) {
+          if(User.get()) {
+            var position = Position.getPosition();
 
-          var view = {
-            viewableId: $scope.item.id,
-            viewableType: $scope.item.modelName
-          };
-
-          // istanbul ignore else
-          if(position.coords) {
-            view.location = {
-              lat: position.coords.latitude,
-              lng: position.coords.longitude
+            var view = {
+              viewableId: $scope.item.id,
+              viewableType: $scope.item.modelName
             };
-          }
-          else {
-            console.log('Warning: Invalid location for view');
-          }
 
-          View.create(view).$promise
-          .then(
-            // istanbul ignore next 
-            function() {
-              console.log('View created: ' + $scope.item.id);
-            }, 
-            // istanbul ignore next 
-            function(err) {
-              console.log('Error: Failed to create a view');
-              console.log(err);
-            });
+            // istanbul ignore else
+            if(position.coords) {
+              view.location = {
+                lat: position.coords.latitude,
+                lng: position.coords.longitude
+              };
+            }
+            else {
+              console.log('Warning: Invalid location for view');
+            }
+
+            View.create(view).$promise
+            .then(
+              // istanbul ignore next 
+              function() {
+                console.log('View created: ' + $scope.item.id);
+              }, 
+              // istanbul ignore next 
+              function(err) {
+                console.log('Error: Failed to create a view');
+                console.log(err);
+              });
+          }
+        };
+
+        console.log($scope.item);
+        if($scope.preLoad instanceof Function) {
+          $scope.preLoad($scope.item, createView);
+        } else {
+          createView();
         }
 
         /*
