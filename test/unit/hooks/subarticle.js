@@ -290,6 +290,7 @@ exports.run = function () {
         var subFind, sub;
 
         beforeEach(function () {
+          ctx.instance._file = {};
           hookName = 'after save';
           subFind = function (query, cb) {};
 
