@@ -290,6 +290,7 @@ exports.run = function () {
         var subFind, sub;
 
         beforeEach(function () {
+          ctx.instance._file = {};
           hookName = 'after save';
           subFind = function (query, cb) {};
 
@@ -339,7 +340,7 @@ exports.run = function () {
                 cb();
               };
               run();
-              expect(click.calledOnce).to.be.true;
+              expect(click.callCount).to.equal(1);
             });
 
             it('should propgate the error', function() {
