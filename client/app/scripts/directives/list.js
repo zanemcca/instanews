@@ -11,7 +11,7 @@ app.directive('inList', [
       scope: {
         list: '='
       },
-      controller: function($scope) {
+      controller: function ($scope, _) {
         $scope.safeApply  = function(fn) {
           var phase = this.$root.$$phase;
           if(phase === '$apply' || phase === '$digest') {
@@ -23,13 +23,13 @@ app.directive('inList', [
           }
         };
 
-        $scope.onInfinite = function() {
+        $scope.onInfinite = _.debounce(function() {
           $scope.list.load( function() {
             $scope.safeApply(function(){
               $scope.$broadcast('scroll.infiniteScrollComplete');
             });
           });
-        };
+        }, 1000);
       },
       templateUrl: 'templates/directives/list.html'
     };

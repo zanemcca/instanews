@@ -6,7 +6,7 @@
          ui-sref="subarticlePost({id: article.id})">
       </a>
    </ion-nav-buttons>
-   <ion-content on-swipe-down="onSwipeDown()" overflow-scroll="true" class="gpu">
+   <ion-content delegate-handle="subarticle" on-swipe-down="onSwipeDown()" overflow-scroll="true" class="gpu">
       <in-list list="Subarticles"> 
         <inMap map="map"></inMap>
         <div class="item" style="border:0px;padding-top:0px;padding-bottom:0px">
