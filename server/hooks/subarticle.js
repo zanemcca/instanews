@@ -122,6 +122,8 @@ module.exports = function(app) {
             }
             next(err);
           });
+        } else {
+          next();
         }
       });
     }
