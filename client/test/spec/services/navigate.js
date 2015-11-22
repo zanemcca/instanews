@@ -21,6 +21,12 @@ describe('instanews.service.navigate', function() {
     ionicHistory = $ionicHistory;
   }));
 
+  var spec;
+  beforeEach(function () {
+    spec = {};
+    navigate = navigate(spec);
+  });
+
   describe('toggleMenu', function() {
     it('should call $ionicSideMenuDelegate.toggleLeft', function() {
       sinon.spy(ionicSideMenuDelegate, 'toggleLeft');
