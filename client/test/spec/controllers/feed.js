@@ -10,13 +10,15 @@ describe('Feed: ', function(){
 
     module(function($provide) {
       $provide.service('Navigate', function() {
-        return {
-          disableNextBack: function() {},
-          onScroll: function() {
-            return false;
-          },
-          scrollTop: function() {},
-          toggleMenu: function() {}
+        return function (spec) {
+          return {
+            disableNextBack: function() {},
+            onScroll: function() {
+              return false;
+            },
+            scrollTop: function() {},
+            toggleMenu: function() {}
+          };
         };
       });
 
@@ -182,27 +184,27 @@ describe('Feed: ', function(){
 
   //TODO Move this to autocomplete
   /*
-  describe('localize' , function() {
+     describe('localize' , function() {
 
-    beforeEach( function() {
-      sinon.stub(maps, 'getFeedMap', function() {
-        return {};
-      });
+     beforeEach( function() {
+     sinon.stub(maps, 'getFeedMap', function() {
+     return {};
+     });
 
-      sinon.stub(maps, 'localize', function() {
-      });
+     sinon.stub(maps, 'localize', function() {
+     });
 
-      controller = initController();
-    });
+     controller = initController();
+     });
 
-    it('should call Maps.getFeedMap and Maps.localize once each', function() {
-      scope.localize();
+     it('should call Maps.getFeedMap and Maps.localize once each', function() {
+     scope.localize();
 
-      expect(maps.getFeedMap.calledOnce).to.be.true;
-      expect(maps.localize.calledOnce).to.be.true;
-    });
-  });
- */
+     expect(maps.getFeedMap.calledOnce).to.be.true;
+     expect(maps.localize.calledOnce).to.be.true;
+     });
+     });
+     */
 
   // Not needed with new list service
   describe.skip('load callers', function() {

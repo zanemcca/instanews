@@ -4,6 +4,7 @@ var app = angular.module('instanews.controller.feed', ['ionic', 'ngResource']);
 
 app.controller('FeedCtrl', [
   '$scope',
+  '$location',
   'Article',
   'Maps',
   'Position',
@@ -12,23 +13,33 @@ app.controller('FeedCtrl', [
   'Navigate',
   function(
     $scope,
+    $location,
     Article,
     Maps,
     Position,
     Platform,
     Articles,
-    Navigate
+    navigate
   ) {
 
+    // Local reference to articles service
     $scope.Articles = Articles;
 
-    // $scope.articles = $scope.Articles.get();
+    // Create a custom navigation service
+    var NavigateSpec = {
+      scrollHandle: 'feed',
+      $location: $location
+    };
+    var Navigate = navigate(NavigateSpec);
     $scope.toggleMenu = Navigate.toggleMenu;
+
+    // Prepare our autocompletion by linking it to out feedmap
     $scope.place = {
       //types: ['(regions)'],
       getMap: Maps.getFeedMap
     };
 
+    // Prepare our map by initializing its id
     $scope.map = {
       id: 'feedMap'
     };
@@ -67,6 +78,7 @@ app.controller('FeedCtrl', [
       }
     });
 
+    // Set the title of the app
     $scope.title = Platform.getAppNameLogo();
 
     //Refresh the map everytime we enter the view
