@@ -41,14 +41,6 @@ app.directive('invotes', [
             Navigate = navigate(spec);
           } // else comments: Do not zoom in on subcomments
 
-          // Create a custom navigation service
-
-          var Models = {
-            article: Article,
-            comment: Comment,
-            subarticle: Subarticle
-          };
-
           $scope.score = {
             value: 0
           };
@@ -75,27 +67,7 @@ app.directive('invotes', [
 
           $scope.toggleComments = function() {
             if(!$scope.votable.showComments) {
-              // istanbul ignore else 
-              if(Models.hasOwnProperty($scope.votable.modelName)) {
-                Models[$scope.votable.modelName].comments({
-                  id: $scope.votable.id,
-                  filter: {
-                    limit: 10,
-                    order: 'rating DESC'
-                  }
-                }).$promise
-                .then( function (res) {
-                  $scope.votable.comments = res;
-                  $scope.votable.showComments = true;
-                },
-                // istanbul ignore next
-                function(err) {
-                  console.log(err);
-                });
-              }
-              else {
-                console.log('Warning: Unknown modelname!');
-              }
+              $scope.votable.showComments = true;
             }
             else {
               $scope.votable.showComments = false;

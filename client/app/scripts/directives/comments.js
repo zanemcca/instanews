@@ -55,24 +55,51 @@ app.directive('incomments', [
           });
         };
 
+        var itemsAvailable = false;
+        //TODO Use comments as the list service name
+        $scope.comments = {
+          areItemsAvailable: function () {
+            return itemsAvailable;
+          }
+        };
+
+        $scope.owner.comments = $scope.owner.comments || [];
+
+        var order = 'rating DESC';
+        if ( $scope.owner.commentableId ) {
+          order = 'date DESC';
+        }
+
+        var spec = {
+          options :{
+            id: $scope.owner.id,
+            filter: {
+              limit: 10,
+              skip: 0,
+              order: order
+            }
+          }
+        };
+
+        $scope.$watch('owner.showComments', function (newVal, oldVal) {
+          if(newVal && !oldVal) {
+            $scope.loadMore();
+          }
+        });
+
         //TODO MOve comments over to the list service. Similar to subarticles and articles
         $scope.loadMore = function() {
-          var order = 'rating DESC';
-          if ( $scope.owner.commentableId ) {
-            order = 'date DESC';
-          }
-
+          spec.options.filter.skip = $scope.owner.comments.length;
           // istanbul ignore else 
           if(Models.hasOwnProperty($scope.owner.modelName)) {
-            Models[$scope.owner.modelName].comments({
-              id: $scope.owner.id,
-              filter: {
-                limit: 10,
-                skip: $scope.owner.comments.length,
-                order: order
-              }
-            }).$promise
+            Models[$scope.owner.modelName].comments(spec.options).$promise
             .then( function (comments) {
+              if(comments.length < spec.options.filter.limit) {
+                itemsAvailable = false;
+              } else {
+                itemsAvailable = true;
+              }
+
               //Remove duplicates
               for( var i = 0; i < comments.length; i++) {
                 for( var j = 0; j < $scope.owner.comments.length; j++) {

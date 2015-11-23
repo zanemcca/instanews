@@ -30,6 +30,7 @@ app.controller('FeedCtrl', [
       scrollHandle: 'feed',
       $location: $location
     };
+
     var Navigate = navigate(NavigateSpec);
     $scope.toggleMenu = Navigate.toggleMenu;
 
