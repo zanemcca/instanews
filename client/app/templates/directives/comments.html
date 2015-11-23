@@ -5,13 +5,12 @@
       class="no-padding item">
       <in-list-item item="comment"></in-list-item>
     </li>
-    <div class="button-bar"
-      style="padding-top: 0px;">
-      <button class="button icon ion-more button-clear"
-        align:"center"
-        ng-click="loadMore(owner)">
-      </button>
-    </div>
+
+    <button class="button ion-refresh button-small button-icon dark"
+      ng-click="loadMore(owner)"> Load more comments
+    </button>
+    <button class="button button-small button-icon ion-edit dark"
+      style="float: right;border:0;margin:0;"
+      ng-click="create()">  Add a comment</button>
   </ul>
-  <button class="button button-icon icon ion-edit" ng-click="create()"></button>
 </div>
