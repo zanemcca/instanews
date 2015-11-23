@@ -1,6 +1,7 @@
 
 @import "compass/css3/transition";
 
+// Floating button
 .float-button {
   //Positioning
   position: absolute;
@@ -30,3 +31,17 @@
   opacity: 0;
   top: 0;
 }
+
+// Footer button
+.footer-btn-wrap {
+  position: relative;
+  height: 100%;
+  width: 50px;
+  top: 7px;
+}
+
+.footer-btn {
+  position: absolute !important;
+  bottom: 4px;
+}
+
