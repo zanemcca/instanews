@@ -402,6 +402,7 @@ module.exports = function (grunt) {
         frameworks: ['mocha', 'chai', 'sinon'],
         files: [
           '<%= yeoman.app %>/bower_components/angular/angular.js',
+          '<%= yeoman.app %>/bower_components/angular-elastic/elastic.js',
           '<%= yeoman.app %>/bower_components/angular-mocks/angular-mocks.js',
           '<%= yeoman.app %>/bower_components/angular-animate/angular-animate.js',
           '<%= yeoman.app %>/bower_components/angular-sanitize/angular-sanitize.js',

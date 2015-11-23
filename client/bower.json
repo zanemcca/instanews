@@ -21,7 +21,8 @@
     "videogular-overlay-play": "~1.2.8",
     "videogular-themes-default": "~1.2.8",
     "videogular-poster": "~1.2.8",
-    "videogular": "~1.2.8"
+    "videogular": "~1.2.8",
+    "angular-elastic": "~2.5.1"
   },
   "resolutions": {
     "angular": ">=1.4",

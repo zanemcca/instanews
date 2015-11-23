@@ -1,26 +1,23 @@
 <!DOCTYPE html>
-<div ng-if="owner.showComments">
+<div ng-show="owner.showComments">
   <ul class="list">
     <li ng-repeat="comment in owner.comments track by comment.id"
       class="no-padding item">
       <in-list-item item="comment"></in-list-item>
     </li>
-    <div class="button-bar"
-      style="padding-top: 0px;">
-      <button class="button icon ion-more button-clear"
-        align:"center"
-        ng-click="loadMore(owner)">
-      </button>
-    </div>
+    <button class="button ion-refresh button-icon dark"
+      style="float: left;"
+      ng-show="comments.areItemsAvailable()"
+      ng-click="loadMore()">
+      Load more
+    </button>
+    <button class="button button-icon dark"
+      style="float: right;"
+      ng-class="(owner.modelName !== 'comment') ? 'ion-edit': 'ion-forward'"
+      ng-click="create()">
+      <i ng-if="owner.modelName !== 'comment'">Comment</i>
+      <i ng-if="owner.modelName === 'comment'">Reply</i>
+    </button>
   </ul>
-  <form name="form" class="item" style="border-color: transparent">
-    <div style="padding-right:60px">
-      <textarea style="width:100%" type="text" ng-model="newComment" placeholder="Comment" required></textarea>
-    </div>
-    <div class="item-icon-right">
-      <button type="reset" class="button button-clear icon ion-forward"
-        ng-click="createComment(owner, newComment)" ng-disabled="!newComment">
-      </button>
-    </div>
-  </form>
 </div>
+
