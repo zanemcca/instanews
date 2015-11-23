@@ -4,9 +4,11 @@ var app = angular.module('instanews.directive.textFooter', ['ionic', 'ngResource
 
 app.directive('inTextFooter', [
   'Platform',
+  'Navigate',
   'TextInput',
   function (
     Platform,
+    navigate,
     TextInput
   ) {
 
@@ -16,25 +18,29 @@ app.directive('inTextFooter', [
       controller: function($scope) {
         var defaultPlaceholder = 'Write a comment...';
         $scope.input = {
-          placeholder: defaultPlaceholder 
+          placeholder: defaultPlaceholder,
+          text: '',
+          maxLength: 300 
         };
 
         $scope.box = {
           visible: false
         };
 
+        var Navigate = navigate();
+
         function keyboardHideHandler(){
           $scope.$apply(function () {
             $scope.box.visible = false;
             onSubmit = null;
-            $scope.input.text = null;
+            $scope.input.text = '';
             $scope.input.placeholder = defaultPlaceholder;
             window.removeEventListener('native.keyboardhide', keyboardHideHandler);
           });
         }
 
         $scope.$on('elastic:resize', function (event, element, oldHeight, newHeight) {
-          var elem = document.getElementById('text-footer');
+          var elem = document.getElementById($scope.input.boxId);
           var border = 15.667; 
           elem.style.height = (newHeight + border*2) + 'px';
         });
@@ -49,6 +55,7 @@ app.directive('inTextFooter', [
           $scope.box.visible = true;
           onSubmit = cb;
           Platform.keyboard.show();
+          Navigate.focus($scope.input.id);
           window.addEventListener('native.keyboardhide', keyboardHideHandler);
         };
 
@@ -56,7 +63,7 @@ app.directive('inTextFooter', [
           if(onSubmit) {
             onSubmit($scope.input.text);
             $scope.box.visible = false;
-            $scope.input.text = null;
+            $scope.input.text = '';
             $scope.input.placeholder = defaultPlaceholder;
             onSubmit = null;
           } else {

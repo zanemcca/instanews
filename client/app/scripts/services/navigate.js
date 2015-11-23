@@ -6,10 +6,15 @@ app.service('Navigate', [
   '$ionicSideMenuDelegate',
   '$ionicScrollDelegate',
   '$ionicHistory',
+  '$timeout',
+  '$window',
   function(
     $ionicSideMenuDelegate,
     $ionicScrollDelegate,
-    $ionicHistory){
+    $ionicHistory,
+    $timeout,
+    $window
+  ){
       var navigate = function(spec) {
         spec = spec || {};
         if(!spec.scrollHandle) { 
@@ -89,7 +94,6 @@ app.service('Navigate', [
           }
         };
 
-
         /*
            var onScroll = function() {
            if($ionicScrollDelegate.getScrollPosition().top > 0) {
@@ -112,8 +116,18 @@ console.log('Scroll top on ? ' + $scope.scroll.buttonOn);
 };
 */
 
+        var focus = function (id) {
+          $timeout(function() {
+            var element = $window.document.getElementById(id);
+            if(element) {
+              element.focus();
+            }
+          });
+        };
+
         return {
           toggleMenu: toggleMenu,
+          focus: focus,
           scrollTop: scrollTop,
           resize: resize,
           anchorScroll: anchorScroll,
