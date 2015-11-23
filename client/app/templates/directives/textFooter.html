@@ -4,10 +4,10 @@
   class="item-input-inset message-footer bar-dark"
   style="padding-right: 0;">
   <label class="item-input-wrapper"
+    ng-class="{'box-invalid' : input.text === undefined }"
     style="padding-top: 5px;padding-bottom:5px;">
     <textarea type="text"
       style="width: 100%;resize: none"
-      ng-class="{'box-invalid' : input.text === undefined }"
       ng-attr-id="{{input.id}}"
       msd-elastic
       ng-model="input.text"
