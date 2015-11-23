@@ -5,18 +5,17 @@
       class="no-padding item">
       <in-list-item item="comment"></in-list-item>
     </li>
-    <button class="button ion-refresh button-small button-icon dark"
+    <button class="button ion-refresh button-icon dark"
       style="float: left;"
       ng-show="comments.areItemsAvailable()"
       ng-click="loadMore()">
-      <i ng-if="owner.modelName !== 'comment'">Load more comments</i>
-      <i ng-if="owner.modelName === 'comment'">Load more replies</i>
+      Load more
     </button>
-    <button class="button button-small button-icon dark"
+    <button class="button button-icon dark"
       style="float: right;"
       ng-class="(owner.modelName !== 'comment') ? 'ion-edit': 'ion-forward'"
       ng-click="create()">
-      <i ng-if="owner.modelName !== 'comment'">Add a comment</i>
+      <i ng-if="owner.modelName !== 'comment'">Comment</i>
       <i ng-if="owner.modelName === 'comment'">Reply</i>
     </button>
   </ul>
