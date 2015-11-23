@@ -79,40 +79,6 @@ app.directive('inListItem', [
       //link: function($scope,element, attributes) {
       link: function($scope) {
 
-        var getAgeString = function (created) {
-          var date = Date.parse(created);
-          var age = Date.now() - date; 
-          age /= 1000;
-          var unit = 'seconds';
-          if(age > 60) {
-            age /= 60;
-            unit = 'minutes';
-            if(age > 60) {
-              age /= 60;
-              unit = 'hours';
-              if(age > 24) {
-                age /= 24;
-                unit = 'days';
-                if(age > 7) {
-                  age /= 7;
-                  unit = 'weeks';
-                  if(age > 52) {
-                    age /= 52;
-                    unit = 'years';
-                  }
-                }
-              }
-            }
-          }
-
-          return {
-            age: Math.round(age),
-            unit: unit
-          };
-        };
-
-        $scope.age = getAgeString($scope.item.created);
-
         $scope.getItemTemplate = getItemTemplate;
 
         // TODO Use the new subarticle retrieval to trigger views instead of using an api
