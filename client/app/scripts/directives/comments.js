@@ -81,7 +81,7 @@ app.directive('incomments', [
           options :{
             id: $scope.owner.id,
             filter: {
-              limit: 10,
+              limit: 5,
               skip: 0,
               order: order
             }
