@@ -21,6 +21,8 @@ app.directive('incomments', [
       }, 
       controller: function($scope) {
 
+        var newComment = '';
+
         var Models = {
           article: Article,
           comment: Comment,
@@ -32,11 +34,16 @@ app.directive('incomments', [
           if($scope.owner.commentableId) {
             textInput.placeholder = 'Write a reply...';
           }
+          textInput.text = newComment;
 
           textInput.open(function (text) {
             createComment(text);
+          }, function (partialText) {
+            //Interruption function
+            newComment = partialText;
           });
         };
+
 
         var createComment = function (content) {
           Comment.create({

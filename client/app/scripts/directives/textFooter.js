@@ -31,6 +31,10 @@ app.directive('inTextFooter', [
 
         function keyboardHideHandler(){
           $scope.$apply(function () {
+            console.log('Interruption!');
+            if(interruptionCB) {
+              interruptionCB($scope.input.text);
+            }
             $scope.box.visible = false;
             onSubmit = null;
             $scope.input.text = '';
@@ -49,11 +53,13 @@ app.directive('inTextFooter', [
           TextInput.register($scope.input);
         });
 
-        var onSubmit;
+        var onSubmit,
+          interruptionCB;
         //TODO Move this into the service
-        $scope.input.open = function (cb) {
+        $scope.input.open = function (done, interrupted) {
           $scope.box.visible = true;
-          onSubmit = cb;
+          onSubmit = done;
+          interruptionCB = interrupted;
           Platform.keyboard.show();
           Navigate.focus($scope.input.id);
           window.addEventListener('native.keyboardhide', keyboardHideHandler);
