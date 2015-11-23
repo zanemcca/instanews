@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<ion-footer-bar ng-if="input.visible" keyboard-attach id="text-footer" class="item-input-inset message-footer bar-dark"
+  style="padding-right: 0;">
+  <label class="item-input-wrapper"
+    style="padding-top: 5px;padding-bottom:5px;">
+    <textarea type="text"
+      style="width: 100%;resize: none"
+      msd-elastic
+      ng-model="input.text"
+      placeholder="{{input.placeholder}}"
+      required>
+    </textarea>
+  </label>
+  <div class="footer-btn-wrap">
+    <button type="submit"
+      ng-click="onSubmit()"
+      class="button button-icon footer-btn icon ion-android-send">
+    </button>
+  </div>
+</ion-footer-bar>
