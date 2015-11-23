@@ -14,16 +14,21 @@ app.directive('inTextFooter', [
       restrict: 'E',
       scope: true, 
       controller: function($scope) {
+        var defaultPlaceholder = 'Write a comment...';
         $scope.input = {
-          placeholder: 'Write a comment...'
+          placeholder: defaultPlaceholder 
         };
 
-        $scope.input.visible = false;
+        $scope.box = {
+          visible: false
+        };
 
         function keyboardHideHandler(){
           $scope.$apply(function () {
-            $scope.input.visible = false;
+            $scope.box.visible = false;
             onSubmit = null;
+            $scope.input.text = null;
+            $scope.input.placeholder = defaultPlaceholder;
             window.removeEventListener('native.keyboardhide', keyboardHideHandler);
           });
         }
@@ -39,9 +44,9 @@ app.directive('inTextFooter', [
         });
 
         var onSubmit;
+        //TODO Move this into the service
         $scope.input.open = function (cb) {
-          $scope.input.text = null;
-          $scope.input.visible = true;
+          $scope.box.visible = true;
           onSubmit = cb;
           Platform.keyboard.show();
           window.addEventListener('native.keyboardhide', keyboardHideHandler);
@@ -50,8 +55,9 @@ app.directive('inTextFooter', [
         $scope.onSubmit = function () {
           if(onSubmit) {
             onSubmit($scope.input.text);
-            $scope.input.visible = false;
+            $scope.box.visible = false;
             $scope.input.text = null;
+            $scope.input.placeholder = defaultPlaceholder;
             onSubmit = null;
           } else {
             console.log('No submit function defined yet!');
