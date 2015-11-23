@@ -180,6 +180,7 @@ angular.module('instanews', [
 
 });
 
+// jshint undef: false
 moment.locale('en', {
   relativeTime: {
     future: 'in %s',
