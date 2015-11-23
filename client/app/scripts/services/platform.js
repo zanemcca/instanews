@@ -168,11 +168,19 @@ app.factory('Platform', [
       });
     }
 
-    var hideKeyboard = function () {
-      if(cordova && cordova.plugins && cordova.plugins.Keyboard) {
-        cordova.plugins.Keyboard.close();
+    var keyboard = {
+      hide: function () {
+        if(window.cordova && cordova.plugins && cordova.plugins.Keyboard) {
+          cordova.plugins.Keyboard.close();
+        }
+      },
+      show: function () {
+        if(window.cordova && cordova.plugins && cordova.plugins.Keyboard) {
+          cordova.plugins.Keyboard.show();
+        }
       }
     };
+
 
     var loading = {
       show: function () {
@@ -215,7 +223,7 @@ app.factory('Platform', [
     };
 
     return {
-      hideKeyboard: hideKeyboard,
+      keyboard: keyboard,
       getAppNameLogo: getAppNameLogo,
       loading: loading,
       getUUID: getUUID,
