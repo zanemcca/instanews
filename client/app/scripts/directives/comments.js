@@ -25,20 +25,24 @@ app.directive('incomments', [
           article: Article,
           comment: Comment,
           subarticle: Subarticle
-        };
+        }; 
 
         $scope.create = function () {
-          TextInput.get().open(function (text) {
+          var textInput = TextInput.get();
+          if($scope.owner.commentableId) {
+            textInput.placeholder = 'Write a reply...';
+          }
+
+          textInput.open(function (text) {
             createComment(text);
           });
         };
 
         var createComment = function (content) {
-          var instance = $scope.owner;
           Comment.create({
             content: content,
-            commentableId: instance.id,
-            commentableType: instance.modelName
+            commentableId: $scope.owner.id,
+            commentableType: $scope.owner.modelName
           }).$promise
           .then(function(res,err) {
             // istanbul ignore if 
@@ -46,33 +50,33 @@ app.directive('incomments', [
               console.log(err);
             }
             else {
-              instance.comments.push(res);
+              $scope.owner.comments.push(res);
             }
           });
         };
 
         //TODO MOve comments over to the list service. Similar to subarticles and articles
-        $scope.loadMore = function(instance) {
+        $scope.loadMore = function() {
           var order = 'rating DESC';
-          if ( instance.commentableId ) {
+          if ( $scope.owner.commentableId ) {
             order = 'date DESC';
           }
 
           // istanbul ignore else 
-          if(Models.hasOwnProperty(instance.modelName)) {
-            Models[instance.modelName].comments({
-              id: instance.id,
+          if(Models.hasOwnProperty($scope.owner.modelName)) {
+            Models[$scope.owner.modelName].comments({
+              id: $scope.owner.id,
               filter: {
                 limit: 10,
-                skip: instance.comments.length,
+                skip: $scope.owner.comments.length,
                 order: order
               }
             }).$promise
             .then( function (comments) {
               //Remove duplicates
               for( var i = 0; i < comments.length; i++) {
-                for( var j = 0; j < instance.comments.length; j++) {
-                  var comment = instance.comments[j];
+                for( var j = 0; j < $scope.owner.comments.length; j++) {
+                  var comment = $scope.owner.comments[j];
                   if( comment.id === comments[i].id) {
                     comments.splice(i,1);
                     break;
@@ -80,7 +84,7 @@ app.directive('incomments', [
                 }
               }
               //Concatinate the new comments
-              instance.comments = instance.comments.concat(comments);
+              $scope.owner.comments = $scope.owner.comments.concat(comments);
               //TODO Ensure the comments are in their proper order
             });
           }
