@@ -7,9 +7,15 @@ app.factory('TextInput', [
   function(
   ) {
     var current;
+    var count = 0;
 
     var register = function (input) {
       current = input;
+      if(!current.id) {
+        count++;
+        current.id = 'text-input-' + count;
+        current.boxId = 'text-box-' + count;
+      }
     };
 
     var get = function () {

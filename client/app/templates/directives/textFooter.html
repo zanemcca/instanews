@@ -1,12 +1,17 @@
 <!DOCTYPE html>
-<ion-footer-bar ng-show="box.visible" keyboard-attach id="text-footer" class="item-input-inset message-footer bar-dark"
+<ion-footer-bar ng-show="box.visible" keyboard-attach
+  ng-attr-id="{{input.boxId}}"
+  class="item-input-inset message-footer bar-dark"
   style="padding-right: 0;">
   <label class="item-input-wrapper"
     style="padding-top: 5px;padding-bottom:5px;">
     <textarea type="text"
       style="width: 100%;resize: none"
+      ng-class="{'box-invalid' : input.text === undefined }"
+      ng-attr-id="{{input.id}}"
       msd-elastic
       ng-model="input.text"
+      ng-maxlength="input.maxLength"
       placeholder="{{input.placeholder}}"
       required>
     </textarea>
@@ -14,6 +19,7 @@
   <div class="footer-btn-wrap">
     <button type="submit"
       ng-click="onSubmit()"
+      ng-disabled="!input.text || input.text.length > input.maxLength"
       class="button button-icon footer-btn icon ion-android-send">
     </button>
   </div>
