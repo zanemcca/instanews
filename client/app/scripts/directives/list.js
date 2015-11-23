@@ -1,6 +1,6 @@
 
 'use strict';
-var app = angular.module('instanews.directive.list', ['ionic']);
+var app = angular.module('instanews.directive.list', ['ionic', 'angularMoment']);
 
 app.directive('inList', [
   function (
