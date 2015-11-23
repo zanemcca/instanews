@@ -84,6 +84,7 @@ app.service('Articles', [
     spec.update = update;
     spec.addFilter = spec.addFilter || addFilter;
     spec.options = spec.options || {};
+    //TODO Move this to the backend as a default filter
     spec.options.filter = {
       where: {
         pending: {
