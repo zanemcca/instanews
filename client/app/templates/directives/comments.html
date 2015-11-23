@@ -7,10 +7,24 @@
     </li>
 
     <button class="button ion-refresh button-small button-icon dark"
-      ng-click="loadMore(owner)"> Load more comments
+      ng-click="loadMore(owner)">
+      <i ng-if="owner.modelName !== 'comment'">
+        Load more comments
+      </i>
+      <i ng-if="owner.modelName === 'comment'">
+        Load more replies
+      </i>
     </button>
-    <button class="button button-small button-icon ion-edit dark"
+    <button class="button button-small button-icon dark"
       style="float: right;border:0;margin:0;"
-      ng-click="create()">  Add a comment</button>
+      ng-class="(owner.modelName !== 'comment') ? 'ion-edit': 'ion-forward'"
+      ng-click="create()">
+      <i ng-if="owner.modelName !== 'comment'">
+        Add a comment
+      </i>
+      <i ng-if="owner.modelName === 'comment'">
+        Reply
+      </i>
+    </button>
   </ul>
 </div>
