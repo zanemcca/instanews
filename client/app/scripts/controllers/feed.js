@@ -1,6 +1,6 @@
 
 'use strict';
-var app = angular.module('instanews.controller.feed', ['ionic', 'ngResource']);
+var app = angular.module('instanews.controller.feed', ['ionic', 'ngResource', 'monospaced.elastic']);
 
 app.controller('FeedCtrl', [
   '$scope',
@@ -30,6 +30,7 @@ app.controller('FeedCtrl', [
       scrollHandle: 'feed',
       $location: $location
     };
+
     var Navigate = navigate(NavigateSpec);
     $scope.toggleMenu = Navigate.toggleMenu;
 
@@ -119,19 +120,19 @@ $scope.$broadcast('scroll.refreshComplete');
 };
 */
     /*istanbul ignore next */
-    /*
-       $scope.safeApply = function(fn) {
-       var phase = this.$root.$$phase;
-       if(phase === '$apply' || phase === '$digest') {
-       if(fn && (typeof(fn) === 'function')) {
-       fn();
-       }
-       } else {
-       this.$apply(fn);
-       }
-       };
+/*
+   $scope.safeApply = function(fn) {
+   var phase = this.$root.$$phase;
+   if(phase === '$apply' || phase === '$digest') {
+   if(fn && (typeof(fn) === 'function')) {
+   fn();
+   }
+   } else {
+   this.$apply(fn);
+   }
+   };
 
-       var items = {
+   var items = {
 available: function () {
 return false;
 }
