@@ -3,7 +3,7 @@
    <img src="images/ionic.png">
    <a class="button button-clear no-padding button-small"
       ui-sref="app.profile({username: item.username})">
-      <b>{{item.username}}</b> {{age.age}} {{age.unit}} ago
+      <b>{{item.username}}</b> &bull; <span am-time-ago="item.created"></span>
    </a>
    <p>{{item.text}}</p>
 

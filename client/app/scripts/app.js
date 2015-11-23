@@ -41,6 +41,7 @@ angular.module('instanews', [
   'instanews.service.user',
   'lbServices',
   'ui.router',
+  'angularMoment',
   'ngCordova'
 ])
 
@@ -178,3 +179,21 @@ angular.module('instanews', [
   $urlRouterProvider.otherwise('/app/feed');
 
 });
+
+moment.locale('en', {
+  relativeTime: {
+    future: 'in %s',
+    past: '%s ago',
+    s: '%d sec',
+    m: 'a minute',
+    mm: '%d minutes',
+    h: 'an hour',
+    hh: '%d hours',
+    d: 'a day',
+    dd: '%d days',
+    M: 'a month',
+    MM: '%d months',
+    y: 'a year',
+    yy: '%d years'
+  }
+}); 
