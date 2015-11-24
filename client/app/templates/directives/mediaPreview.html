@@ -2,5 +2,12 @@
 <div ng-controller="imageCtrl"
   class="item no-padding item-image">
   <img height="auto" width:"auto" alt="Oops! There was a problem loading this image" ng-src="{{source}}">
-  <textarea type="text" style="width:100%;" ng-model="media.caption" placeholder=" Caption"></textarea>
+</div>
+
+<div class="item"
+  ng-if="media.caption"
+  style="padding-bottom:0px">
+  <p class="no-margin">
+  {{media.caption}}
+  </p>
 </div>
