@@ -98,10 +98,6 @@ app.service('Comments', [
       spec.options.filter.order = spec.options.filter.order || filter.order;
       spec.options.filter.limit = spec.options.filter.limit || filter.limit;
 
-      //TODO Add an option to not use infinite scroll in the directive
-      //  or use a new directive
-      //  Could create an infiniteList and loadMoreList
-
       var Model = Models[commentableType];
       if(!Model) {
         console.log(commentableType + ' is not a valid commentableType');
@@ -112,8 +108,6 @@ app.service('Comments', [
 
       // Create a list for articles within view
       var comments = list(spec);
-
-      comments.load();
 
       return comments;
     };
