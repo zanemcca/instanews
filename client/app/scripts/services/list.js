@@ -179,7 +179,7 @@ function ListFactory (Platform) {
     spec.options.filter.skip = spec.options.filter.skip || 0;
     spec.options.filter.limit = spec.options.filter.limit || 5;
 
-    for(var i in spec.options.filter) {
+     for(var i in spec.options.filter) {
       ogFilter[i] = spec.options.filter[i];
     }
 

@@ -3,7 +3,7 @@
   style="border-bottom:0;margin-bottom:0;padding-bottom: 0px; border-bottom-color: transparent">
   <a class="button button-clear button-small"
      ui-sref="app.profile({username: item.username})" >
-     <b>{{item.username}}</b> {{age.age}} {{age.unit}} ago
+     <b>{{item.username}}</b> &bull; <span am-time-ago="item.created"></span>
   </a>
   <p>{{item.content}}</p>
 
