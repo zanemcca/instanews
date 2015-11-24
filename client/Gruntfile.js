@@ -404,6 +404,7 @@ module.exports = function (grunt) {
           '<%= yeoman.app %>/bower_components/angular/angular.js',
           '<%= yeoman.app %>/bower_components/angular-elastic/elastic.js',
           '<%= yeoman.app %>/bower_components/angular-mocks/angular-mocks.js',
+          '<%= yeoman.app %>/bower_components/angular-moment/angular-moment.js',
           '<%= yeoman.app %>/bower_components/angular-animate/angular-animate.js',
           '<%= yeoman.app %>/bower_components/angular-sanitize/angular-sanitize.js',
           '<%= yeoman.app %>/bower_components/angular-ui-router/release/angular-ui-router.js',
