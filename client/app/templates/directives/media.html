@@ -28,7 +28,9 @@
   </videogular>
 </div>
 
-<div class="item" style="padding-bottom:0px">
+<div class="item"
+  ng-if="media.caption"
+  style="padding-bottom:0px">
   <p class="no-margin">
   {{media.caption}}
   </p>
