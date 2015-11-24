@@ -9,7 +9,8 @@
    </ion-nav-buttons>
 
    <ion-content delegate-handle="feed" on-swipe-down="onSwipeDown()" overflow-scroll="true" class="gpu">
-      <in-list list="Articles"> 
+      <in-list list="Articles"
+        is-card="true"> 
         <inAutocomplete place="place"></inAutocomplete>
         <inMap map="map"></inMap>
       </in-list>

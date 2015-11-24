@@ -1,14 +1,19 @@
 <!DOCTYPE html>
 <div ng-show="owner.showComments">
-  <ul class="list">
+  <in-list list="Comments"
+    is-card="false"
+    is-not-infinite="true"> 
+  </in-list>
+  <!--ul class="list">
     <li ng-repeat="comment in owner.comments track by comment.id"
       class="no-padding item">
       <in-list-item item="comment"></in-list-item>
     </li>
+  </ul-->
     <button class="button ion-refresh button-icon dark"
       style="float: left;"
-      ng-show="comments.areItemsAvailable()"
-      ng-click="loadMore()">
+      ng-show="Comments.areItemsAvailable()"
+      ng-click="Comments.load()">
       Load more
     </button>
     <button class="button button-icon dark"
@@ -18,6 +23,5 @@
       <i ng-if="owner.modelName !== 'comment'">Comment</i>
       <i ng-if="owner.modelName === 'comment'">Reply</i>
     </button>
-  </ul>
 </div>
 
