@@ -20,6 +20,15 @@ app.directive('incomments', [
       controller: function($scope) {
 
         $scope.Comments = Comments.findOrCreate($scope.owner.modelName, $scope.owner.id);
+        var spec = $scope.Comments.getSpec();
+
+        $scope.$watch('owner.showComments', function (newVal, oldVal) {
+          if( newVal && !oldVal) {
+            spec.options.filter.skip = 0;
+            spec.options.filter.limit = 5;
+            $scope.Comments.load();
+          }
+        });
 
         var newComment = '';
 
