@@ -26,6 +26,7 @@ angular.module('instanews', [
   'instanews.directive.votes',
   'instanews.service.articles',
   'instanews.service.camera',
+  'instanews.service.comments',
   'instanews.service.fileTransfer',
   'instanews.service.list',
   'instanews.service.localStorage',

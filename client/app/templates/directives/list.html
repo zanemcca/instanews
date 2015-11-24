@@ -5,7 +5,8 @@
 <div ng-transclude></div>
 <ul class="list">
   <ion-item ng-repeat="item in list.get() track by item.id"
-    class="no-padding card">
+    class="no-padding"
+    ng-class="{'card' : isCard }">
     <in-list-item item="item"
       pre-load="list.preLoad">
     </in-list-item>
@@ -13,7 +14,7 @@
 </ul>
 <ion-infinite-scroll
    immediate-check="false"
-   ng-if="list.areItemsAvailable()"
-   on-infinite="onInfinite()"
+   ng-if="!isNotInfinite && list.areItemsAvailable()"
+   on-infinite="load()"
    distance="10%">
 </ion-infinite-scroll>
