@@ -47,6 +47,7 @@ module.exports = function(Article) {
     Article.find({
       limit: 500,
       fields: {
+        id: true,   // Workaround for loopback-datasource-juggler bug in PR 704
         location: true,
         rating: true
       },
