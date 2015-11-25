@@ -51,6 +51,7 @@ exports.run = function () {
           expect(query).to.deep.equal({
             limit: 500,
             fields: {
+              id: true,
               location: true,
               rating: true
             },
