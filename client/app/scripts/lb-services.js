@@ -1,4 +1,4 @@
-// istanbul ignore next
+// jshint ignore next 
 (function(window, angular, undefined) {'use strict';
 
 var urlBase = "/api";
@@ -568,48 +568,6 @@ module.factory(
 
         /**
          * @ngdoc method
-         * @name lbServices.Journalist#prototype$__updateById__notifications
-         * @methodOf lbServices.Journalist
-         *
-         * @description
-         *
-         * Update a related item by id for notifications.
-         *
-         * @param {Object=} parameters Request parameters.
-         *
-         *  - `id` – `{*}` - voteUser id
-         *
-         *  - `fk` – `{*}` - Foreign key for notifications
-         *
-         * @param {Object} postData Request data.
-         *
-         * This method expects a subset of model properties as request parameters.
-         *
-         * @param {function(Object,Object)=} successCb
-         *   Success callback with two arguments: `value`, `responseHeaders`.
-         *
-         * @param {function(Object)=} errorCb Error callback with one argument:
-         *   `httpResponse`.
-         *
-         * @returns {Object} An empty reference that will be
-         *   populated with the actual data once the response is returned
-         *   from the server.
-         *
-         * <em>
-         * (The remote method definition does not provide any description.
-         * This usually means the response is a `Journalist` object.)
-         * </em>
-         */
-        "prototype$__updateById__notifications": {
-          params: {
-          'fk': '@fk'
-          },
-          url: urlBase + "/journalists/:id/notifications/:fk",
-          method: "PUT"
-        },
-
-        /**
-         * @ngdoc method
          * @name lbServices.Journalist#prototype$__create__accessTokens
          * @methodOf lbServices.Journalist
          *
@@ -619,7 +577,7 @@ module.factory(
          *
          * @param {Object=} parameters Request parameters.
          *
-         *  - `id` – `{*}` - voteUser id
+         *  - `id` – `{*}` - User id
          *
          * @param {Object} postData Request data.
          *
@@ -652,39 +610,17 @@ module.factory(
           method: "GET"
         },
 
-        /**
-         * @ngdoc method
-         * @name lbServices.Journalist#prototype$__get__notifications
-         * @methodOf lbServices.Journalist
-         *
-         * @description
-         *
-         * Queries notifications of journalist.
-         *
-         * @param {Object=} parameters Request parameters.
-         *
-         *  - `id` – `{*}` - voteUser id
-         *
-         *  - `filter` – `{object=}` - 
-         *
-         * @param {function(Array.<Object>,Object)=} successCb
-         *   Success callback with two arguments: `value`, `responseHeaders`.
-         *
-         * @param {function(Object)=} errorCb Error callback with one argument:
-         *   `httpResponse`.
-         *
-         * @returns {Array.<Object>} An empty reference that will be
-         *   populated with the actual data once the response is returned
-         *   from the server.
-         *
-         * <em>
-         * (The remote method definition does not provide any description.
-         * This usually means the response is a `Journalist` object.)
-         * </em>
-         */
-        "prototype$__get__notifications": {
+        // INTERNAL. Use Journalist.upVotes() instead.
+        "prototype$__get__upVotes": {
           isArray: true,
-          url: urlBase + "/journalists/:id/notifications",
+          url: urlBase + "/journalists/:id/upVotes",
+          method: "GET"
+        },
+
+        // INTERNAL. Use Journalist.downVotes() instead.
+        "prototype$__get__downVotes": {
+          isArray: true,
+          url: urlBase + "/journalists/:id/downVotes",
           method: "GET"
         },
 
@@ -1037,7 +973,7 @@ module.factory(
          *
          * @param {Object=} parameters Request parameters.
          *
-         *  - `id` – `{*}` - voteUser id
+         *  - `id` – `{*}` - User id
          *
          *  - `filter` – `{object=}` - 
          *
@@ -1059,6 +995,78 @@ module.factory(
         R.articles = function() {
           var TargetResource = $injector.get("Article");
           var action = TargetResource["::get::journalist::articles"];
+          return action.apply(R, arguments);
+        };
+
+        /**
+         * @ngdoc method
+         * @name lbServices.Journalist#upVotes
+         * @methodOf lbServices.Journalist
+         *
+         * @description
+         *
+         * Queries upVotes of journalist.
+         *
+         * @param {Object=} parameters Request parameters.
+         *
+         *  - `id` – `{*}` - User id
+         *
+         *  - `filter` – `{object=}` - 
+         *
+         * @param {function(Array.<Object>,Object)=} successCb
+         *   Success callback with two arguments: `value`, `responseHeaders`.
+         *
+         * @param {function(Object)=} errorCb Error callback with one argument:
+         *   `httpResponse`.
+         *
+         * @returns {Array.<Object>} An empty reference that will be
+         *   populated with the actual data once the response is returned
+         *   from the server.
+         *
+         * <em>
+         * (The remote method definition does not provide any description.
+         * This usually means the response is a `UpVote` object.)
+         * </em>
+         */
+        R.upVotes = function() {
+          var TargetResource = $injector.get("UpVote");
+          var action = TargetResource["::get::journalist::upVotes"];
+          return action.apply(R, arguments);
+        };
+
+        /**
+         * @ngdoc method
+         * @name lbServices.Journalist#downVotes
+         * @methodOf lbServices.Journalist
+         *
+         * @description
+         *
+         * Queries downVotes of journalist.
+         *
+         * @param {Object=} parameters Request parameters.
+         *
+         *  - `id` – `{*}` - User id
+         *
+         *  - `filter` – `{object=}` - 
+         *
+         * @param {function(Array.<Object>,Object)=} successCb
+         *   Success callback with two arguments: `value`, `responseHeaders`.
+         *
+         * @param {function(Object)=} errorCb Error callback with one argument:
+         *   `httpResponse`.
+         *
+         * @returns {Array.<Object>} An empty reference that will be
+         *   populated with the actual data once the response is returned
+         *   from the server.
+         *
+         * <em>
+         * (The remote method definition does not provide any description.
+         * This usually means the response is a `DownVote` object.)
+         * </em>
+         */
+        R.downVotes = function() {
+          var TargetResource = $injector.get("DownVote");
+          var action = TargetResource["::get::journalist::downVotes"];
           return action.apply(R, arguments);
         };
 
@@ -1507,6 +1515,13 @@ module.factory(
           url: urlBase + "/upVotes",
           method: "POST"
         },
+
+        // INTERNAL. Use Journalist.upVotes() instead.
+        "::get::journalist::upVotes": {
+          isArray: true,
+          url: urlBase + "/journalists/:id/upVotes",
+          method: "GET"
+        },
       }
     );
 
@@ -1627,6 +1642,13 @@ module.factory(
           isArray: true,
           url: urlBase + "/downVotes",
           method: "POST"
+        },
+
+        // INTERNAL. Use Journalist.downVotes() instead.
+        "::get::journalist::downVotes": {
+          isArray: true,
+          url: urlBase + "/journalists/:id/downVotes",
+          method: "GET"
         },
       }
     );

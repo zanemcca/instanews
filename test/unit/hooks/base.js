@@ -100,7 +100,8 @@ exports.run = function () {
           });
         });
 
-        describe('ctx.query.include', function () {
+        // Upvotes are not included anymore so this is irrelevant
+        describe.skip('ctx.query.include', function () {
           it('should create a new empty array', function () {
             delete ctx.query.include;
             run();
@@ -129,7 +130,8 @@ exports.run = function () {
           });
         });
 
-        describe('authenticated user', function () {
+        // Upvotes are not included anymore so this is irrelevant
+        describe.skip('authenticated user', function () {
           var stat;
           beforeEach(function () {
             token = {

@@ -3,6 +3,10 @@
 
 module.exports = function(app) {
 
+  var ONE_DAY = 24*60*60*1000; // 1 Day in millisecs
+  var ONE_WEEK = 7*ONE_DAY; // 1 Week in millisecs
+  var ONE_MONTH = 30*ONE_DAY; // 1 Month in millisecs
+
   var DownVote = app.models.downVote;
   var Click = app.models.click;
   var debug = app.debug('hooks:downvote');
@@ -33,6 +37,15 @@ module.exports = function(app) {
       next(error);
     }
     */
+  });
+
+  DownVote.observe('access', function(ctx, next) {
+    //console.log(objectIdWithTimestamp(Date.now() - 2*ONE_WEEK));
+    ctx.query.where = ctx.query.where || {};
+    ctx.query.where.id = ctx.query.where.id || { gt: app.utils.objectIdWithTimestamp(Date.now() - 2 * ONE_WEEK) };
+
+    debug('observe.access', ctx);
+    next();
   });
 
   DownVote.observe('after save', function(ctx, next) {

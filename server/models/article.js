@@ -31,7 +31,9 @@ module.exports = function(Article) {
             next();
           }
         });
-      } else {
+      }
+      // istanbul ignore else
+      else {
         console.log('The pending flag on the article has already been cleared');
         next();
       }
@@ -47,6 +49,7 @@ module.exports = function(Article) {
     Article.find({
       limit: 500,
       fields: {
+        id: true,   // Workaround for loopback-datasource-juggler bug in PR 704
         location: true,
         rating: true
       },
