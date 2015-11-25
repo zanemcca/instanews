@@ -2,6 +2,11 @@
 /* jshint camelcase: false */
 var LIMIT = 300;
 
+
+var ONE_DAY = 24*60*60*1000; // 1 Day in millisecs
+var ONE_WEEK = 7*ONE_DAY; // 1 Week in millisecs
+var ONE_MONTH = 30*ONE_DAY; // 1 Month in millisecs
+
 module.exports = function(app) {
 
   var loopback = require('loopback');
@@ -62,6 +67,10 @@ module.exports = function(app) {
       ctx.query.limit = LIMIT;
     }
 
+    ctx.query.where = ctx.query.where || {};
+    ctx.query.where.id = ctx.query.where.id || { gt: app.utils.objectIdWithTimestamp(Date.now() - 2 * ONE_WEEK) };
+
+    /*
     if(ctx.query.include) {
       if(!Array.isArray(ctx.query.include)) {
         ctx.query.include = [ctx.query.include];
@@ -104,6 +113,7 @@ module.exports = function(app) {
         }
       }
     }
+   */
 
     debug('observe.access', ctx);
     next();
