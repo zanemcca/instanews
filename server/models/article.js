@@ -31,7 +31,9 @@ module.exports = function(Article) {
             next();
           }
         });
-      } else {
+      }
+      // istanbul ignore else
+      else {
         console.log('The pending flag on the article has already been cleared');
         next();
       }
