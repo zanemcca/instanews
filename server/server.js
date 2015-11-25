@@ -20,7 +20,7 @@ function objectIdWithTimestamp(timestamp) {
     // Create an ObjectId with that hex timestamp
     var constructedObjectId = ObjectId(hexSeconds + "0000000000000000");
 
-    return constructedObjectId
+    return constructedObjectId;
 }
 
 
