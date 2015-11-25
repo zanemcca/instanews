@@ -60,6 +60,16 @@
       "type": "hasMany",
       "model": "view",
       "foreignKey": "username"
+    },
+    "upVotes": {
+      "type": "hasMany",
+      "model": "upVote",
+      "foreignKey": "username"
+    },
+    "downVotes": {
+      "type": "hasMany",
+      "model": "downVote",
+      "foreignKey": "username"
     }
   },
   "acls": [
@@ -82,6 +92,20 @@
       "principalId": "$everyone",
       "permission": "ALLOW",
       "property": "findById"
+    },
+    {
+      "accessType": "EXECUTE",
+      "principalType": "ROLE",
+      "principalId": "$owner",
+      "permission": "ALLOW",
+      "property": "__get__upVotes"
+    },
+    {
+      "accessType": "EXECUTE",
+      "principalType": "ROLE",
+      "principalId": "$owner",
+      "permission": "ALLOW",
+      "property": "__get__downVotes"
     },
     {
       "accessType": "EXECUTE",
