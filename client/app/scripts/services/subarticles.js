@@ -25,7 +25,10 @@ app.service('Subarticles', [
         parent = {
           spec: {
             options: {
-              id: parentId
+              id: parentId,
+              filter: {
+                limit: 1
+              }
             }
           }
         };
@@ -83,8 +86,6 @@ app.service('Subarticles', [
 
       // Create a list for articles within view
       var subarticles = list(spec);
-
-      subarticles.load();
 
       return subarticles;
     };

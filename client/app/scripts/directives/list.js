@@ -9,7 +9,9 @@ app.directive('inList', [
       restrict: 'E',
       transclude: true,
       scope: {
-        list: '='
+        list: '=',
+        isCard: '=',
+        isNotInfinite: '='
       },
       controller: function ($scope, _) {
         $scope.safeApply  = function(fn) {
@@ -23,7 +25,7 @@ app.directive('inList', [
           }
         };
 
-        $scope.onInfinite = _.debounce(function() {
+        $scope.load = _.debounce(function() {
           $scope.list.load( function() {
             $scope.safeApply(function(){
               $scope.$broadcast('scroll.infiniteScrollComplete');
@@ -72,6 +74,7 @@ app.directive('inListItem', [
       restrict: 'E',
       scope: {
         item: '=',
+        isCard: '=',
         preLoad: '='
       },
       controller: function() {},

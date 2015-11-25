@@ -57,7 +57,6 @@ module.exports = function(app) {
   };
 
   Base.observe('access', function(ctx, next) {
-    debug('observe.access', ctx);
     //Limit the queries to LIMIT per request
     if( !ctx.query.limit || ctx.query.limit > LIMIT) {
       ctx.query.limit = LIMIT;
@@ -105,6 +104,8 @@ module.exports = function(app) {
         }
       }
     }
+
+    debug('observe.access', ctx);
     next();
   });
 
