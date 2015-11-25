@@ -128,6 +128,14 @@ function ListFactory (Platform) {
       return removed;
     };
 
+    // Clears all the items
+    var clear = function () {
+      if(spec.items.length) {
+        spec.items = [];
+        notifyObservers();
+      }
+    }
+
     // Find by id
     var findById = function (id) {
       for(var i in spec.items) {
@@ -153,7 +161,6 @@ function ListFactory (Platform) {
     };
 
     var preLoad = function (item, cb) {
-      //TODO Add up/downvote retrieval 
       spec.preLoad(item, cb);
     };
 
@@ -179,7 +186,7 @@ function ListFactory (Platform) {
     spec.options.filter.skip = spec.options.filter.skip || 0;
     spec.options.filter.limit = spec.options.filter.limit || 5;
 
-     for(var i in spec.options.filter) {
+    for(var i in spec.options.filter) {
       ogFilter[i] = spec.options.filter[i];
     }
 
@@ -192,6 +199,7 @@ function ListFactory (Platform) {
     // it has privlidged access to my, and spec
     that = {
       get: get, 
+      clear: clear,
       getTop: getTop, 
       findById: findById,
       load: load, 
