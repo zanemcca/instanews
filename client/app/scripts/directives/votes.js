@@ -3,19 +3,23 @@
 var app = angular.module('instanews.directive.votes', ['ionic', 'ngResource']);
 
 app.directive('invotes', [
+  '$timeout',
   'Comment',
   'Article',
   'Subarticle',
   'UpVote',
   'DownVote',
+  'Votes',
   'Navigate',
   'Position',
   function (
+    $timeout,
     Comment,
     Article,
     Subarticle,
     UpVote,
     DownVote,
+    Votes,
     navigate,
     Position) {
 
@@ -25,6 +29,33 @@ app.directive('invotes', [
           votable: '='
         },
         controller: function($scope, $location) {
+
+          var update = function () {
+            $timeout(function () {
+              $scope.votable.upVotes = Votes.up.find($scope.votable);
+              $scope.votable.downVotes = Votes.down.find($scope.votable);
+
+              if($scope.votable.upVotes.length) {
+                $scope.votable.upVoted = true;
+                $scope.votable.downVoted = false;
+              }
+              else if($scope.votable.downVotes.length) {
+                $scope.votable.downVoted = true;
+                $scope.votable.upVoted = false;
+              }
+
+              $scope.score.value = Math.round($scope.votable.rating*10000)/100;
+            });
+          };
+
+          //TODO Remove
+          $scope.score = {
+            value: 0
+          };
+
+          update();
+          Votes.up.registerObserver(update);
+          Votes.down.registerObserver(update);
 
           var Navigate;
           var spec = {
@@ -41,29 +72,6 @@ app.directive('invotes', [
             Navigate = navigate(spec);
           } // else comments: Do not zoom in on subcomments
 
-          $scope.score = {
-            value: 0
-          };
-
-          function update(votable) {
-            if(votable.upVotes && votable.upVotes.length > 0) {
-              $scope.votable.upVoted = true;
-              $scope.votable.downVoted = false;
-            }
-            else if(votable.downVotes && votable.downVotes.length > 0) {
-              $scope.votable.downVoted = true;
-              $scope.votable.upVoted = false;
-            }
-
-            $scope.score.value = Math.round(votable.rating*10000)/100;
-          }
-
-          update($scope.votable);
-          $scope.$watch(function (scope) {
-            return scope.votable;
-          }, function (newV) {
-            update(newV);
-          });
 
           $scope.toggleComments = function() {
             if(!$scope.votable.showComments) {
@@ -86,7 +94,7 @@ app.directive('invotes', [
             }
 
             if($scope.votable.downVoted) {
-              $scope.votable.downVotes = [];
+              Votes.down.remove($scope.votable);
               $scope.votable.downVoteCount--;
               $scope.votable.downVoted = false;
             }
@@ -108,8 +116,8 @@ app.directive('invotes', [
             UpVote.create(vote)
             .$promise
             .then(
-              // istanbul ignore  next 
-              function() {
+              function(res) {
+                Votes.up.add(res);
                 console.log('Successfully upvoted');
               }, 
               // istanbul ignore  next 
@@ -128,7 +136,7 @@ app.directive('invotes', [
             }
 
             if($scope.votable.upVoted) {
-              $scope.votable.upVotes = [];
+              Votes.up.remove($scope.votable);
               $scope.votable.upVoteCount--;
               $scope.votable.upVoted = false;
             }
@@ -150,8 +158,8 @@ app.directive('invotes', [
             DownVote.create(vote)
             .$promise
             .then(
-              // istanbul ignore next 
-              function() {
+              function(res) {
+                Votes.down.add(res);
                 console.log('Successfully downVoted');
               },
               // istanbul ignore next 
