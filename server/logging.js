@@ -10,7 +10,7 @@ var summarize = function (object) {
     var summary = '';
     switch(typeof(object)) {
       case 'string':
-      if(object.length > 25) {
+        if(object.length > 25) {
         summary += object.slice(0, 25) + '... ';
       } else {
         summary += '\'' + object +'\'';
@@ -35,15 +35,15 @@ var summarize = function (object) {
 function stringify(o) {
   var cache = [];
   return JSON.stringify(o, function(key, value) {
-      if (typeof value === 'object' && value !== null) {
-          if (cache.indexOf(value) !== -1) {
-              // Circular reference found, discard key
-              return;
-          }
-          // Store value in our collection
-          cache.push(value);
+    if (typeof value === 'object' && value !== null) {
+      if (cache.indexOf(value) !== -1) {
+        // Circular reference found, discard key
+        return;
       }
-      return value;
+      // Store value in our collection
+      cache.push(value);
+    }
+    return value;
   }, '  ');
 }
 
@@ -85,30 +85,33 @@ var debug = function(debugString) {
   return debuggers[debugString];
 };
 
+// istanbul ignore next 
 function colorConsole() {
-  [
-    [ 'warn',  'yellow', 'yellow' ],
-    [ 'error', 'red', 'bold'],
-    //  [ 'log',   'cyan'  ]
-  ].forEach(function(pair) {
-    var method = pair[0], color = pair[1], color2 = pair[2];
-    var oldCall = console[method];
-    console[method] = function () {
-      var args = Array.prototype.slice.call(arguments);
-      if(args.length > 0) {
-        var input = method.toUpperCase() + ': '; 
-        input = chalk[color](input);
-        if(args.length === 1) {
-          input += chalk[color2](stringify(args[0]));
-        } else {
-          input += chalk[color2](sprintf.apply(sprintf,args));
+  if(!process.env.NODE_ENV || process.env.NODE_ENV === 'development') {
+    [
+      [ 'warn',  'yellow', 'yellow' ],
+      [ 'error', 'red', 'bold'],
+      //  [ 'log',   'cyan'  ]
+    ].forEach(function(pair) {
+      var method = pair[0], color = pair[1], color2 = pair[2];
+      var oldCall = console[method];
+      console[method] = function () {
+        var args = Array.prototype.slice.call(arguments);
+        if(args.length > 0) {
+          var input = method.toUpperCase() + ': '; 
+          input = chalk[color](input);
+          if(args.length === 1) {
+            input += chalk[color2](stringify(args[0]));
+          } else {
+            input += chalk[color2](sprintf.apply(sprintf,args));
+          }
+          oldCall(input);
+        } else  {
+          oldCall();
         }
-        oldCall(input);
-      } else  {
-        oldCall();
-      }
-    };
-  });
+      };
+    });
+  }
 }
 
 colorConsole();

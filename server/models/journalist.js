@@ -70,6 +70,22 @@ module.exports = function(Journalist) {
       '__create__clicks',
       '__updateById__clicks',
       '__count__clicks',
+      //disable all upVotes REST endpoints
+      //'__get__upVotes',
+      '__delete__upVotes',
+      '__destroyById__upVotes',
+      '__findById__upVotes',
+      '__create__upVotes',
+      '__updateById__upVotes',
+      '__count__upVotes',
+      //disable all downVotes REST endpoints
+      //'__get__downVotes',
+      '__delete__downVotes',
+      '__destroyById__downVotes',
+      '__findById__downVotes',
+      '__create__downVotes',
+      '__updateById__downVotes',
+      '__count__downVotes',
       //disable all views REST endpoints
       '__get__views',
       '__delete__views',

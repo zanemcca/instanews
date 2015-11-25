@@ -18,8 +18,9 @@ module.exports = function(app) {
     };
     debug('afterRemote __get__comments', ctx, inst, next);
     Base.createClickAfterRemote(
+      ctx,
       // istanbul ignore next
-      ctx, function (err) {
+      function (err) {
       if(err) {
         console.error(err.stack);
       }

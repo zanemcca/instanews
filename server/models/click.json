@@ -11,6 +11,10 @@
   "options": {
     "validateUpsert": true
   },
+  "hidden": [
+    "location",
+    "viewId"
+  ],
   "properties": {
     "created": {
       "type": "date"

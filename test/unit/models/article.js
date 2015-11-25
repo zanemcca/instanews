@@ -16,6 +16,7 @@ var findOne;
 function start() {
   Article = {
     find: function () {},
+    findById: function () {},
     disableRemoteMethod: function () {},
     remoteMethod: function () {}
   };
@@ -51,6 +52,7 @@ exports.run = function () {
           expect(query).to.deep.equal({
             limit: 500,
             fields: {
+              id: true,
               location: true,
               rating: true
             },
@@ -70,6 +72,84 @@ exports.run = function () {
             expect(Article.find.calledOnce).to.be.true;
             done();
           });
+      });
+    });
+
+    describe('clearPending', function (id, next) {
+      describe('findById', function () {
+        var findById, id, err, res;
+        beforeEach(function () {
+          err = null;
+          res = null;
+          id = 'id';
+          findById = function (id, where, cb) {
+            cb(err, res);
+          };
+
+          sandbox.stub(Article, 'findById', function (id, where, cb) {
+            findById(id, where,cb);
+          });
+        });
+
+        it('should be call with the proper arguments', function (done) {
+          findById = function (Id, where, cb) {
+            expect(Id).to.equal(id);
+            expect(where).to.deep.equal({
+              pending: {
+                exists: true
+              }
+            });
+            done();
+          };
+
+          Article.clearPending(id);
+        });
+
+        it('should propogate the error', function (done) {
+          err = 'err';
+
+          Article.clearPending(id, function (error) {
+            expect(error).to.equal(err);
+            done();
+          });
+        });
+
+        describe('updateAttributes', function () {
+          var update, err;
+          beforeEach(function () {
+            update = function (data, cb) {
+             cb(err); 
+            };
+
+            res = {
+              updateAttributes: function (data, cb) {
+                update(data,cb);
+              }
+            };
+          });
+
+          it('should be call with the proper arguments', function (done) {
+            update = function (data, cb) {
+              expect(data).to.deep.equal({
+                $unset: {
+                  pending: '' 
+                }
+              });
+              done();
+            };
+
+            Article.clearPending(id);
+          });
+
+          it('should propogate the error', function (done) {
+            err = 'err';
+
+            Article.clearPending(id, function (error) {
+              expect(error).to.equal(err);
+              done();
+            });
+          });
+        });
       });
     });
   });
