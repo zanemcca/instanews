@@ -58,6 +58,7 @@ app.service('Articles', [
     };
 
     var preLoad = function (article, cb) {
+      //TODO This should be within a $scope.$apply in order to be rendered
       var update = function () {
         //console.log('Trying to get topSubarticle');
         var subarticle = article.Subarticles.getTop();

@@ -11,13 +11,13 @@
       <p>{{item.topSub.text}}</p>
    </div>
    <div class="item"
-      style="border-bottom: 0; margin-bottom:0; border-top:0px;padding-right:0px;padding-left:0px;padding-top:0px;padding-bottom:1px">
+      style="border-bottom: 0; margin-bottom:0; border-top:0px;padding-right:0px;padding-left:0px;padding-top:0px;padding-bottom:0px">
 
       <inMediaPreview ng-if="item.topSub._file"
          media="item.topSub._file" id="item.topSub.id">
       </inMediaPreview>
 
-      <div class="item item-icon-right"
+      <!--div class="item item-icon-right"
          style="padding-top:0px;border-top:0px">
          <div class="icon">
             <a class="button button-clear no-padding button-small"
@@ -26,10 +26,16 @@
                <b>{{item.topSub.username}}</b> &bull; <span am-time-ago="item.created"></span>
             </a>
          </div>
-      </div>
+      </div-->
    </div>
 </a>
 
+<div class="item"
+  style="padding-top:1px;padding-bottom:1px;border:0;"> 
+  <div style="float: right;">
+    <b>{{item.topSub.username}}</b> &bull; <span am-time-ago="item.created"></span>
+  </div>
+</div>
 <div class="item" style="border:0px;padding-top:0px;padding-bottom:0px">
    <inVotes style="border: transparent"
       votable="item">
