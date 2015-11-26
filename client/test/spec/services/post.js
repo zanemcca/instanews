@@ -5,7 +5,20 @@ describe('Post service', function() {
 
   var newArticle, uploads;
   var Upload;
+  var map , place;
   beforeEach(function() {
+    map = {
+      addListener: function (name, cb) {
+        cb();
+      }
+    };
+    place = {
+      address_components: [{
+        types: ['route'],
+        long_name: 'hello Rd'
+      }]
+    };
+
     Upload = function (text) {
       if(!text) {
         text = 'subarticle text';
@@ -116,6 +129,17 @@ describe('Post service', function() {
             }
           },
           showToast: function(message) {}
+        };
+      });
+
+      $provide.service('Maps', function() {
+        return {
+          getPlace: function (location, cb) {
+            cb(place);
+          },
+          getFeedMap: function() {
+            return map;
+          }
         };
       });
 
@@ -547,6 +571,7 @@ describe('Post service', function() {
               lat: 1,
               lng: 2
             },
+            place: place.address_components, 
             title: 'Title' 
           });
 
