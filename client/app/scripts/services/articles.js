@@ -9,7 +9,7 @@ app.service('Articles', [
   'list',
   'Subarticles',
   'Platform',
-  'Position',
+'Position',
   function(
     $filter,
     Article,
@@ -72,10 +72,12 @@ app.service('Articles', [
         article.Subarticles.registerObserver(update);
       }
 
+
       var spec = article.Subarticles.getSpec();
       spec.options.filter.skip = 0;
       spec.options.filter.limit = 1;
       article.Subarticles.load();
+
       cb(article);
     };
 

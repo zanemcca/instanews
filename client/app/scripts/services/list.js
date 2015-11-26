@@ -134,7 +134,7 @@ function ListFactory (Platform) {
         spec.items = [];
         notifyObservers();
       }
-    }
+    };
 
     // Find by id
     var findById = function (id) {
