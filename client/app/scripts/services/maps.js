@@ -4,12 +4,10 @@ var app = angular.module('instanews.service.maps', ['ionic', 'ngResource','ngCor
 
 app.service('Maps', [
   'Article',
-  'Articles',
   'Position',
   'Platform',
   function(
     Article,
-    Articles,
     Position,
     Platform
   ){
@@ -196,7 +194,6 @@ return gradient;
 */
 
     var updateHeatmap = function() {
-      //var articles = Articles.get();
       var bounds = Position.getBounds();
       if(bounds) {
         var sw = bounds.getSouthWest();
@@ -396,6 +393,19 @@ return gradient;
       });
     };
 
+    var geocoder = new google.maps.Geocoder();
+    var getPlace = function (location, cb) {
+      geocoder.geocode({
+        location: location
+      }, function (results, status) {
+        if(status === google.maps.GeocoderStatus.OK) {
+          cb(results[0]);
+        } else {
+          console.log('Warning: Failed to look up place! (' + status + ')');
+        }
+      });
+    };
+
     //My Circle =============================================================
 
     /*
@@ -518,7 +528,6 @@ markers.push(new google.maps.Marker(tempMarker));
 
 */
 
-//Articles.registerObserver(updateHeatmap);
 Position.registerBoundsObserver(updateHeatmap);
 
 return {
@@ -527,6 +536,7 @@ return {
   setCenter: setCenter,
   setMarker: setMarker,
   getMarker: getMarker,
+  getPlace: getPlace,
   deleteMarker: deleteMarker,
   fitBounds: fitBounds,
   setPostMap: setPostMap,
