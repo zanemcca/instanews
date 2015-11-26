@@ -1,4 +1,5 @@
 
+// jshint camelcase: false
 'use strict';
 var app = angular.module('instanews.directive.list', ['ionic']);
 
@@ -77,7 +78,50 @@ app.directive('inListItem', [
         isCard: '=',
         preLoad: '='
       },
-      controller: function() {},
+      controller: function($scope, $timeout, Maps) {
+        var WHITELIST = [
+          'route',
+          'neighborhood',
+          'locality',
+          'administrative_area_level_1',
+          'country'
+        ];
+
+        var feedMap = Maps.getFeedMap();
+        $scope.location = {};
+
+        var setPlaceName = function () {
+          $timeout(function () {
+            $scope.$apply(function () {
+            var whitelist = WHITELIST.slice(0);
+            var zoom = feedMap.getZoom();
+
+            if(zoom <= 9) {
+              whitelist.shift();
+            }
+            if(zoom <= 7) {
+              whitelist.shift();
+            }
+
+            console.log(zoom);
+            console.log(whitelist);
+            var place = $scope.item.place;
+            if(place) {
+              for(var i in place) {
+                if(whitelist.indexOf(place[i].types[0]) > -1) {
+                  console.log(place[i].long_name);
+                  $scope.location.name = place[i].long_name;
+                  return;
+                }
+              }
+            }
+            });
+          });
+        };
+
+        setPlaceName();
+        feedMap.addListener('zoom_changed', setPlaceName);
+      },
       templateUrl: 'templates/directives/listItem.html',
       //link: function($scope,element, attributes) {
       link: function($scope) {
@@ -122,6 +166,8 @@ app.directive('inListItem', [
               });
           }
         };
+
+
 
         console.log($scope.item);
         if($scope.preLoad instanceof Function) {
