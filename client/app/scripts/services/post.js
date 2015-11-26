@@ -1,13 +1,16 @@
 
+// jshint camelcase: false
 'use strict';
 
 var app = angular.module('instanews.service.post', ['ionic', 'ngResource']);
 
 app.factory('Post', [
   'Article',
+  'Maps',
   'Platform',
   function(
     Article,
+    Maps,
     Platform
   ) {
 
@@ -86,18 +89,35 @@ app.factory('Post', [
       if(uploads.length) {
         if(typeof article === 'string') {
           postSubarticles(uploads, article);
-        // istanbul ignore else 
+          // istanbul ignore else 
         } else if(isValidArticle(article)) { 
-          Article.create(article)
-          .$promise
-          .then( function(res) {
-            postSubarticles(uploads, res.id);
-          }, function (err) {
-            posting = false;
-            var message = 'Your article failed to upload. Please make sure you included a title and at least one piece of content.';
-            Platform.showToast(message);
-            console.log('Failed to create article');
-            console.log(err);
+          Maps.getPlace(article.location, function (place) {
+            article.place = [];
+            var whitelist = [
+              'route',
+              'neighborhood',
+              'locality',
+              'administrative_area_level_1',
+              'country'
+            ];
+
+            for(var i in place.address_components) {
+              if(whitelist.indexOf(place.address_components[i].types[0]) > -1) {
+                article.place.push(place.address_components[i]);
+              }
+            }
+
+            Article.create(article)
+            .$promise
+            .then( function(res) {
+              postSubarticles(uploads, res.id);
+            }, function (err) {
+              posting = false;
+              var message = 'Your article failed to upload. Please make sure you included a title and at least one piece of content.';
+              Platform.showToast(message);
+              console.log('Failed to create article');
+              console.log(err);
+            });
           });
         } else {
           console.log('Cannot post malformed article');
