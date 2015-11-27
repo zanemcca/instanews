@@ -6,7 +6,7 @@ app.controller('PostCtrl', [
   '$stateParams',
   '$scope',
   '$ionicModal',
-  '$ionicHistory',
+  'Navigate',
   'Article',
   'Articles',
   'Post',
@@ -19,7 +19,7 @@ app.controller('PostCtrl', [
     $stateParams,
     $scope,
     $ionicModal,
-    $ionicHistory,
+    Navigate,
     Article,
     Articles,
     Post,
@@ -118,12 +118,12 @@ app.controller('PostCtrl', [
         cancelText: 'Cancel',
         cancel:  function() {},
         buttonClicked: function() {
-          $ionicHistory.goBack();
+          Navigate.goBack();
         },
         destructiveButtonClicked: function() {
           console.log('post goback button was clicked');
           Upload.destroy($scope.uploads);
-          $ionicHistory.goBack();
+          Navigate.goBack();
         }
       });
     };
@@ -133,7 +133,7 @@ app.controller('PostCtrl', [
         Platform.showToast('We\'ll let you know when your content is uploaded');
       }
 
-      $ionicHistory.goBack();
+      Navigate.goBack();
     };
 
     $scope.post = function () {

@@ -63,9 +63,11 @@ angular.module('instanews', [
 
 .controller('AppCtrl', [
   '$scope',
+  'Navigate',
   'User',
   function (
     $scope,
+    Navigate,
     User
   ) {
     //Update user function
@@ -78,6 +80,19 @@ angular.module('instanews', [
 
     $scope.login = User.login;
     $scope.logout = User.logout;
+
+    $scope.Navigate = Navigate;
+  }
+])
+
+.controller('NavCtrl', [
+  '$scope',
+  'Navigate',
+  function (
+    $scope,
+    Navigate
+  ) {
+    $scope.Navigate = Navigate;
   }
 ])
 
@@ -182,18 +197,26 @@ angular.module('instanews', [
     }
   })
 
-  .state('articlePost', {
+  .state('app.articlePost', {
     cache: false,
     url: '/post/article',
-    templateUrl: 'templates/articlePost.html',
-    controller: 'PostCtrl'
+    views: {
+      'menuContent': {
+        templateUrl: 'templates/articlePost.html',
+        controller: 'PostCtrl'
+      }
+    }
   })
 
-  .state('subarticlePost', {
+  .state('app.subarticlePost', {
     cache: false,
     url: '/post/article/{id}',
-    templateUrl: 'templates/subarticlePost.html',
-    controller: 'PostCtrl'
+    views: {
+      'menuContent': {
+        templateUrl: 'templates/subarticlePost.html',
+        controller: 'PostCtrl'
+      }
+    }
   });
 
   // if none of the above states are matched, use this as the fallback

@@ -9,13 +9,15 @@ app.controller('ArticleCtrl', [
   'Articles',
   'Subarticles',
   'Maps',
+  'Navigate',
   function(
     $scope,
     $stateParams,
     Article,
     Articles,
     Subarticles,
-    Maps
+    Maps,
+    Navigate
   ) {
 
     $scope.Subarticles = Subarticles.findOrCreate($stateParams.id);
@@ -46,6 +48,12 @@ app.controller('ArticleCtrl', [
     $scope.$on('$ionicView.afterLeave', function() {
       marker = Maps.deleteMarker(marker);
     });
+
+    $scope.post = function () {
+      Navigate.go('app.subarticlePost', {
+        id: $scope.article.id
+      });
+    };
 
     /*
        $scope.onRefresh = function () {
