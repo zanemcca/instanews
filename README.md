@@ -17,10 +17,11 @@ Local Citizen Journalism in an elegant simple platform
 - ```cd ~/workdir/instanews/client```
 - ```npm install```
 - ```bower install```
-- Install [homebrew](http://brew.sh/) on Mac
+- Install [homebrew](http://brew.sh/) and Xcode on Mac
 - Install [Ruby](https://www.ruby-lang.org/en/documentation/installation/) `brew install ruby`
 - Install [Compass](http://compass-style.org/install/) `gem install compass`
 - Install [mongodb](https://docs.mongodb.org/manual/) `brew install mongodb` (You may need to create /data/db)
+- Download the [Android Studio](http://developer.android.com/sdk/index.html)
 
 ### Documentation
 - ```grunt docs```
