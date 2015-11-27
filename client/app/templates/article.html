@@ -2,9 +2,9 @@
 <ion-view view-title="{{article.title}}" 
   style="background: #C0C0C0">
    <ion-nav-buttons side="secondary">
-      <a class="button button-clear icon ion-plus-round"
-         ui-sref="subarticlePost({id: article.id})">
-      </a>
+      <button class="button button-clear icon ion-plus-round"
+         ng-click="post()">
+      </button>
    </ion-nav-buttons>
    <ion-content delegate-handle="subarticle" on-swipe-down="onSwipeDown()" overflow-scroll="true" class="gpu">
       <in-list list="Subarticles"
@@ -20,26 +20,4 @@
    </ion-content>
    <in-text-footer>
    </in-text-footer>
-
-   <!--ion-content overflow-scroll="true" class="gpu">
-      <inMap map="map"></inMap>
-      <div class="item" style="border:0px;padding-top:0px;padding-bottom:0px">
-         <inVotes style="border: transparent"
-            votable="article">
-         </inVotes>
-         <inComments owner="article"></inComments>
-      </div>
-      <ul class="list">
-        <ion-item ng-repeat="subarticle in subarticles track by subarticle.id"
-          class="no-padding card">
-          <in-list-item item="subarticle"></in-list-item>
-        </ion-item>
-      </ul>
-      <ion-infinite-scroll
-         immediate-check="false"
-         ng-if="areItemsAvailable()"
-         on-infinite="loadMore()"
-         distance="10%">
-      </ion-infinite-scroll>
-   </ion-content-->
 </ion-view>

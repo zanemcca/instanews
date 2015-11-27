@@ -43,7 +43,7 @@ app.controller('LoginCtrl', [
       $scope.signupModal = modal;
    });
 
-
+   //TODO Remove
    $scope.skip = function () {
       $scope.cred.username = 'zane';
       $scope.cred.password = 'password';
@@ -120,9 +120,7 @@ app.controller('LoginCtrl', [
         };
 
         $scope.invalidLogin = false;
-
-        Navigate.disableNextBack();
-        $state.go('app.feed');
+        Navigate.go();
       }; 
 
      var failedLogin = function (err) {

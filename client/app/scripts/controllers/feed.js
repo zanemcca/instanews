@@ -19,19 +19,12 @@ app.controller('FeedCtrl', [
     Position,
     Platform,
     Articles,
-    navigate
+    Navigate
   ) {
 
     // Local reference to articles service
     $scope.Articles = Articles;
 
-    // Create a custom navigation service
-    var NavigateSpec = {
-      scrollHandle: 'feed',
-      $location: $location
-    };
-
-    var Navigate = navigate(NavigateSpec);
     $scope.toggleMenu = Navigate.toggleMenu;
 
     // Prepare our autocompletion by linking it to out feedmap
@@ -81,6 +74,10 @@ app.controller('FeedCtrl', [
 
     // Set the title of the app
     $scope.title = Platform.getAppNameLogo();
+
+    $scope.post = function () {
+      Navigate.go('app.articlePost');
+    };
 
     //Refresh the map everytime we enter the view
     $scope.$on('$ionicView.afterEnter', function() {

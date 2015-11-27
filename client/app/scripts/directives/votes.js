@@ -20,7 +20,7 @@ app.directive('invotes', [
     UpVote,
     DownVote,
     Votes,
-    navigate,
+    Navigate,
     Position) {
 
       return {
@@ -57,7 +57,7 @@ app.directive('invotes', [
           Votes.up.registerObserver(update);
           Votes.down.registerObserver(update);
 
-          var Navigate;
+          var Scroll;
           var spec = {
             scrollHandle: '',
             $location: $location
@@ -66,10 +66,10 @@ app.directive('invotes', [
           //Get the proper delegate_handle
           if($scope.votable.modelName === 'subarticle') {
             spec.scrollHandle = 'subarticle';
-            Navigate = navigate(spec);
+            Scroll = Navigate.scroll(spec);
           } else if ($scope.votable.modelName === 'article') {
             spec.scrollHandle = 'feed';
-            Navigate = navigate(spec);
+            Scroll = Navigate.scroll(spec);
           } // else comments: Do not zoom in on subcomments
 
 
@@ -80,8 +80,8 @@ app.directive('invotes', [
             else {
               $scope.votable.showComments = false;
             }
-            if(Navigate) {
-              Navigate.toggleAnchorScroll($scope.votable.id);
+            if(Scroll) {
+              Scroll.toggleAnchorScroll($scope.votable.id);
             }
           };
 
