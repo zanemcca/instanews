@@ -18,7 +18,9 @@ Local Citizen Journalism in an elegant simple platform
 - ```npm install```
 - ```bower install```
 - Install [homebrew](http://brew.sh/) on Mac
-- Install [mongodb](https://docs.mongodb.org/manual/)
+- Install [Ruby](https://www.ruby-lang.org/en/documentation/installation/) `brew install ruby`
+- Install [Compass](http://compass-style.org/install/) `gem install compass`
+- Install [mongodb](https://docs.mongodb.org/manual/) `brew install mongodb` (You may need to create /data/db)
 
 ### Documentation
 - ```grunt docs```
