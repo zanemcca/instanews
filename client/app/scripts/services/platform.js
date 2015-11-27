@@ -181,7 +181,6 @@ app.factory('Platform', [
       }
     };
 
-
     var loading = {
       show: function () {
         if(!loading.loader ) {

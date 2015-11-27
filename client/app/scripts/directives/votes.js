@@ -72,7 +72,6 @@ app.directive('invotes', [
             Scroll = Navigate.scroll(spec);
           } // else comments: Do not zoom in on subcomments
 
-
           $scope.toggleComments = function() {
             if(!$scope.votable.showComments) {
               $scope.votable.showComments = true;
