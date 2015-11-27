@@ -6,17 +6,19 @@ Local Citizen Journalism in an elegant simple platform
 
 ### Setup
 - Encrypt your working directory
-- Install node v4.x from (here)[https://github.com/nodesource/distributions]
-- Install git
+- Install nvm from [here](https://github.com/creationix/nvm)
+- Install node v4.2.2 with `nvm install v4.2.2`
 - Install npm (node package manager)
-- ```npm install -g slc grunt grunt-cli mocha karma ionic```
-- ```cd ~/workdir```
+- ```npm install -g grunt-cli```
+- Install git
 - Follow [this](https://help.github.com/articles/generating-ssh-keys/) tutorial to enable SSH github communication
 - ```git clone git@github.com:instanews/instanews.git```
 - ```npm install```
 - ```cd ~/workdir/instanews/client```
 - ```npm install```
 - ```bower install```
+- Install [homebrew](http://brew.sh/) on Mac
+- Install [mongodb](https://docs.mongodb.org/manual/)
 
 ### Documentation
 - ```grunt docs```
