@@ -3,11 +3,13 @@
 var app = angular.module('instanews.directive.comments', ['ionic', 'ngResource']);
 
 app.directive('incomments', [
+  '$timeout',
   'Comment',
   'Comments',
   'Navigate',
   'TextInput',
   function (
+    $timeout,
     Comment,
     Comments,
     Navigate,
@@ -33,6 +35,12 @@ app.directive('incomments', [
         });
 
         var newComment = '';
+
+        var scrollSpec = {
+          scrollHandle: 'feed'
+        };
+
+        var Scroll = Navigate.scroll(scrollSpec);
 
         $scope.create = function () {
           Navigate.ensureLogin( function () {
@@ -62,6 +70,11 @@ app.directive('incomments', [
               //Interruption function
               newComment = partialText;
             });
+
+            // Wait a frame
+            $timeout(function () {
+              Scroll.anchorScroll($scope.owner.id);
+            }, 16);
           });
         };
       },

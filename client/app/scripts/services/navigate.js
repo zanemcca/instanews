@@ -173,7 +173,6 @@ app.service('Navigate', [
         return delegate;
       };
 
-
       var anchorScroll = function (anchor) {
         document.getElementById(anchor).scrollIntoView();
         /*
