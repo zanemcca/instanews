@@ -120,7 +120,7 @@ app.controller('LoginCtrl', [
         };
 
         $scope.invalidLogin = false;
-        Navigate.go();
+        Navigate.goOrGoBack();
       }; 
 
      var failedLogin = function (err) {

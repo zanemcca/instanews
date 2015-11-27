@@ -7,6 +7,7 @@ app.service('Navigate', [
   '$ionicSideMenuDelegate',
   '$ionicScrollDelegate',
   '$ionicHistory',
+  '$ionicPlatform',
   '$state',
   '$timeout',
   '$window',
@@ -16,6 +17,7 @@ app.service('Navigate', [
     $ionicSideMenuDelegate,
     $ionicScrollDelegate,
     $ionicHistory,
+    $ionicPlatform,
     $state,
     $timeout,
     $window,
@@ -29,9 +31,40 @@ app.service('Navigate', [
       'app.subarticlePost'
     ];
 
+    var loginSuccess;
     var redirect = {
       prev: null,
       next: null
+    };
+
+    // If the previous view and the next view are the same then goBack instead of forward
+    var goOrGoBack = function(state) {
+      if(!state) {
+        state = redirect.next;
+      }
+      var prev = $ionicHistory.backView();
+      if(!state || state === prev.stateId) {
+        goBack();
+      } else {
+        go(state);
+      }
+      satisfyLoginSuccessCallback();
+    };
+
+    // Checks if the login view is going back and if
+    // it succeeded, then it wil call the success callback.
+    // If not then it will just clear the callback
+    var satisfyLoginSuccessCallback = function () {
+      if(loginSuccess) {
+        var curr = $ionicHistory.currentView();
+        if(curr.stateId === 'app.login') {
+          var user = User.get();
+          if(user) {
+            loginSuccess();
+          }
+          loginSuccess = null;
+        }
+      }
     };
 
     var go =  function(state, params) {
@@ -48,11 +81,11 @@ app.service('Navigate', [
           $state.go('app.login');
         } else {
           $state.go(state, params);
-        }
+         }
       } else {
         $state.go(state, params);
       }
-    };
+    }; 
 
     var goBack = function () {
       var viewCount = 1;
@@ -74,6 +107,20 @@ app.service('Navigate', [
       }
       console.log('Going back ' + viewCount + ' views');
       $ionicHistory.goBack(0 - viewCount);
+
+      satisfyLoginSuccessCallback();
+    };
+
+    $ionicPlatform.registerBackButtonAction(goBack, 101);
+
+    var ensureLogin = function (cb) {
+      var user = User.get();
+      if(!user) {
+        loginSuccess = cb;
+        go('app.login');
+      } else {
+        cb();
+      }
     };
 
     var toggleMenu = function() {
@@ -200,6 +247,8 @@ console.log('Scroll top on ? ' + $scope.scroll.buttonOn);
       focus: focus,
       go: go,
       goBack: goBack,
+      goOrGoBack: goOrGoBack,
+      ensureLogin: ensureLogin,
       disableNextBack: disableNextBack
     };
   }]);

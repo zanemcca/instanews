@@ -86,87 +86,91 @@ app.directive('invotes', [
           };
 
           $scope.upvote = function () {
-            if($scope.votable.upVoted) {
-              //TODO Delete the vote if it already exists
-            } else {
-              $scope.votable.upVoteCount++;
-              $scope.votable.upVoted = true;
-            }
+            Navigate.ensureLogin( function () {
+              if($scope.votable.upVoted) {
+                //TODO Delete the vote if it already exists
+              } else {
+                $scope.votable.upVoteCount++;
+                $scope.votable.upVoted = true;
+              }
 
-            if($scope.votable.downVoted) {
-              Votes.down.remove($scope.votable);
-              $scope.votable.downVoteCount--;
-              $scope.votable.downVoted = false;
-            }
+              if($scope.votable.downVoted) {
+                Votes.down.remove($scope.votable);
+                $scope.votable.downVoteCount--;
+                $scope.votable.downVoted = false;
+              }
 
-            var position = Position.getPosition();
-            var vote = {
-              clickableId: $scope.votable.id,
-              clickableType: $scope.votable.modelName
-            };
-
-            // istanbul ignore else 
-            if(position) {
-              vote.location = {
-                lat: position.coords.latitude,
-                lng: position.coords.longitude
+              var position = Position.getPosition();
+              var vote = {
+                clickableId: $scope.votable.id,
+                clickableType: $scope.votable.modelName
               };
-            }
 
-            UpVote.create(vote)
-            .$promise
-            .then(
-              function(res) {
-                Votes.up.add(res);
-                console.log('Successfully upvoted');
-              }, 
-              // istanbul ignore  next 
-              function(err) {
-                console.log('Error: Failed to create an upvote');
-                console.log(err);
-              });
+              // istanbul ignore else 
+              if(position) {
+                vote.location = {
+                  lat: position.coords.latitude,
+                  lng: position.coords.longitude
+                };
+              }
+
+              UpVote.create(vote)
+              .$promise
+              .then(
+                function(res) {
+                  Votes.up.add(res);
+                  console.log('Successfully upvoted');
+                }, 
+                // istanbul ignore  next 
+                function(err) {
+                  console.log('Error: Failed to create an upvote');
+                  console.log(err);
+                });
+            });
           };
 
           $scope.downvote = function () {
-            if($scope.votable.downVoted) {
-              //TODO Delete the vote if it already exists
-            } else {
-              $scope.votable.downVoteCount++;
-              $scope.votable.downVoted = true;
-            }
+            Navigate.ensureLogin( function () {
+              if($scope.votable.downVoted) {
+                //TODO Delete the vote if it already exists
+              } else {
+                $scope.votable.downVoteCount++;
+                $scope.votable.downVoted = true;
+              }
 
-            if($scope.votable.upVoted) {
-              Votes.up.remove($scope.votable);
-              $scope.votable.upVoteCount--;
-              $scope.votable.upVoted = false;
-            }
+              if($scope.votable.upVoted) {
+                Votes.up.remove($scope.votable);
+                $scope.votable.upVoteCount--;
+                $scope.votable.upVoted = false;
+              }
 
-            var position = Position.getPosition();
-            var vote = {
-              clickableId: $scope.votable.id,
-              clickableType: $scope.votable.modelName
-            };
-
-            // istanbul ignore else 
-            if(position) {
-              vote.location = {
-                lat: position.coords.latitude,
-                lng: position.coords.longitude
+              var position = Position.getPosition();
+              var vote = {
+                clickableId: $scope.votable.id,
+                clickableType: $scope.votable.modelName
               };
-            }
 
-            DownVote.create(vote)
-            .$promise
-            .then(
-              function(res) {
-                Votes.down.add(res);
-                console.log('Successfully downVoted');
-              },
-              // istanbul ignore next 
-              function(err) {
-                console.log('Error: Failed to create an downVote');
-                console.log(err);
-              });
+              // istanbul ignore else 
+              if(position) {
+                vote.location = {
+                  lat: position.coords.latitude,
+                  lng: position.coords.longitude
+                };
+              }
+
+              DownVote.create(vote)
+              .$promise
+              .then(
+                function(res) {
+                  Votes.down.add(res);
+                  console.log('Successfully downVoted');
+                },
+                // istanbul ignore next 
+                function(err) {
+                  console.log('Error: Failed to create an downVote');
+                  console.log(err);
+                });
+            });
           };
         },
         templateUrl: 'templates/directives/votes.html'
