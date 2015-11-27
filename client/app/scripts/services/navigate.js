@@ -60,7 +60,8 @@ app.service('Navigate', [
         if(curr.stateId === 'app.login') {
           var user = User.get();
           if(user) {
-            loginSuccess();
+            // Wait a frame
+            $timeout(loginSuccess, 16);
           }
           loginSuccess = null;
         }
@@ -77,7 +78,6 @@ app.service('Navigate', [
           redirect.nextParams = params;
           var current = $ionicHistory.currentView();
           redirect.prev = current.stateId; 
-          $ionicNavBarDelegate.showBackButton(true);
           $state.go('app.login');
         } else {
           $state.go(state, params);
@@ -91,21 +91,18 @@ app.service('Navigate', [
       var viewCount = 1;
       if(redirect.prev) {
         var history = $ionicHistory.viewHistory();
-        console.log(history);
         if(redirect.prev !== history.backView.stateId) {
           var histId = $ionicHistory.currentHistoryId();
           var hist = history.histories[histId];
           for(;viewCount < hist.stack.length; viewCount++) {
             var curr = hist.stack[hist.stack.length - 1 - viewCount];
             if(curr.stateId === redirect.prev) {
-              console.log(curr);
               break;
             }
           }
         }
         redirect = {};
       }
-      console.log('Going back ' + viewCount + ' views');
       $ionicHistory.goBack(0 - viewCount);
 
       satisfyLoginSuccessCallback();
