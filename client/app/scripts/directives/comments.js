@@ -5,10 +5,12 @@ var app = angular.module('instanews.directive.comments', ['ionic', 'ngResource']
 app.directive('incomments', [
   'Comment',
   'Comments',
+  'Navigate',
   'TextInput',
   function (
     Comment,
     Comments,
+    Navigate,
     TextInput
   ) {
 
@@ -33,6 +35,7 @@ app.directive('incomments', [
         var newComment = '';
 
         $scope.create = function () {
+          Navigate.ensureLogin( function () {
           var textInput = TextInput.get();
           if($scope.owner.commentableId) {
             textInput.placeholder = 'Write a reply...';
@@ -58,6 +61,7 @@ app.directive('incomments', [
           }, function (partialText) {
             //Interruption function
             newComment = partialText;
+          });
           });
         };
       },
