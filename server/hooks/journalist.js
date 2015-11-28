@@ -7,143 +7,132 @@ module.exports = function(app) {
   var Stat = app.models.stat;
   var debug = app.debug('hooks:journalist');
 
-   Journalist.afterRemote('prototype.__get__articles',
-   function(ctx, instance, next) {
-     debug('afterRemote __get__articles', ctx, instance, next);
-      //Automatically remove all duplicate articles
-      //Duplicates can be present since the articles associated
-      //with a journalist come through their subarticles
-      var uniqueIds = [];
-      for(var i = 0; i < instance.length; i++) {
-         if(uniqueIds.indexOf(instance[i].id) > -1 ) {
+  Journalist.afterRemote('prototype.__get__articles',
+      function(ctx, instance, next) {
+        debug('afterRemote __get__articles', ctx, instance, next);
+        //Automatically remove all duplicate articles
+        //Duplicates can be present since the articles associated
+        //with a journalist come through their subarticles
+        var uniqueIds = [];
+        for(var i = 0; i < instance.length; i++) {
+          if(uniqueIds.indexOf(instance[i].id) > -1 ) {
             instance.splice(i,1);
             i--;
-         }
-         else {
-            uniqueIds.push(instance[i].id);
-         }
-      }
-
-      next();
-   });
-
-    Journalist.afterRemoteError('login',
-    function(ctx, next) {
-      app.dd.increment('journalist.login.error');
-      debug('afterRemoteError login', ctx, instance, next);
-      app.brute.prevent(ctx.req, ctx.res, function() {
-         next();
-      });
-    });
-
-    Journalist.beforeRemote('create', function(ctx, instance, done) {
-       debug('beforeRemote create', ctx, instance, done);
-      // var excTime = Date.now();
-       var next = function (err) {
-        // excTime = Date.now() - excTime;
-     //    app.dd.timing('journalist.create.timing',excTime); //Execution time in ms
-         done(err);
-       };
-
-      var user;
-      if( ctx && ctx.req && ctx.req.body) {
-        user = ctx.req.body;
-      }
-      else if( instance ) {
-        user = instance;
-      }
-      else {
-        next(new Error('Bad user given for creation!'));
-      }
-
-      //TODO make this the same as front end password check
-      if( !user.password || user.password.length < 8) {
-        var e = new Error('Password is too weak!');
-        e.status = 403;
-        next(e);
-      }
-      else {
-        Journalist.count({
-            or: [{
-              email: user.email
-            },
-            {
-              username: user.username
-            }]
-        }, function(err, count) {
-          if( err) {
-            next(err);
-          }
-          else if(count === 0) {
-            next();
           }
           else {
-            var er = new Error('Username or email is already used!'); 
-            er.status = 403;
-            next(er);
+            uniqueIds.push(instance[i].id);
           }
-        });
-      }
-    });
+        }
 
-  /*
-//  Journalist.afterRemote('create', function(ctx, instance, next) {
-  Journalist.observe('after save', function(ctx, next) {
-     debug('after save', ctx, next);
-    var instance = ctx.instance;
-    if(instance && ctx.isNewInstance) {
-      Stat.findById(Stat.averageId, function(err, res) {
-        if( err ) {
-          console.error('Error: Failed to find ' + Stat.averageId);
-          console.error(err.stack);
+        next();
+      });
+
+  Journalist.afterRemoteError('login', function(ctx, next) {
+    app.dd.increment('journalist.login.error');
+    debug('afterRemoteError login', ctx, instance, next);
+    app.brute.prevent(ctx.req, ctx.res, function() {
+      next();
+    });
+  });
+
+  //TODO app brute for confirm
+  Journalist.beforeRemote('confirm', function (ctx, user, next) {
+    debug('after confirm', user);
+    console.dir(user);
+    next();
+  });
+
+  Journalist.beforeRemote('create', function(ctx, instance, done) {
+    debug('beforeRemote create', ctx, instance, done);
+    // var excTime = Date.now();
+    var next = function (err) {
+      // excTime = Date.now() - excTime;
+      //    app.dd.timing('journalist.create.timing',excTime); //Execution time in ms
+      done(err);
+    };
+
+    var user;
+    if( ctx && ctx.req && ctx.req.body) {
+      user = ctx.req.body;
+    }
+    else if( instance ) {
+      user = instance;
+    }
+    else {
+      next(new Error('Bad user given for creation!'));
+    }
+
+  //TODO make this the same as front end password check
+    if( !user.password || user.password.length < 8) {
+      var e = new Error('Password is too weak!');
+      e.status = 403;
+      next(e);
+    }
+    else {
+      Journalist.count({
+        or: [{
+              email: user.email
+            },
+        {
+          username: user.username
+        }]
+      }, function(err, count) {
+        if( err) {
           next(err);
         }
+        else if(count === 0) {
+          next();
+        }
         else {
-          var stat = {
-            username: instance.username,
-            subarticle: res.subarticle,
-            article: res.article,
-            comment: res.comment,
-            upVote: res.upVote,
-            version: 0
-          };
-
-          //TODO Modify the count on the stats so that the user has a
-          // predictable number of interactions before they can
-          // througoughly modify the statistics
-          Stat.create(stat, function(err, res) {
-            if( err) {
-              console.error('Error: Failed to create stat object for user ' +
-                          instance.username);
-              console.error(err.stack);
-              next(err);
-            }
-            else {
-              next();
-            }
-          });
+          var er = new Error('Username or email is already used!'); 
+          er.status = 403;
+          next(er);
         }
       });
     }
-    else {
-      console.warn('Warning: There is no instance attached to' +
-                  ' Journalist after save observer');
-      next();
-    }
   });
- */
+
+  Journalist.afterRemote('create', function(ctx, user, next) {
+    debug('after create', user, next);
+    var options = {
+      type: 'email',
+    to: user.email,
+    from: 'noreply@instanews.com',
+    redirect: '/',
+    protocol: ctx.req.protocol,
+    host: '192.168.1.9',
+    generateVerificationToken: function (user, cb) {
+      //TODO generate a random token for the user
+      cb(null, '012345');
+    }
+    };
+
+    user.verify(options, function(err, res) {
+      console.log('Done verification!');
+      if( err) {
+        console.error('Error: Failed to verify the email ' + user.email);
+        console.error(err.stack);
+        next(err);
+      }
+      else {
+        next();
+      }
+    });
+  });
 
   Journalist.observe('access', function(ctx, next) {
-     debug('access', ctx, next);
-      //Reserved contents for the owner only
-      ctx.query.fields = {
-         email: false
-      };
+    debug('access', ctx, next);
+    //Reserved contents for the owner only
+    /*
+    ctx.query.fields = {
+      email: false
+    };
+    */
 
-     //Limit the queries to LIMIT per request
-     if( !ctx.query.limit || ctx.query.limit > LIMIT) {
-        ctx.query.limit = LIMIT;
-     }
-      next();
-   });
+    //Limit the queries to LIMIT per request
+    if( !ctx.query.limit || ctx.query.limit > LIMIT) {
+      ctx.query.limit = LIMIT;
+    }
+    next();
+  });
 };

@@ -7,6 +7,10 @@
       "../common/models"
     ]
   },
+  "Email": {
+    "dataSource": "sendgrid",
+    "public": false
+  },
   "User": {
     "dataSource": "db",
     "public": false
@@ -41,7 +45,10 @@
   },
   "journalist": {
     "dataSource": "Users",
-    "public": true
+    "public": true,
+    "options": {
+      "emailVerificationRequired": true
+    }
   },
   "comment": {
     "dataSource": "Articles",
