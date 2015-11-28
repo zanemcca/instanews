@@ -9,6 +9,9 @@
       "email": 1
     }
   },
+  "hidden": [
+    "email"
+  ],
   "properties": {
     "firstName": {
       "type": "string"
@@ -112,6 +115,13 @@
       "principalType": "ROLE",
       "principalId": "$everyone",
       "permission": "ALLOW",
+      "property": "confirm"
+    },
+    {
+      "accessType": "EXECUTE",
+      "principalType": "ROLE",
+      "principalId": "$everyone",
+      "permission": "ALLOW",
       "property": "count"
     },
     {
@@ -143,5 +153,5 @@
       "property": "__get__articles"
     }
   ],
-  "methods": []
+  "methods": {}
 }

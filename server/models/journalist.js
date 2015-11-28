@@ -10,7 +10,7 @@ module.exports = function(Journalist) {
       'upsert',
       'prototype.updateAttributes',
       'deleteById',
-      'confirm',
+ //     'confirm',
       'resetPassword',
       'createChangeStream',
       'createChangeStream_0',
