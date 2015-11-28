@@ -26,6 +26,9 @@ app.controller('LoginCtrl', [
       remember: true
    };
 
+   $scope.invalid = {
+   };
+
    $scope.invalidLogin = false;
    $scope.credUsed = false;
 
@@ -36,11 +39,11 @@ app.controller('LoginCtrl', [
       password: ''
    };
 
-   $ionicModal.fromTemplateUrl('templates/signupModal.html', {
+   $ionicModal.fromTemplateUrl('templates/loginModal.html', {
       scope: $scope,
       animation: 'slide-in-up'
    }).then( function (modal) {
-      $scope.signupModal = modal;
+      $scope.loginModal = modal;
    });
 
    //TODO Remove
@@ -52,7 +55,11 @@ app.controller('LoginCtrl', [
 
    $scope.validEmail = function() { 
      var re = /^([\w-]+(?:\.[\w-]+)*)@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$/i;
-     return re.test($scope.newUser.email);
+     var valid = re.test($scope.newUser.email);
+     if(valid) {
+       $scope.invalid.email = false;
+     }
+     return valid;
     };
 
     $scope.passwordStrength = 0;
@@ -97,7 +104,7 @@ app.controller('LoginCtrl', [
         User.set(res);
 
         /*
-        if ($scope.cred.remember) {
+        if($scope.cred.remember) {
 
           var device = Platform.getDevice();
           if(res && device.type) {
@@ -120,6 +127,10 @@ app.controller('LoginCtrl', [
         };
 
         $scope.invalidLogin = false;
+
+        if($scope.loginModal) {
+          $scope.loginModal.hide();
+        }
         Navigate.goOrGoBack();
       }; 
 
@@ -161,8 +172,8 @@ app.controller('LoginCtrl', [
          email: '',
          remember: true,
          password: ''
-      };
-      $scope.signupModal.hide();
+      }; 
+      //$scope.loginModal.hide();
    };
 
    $scope.signup = function () {
@@ -172,40 +183,59 @@ app.controller('LoginCtrl', [
          password: $scope.newUser.password
       };
 
-      /* istanbul ignore else */
-      if ( $scope.newUser.username ) {
-         user.username = $scope.newUser.username.toLowerCase();
-      }
-
-      /* istanbul ignore else */
-      if( $scope.passwordStrength > 0 && $scope.validEmail()) {
+      if( $scope.passwordStrength <= 0) {
+        Platform.showToast('The password you entered is too weak!');
+      } else if(!$scope.validEmail()) {
+        Platform.showToast('The email you entered is not properly formatted!');
+        $scope.invalid.email = true;
+      } else {
         //Verify that the email and username is unique
         Journalist.count({
           where: {
-            or: [{
-              email: user.email
-            },
-            {
-              username: user.username
-            }]
+            email: user.email
           }
         }, function(res) {
           if( res.count > 0) {
-            $scope.credUsed = true;
-            console.log('The username or email you provided is already used');
+            $scope.invalid.email = true;
+            Platform.showToast('The email you entered is already used!');
           }
           else {
-            Journalist.create(user, function (res) {
-               console.log(res);
-               console.log('Signed up');
-               $scope.cred = {
-                 username: user.username,
-                 password: user.password,
-                 remember: $scope.newUser.remember
-               };
-               $scope.login();
-               $scope.trashNewUser();
-            }, 
+            /* istanbul ignore else */
+            if ( $scope.newUser.username ) {
+               user.username = $scope.newUser.username.toLowerCase();
+            } else {
+              Platform.showToast('You must enter a username!');
+              $scope.invalid.username = true;
+              return;
+            }
+
+            Journalist.count({
+              where: {
+                username: user.username
+              }
+            }, function(res) {
+              if( res.count > 0) {
+                $scope.invalid.username = true;
+                Platform.showToast('The username you entered is already used. Please try again');
+              }
+              else {
+                Journalist.create(user, function (res) {
+                   console.log(res);
+                   console.log('Signed up');
+                   $scope.cred = {
+                     username: user.username,
+                     password: user.password,
+                     remember: $scope.newUser.remember
+                   };
+                   $scope.login();
+                   $scope.trashNewUser();
+                }, 
+                /* istanbul ignore next */
+                function(err) {
+                  console.log(err);
+                });
+              }
+            },
             /* istanbul ignore next */
             function(err) {
               console.log(err);
@@ -216,9 +246,6 @@ app.controller('LoginCtrl', [
         function(err) {
           console.log(err);
         });
-      }
-      else {
-        console.log('Password is too weak or email is invalid!');
       }
    };
 
