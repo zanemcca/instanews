@@ -11,7 +11,6 @@ module.exports = function(app) {
 
   function randomToken(len) {
     var buf = crypto.randomBytes(len);
-    console.log(buf);
     var res = '';
     for(var i in buf) {
       res += buf[i].toString(10);
@@ -44,17 +43,18 @@ module.exports = function(app) {
 
   Journalist.afterRemoteError('login', function(ctx, next) {
     app.dd.increment('journalist.login.error');
-    debug('afterRemoteError login', ctx, instance, next);
+    debug('afterRemoteError login', ctx, next);
     app.brute.prevent(ctx.req, ctx.res, function() {
       next();
     });
   });
 
-  //TODO app brute for confirm
-  Journalist.beforeRemote('confirm', function (ctx, user, next) {
-    debug('after confirm', user);
-    console.dir(user);
-    next();
+  Journalist.afterRemoteError('confirm', function (ctx,next) {
+    app.dd.increment('journalist.confirm.error');
+    debug('afterRemoteError confirm', ctx);
+    app.brute.prevent(ctx.req, ctx.res, function() {
+      next();
+    });
   });
 
   Journalist.beforeRemote('create', function(ctx, instance, done) {
@@ -120,13 +120,11 @@ module.exports = function(app) {
       template: path.resolve(__dirname, '../views/verify.ejs'),
       generateVerificationToken: function (user, cb) {
         var token = randomToken(6);
-        console.log(token);
         cb(null, token);
       }
     };
 
     user.verify(options, function(err, res) {
-      console.log('Done verification!');
       if( err) {
         console.error('Error: Failed to verify the email ' + user.email);
         console.error(err.stack);
@@ -140,12 +138,6 @@ module.exports = function(app) {
 
   Journalist.observe('access', function(ctx, next) {
     debug('access', ctx, next);
-    //Reserved contents for the owner only
-    /*
-    ctx.query.fields = {
-      email: false
-    };
-    */
 
     //Limit the queries to LIMIT per request
     if( !ctx.query.limit || ctx.query.limit > LIMIT) {
