@@ -10,6 +10,7 @@
     }
   },
   "hidden": [
+    "verificationToken",
     "email"
   ],
   "properties": {
@@ -109,6 +110,13 @@
       "principalId": "$owner",
       "permission": "ALLOW",
       "property": "__get__downVotes"
+    },
+    {
+      "accessType": "EXECUTE",
+      "principalType": "ROLE",
+      "principalId": "$everyone",
+      "permission": "ALLOW",
+      "property": "resendConfirmation"
     },
     {
       "accessType": "EXECUTE",

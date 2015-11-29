@@ -3,6 +3,92 @@ var common = require('./common');
 
 module.exports = function(Journalist) {
 
+  var path = require('path');
+  var crypto = require('crypto');
+
+  function randomToken(len) {
+    var buf = crypto.randomBytes(len);
+    var res = '';
+    for(var i in buf) {
+      res += buf[i].toString(10);
+      if(res.length >= len) {
+        return res.slice(0,len);
+      }
+    }
+    console.log('Error: Failed to create a randomToken');
+  }
+
+  Journalist.sendConfirmation = function (user, next) {
+    var options = {
+      type: 'email',
+      to: user.email,
+      from: 'noreply@instanews.com',
+      //redirect: '/',
+      //protocol: ctx.req.protocol,
+      //host: '192.168.1.9',
+      subject: 'Verify Your Email Address',
+      template: path.resolve(__dirname, '../views/verify.ejs'),
+      generateVerificationToken: function (user, cb) {
+        var token = randomToken(6);
+        cb(null, token);
+      }
+    };
+
+    user.verify(options, function(err, res) {
+      if( err) {
+        console.error('Error: Failed to verify the email ' + user.email);
+        console.error(err.stack);
+        next(err);
+      }
+      else {
+        next();
+      }
+    });
+  };
+
+  Journalist.resendConfirmation = function (user, next) {
+    var query = {
+      where: {}
+    };
+
+    if(!user || !(user.email || user.username)) {
+      var e = new Error('The user is invalid');
+      e.status = 422;
+      return next(e);
+    }
+    if(user.email) {
+      query.where.email = user.email;
+    } else {
+      query.where.username = user.username;
+    }
+
+    Journalist.findOne(query, function (err, res) {
+      if(err) {
+        return next(err);
+      }
+      if(!res) {
+        err = new Error('There is no user under that search');
+        err.status = 404;
+        return next(err);
+      } else {
+        if(res.__data.emailVerified) {
+          err = new Error('This users email is already verified: ' + res.username);
+          err.status = 403;
+          return next(err);
+        } else {
+          Journalist.sendConfirmation(res, next);
+        }
+      }
+    });
+  };
+
+  Journalist.remoteMethod(
+    'resendConfirmation',
+    {
+      accepts: { arg: 'user', type: 'object', required: true}
+    }
+   );
+
    var staticDisable = [
       'exists',
       'find',
