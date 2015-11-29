@@ -7,6 +7,20 @@ module.exports = function(app) {
   var Stat = app.models.stat;
   var debug = app.debug('hooks:journalist');
   var path = require('path');
+  var crypto = require('crypto');
+
+  function randomToken(len) {
+    var buf = crypto.randomBytes(len);
+    console.log(buf);
+    var res = '';
+    for(var i in buf) {
+      res += buf[i].toString(10);
+      if(res.length >= len) {
+        return res.slice(0,len);
+      }
+    }
+    console.log('Error: Failed to create a randomToken');
+  }
 
   Journalist.afterRemote('prototype.__get__articles',
       function(ctx, instance, next) {
@@ -105,8 +119,9 @@ module.exports = function(app) {
       subject: 'Verify Your Email Address',
       template: path.resolve(__dirname, '../views/verify.ejs'),
       generateVerificationToken: function (user, cb) {
-        //TODO generate a random token for the user
-        cb(null, '012345');
+        var token = randomToken(6);
+        console.log(token);
+        cb(null, token);
       }
     };
 
