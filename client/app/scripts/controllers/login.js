@@ -26,6 +26,10 @@ app.controller('LoginCtrl', [
       remember: true
    };
 
+   $scope.verify = {
+     token: null
+   };
+
    $scope.invalid = {
    };
 
@@ -44,6 +48,13 @@ app.controller('LoginCtrl', [
       animation: 'slide-in-up'
    }).then( function (modal) {
       $scope.loginModal = modal;
+   });
+
+   $ionicModal.fromTemplateUrl('templates/verifyModal.html', {
+      scope: $scope,
+      animation: 'slide-in-up'
+   }).then( function (modal) {
+      $scope.verifyModal = modal;
    });
 
    //TODO Remove
@@ -144,26 +155,56 @@ app.controller('LoginCtrl', [
       };
 
       var credentials;
+      var query = {
+        where: {}
+      };
 
       if ( $scope.cred.username.indexOf('@') > -1 ) {
          credentials = {
             email: $scope.cred.username.toLowerCase(),
             password: $scope.cred.password,
          };
-      }
-      else {
+         query.where.email = credentials.email;
+      } else {
          credentials = {
             username: $scope.cred.username.toLowerCase(),
             password: $scope.cred.password,
          };
+         query.where.username = credentials.username;
       }
 
-      Journalist.login({
-       //  include: 'user',
-         rememberMe: $scope.cred.remember
-      }, credentials,
-      successLogin,
-      failedLogin);
+      Journalist.findOne(query, function (res) {
+        if(!res.emailVerified) {
+          $scope.verifyModal.show();
+        } else {
+          Journalist.login({
+           //  include: 'user',
+             rememberMe: $scope.cred.remember
+          }, credentials,
+          successLogin,
+          failedLogin);
+        }
+      }, function (err) {
+        Platform.showToast('There is no user with the given username');
+      });
+   }; 
+
+   $scope.verify = function () {
+     Journalist.confirm({
+       uid: $scope.cred.username.toLowerCase(),
+       token: $scope.verify.token
+     }, function (res) {
+       $scope.login();
+       $scope.verifyModal.hide();
+     }, function (err) {
+        $scope.invalid.token = true;
+        Platform.showToast('The token you entered is invalid. Please try again');
+     });
+   };
+
+   $scope.verifyLater = function () {
+     $scope.verifyModal.hide();
+     Navigate.goOrGoBack();
    };
 
    $scope.trashNewUser = function () {
@@ -248,5 +289,4 @@ app.controller('LoginCtrl', [
         });
       }
    };
-
 }]);

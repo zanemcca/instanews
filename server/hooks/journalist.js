@@ -6,6 +6,7 @@ module.exports = function(app) {
   var Journalist = app.models.journalist;
   var Stat = app.models.stat;
   var debug = app.debug('hooks:journalist');
+  var path = require('path');
 
   Journalist.afterRemote('prototype.__get__articles',
       function(ctx, instance, next) {
@@ -96,15 +97,17 @@ module.exports = function(app) {
     debug('after create', user, next);
     var options = {
       type: 'email',
-    to: user.email,
-    from: 'noreply@instanews.com',
-    redirect: '/',
-    protocol: ctx.req.protocol,
-    host: '192.168.1.9',
-    generateVerificationToken: function (user, cb) {
-      //TODO generate a random token for the user
-      cb(null, '012345');
-    }
+      to: user.email,
+      from: 'noreply@instanews.com',
+      //redirect: '/',
+      protocol: ctx.req.protocol,
+      host: '192.168.1.9',
+      subject: 'Verify Your Email Address',
+      template: path.resolve(__dirname, '../views/verify.ejs'),
+      generateVerificationToken: function (user, cb) {
+        //TODO generate a random token for the user
+        cb(null, '012345');
+      }
     };
 
     user.verify(options, function(err, res) {

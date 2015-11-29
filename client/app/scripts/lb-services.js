@@ -1,4 +1,3 @@
-// jshint ignore next 
 (function(window, angular, undefined) {'use strict';
 
 var urlBase = "/api";
@@ -738,6 +737,39 @@ module.factory(
 
         /**
          * @ngdoc method
+         * @name lbServices.Journalist#findOne
+         * @methodOf lbServices.Journalist
+         *
+         * @description
+         *
+         * Find first instance of the model matched by filter from the data source.
+         *
+         * @param {Object=} parameters Request parameters.
+         *
+         *  - `filter` – `{object=}` - Filter defining fields, where, include, order, offset, and limit
+         *
+         * @param {function(Object,Object)=} successCb
+         *   Success callback with two arguments: `value`, `responseHeaders`.
+         *
+         * @param {function(Object)=} errorCb Error callback with one argument:
+         *   `httpResponse`.
+         *
+         * @returns {Object} An empty reference that will be
+         *   populated with the actual data once the response is returned
+         *   from the server.
+         *
+         * <em>
+         * (The remote method definition does not provide any description.
+         * This usually means the response is a `Journalist` object.)
+         * </em>
+         */
+        "findOne": {
+          url: urlBase + "/journalists/findOne",
+          method: "GET"
+        },
+
+        /**
+         * @ngdoc method
          * @name lbServices.Journalist#count
          * @methodOf lbServices.Journalist
          *
@@ -864,6 +896,40 @@ module.factory(
           },
           url: urlBase + "/journalists/logout",
           method: "POST"
+        },
+
+        /**
+         * @ngdoc method
+         * @name lbServices.Journalist#confirm
+         * @methodOf lbServices.Journalist
+         *
+         * @description
+         *
+         * Confirm a user registration with email verification token.
+         *
+         * @param {Object=} parameters Request parameters.
+         *
+         *  - `uid` – `{string}` - 
+         *
+         *  - `token` – `{string}` - 
+         *
+         *  - `redirect` – `{string=}` - 
+         *
+         * @param {function(Object,Object)=} successCb
+         *   Success callback with two arguments: `value`, `responseHeaders`.
+         *
+         * @param {function(Object)=} errorCb Error callback with one argument:
+         *   `httpResponse`.
+         *
+         * @returns {Object} An empty reference that will be
+         *   populated with the actual data once the response is returned
+         *   from the server.
+         *
+         * This method returns no data.
+         */
+        "confirm": {
+          url: urlBase + "/journalists/confirm",
+          method: "GET"
         },
 
         /**
@@ -1340,6 +1406,8 @@ module.factory(
          *  - `container` – `{string=}` - 
          *
          *  - `file` – `{string=}` - 
+         *
+         *  - `req` – `{object=}` - 
          *
          *  - `res` – `{object=}` - 
          *
