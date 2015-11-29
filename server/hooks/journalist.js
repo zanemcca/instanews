@@ -6,20 +6,6 @@ module.exports = function(app) {
   var Journalist = app.models.journalist;
   var Stat = app.models.stat;
   var debug = app.debug('hooks:journalist');
-  var path = require('path');
-  var crypto = require('crypto');
-
-  function randomToken(len) {
-    var buf = crypto.randomBytes(len);
-    var res = '';
-    for(var i in buf) {
-      res += buf[i].toString(10);
-      if(res.length >= len) {
-        return res.slice(0,len);
-      }
-    }
-    console.log('Error: Failed to create a randomToken');
-  }
 
   Journalist.afterRemote('prototype.__get__articles',
       function(ctx, instance, next) {
@@ -109,31 +95,7 @@ module.exports = function(app) {
 
   Journalist.afterRemote('create', function(ctx, user, next) {
     debug('after create', user, next);
-    var options = {
-      type: 'email',
-      to: user.email,
-      from: 'noreply@instanews.com',
-      //redirect: '/',
-      protocol: ctx.req.protocol,
-      host: '192.168.1.9',
-      subject: 'Verify Your Email Address',
-      template: path.resolve(__dirname, '../views/verify.ejs'),
-      generateVerificationToken: function (user, cb) {
-        var token = randomToken(6);
-        cb(null, token);
-      }
-    };
-
-    user.verify(options, function(err, res) {
-      if( err) {
-        console.error('Error: Failed to verify the email ' + user.email);
-        console.error(err.stack);
-        next(err);
-      }
-      else {
-        next();
-      }
-    });
+    Journalist.sendConfirmation(user, next);
   });
 
   Journalist.observe('access', function(ctx, next) {

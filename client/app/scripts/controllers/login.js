@@ -206,6 +206,25 @@ app.controller('LoginCtrl', [
      $scope.verifyModal.hide();
      Navigate.goOrGoBack();
    };
+   
+   $scope.resendConfirmation = function () {
+     var usr = {};
+     if($scope.cred.username) {
+       usr.username = $scope.cred.username;
+     } else if($scope.cred.email) {
+       usr.email = $scope.cred.email;
+     } else {
+       console.log('Failed to send the confirmation code');
+       return;
+     }
+     Journalist.resendConfirmation({
+       user: usr
+     }, function () {
+       Platform.showToast('We sent you a new confirmation code. It should arrive soon');
+     }, function (err) {
+       Platform.showToast('Failed to send the confirmation code. Please try again');
+     });
+   };
 
    $scope.trashNewUser = function () {
       $scope.newUser = {
