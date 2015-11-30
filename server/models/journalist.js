@@ -7,6 +7,10 @@ module.exports = function(Journalist) {
   var crypto = require('crypto');
 
   function randomToken(len) {
+    if(!len) {
+      len = 6;
+    }
+
     var buf = crypto.randomBytes(len);
     var res = '';
     for(var i in buf) {
@@ -44,7 +48,7 @@ module.exports = function(Journalist) {
         next();
       }
     });
-  };
+  }; 
 
   Journalist.resendConfirmation = function (user, next) {
     var query = {
@@ -82,8 +86,80 @@ module.exports = function(Journalist) {
     });
   };
 
+  Journalist.requestPasswordReset = function (user, next) {
+    var query = {
+      where: {}
+    };
+
+    if(!user || !(user.email || user.username)) {
+      var e = new Error('The user is invalid');
+      e.status = 422;
+      return next(e);
+    }
+    if(user.email) {
+      query.where.email = user.email;
+    } else {
+      query.where.username = user.username;
+    }
+
+    Journalist.findOne(query, function (err, res) {
+      if(err) {
+        return next(err);
+      }
+      if(!res) {
+        err = new Error('There is no user under that search');
+        err.status = 404;
+        return next(err);
+      } else {
+        var options = {
+          to: user.email,
+          generateVerificationToken: function (user, cb) {
+            var token = randomToken(6);
+            cb(null, token);
+          }
+        };
+
+        res.requestPasswordReset(options, function(err, res) {
+          if( err) {
+            console.error('Error: Failed to verify the email ' + user.email);
+            console.error(err.stack);
+            next(err);
+          }
+          else {
+            next();
+          }
+        });
+      }
+    });
+  };
+
+  Journalist.on('resetPasswordRequest', function (info) {
+    //TODO randomToken does not set the accesstoken at all
+    //  Solve by adding generateAccessToken function to options of resetPassword
+    var html = '<p>Password reset code: <b>' + info.accessToken.id + '</b></p>';
+    Journalist.app.models.Email.send({
+      to: info.email,
+      from: 'noreply@instanews.com',
+      subject: 'Password Reset',
+      html: html
+    }, function (err) {
+      if (err) {
+        console.error(err.stack);
+      } else {
+        console.log('Successful password reset email sent');
+      }
+    });
+  });
+
   Journalist.remoteMethod(
     'resendConfirmation',
+    {
+      accepts: { arg: 'user', type: 'object', required: true}
+    }
+   );
+
+  Journalist.remoteMethod(
+    'requestPasswordReset',
     {
       accepts: { arg: 'user', type: 'object', required: true}
     }
@@ -97,7 +173,7 @@ module.exports = function(Journalist) {
       'prototype.updateAttributes',
       'deleteById',
  //     'confirm',
-      'resetPassword',
+ //     'resetPassword',
       'createChangeStream',
       'createChangeStream_0',
       'updateAll'
