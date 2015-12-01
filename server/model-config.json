@@ -45,10 +45,7 @@
   },
   "journalist": {
     "dataSource": "Users",
-    "public": true,
-    "options": {
-      "emailVerificationRequired": true
-    }
+    "public": true
   },
   "comment": {
     "dataSource": "Articles",
