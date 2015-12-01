@@ -62,9 +62,9 @@ module.exports = function(Journalist) {
       return next(e);
     }
     if(user.email) {
-      query.where.email = user.email;
+      query.where.email = user.email.toLowerCase();
     } else {
-      query.where.username = user.username;
+      query.where.username = user.username.toLowerCase();
     }
 
     Journalist.findOne(query, function (err, res) {
@@ -98,9 +98,9 @@ module.exports = function(Journalist) {
       return next(e);
     }
     if(user.email) {
-      query.where.email = user.email;
+      query.where.email = user.email.toLowerCase();
     } else {
-      query.where.username = user.username;
+      query.where.username = user.username.toLowerCase();
     }
 
     Journalist.findOne(query, function (err, res) {
@@ -198,9 +198,9 @@ module.exports = function(Journalist) {
     }
 
     if(user.email) {
-      query.where.email = user.email;
+      query.where.email = user.email.toLowerCase();
     } else {
-      query.where.username = user.username;
+      query.where.username = user.username.toLowerCase();
     }
 
     Journalist.findOne(query, function (err, res) {

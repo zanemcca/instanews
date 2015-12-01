@@ -48,6 +48,8 @@ app.controller('LoginCtrl', [
 
       $ionicModal.fromTemplateUrl('templates/modals/loginModal.html', {
         scope: $scope,
+        backdropClickToClose: false,
+        focusFirstInput: true,
         animation: 'slide-in-up'
       }).then( function (modal) {
         $scope.loginModal = modal;
@@ -55,6 +57,8 @@ app.controller('LoginCtrl', [
 
       $ionicModal.fromTemplateUrl('templates/modals/verifyModal.html', {
         scope: $scope,
+        backdropClickToClose: false,
+        focusFirstInput: true,
         animation: 'slide-in-up'
       }).then( function (modal) {
         $scope.verifyModal = modal;
@@ -62,6 +66,8 @@ app.controller('LoginCtrl', [
 
       $ionicModal.fromTemplateUrl('templates/modals/resetPasswordModal.html', {
         scope: $scope,
+        backdropClickToClose: false,
+        focusFirstInput: true,
         animation: 'slide-in-up'
       }).then( function (modal) {
         $scope.reset.Modal = modal;
@@ -74,6 +80,8 @@ app.controller('LoginCtrl', [
 
       $ionicModal.fromTemplateUrl('templates/modals/forgotPassword.html', {
         scope: $scope,
+        backdropClickToClose: false,
+        focusFirstInput: true,
         animation: 'slide-in-up'
       }).then( function (modal) {
         $scope.reset.forgotModal = modal;
@@ -197,7 +205,7 @@ username: '',
           query.where.username = credentials.username;
         }
 
-        Journalist.findOne(query, function (res) {
+        Journalist.findOne({ filter: query}, function (res) {
           if(!res.emailVerified) {
             $scope.verifyModal.show();
           } else {
@@ -230,6 +238,9 @@ username: '',
 
       $scope.verifyLater = function () {
         $scope.verifyModal.hide();
+        if( $scope.loginModal) {
+          $scope.loginModal.hide();
+        }
         Navigate.goOrGoBack();
       };
 
