@@ -17,6 +17,7 @@ describe('Login: ', function(){
 
       $provide.service('Platform', function() {
         return {
+          showToast: function() {},
           getDevice: function() {}
         };
       });
@@ -68,6 +69,9 @@ describe('Login: ', function(){
         var login = function( obj, credentialsi, success, failed) {};
         return {
           create: create,
+          findOne: function (query, cb) {
+            cb('error');
+          },
           count: count,
           login: login
         };
@@ -273,23 +277,12 @@ describe('Login: ', function(){
   });
 
   it('should clear the newUser', function() {
-
-    scope.signupModal = {
-      hide: function() {
-        console.log('Modal hide stub');
-      }
-    };
-
-    var hide = sinon.stub(scope.signupModal, 'hide');
-
     scope.trashNewUser();
 
     expect(scope.newUser.remember).to.be.true;
     expect(scope.newUser.username).to.be.equal('');
     expect(scope.newUser.email).to.be.equal('');
     expect(scope.newUser.password).to.be.equal('');
-
-    expect(hide.calledOnce).to.be.true;
   });
   
   it('should be a valid email', function() {
