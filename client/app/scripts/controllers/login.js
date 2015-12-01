@@ -211,6 +211,7 @@ username: '',
             failedLogin);
           }
         }, function (err) {
+          console.log(err);
           Platform.showToast('There is no user with the given username');
         });
       }; 
@@ -219,10 +220,11 @@ username: '',
         Journalist.confirm({
           uid: $scope.cred.username.toLowerCase(),
           token: $scope.verify.token
-        }, function (res) {
+        }, function () {
           $scope.login();
           $scope.verifyModal.hide();
         }, function (err) {
+          console.log(err);
           $scope.invalid.token = true;
           Platform.showToast('The token you entered is invalid. Please try again');
         });
@@ -248,6 +250,7 @@ username: '',
         }, function () {
           Platform.showToast('We sent you a new confirmation code. It should arrive soon');
         }, function (err) {
+          console.log(err);
           Platform.showToast('Failed to send the confirmation code. Please try again');
         });
       };
@@ -256,6 +259,7 @@ username: '',
         var usr = {};
 
         if($scope.cred.username) {
+          $scope.cred.username = $scope.cred.username.toLowerCase();
           if($scope.cred.username.indexOf('@') > -1) {
             usr.email = $scope.cred.username;
           } else {
@@ -273,6 +277,7 @@ username: '',
           $scope.reset.forgotModal.hide();
           $scope.reset.Modal.show();
         }, function (err) {
+          console.log(err);
           Platform.showToast('Failed to send the reset code. Please try again');
         });
       };
@@ -280,6 +285,7 @@ username: '',
       $scope.resetPassword = function () {
         var usr = {};
         if($scope.cred.username) {
+          $scope.cred.username = $scope.cred.username.toLowerCase();
           if($scope.cred.username.indexOf('@') > -1) {
             usr.email = $scope.cred.username;
           } else {
