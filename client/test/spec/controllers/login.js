@@ -132,6 +132,11 @@ describe('Login: ', function(){
       password: 'password',
       remember: true
     };
+
+    scope.verifyModal = {
+      hide: function () {},
+      show: function () {}
+    };
   });
 
   describe('signup' , function() {

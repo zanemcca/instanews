@@ -305,6 +305,7 @@ describe('Post: ', function(){
     Post,
     Platform,
     Maps,
+    Navigate,
     User,
     Upload,
     Camera
@@ -317,6 +318,7 @@ describe('Post: ', function(){
     post = Post;
     platform = Platform;
     maps = Maps;
+    navigate = Navigate;
     user = User;
     upload = Upload;
     camera = Camera;
@@ -551,8 +553,8 @@ describe('Post: ', function(){
       });
 
 
-      it('should call $ionicHistory.goBack() when save is called', function() {
-        sinon.spy(ionicHistory, 'goBack');
+      it('should call Navigate.goBack() when save is called', function() {
+        sinon.spy(navigate, 'goBack');
         sinon.stub(platform, 'showSheet', function(sheet) {
           sheet.buttonClicked();
         });
@@ -560,11 +562,11 @@ describe('Post: ', function(){
         scope.goBack();
 
         expect(platform.showSheet.calledOnce).to.be.true;
-        expect(ionicHistory.goBack.calledOnce).to.be.true;
+        expect(navigate.goBack.calledOnce).to.be.true;
       });
 
-      it('should call Upload.destroy then $ionicHistory.goBack() when delete is clicked', function() {
-        sinon.spy(ionicHistory, 'goBack');
+      it('should call Upload.destroy then Navigate.goBack() when delete is clicked', function() {
+        sinon.spy(navigate, 'goBack');
         sinon.spy(upload, 'destroy');
         sinon.stub(platform, 'showSheet', function(sheet) {
           sheet.destructiveButtonClicked();
@@ -574,7 +576,7 @@ describe('Post: ', function(){
 
         expect(platform.showSheet.calledOnce).to.be.true;
         expect(upload.destroy.calledOnce).to.be.true;
-        expect(ionicHistory.goBack.calledOnce).to.be.true;
+        expect(navigate.goBack.calledOnce).to.be.true;
       });
     });
 
