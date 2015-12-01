@@ -4,6 +4,13 @@ var LIMIT = 10;
 module.exports = function(app) {
 
   var Journalist = app.models.journalist;
+
+  if(process.env.NODE_ENV === 'production') {
+    Journalist.settings.emailVerificationRequired = true;
+  } else {
+    Journalist.settings.emailVerificationRequired = false;
+  }
+
   var Stat = app.models.stat;
   var debug = app.debug('hooks:journalist');
 
