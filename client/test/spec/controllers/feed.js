@@ -10,15 +10,13 @@ describe('Feed: ', function(){
 
     module(function($provide) {
       $provide.service('Navigate', function() {
-        return function (spec) {
-          return {
-            disableNextBack: function() {},
-            onScroll: function() {
-              return false;
-            },
-            scrollTop: function() {},
-            toggleMenu: function() {}
-          };
+        return {
+          disableNextBack: function() {},
+          onScroll: function() {
+            return false;
+          },
+          scrollTop: function() {},
+          toggleMenu: function() {}
         };
       });
 

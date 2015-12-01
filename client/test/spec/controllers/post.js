@@ -239,6 +239,22 @@ describe('Post: ', function(){
         };
       });
 
+      $provide.service('Navigate', function() {
+        return {
+          goBack: function () {},
+          disableNextBack: function() {},
+          scroll: function (spec) {
+            return {
+              onScroll: function() {
+                return false;
+              },
+              scrollTop: function() {}
+            };
+          },
+          toggleMenu: function() {}
+        };
+      });
+
       $provide.service('Position', function() {
         return {
           registerObserver: function(cb) {
@@ -563,240 +579,240 @@ describe('Post: ', function(){
     });
 
     /*
-    describe('postArticle', function() {
+       describe('postArticle', function() {
 
-      beforeEach(function() {
-        scope.user = {
-          username: 'bob'
-        };
+       beforeEach(function() {
+       scope.user = {
+username: 'bob'
+};
 
-        sinon.stub(maps,'getMarker', function() {
-          return {
-            getPosition: function() {
-              return {
-                lat: function() { return 1;},
-                lng: function() { return 2;}
-              }
-            }
-          }
-        });
+sinon.stub(maps,'getMarker', function() {
+return {
+getPosition: function() {
+return {
+lat: function() { return 1;},
+lng: function() { return 2;}
+}
+}
+}
+});
+});
+
+it('should call Maps.getMarker', function() {
+scope.postArticle();
+
+expect(maps.getMarker.calledOnce).to.be.true;
+});
+
+it('should call Post.savePosition', function() {
+sinon.spy(post, 'savePosition');
+
+scope.postArticle();
+
+expect(post.savePosition.calledOnce).to.be.true;
+});
+
+it('should call Post.saveTitle', function() {
+sinon.spy(post, 'saveTitle');
+
+scope.postArticle();
+
+expect(post.saveTitle.calledOnce).to.be.true;
+});
+
+it('should call Post.post', function() {
+sinon.spy(post, 'post');
+
+scope.postArticle();
+
+expect(post.post.calledOnce).to.be.true;
+});
+});
+
+describe('postSubarticle', function() {
+beforeEach(function() {
+scope.user = {
+username: 'username'
+};
+stateParams.id = 'parent id';
+});
+
+it('should call Post.post', function() {
+sinon.spy(post, 'post');
+
+scope.postSubarticle();
+
+expect(post.post.calledOnce).to.be.true;
+});
+
+describe('exit', function() {
+it('should call Post.isPosting', function() {
+sinon.spy(post, 'isPosting');
+scope.postSubarticle();
+expect(post.isPosting.calledOnce).to.be.true;
+});
+
+it('should call Platform.showToast', function() {
+    sinon.stub(post, 'isPosting', function() {
+      return true;
       });
-
-      it('should call Maps.getMarker', function() {
-        scope.postArticle();
-
-        expect(maps.getMarker.calledOnce).to.be.true;
-      });
-
-      it('should call Post.savePosition', function() {
-        sinon.spy(post, 'savePosition');
-
-        scope.postArticle();
-
-        expect(post.savePosition.calledOnce).to.be.true;
-      });
-
-      it('should call Post.saveTitle', function() {
-        sinon.spy(post, 'saveTitle');
-
-        scope.postArticle();
-
-        expect(post.saveTitle.calledOnce).to.be.true;
-      });
-
-      it('should call Post.post', function() {
-        sinon.spy(post, 'post');
-
-        scope.postArticle();
-
-        expect(post.post.calledOnce).to.be.true;
-      });
+    sinon.spy(platform, 'showToast');
+    scope.postSubarticle();
+    expect(post.isPosting.calledOnce).to.be.true;
+    expect(platform.showToast.calledOnce).to.be.true;
     });
 
-    describe('postSubarticle', function() {
-      beforeEach(function() {
-          scope.user = {
-            username: 'username'
-          };
-          stateParams.id = 'parent id';
+it('should call Platform.showToast with the correct message', function() {
+    sinon.stub(post, 'isPosting', function() {
+      return true;
       });
-
-      it('should call Post.post', function() {
-        sinon.spy(post, 'post');
-
-        scope.postSubarticle();
-
-        expect(post.post.calledOnce).to.be.true;
+    sinon.stub(platform, 'showToast', function(message) {
+      expect(message).to.equal('We\'ll let you know when your content is uploaded');
       });
-
-      describe('exit', function() {
-        it('should call Post.isPosting', function() {
-          sinon.spy(post, 'isPosting');
-          scope.postSubarticle();
-          expect(post.isPosting.calledOnce).to.be.true;
-        });
-
-        it('should call Platform.showToast', function() {
-          sinon.stub(post, 'isPosting', function() {
-            return true;
-          });
-          sinon.spy(platform, 'showToast');
-          scope.postSubarticle();
-          expect(post.isPosting.calledOnce).to.be.true;
-          expect(platform.showToast.calledOnce).to.be.true;
-        });
-
-        it('should call Platform.showToast with the correct message', function() {
-          sinon.stub(post, 'isPosting', function() {
-            return true;
-          });
-          sinon.stub(platform, 'showToast', function(message) {
-            expect(message).to.equal('We\'ll let you know when your content is uploaded');
-          });
-          scope.postSubarticle();
-          expect(platform.showToast.calledOnce).to.be.true;
-        });
-
-        it('should call $ionicHistory.goBack()', function() {
-          sinon.spy(ionicHistory, 'goBack');
-          scope.postSubarticle();
-          expect(ionicHistory.goBack.calledOnce).to.be.true;
-        });
-      });
-    });
-   */
-
-    describe('trashText', function() {
-
-      it('should reset data.text', function() {
-        scope.postTextModal = {
-          hide: function() {}
-        };
-
-        scope.data.text = 'text';
-
-        scope.trashText();
-
-        expect(scope.data.text).to.equal('');
-      });
-
-      it('should hide the postTextModal', function() {
-        scope.postTextModal = {
-          hide: function() {}
-        };
-        sinon.spy(scope.postTextModal, 'hide');
-
-        scope.trashText();
-
-        expect(scope.postTextModal.hide.calledOnce).to.be.true;
-      });
+    scope.postSubarticle();
+    expect(platform.showToast.calledOnce).to.be.true;
     });
 
-    describe('saveText', function() {
+it('should call $ionicHistory.goBack()', function() {
+    sinon.spy(ionicHistory, 'goBack');
+    scope.postSubarticle();
+    expect(ionicHistory.goBack.calledOnce).to.be.true;
+    });
+});
+});
+*/
 
-      beforeEach(function() {
-        scope.postTextModal = {
-          hide: function() {}
-        };
+describe('trashText', function() {
+
+    it('should reset data.text', function() {
+      scope.postTextModal = {
+hide: function() {}
+};
+
+scope.data.text = 'text';
+
+    scope.trashText();
+
+    expect(scope.data.text).to.equal('');
+});
+
+    it('should hide the postTextModal', function() {
+      scope.postTextModal = {
+hide: function() {}
+};
+sinon.spy(scope.postTextModal, 'hide');
+
+scope.trashText();
+
+expect(scope.postTextModal.hide.calledOnce).to.be.true;
+});
+});
+
+describe('saveText', function() {
+
+    beforeEach(function() {
+      scope.postTextModal = {
+hide: function() {}
+};
+});
+
+    it('should push data.text onto the scope.uploads', function() {
+      scope.data.text = 'text';
+      scope.saveText();
+
+      expect(upload.text.calledOnce).to.be.true;
+      expect(scope.uploads.length).to.equal(1);
+      expect(scope.uploads[0]).to.equal(upld);
       });
 
-      it('should push data.text onto the scope.uploads', function() {
-        scope.data.text = 'text';
-        scope.saveText();
+    it('should call trashText after', function() {
+      sinon.spy(scope, 'trashText');
 
-        expect(upload.text.calledOnce).to.be.true;
-        expect(scope.uploads.length).to.equal(1);
-        expect(scope.uploads[0]).to.equal(upld);
+      scope.saveText();
+      expect(scope.trashText.calledOnce).to.be.true;
       });
+});
 
-      it('should call trashText after', function() {
-        sinon.spy(scope, 'trashText');
+  describe('captureVideo', function() {
+    it('should call Camera.captureVideo', function() {
+      sinon.spy(camera, 'captureVideo');
+      scope.captureVideo();
 
-        scope.saveText();
-        expect(scope.trashText.calledOnce).to.be.true;
-      });
+      expect(camera.captureVideo.calledOnce).to.be.true;
     });
 
-    describe('captureVideo', function() {
-      it('should call Camera.captureVideo', function() {
-        sinon.spy(camera, 'captureVideo');
-        scope.captureVideo();
+    it('should add the video to uploads', function() {
+      uploader = function (vid) {
+        expect(vid).to.equal(video);
+        return upld;
+      };
 
-        expect(camera.captureVideo.calledOnce).to.be.true;
-      });
+      scope.captureVideo();
 
-      it('should add the video to uploads', function() {
-        uploader = function (vid) {
-          expect(vid).to.equal(video);
-          return upld;
-        };
-
-        scope.captureVideo();
-
-        expect(upload.video.calledOnce).to.be.true;
-        expect(scope.uploads.length).to.equal(1);
-        expect(scope.uploads[0]).to.equal(upld);
-      });
-
+      expect(upload.video.calledOnce).to.be.true;
+      expect(scope.uploads.length).to.equal(1);
+      expect(scope.uploads[0]).to.equal(upld);
     });
 
-    describe('openMediaGallery', function() {
-      it('should call Camera.openMediaGallery', function() {
-        sinon.spy(camera, 'openMediaGallery');
+});
 
-        scope.openMediaGallery();
-        expect(camera.openMediaGallery.calledOnce).to.be.true;
-      });
+describe('openMediaGallery', function() {
+  it('should call Camera.openMediaGallery', function() {
+    sinon.spy(camera, 'openMediaGallery');
 
-      it('should add the photo to uploads', function() {
-        uploader = function(pic) {
-          expect(pic).to.deep.equal(media);
-          return upld;
-        };
+    scope.openMediaGallery();
+    expect(camera.openMediaGallery.calledOnce).to.be.true;
+  });
 
-        scope.openMediaGallery();
+  it('should add the photo to uploads', function() {
+    uploader = function(pic) {
+      expect(pic).to.deep.equal(media);
+      return upld;
+    };
 
-        expect(upload.picture.calledOnce).to.be.true;
-        expect(scope.uploads.length).to.equal(1);
-        expect(scope.uploads[0]).to.equal(upld);
-      });
+    scope.openMediaGallery();
 
-      it('should add the video to uploads', function() {
-        media.type = 'video';
-        uploader = function(vid) {
-          expect(vid).to.deep.equal(media);
-          return upld;
-        };
+    expect(upload.picture.calledOnce).to.be.true;
+    expect(scope.uploads.length).to.equal(1);
+    expect(scope.uploads[0]).to.equal(upld);
+  });
 
-        scope.openMediaGallery();
+  it('should add the video to uploads', function() {
+    media.type = 'video';
+    uploader = function(vid) {
+      expect(vid).to.deep.equal(media);
+      return upld;
+    };
 
-        expect(upload.video.calledOnce).to.be.true;
-        expect(scope.uploads.length).to.equal(1);
-        expect(scope.uploads[0]).to.equal(upld);
-      });
-    });
+    scope.openMediaGallery();
 
-    describe('capturePicture', function() {
-      it('should call Camera.getPicture', function() {
-        sinon.spy(camera, 'capturePicture');
+    expect(upload.video.calledOnce).to.be.true;
+    expect(scope.uploads.length).to.equal(1);
+    expect(scope.uploads[0]).to.equal(upld);
+  });
+});
 
-        scope.capturePicture();
+describe('capturePicture', function() {
+  it('should call Camera.getPicture', function() {
+    sinon.spy(camera, 'capturePicture');
 
-        expect(camera.capturePicture.calledOnce).to.be.true;
-      });
+    scope.capturePicture();
 
-      it('should add the photo to uploads', function() {
-        uploader = function (pic) {
-          expect(pic).to.equal(picture);
-          return upld;
-        };
+    expect(camera.capturePicture.calledOnce).to.be.true;
+  });
 
-        scope.capturePicture();
+  it('should add the photo to uploads', function() {
+    uploader = function (pic) {
+      expect(pic).to.equal(picture);
+      return upld;
+    };
 
-        expect(upload.picture.calledOnce).to.be.true;
-        expect(scope.uploads.length).to.equal(1);
-        expect(scope.uploads[0]).to.equal(upld);
-      });
-    });
+    scope.capturePicture();
+
+    expect(upload.picture.calledOnce).to.be.true;
+    expect(scope.uploads.length).to.equal(1);
+    expect(scope.uploads[0]).to.equal(upld);
+  });
+});
   });
 });
