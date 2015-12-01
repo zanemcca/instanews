@@ -38,7 +38,6 @@ app.controller('LoginCtrl', [
       };
 
       $scope.invalidLogin = false;
-      $scope.credUsed = false;
 
       $scope.newUser = {
         username: '',
@@ -132,7 +131,6 @@ app.controller('LoginCtrl', [
         if (newVal.password !== oldVal.password) {
           $scope.passwordStrength = checkPasswordStrength(newVal.password);
         }
-        $scope.credUsed = false;
       }, true );
 
       $scope.login = function () {

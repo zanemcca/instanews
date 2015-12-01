@@ -11,6 +11,7 @@ describe('Login: ', function(){
     module(function($provide) {
       $provide.service('Navigate', function() {
         return {
+          goOrGoBack: function () {},
           disableNextBack: function() {}
         };
       });
@@ -69,15 +70,16 @@ describe('Login: ', function(){
         var login = function( obj, credentialsi, success, failed) {};
         return {
           create: create,
-          findOne: function (query, cb) {
-            cb('error');
+          findOne: function (query, succ, fail) {
+            succ({
+              emailVerified: true
+            });
           },
           count: count,
           login: login
         };
       });
     });
-
   });
 
   // Inject the controller and initialize any dependencies we need
@@ -165,7 +167,6 @@ describe('Login: ', function(){
     });
 
     it('should reject the signup because the username or email is taken', function() {
-
       sinon.stub(journalist, 'count', function(obj, succ, fail) {
         succ({
           count: 1 
@@ -175,15 +176,7 @@ describe('Login: ', function(){
       scope.signup();
 
       expect(journalist.count.calledOnce).to.be.true;
-
-      expect(scope.credUsed).to.be.true;
-
-      scope.newUser.username = ''
-      scope.$digest();
-
-      expect(scope.credUsed).to.be.false;
     });
-
   });
 
   describe('login', function() {
@@ -228,20 +221,8 @@ describe('Login: ', function(){
     });
 
     it('should call success callback', function() {
-
         var set = sinon.stub(user, 'set');
-        var disable = sinon.stub(navigate, 'disableNextBack');
-        var go = sinon.stub(state, 'go');
-        /*
-        var write = sinon.stub(storage, 'secureWrite');
-        var getDev = sinon.stub(platform, 'getDevice', function() {
-            var device = {
-              type: 'iOS',
-              token: '' 
-            };
-            return device;
-        });
-       */
+        var go = sinon.stub(navigate, 'goOrGoBack');
 
         var login = sinon.stub(journalist, 'login', function(obj, cred, success, fail) {
           success(scope.cred);
@@ -250,12 +231,7 @@ describe('Login: ', function(){
         scope.login();
 
         expect(set.calledOnce).to.be.true;
-        expect(disable.calledOnce).to.be.true;
         expect(go.calledOnce).to.be.true;
-        /*
-        expect(getDev.calledOnce).to.be.true;
-        expect(write.calledOnce).to.be.true;
-       */
 
         expect(scope.cred.username).to.equal('');
         expect(scope.cred.email).to.equal('');
