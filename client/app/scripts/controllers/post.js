@@ -40,6 +40,27 @@ app.controller('PostCtrl', [
 
     User.registerObserver(updateUser);
 
+    $scope.$watch('newArticle.title', function (newTitle, oldTitle) {
+      if(newTitle !== oldTitle) {
+        if(newTitle && newTitle.length > 0) {
+          var title = Case.title(newTitle);
+
+          // Capitalize the first character of the first word
+          title = title.charAt(0).toUpperCase() + title.substr(1);
+
+          // Capitalize the first character of the last word
+          var lastSpaceIdx = title.lastIndexOf(' ');
+          if(lastSpaceIdx > -1) {
+            var lastWord = title.substr(lastSpaceIdx + 1);
+            if(lastWord.length > 0) {
+              title = title.slice(0, lastSpaceIdx + 1) + lastWord.charAt(0).toUpperCase() + lastWord.substr(1); 
+            }
+          }
+          $scope.newArticle.title = title;
+        }
+      }
+    });
+
     $scope.place = {
       getMap: Maps.getPostMap,
       ignore: ['country', 'administrative_area_level_1'],
