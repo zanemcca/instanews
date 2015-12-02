@@ -1,4 +1,3 @@
-
 'use strict';
 var app = angular.module('instanews.controller.post', ['ionic', 'ngResource', 'uuid']);
 
@@ -43,10 +42,8 @@ app.controller('PostCtrl', [
     $scope.$watch('newArticle.title', function (newTitle, oldTitle) {
       if(newTitle !== oldTitle) {
         if(newTitle && newTitle.length > 0) {
+          // jshint undef: false
           var title = Case.title(newTitle);
-
-          // Capitalize the first character of the first word
-          title = title.charAt(0).toUpperCase() + title.substr(1);
 
           // Capitalize the first character of the last word
           var lastSpaceIdx = title.lastIndexOf(' ');
@@ -56,6 +53,7 @@ app.controller('PostCtrl', [
               title = title.slice(0, lastSpaceIdx + 1) + lastWord.charAt(0).toUpperCase() + lastWord.substr(1); 
             }
           }
+
           $scope.newArticle.title = title;
         }
       }
