@@ -117,7 +117,7 @@ app.factory('Platform', [
           sizeClass = Math.floor(pr -1);
         break;
         case 'tablet':
-          sizeClass = Math.floor(pr*3/2);
+          sizeClass = Math.ceil(pr*3/2);
         break;
         default:
           sizeClass = 0;
