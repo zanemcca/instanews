@@ -84,8 +84,12 @@ angular.module('instanews', [
 .config(function(
   $stateProvider,
   $urlRouterProvider,
-  $ionicConfigProvider
+  $ionicConfigProvider,
+  $mdGestureProvider
 ) {
+
+  // Fix ionic ng-click from firing twice when using ngMaterial
+  $mdGestureProvider.skipClickHijack();
 
   // jshint undef: false
   moment.locale('en', {
