@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <div ng-controller="uploadCtrl">
-  <div class="item card" ng-if="upload.subarticle._file" id="progressWrap">
-    <progress value="{{upload.progress.loaded}}" max="{{upload.progress.total}}"></progress>
+  <div class="item card no-padding" ng-if="upload.subarticle._file" id="progressWrap">
+    <md-progress-linear value="{{upload.progress.loaded}}" md-mode="determinate" max="{{upload.progress.total}}"></md-progress-linear>
     <inMedia media="upload.subarticle._file"></inMedia>
   </div>
   <div class="item card" ng-if="upload.subarticle.text" class="item">

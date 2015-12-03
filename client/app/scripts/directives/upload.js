@@ -3,6 +3,7 @@
 var app = angular.module('instanews.directive.upload', [
   'ionic',
   'ngResource',
+  'ngMaterial'
 ]);
 
 // Video controller
