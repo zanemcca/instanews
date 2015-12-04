@@ -141,6 +141,10 @@ app.factory('Platform', [
       return sizes[getSizeClass(max)];
     };
 
+    var isTablet = function () {
+      return 'tablet' === getDeviceType();
+    };
+
     /* Initialization */
     if(isBrowser()) {
       console.log('App is running in the browser!');
@@ -235,6 +239,7 @@ app.factory('Platform', [
       isBrowser: isBrowser,
       isCameraPresent: isCameraPresent,
       isVideoPresent: isVideoPresent,
+      isTablet: isTablet,
       getDevice: getDevice,
       setDevice: setDevice,
       setDeviceToken: setDeviceToken,

@@ -4,7 +4,9 @@
 var app = angular.module('instanews.directive.list', ['ionic']);
 
 app.directive('inList', [
+  'Platform',
   function (
+    Platform
   ) {
     return {
       restrict: 'E',
@@ -15,6 +17,8 @@ app.directive('inList', [
         isNotInfinite: '='
       },
       controller: function ($scope, _) {
+        $scope.isTablet = Platform.isTablet;
+
         $scope.safeApply  = function(fn) {
           var phase = this.$root.$$phase;
           if(phase === '$apply' || phase === '$digest') {
