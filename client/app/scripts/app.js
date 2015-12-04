@@ -40,7 +40,7 @@ angular.module('instanews', [
   'instanews.service.post',
   'instanews.service.subarticles',
   'instanews.service.textInput',
-  'instanews.service.upload',
+  'instanews.service.uploads',
   'instanews.service.user',
   'instanews.service.votes',
   'lbServices',
