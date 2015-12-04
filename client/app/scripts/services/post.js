@@ -6,20 +6,38 @@ var app = angular.module('instanews.service.post', ['ionic', 'ngResource']);
 
 app.factory('Post', [
   'Article',
+  'Camera',
   'Maps',
+  'observable',
   'Platform',
+  'Upload',
   function(
     Article,
+    Camera,
     Maps,
-    Platform
+    observable,
+    Platform,
+    Upload
   ) {
 
     var posting = false;
 
+    var uploadItems = [];
+    var uploads = observable(); 
+
+    uploads.get = function (){
+      return uploadItems;
+    };
+
+    var addUpload = function (item) {
+      uploadItems.unshift(item);
+      uploads.notifyObservers();
+    };
+
     var isValidArticle = function(article) {
       if( article.title && typeof article.title === 'string' && article.title.length > 0 &&
          article.location && article.location.lat && article.location.lng &&
-           typeof article.location.lat === 'number' && typeof article.location.lng === 'number' 
+         typeof article.location.lat === 'number' && typeof article.location.lng === 'number' 
         ) {
           return true;
         }
@@ -43,10 +61,10 @@ app.factory('Post', [
       return posting;
     };
 
-    var postSubarticles = function (uploads, parentId) {
+    var postSubarticles = function (parentId) {
       var completed = 0;
-      var total = uploads.length;
-      uploads.forEach(function (upload) {
+      var total = uploadItems.length;
+      uploadItems.forEach(function (upload) {
         var failed = false;
         upload.complete.promise.then( function () {
           var sub = upload.subarticle;
@@ -64,8 +82,10 @@ app.factory('Post', [
               var message = 'Your content has finished uploading and should be available soon';
               if(failed) {
                 message = 'Uh-Oh! Some of your content failed to upload!';
+                //TODO Allow retrying
               }
               Platform.showToast(message);
+              uploadItems = [];
             }
           }, 
           // istanbul ignore next
@@ -82,13 +102,13 @@ app.factory('Post', [
       });
     };
 
-    var post = function (uploads, article) {
+    var post = function (article) {
       posting = true;
 
       // istanbul ignore else
-      if(uploads.length) {
+      if(uploadItems.length) {
         if(typeof article === 'string') {
-          postSubarticles(uploads, article);
+          postSubarticles(article);
           // istanbul ignore else 
         } else if(isValidArticle(article)) { 
           Maps.getPlace(article.location, function (place) {
@@ -110,7 +130,7 @@ app.factory('Post', [
             Article.create(article)
             .$promise
             .then( function(res) {
-              postSubarticles(uploads, res.id);
+              postSubarticles(res.id);
             }, function (err) {
               posting = false;
               var message = 'Your article failed to upload. Please make sure you included a title and at least one piece of content.';
@@ -127,10 +147,62 @@ app.factory('Post', [
       }
     };
 
+    //Capture video using the video camera
+    var captureVideo = function() {
+      Camera.captureVideo()
+      .then( function(video) {
+        if(video) {
+          addUpload(Upload.video(video));
+        }
+      },
+      // istanbul ignore next
+      function(err) {
+        console.log(err);
+      });
+    };
+
+    //Get a photo(s) from the gallery
+    var getFromGallery = function() {
+      Camera.openMediaGallery()
+      .then( function(media) {
+        if(media) {
+          console.log(media);
+          if(media.type.indexOf('image') > -1) {
+            addUpload(Upload.picture(media));
+          } else if (media.type.indexOf('video') > -1) {
+            addUpload(Upload.video(media));
+          }
+        }
+      },
+      // istanbul ignore next
+      function(err) {
+        console.log(err);
+      });
+    };
+
+    //Capture a photo using the camera and store it into the new article
+    var capturePicture = function() {
+      Camera.capturePicture()
+      .then( function(photo) {
+        if(photo) {
+          addUpload(Upload.picture(photo));
+        }
+      }, 
+      // istanbul ignore next
+      function(err) {
+        console.log('Error: Failed to capture a new photo: ' + JSON.stringify(err));
+      });
+    };
+
     return {
       isValidArticle: isValidArticle,
       isValidSubarticle: isValidSubarticle,
       post: post,
+      captureVideo: captureVideo,
+      capturePicture: capturePicture,
+      getFromGallery: getFromGallery,
+      uploads: uploads,
       isPosting: isPosting
     };
-  }]);
+  }
+]);
