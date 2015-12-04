@@ -33,7 +33,6 @@ app.controller('PostCtrl', [
     $scope.getMarker = Maps.getMarker;
 
     $scope.Uploads = Uploads.findOrCreate();
-    $scope.uploads = $scope.Uploads.get();
 
     var updateUser = function() {
       $scope.user = User.get();
@@ -154,16 +153,8 @@ app.controller('PostCtrl', [
       $ionicHistory.goBack();
     };
 
-    //TODO On exit call uploadObserver.unregister();
-    var uploadObserver = $scope.Uploads.registerObserver(function () {
-      //TODO use safeApply
-      $scope.$apply(function () {
-        $scope.uploads = $scope.Uploads.get();
-      });
-    });
-
     $scope.post = function () {
-      if($scope.uploads.length) {
+      if($scope.Uploads.get().length) {
           var marker = Maps.getMarker();
           if(marker && $scope.newArticle.title) {
             var position = {
