@@ -3,20 +3,24 @@
 var app = angular.module('instanews.controller.article', ['ionic', 'ngResource']);
 
 app.controller('ArticleCtrl', [
+  '$ionicModal',
   '$scope',
   '$stateParams',
   'Article',
   'Articles',
   'Subarticles',
   'Maps',
+  'Post',
   'Uploads',
   function(
+    $ionicModal,
     $scope,
     $stateParams,
     Article,
     Articles,
     Subarticles,
     Maps,
+    Post,
     Uploads
   ) {
 
@@ -36,6 +40,7 @@ app.controller('ArticleCtrl', [
     };
 
     var marker;
+    var uploadObserver;
 
     //Refresh the map everytime we enter the view
     $scope.$on('$ionicView.afterEnter', function() {
@@ -44,10 +49,18 @@ app.controller('ArticleCtrl', [
       if(map) {
         marker = Maps.setMarker(map,$scope.article.location);
       }
+
+      uploadObserver = $scope.Uploads.registerObserver(function () {
+        var uploads = $scope.Uploads.get();
+        if(uploads.length > 0) {
+          $scope.uploadModal.show();
+        }
+      });
     });
 
     $scope.$on('$ionicView.afterLeave', function() {
       marker = Maps.deleteMarker(marker);
+      uploadObserver.unregister();
     });
 
     /*
@@ -60,5 +73,23 @@ app.controller('ArticleCtrl', [
        };
        */
 
-  }]);
+   $ionicModal.fromTemplateUrl('templates/modals/upload.html', {
+      scope: $scope,
+      animation: 'slide-in-up'
+   }).then( function (modal) {
+      $scope.uploadModal = modal;
+      $scope.post = function (){
+        Post.post($scope.Uploads, $stateParams.id);
+        modal.hide();
+      };
+
+      //TODO Add a delete function to each upload instance and deal with deletion
+      //from the upload directive instead of here
+      $scope.clear = function () {
+        $scope.Uploads.clear();
+        modal.hide();
+      };
+   });
+  }
+]);
 

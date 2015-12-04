@@ -1,9 +1,8 @@
 
 'use strict';
-var app = angular.module('instanews.service.observable', ['ionic', 'ngCordova']);
+var app = angular.module('instanews.service.observable', []);
 
-
-function ObservableFactory(Platform) {
+function ObservableFactory() {
   var observerable = function (spec) {
     var that;
     spec = spec || {};
@@ -26,7 +25,7 @@ function ObservableFactory(Platform) {
       that = {
         id: id,
         cb: cb,
-        unregsiter: unregister
+        unregister: unregister
       };
 
       spec.observerCallbacks.push(that);
@@ -61,6 +60,5 @@ function ObservableFactory(Platform) {
 }
 
 app.factory('observable', [
-  'Platform',
   ObservableFactory
 ]);

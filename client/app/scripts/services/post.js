@@ -95,7 +95,7 @@ app.factory('Post', [
       // istanbul ignore else
       if(uploads.length) {
         if(typeof article === 'string') {
-          postSubarticles(article);
+          postSubarticles(uploads, article);
           // istanbul ignore else 
         } else if(isValidArticle(article)) { 
           Maps.getPlace(article.location, function (place) {
@@ -117,7 +117,7 @@ app.factory('Post', [
             Article.create(article)
             .$promise
             .then( function(res) {
-              postSubarticles(res.id);
+              postSubarticles(uploads, res.id);
             }, function (err) {
               posting = false;
               var message = 'Your article failed to upload. Please make sure you included a title and at least one piece of content.';

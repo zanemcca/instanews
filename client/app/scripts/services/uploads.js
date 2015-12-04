@@ -62,25 +62,25 @@ app.service('Uploads', [
         uploads.notifyObservers();
       };
 
-      function video(video) {
-        console.log(video);
+      function video(vid) {
+        console.log(vid);
 
         var subarticle = {
           _file: {
-            name: video.name,
-            sources: [video.nativeURL],
+            name: vid.name,
+            sources: [vid.nativeURL],
             container: 'instanews-videos-in',
-            size: video.size,
-            type: video.type
+            size: vid.size,
+            type: vid.type
           }
         };
 
         var upload = {
           container: 'instanews-videos-in',
-          uri: video.nativeURL,
+          uri: vid.nativeURL,
           options: {
-            fileName: video.name,
-            mimeType: video.type,
+            fileName: vid.name,
+            mimeType: vid.type,
             headers: { 'Authorization': User.getToken()}
           },
           subarticle: subarticle
@@ -89,28 +89,28 @@ app.service('Uploads', [
         upload.complete = $q.defer();
 
         return upload;
-      };
+      }
 
-      function picture(picture) {
-        console.log(picture);
+      function picture(photo) {
+        console.log(photo);
 
         var subarticle = {
           _file: {
-            name: picture.name,
-            source: picture.nativeURL,
+            name: photo.name,
+            source: photo.nativeURL,
             container: 'instanews-photos-in',
-            size: picture.size,
-            caption: picture.caption,
-            type: picture.type
+            size: photo.size,
+            caption: photo.caption,
+            type: photo.type
           }
         };
 
         var upload = {
           container: 'instanews-photos-in',
-          uri: picture.nativeURL,
+          uri: photo.nativeURL,
           options: {
-            fileName: picture.name,
-            mimeType: picture.type,
+            fileName: photo.name,
+            mimeType: photo.type,
             headers: { 'Authorization': User.getToken()}
           },
           subarticle: subarticle
@@ -119,11 +119,11 @@ app.service('Uploads', [
         upload.complete = $q.defer();
 
         return upload;
-      };
+      }
 
-      function text(text) {
+      function text(content) {
         var subarticle = {
-          text: text
+          text: content
         };
 
         var upload = {
@@ -133,7 +133,7 @@ app.service('Uploads', [
         };
 
         return upload;
-      };
+      }
 
       // Public functions
       uploads.get = function (){
@@ -187,6 +187,16 @@ app.service('Uploads', [
         });
       };
 
+      uploads.clear = function () {
+        //TODO Do a proper cleanup of uploads. aka - actually cancel the upload
+        uploadItems = [];
+        uploads.notifyObservers();
+      };
+
+      uploads.getText = function () {
+        //TODO Link to textinput footer
+        addUpload(text('Hello'));
+      };
 
       return uploads;
     };
