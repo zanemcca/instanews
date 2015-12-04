@@ -58,13 +58,17 @@ app.service('Uploads', [
       var uploads = observable(spec); 
 
       var addUpload = function (item) {
+        item.remove = function () {
+          var removed = uploadItems.splice(uploadItems.indexOf(item), 1);
+          uploads.notifyObservers();
+          return removed;
+        };
+
         uploadItems.unshift(item);
         uploads.notifyObservers();
       };
 
       function video(vid) {
-        console.log(vid);
-
         var subarticle = {
           _file: {
             name: vid.name,
@@ -92,8 +96,6 @@ app.service('Uploads', [
       }
 
       function picture(photo) {
-        console.log(photo);
-
         var subarticle = {
           _file: {
             name: photo.name,
@@ -159,7 +161,6 @@ app.service('Uploads', [
         Camera.openMediaGallery()
         .then( function(media) {
           if(media) {
-            console.log(media);
             if(media.type.indexOf('image') > -1) {
               addUpload(picture(media));
             } else if (media.type.indexOf('video') > -1) {
