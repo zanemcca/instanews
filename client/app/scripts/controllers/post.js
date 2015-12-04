@@ -13,7 +13,6 @@ app.controller('PostCtrl', [
   'Maps',
   'User',
   'Uploads',
-  'Camera',
   function(
     $stateParams,
     $scope,
@@ -25,8 +24,7 @@ app.controller('PostCtrl', [
     Platform,
     Maps,
     User,
-    Uploads,
-    Camera
+    Uploads
   ) {
 
     $scope.user = User.get();
