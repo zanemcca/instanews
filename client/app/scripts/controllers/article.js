@@ -9,16 +9,19 @@ app.controller('ArticleCtrl', [
   'Articles',
   'Subarticles',
   'Maps',
+  'Uploads',
   function(
     $scope,
     $stateParams,
     Article,
     Articles,
     Subarticles,
-    Maps
+    Maps,
+    Uploads
   ) {
 
     $scope.Subarticles = Subarticles.findOrCreate($stateParams.id);
+    $scope.Uploads = Uploads.findOrCreate($stateParams.id);
 
     var spec = $scope.Subarticles.getSpec();
     spec.options.filter.limit = 5;

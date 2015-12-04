@@ -10,29 +10,15 @@ app.factory('Post', [
   'Maps',
   'observable',
   'Platform',
-  'Upload',
   function(
     Article,
     Camera,
     Maps,
     observable,
-    Platform,
-    Upload
+    Platform
   ) {
 
     var posting = false;
-
-    var uploadItems = [];
-    var uploads = observable(); 
-
-    uploads.get = function (){
-      return uploadItems;
-    };
-
-    var addUpload = function (item) {
-      uploadItems.unshift(item);
-      uploads.notifyObservers();
-    };
 
     var isValidArticle = function(article) {
       if( article.title && typeof article.title === 'string' && article.title.length > 0 &&
@@ -61,10 +47,10 @@ app.factory('Post', [
       return posting;
     };
 
-    var postSubarticles = function (parentId) {
+    var postSubarticles = function (uploads, parentId) {
       var completed = 0;
-      var total = uploadItems.length;
-      uploadItems.forEach(function (upload) {
+      var total = uploads.length;
+      uploads.forEach(function (upload) {
         var failed = false;
         upload.complete.promise.then( function () {
           var sub = upload.subarticle;
@@ -85,7 +71,7 @@ app.factory('Post', [
                 //TODO Allow retrying
               }
               Platform.showToast(message);
-              uploadItems = [];
+              uploads = [];
             }
           }, 
           // istanbul ignore next
@@ -102,11 +88,12 @@ app.factory('Post', [
       });
     };
 
-    var post = function (article) {
+    var post = function (Uploads, article) {
+      var uploads = Uploads.get();
       posting = true;
 
       // istanbul ignore else
-      if(uploadItems.length) {
+      if(uploads.length) {
         if(typeof article === 'string') {
           postSubarticles(article);
           // istanbul ignore else 
@@ -147,61 +134,10 @@ app.factory('Post', [
       }
     };
 
-    //Capture video using the video camera
-    var captureVideo = function() {
-      Camera.captureVideo()
-      .then( function(video) {
-        if(video) {
-          addUpload(Upload.video(video));
-        }
-      },
-      // istanbul ignore next
-      function(err) {
-        console.log(err);
-      });
-    };
-
-    //Get a photo(s) from the gallery
-    var getFromGallery = function() {
-      Camera.openMediaGallery()
-      .then( function(media) {
-        if(media) {
-          console.log(media);
-          if(media.type.indexOf('image') > -1) {
-            addUpload(Upload.picture(media));
-          } else if (media.type.indexOf('video') > -1) {
-            addUpload(Upload.video(media));
-          }
-        }
-      },
-      // istanbul ignore next
-      function(err) {
-        console.log(err);
-      });
-    };
-
-    //Capture a photo using the camera and store it into the new article
-    var capturePicture = function() {
-      Camera.capturePicture()
-      .then( function(photo) {
-        if(photo) {
-          addUpload(Upload.picture(photo));
-        }
-      }, 
-      // istanbul ignore next
-      function(err) {
-        console.log('Error: Failed to capture a new photo: ' + JSON.stringify(err));
-      });
-    };
-
     return {
       isValidArticle: isValidArticle,
       isValidSubarticle: isValidSubarticle,
       post: post,
-      captureVideo: captureVideo,
-      capturePicture: capturePicture,
-      getFromGallery: getFromGallery,
-      uploads: uploads,
       isPosting: isPosting
     };
   }

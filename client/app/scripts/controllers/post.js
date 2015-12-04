@@ -12,7 +12,7 @@ app.controller('PostCtrl', [
   'Platform',
   'Maps',
   'User',
-  'Upload',
+  'Uploads',
   'Camera',
   function(
     $stateParams,
@@ -25,13 +25,15 @@ app.controller('PostCtrl', [
     Platform,
     Maps,
     User,
-    Upload,
+    Uploads,
     Camera
   ) {
 
     $scope.user = User.get();
     $scope.getMarker = Maps.getMarker;
-    $scope.uploads = [];
+
+    $scope.Uploads = Uploads.findOrCreate();
+    $scope.uploads = $scope.Uploads.get();
 
     var updateUser = function() {
       $scope.user = User.get();
@@ -75,16 +77,15 @@ app.controller('PostCtrl', [
 
     //If we have an ID given then we know we are posting subarticles within an article
     // istanbul ignore else 
-    if( !$stateParams.id ) {
-      $scope.newArticle = {
-        title: ''
-      };
-      //Refresh the map everytime we enter the view
-      $scope.$on('$ionicView.afterEnter', function() {
-        console.log('Post after enter');
-        $scope.place.localize();
-      });
-    }
+    $scope.newArticle = {
+      title: ''
+    };
+
+    //Refresh the map everytime we enter the view
+    $scope.$on('$ionicView.afterEnter', function() {
+      console.log('Post after enter');
+      $scope.place.localize();
+    });
 
     $scope.map = {
       id: 'postMap'
@@ -127,6 +128,7 @@ app.controller('PostCtrl', [
      });
 
      //TODO Either use this everytime or not at all
+     //TODO DEPRICATE this. Use an always save policy
     $scope.goBack = function() {
       Platform.showSheet({
         destructiveText: 'Delete',
@@ -138,7 +140,7 @@ app.controller('PostCtrl', [
         },
         destructiveButtonClicked: function() {
           console.log('post goback button was clicked');
-          Upload.destroy($scope.uploads);
+          //$scope.Upload.destroy(Uploads);
           $ionicHistory.goBack();
         }
       });
@@ -153,8 +155,11 @@ app.controller('PostCtrl', [
     };
 
     //TODO On exit call uploadObserver.unregister();
-    var uploadObserver = Post.uploads.registerObserver(function () {
-      $scope.uploads = Post.uploads.get();
+    var uploadObserver = $scope.Uploads.registerObserver(function () {
+      //TODO use safeApply
+      $scope.$apply(function () {
+        $scope.uploads = $scope.Uploads.get();
+      });
     });
 
     $scope.post = function () {
@@ -172,7 +177,7 @@ app.controller('PostCtrl', [
               title: $scope.newArticle.title
             };
 
-            Post.post(article);
+            Post.post($scope.Uploads, article);
             exit();
           }
           else {
@@ -205,7 +210,7 @@ app.controller('PostCtrl', [
 
     //Move the text out of the form so that it is ready to be submitted
     $scope.saveText = function() {
-      $scope.uploads.unshift(Upload.text($scope.data.text));
+      $scope.uploads.unshift($scope.Upload.text($scope.data.text));
       $scope.trashText();
     };
 
@@ -214,7 +219,7 @@ app.controller('PostCtrl', [
       Camera.captureVideo()
       .then( function(video) {
         if(video) {
-          $scope.uploads.unshift(Upload.video(video));
+          $scope.uploads.unshift($scope.Upload.video(video));
         }
       },
       // istanbul ignore next
@@ -230,9 +235,9 @@ app.controller('PostCtrl', [
         if(media) {
           console.log(media);
           if(media.type.indexOf('image') > -1) {
-            $scope.uploads.unshift(Upload.picture(media));
+            $scope.uploads.unshift($scope.Upload.picture(media));
           } else if (media.type.indexOf('video') > -1) {
-            $scope.uploads.unshift(Upload.video(media));
+            $scope.uploads.unshift($scope.Upload.video(media));
           }
         }
       },
@@ -247,7 +252,7 @@ app.controller('PostCtrl', [
       Camera.capturePicture()
       .then( function(photo) {
         if(photo) {
-          $scope.uploads.unshift(Upload.picture(photo));
+          $scope.uploads.unshift($scope.Upload.picture(photo));
         }
       }, 
       // istanbul ignore next
@@ -256,4 +261,5 @@ app.controller('PostCtrl', [
       });
     };
     */
-  }]);
+  }
+]);
