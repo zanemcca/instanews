@@ -1,0 +1,63 @@
+
+<!-- Bottom-right -->
+<md-fab-speed-dial 
+  md-open="fab.isOpen" md-direction="up"
+  ng-if="position === 'bottom-right'"
+  class="md-fab-bottom-right md-fling">
+  <md-fab-trigger>
+    <md-button aria-label="menu"
+      style="font-size: x-large"
+      class="no-margin md-fab md-dark icon ion-plus-round">
+    </md-button>
+  </md-fab-trigger>
+  <md-fab-actions>
+    <md-button aria-label="photo" ng-click="Post.capturePicture()"
+      style="font-size: x-large; color: white;"
+      class="md-fab md-mini md-positive md-raised icon ion-camera">
+    </md-button>
+    <md-button aria-label="video" ng-click="Post.captureVideo()"
+      style="font-size: x-large; color: white;"
+      class="md-fab md-mini md-positive md-raised icon ion-videocamera">
+    </md-button>
+    <md-button aria-label="gallery" ng-click="Post.getFromGallery()"
+      style="font-size: x-large; color: white;"
+      class="md-fab md-mini md-positive md-raised icon ion-image">
+    </md-button>
+    <md-button aria-label="compose" ng-click="postTextModal.show()"
+      style="font-size: x-large; color: white;"
+      class="md-fab md-mini md-positive md-raised icon ion-compose">
+    </md-button>
+  </md-fab-actions>
+</md-fab-speed-dial>
+
+<!-- Top-right -->
+<md-fab-speed-dial
+  md-open="fab.isOpen" md-direction="down"
+  ng-if="position === 'top-right'"
+  class="md-fab-top-right md-fling"
+  style="width:35px;top:0;right:0;">
+  <md-fab-trigger>
+    <md-button aria-label="menu"
+      style="font-size: x-large"
+      class="button button-clear icon ion-plus-round">
+    </md-button>
+  </md-fab-trigger>
+  <md-fab-actions>
+    <md-button aria-label="compose" ng-click="postTextModal.show()"
+      style="font-size: x-large; color: white;"
+      class="md-fab md-mini md-positive md-raised icon ion-compose">
+    </md-button>
+    <md-button aria-label="gallery" ng-click="Post.getFromGallery()"
+      style="font-size: x-large; color: white;"
+      class="md-fab md-mini md-positive md-raised icon ion-image">
+    </md-button>
+    <md-button aria-label="video" ng-click="Post.captureVideo()"
+      style="font-size: x-large; color: white;"
+      class="md-fab md-mini md-positive md-raised icon ion-videocamera">
+    </md-button>
+    <md-button aria-label="photo" ng-click="Post.capturePicture()"
+      style="font-size: x-large; color: white;"
+      class="md-fab md-mini md-positive md-raised icon ion-camera">
+    </md-button>
+  </md-fab-actions>
+</md-fab-speed-dial>

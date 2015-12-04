@@ -126,10 +126,7 @@ app.controller('PostCtrl', [
        }
      });
 
-    $scope.data = {
-      text: '',
-    };
-
+     //TODO Either use this everytime or not at all
     $scope.goBack = function() {
       Platform.showSheet({
         destructiveText: 'Delete',
@@ -155,9 +152,13 @@ app.controller('PostCtrl', [
       $ionicHistory.goBack();
     };
 
+    //TODO On exit call uploadObserver.unregister();
+    var uploadObserver = Post.uploads.registerObserver(function () {
+      $scope.uploads = Post.uploads.get();
+    });
+
     $scope.post = function () {
       if($scope.uploads.length) {
-        if(!$stateParams.id) {
           var marker = Maps.getMarker();
           if(marker && $scope.newArticle.title) {
             var position = {
@@ -171,23 +172,22 @@ app.controller('PostCtrl', [
               title: $scope.newArticle.title
             };
 
-            Post.post($scope.uploads, article);
+            Post.post(article);
             exit();
           }
           else {
             console.log('Error: Cannot post article without both position and title');
           }
-
-        } else {
-          Post.post($scope.uploads, $stateParams.id);
-          exit();
-        }
       } else {
         console.log('Cannot post without subarticles');
       }
     };
 
     /* Text Posting */
+    /*
+    $scope.data = {
+      text: '',
+    };
 
     //Modal for posting text
     $ionicModal.fromTemplateUrl('templates/postTextModal.html', {
@@ -205,17 +205,16 @@ app.controller('PostCtrl', [
 
     //Move the text out of the form so that it is ready to be submitted
     $scope.saveText = function() {
-      $scope.uploads.push(Upload.text($scope.data.text));
+      $scope.uploads.unshift(Upload.text($scope.data.text));
       $scope.trashText();
     };
 
-    /* Video posting */
     //Capture video using the video camera
     $scope.captureVideo = function() {
       Camera.captureVideo()
       .then( function(video) {
         if(video) {
-          $scope.uploads.push(Upload.video(video));
+          $scope.uploads.unshift(Upload.video(video));
         }
       },
       // istanbul ignore next
@@ -224,8 +223,6 @@ app.controller('PostCtrl', [
       });
     };
 
-    /* Photo posting */
-
     //Get a photo(s) from the gallery
     $scope.openMediaGallery = function() {
       Camera.openMediaGallery()
@@ -233,9 +230,9 @@ app.controller('PostCtrl', [
         if(media) {
           console.log(media);
           if(media.type.indexOf('image') > -1) {
-            $scope.uploads.push(Upload.picture(media));
+            $scope.uploads.unshift(Upload.picture(media));
           } else if (media.type.indexOf('video') > -1) {
-            $scope.uploads.push(Upload.video(media));
+            $scope.uploads.unshift(Upload.video(media));
           }
         }
       },
@@ -250,7 +247,7 @@ app.controller('PostCtrl', [
       Camera.capturePicture()
       .then( function(photo) {
         if(photo) {
-          $scope.uploads.push(Upload.picture(photo));
+          $scope.uploads.unshift(Upload.picture(photo));
         }
       }, 
       // istanbul ignore next
@@ -258,4 +255,5 @@ app.controller('PostCtrl', [
         console.log('Error: Failed to capture a new photo: ' + JSON.stringify(err));
       });
     };
+    */
   }]);

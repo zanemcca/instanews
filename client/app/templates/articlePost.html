@@ -1,10 +1,13 @@
 <!DOCTYPE html>
-<ion-view view-title="{{newArticle.title}}">
+<ion-view view-title="{{newArticle.title}}"
+  style="background-color: #F0F0F0">
   <!--ion-nav-back-button class="button-clear" ng-click="goBack()"></button>
   </ion-nav-back-button-->
   <ion-nav-buttons side="secondary">
-      <button class="button button-clear icon ion-forward" ng-click="post()"
-         ng-disabled="!newArticle.title || !getMarker() || !uploads.length"></button>
+      <button class="button button-clear" ng-click="post()"
+        ng-disabled="!newArticle.title || !getMarker() || !uploads.length">
+        POST
+      </button>
   </ion-nav-buttons>
   <ion-content>
       <inAutocomplete place="place"></inAutocomplete>
@@ -20,33 +23,5 @@
          </div>
       </div>
   </ion-content>
-  <div class="row">
-    <md-fab-speed-dial style="position:absolute;right:0;bottom:0;"
-    md-open="fab.isOpen" md-direction="up" class="md-fling">
-      <md-fab-trigger>
-        <md-button aria-label="menu"
-          style="font-size: x-large"
-          class="md-fab md-dark icon ion-plus-round">
-        </md-button>
-      </md-fab-trigger>
-      <md-fab-actions>
-        <md-button aria-label="photo" ng-click="capturePicture()"
-          style="font-size: x-large; color: white;"
-          class="md-fab md-mini md-positive md-raised icon ion-camera">
-        </md-button>
-        <md-button aria-label="video" ng-click="captureVideo()"
-          style="font-size: x-large; color: white;"
-          class="md-fab md-mini md-positive md-raised icon ion-videocamera">
-        </md-button>
-        <md-button aria-label="gallery" ng-click="openMediaGallery()"
-          style="font-size: x-large; color: white;"
-          class="md-fab md-mini md-positive md-raised icon ion-image">
-        </md-button>
-        <md-button aria-label="compose" ng-click="postTextModal.show()"
-          style="font-size: x-large; color: white;"
-          class="md-fab md-mini md-positive md-raised icon ion-compose">
-        </md-button>
-      </md-fab-actions>
-   </md-fab-speed-dial>
-  </div>
+  <in-speed-dial position="'bottom-right'"></in-speed-dial>
 </ion-view>
