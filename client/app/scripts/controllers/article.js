@@ -11,6 +11,7 @@ app.controller('ArticleCtrl', [
   'Subarticles',
   'Maps',
   'Post',
+  'Platform',
   'Uploads',
   function(
     $ionicModal,
@@ -21,9 +22,11 @@ app.controller('ArticleCtrl', [
     Subarticles,
     Maps,
     Post,
+    Platform,
     Uploads
   ) {
 
+    $scope.Platform = Platform;
     $scope.Subarticles = Subarticles.findOrCreate($stateParams.id);
     $scope.Uploads = Uploads.findOrCreate($stateParams.id);
 

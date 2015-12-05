@@ -1,17 +1,15 @@
 <!DOCTYPE html>
 <ion-modal-view>
    <ion-header-bar class="bar-dark">
-     <div class="buttons">
-      <button class="button button-clear icon ion-close-round"
-         ng-click="clear()">
-      </button>
-     </div>
+     <button class="button buttons back-button button-clear"
+      ng-click="uploadModal.hide()">
+      <i class="icon"
+        ng-class="Platform.isIOS() ? 'ion-ios-arrow-back' : 'ion-android-arrow-back'"></i>
+     </button>
      <h1 class="title">{{article.title}}</h1>
-     <div class="buttons">
-      <button class="button button-clear" ng-click="post()">
+     <button class="button buttons button-clear" ng-click="post()">
        ADD 
-      </button>
-    </div>
+     </button>
    </ion-header-bar>
    <ion-content>
       <div class="list">
@@ -21,3 +19,4 @@
       </div>
    </ion-content>
 </ion-modal-view>
+
