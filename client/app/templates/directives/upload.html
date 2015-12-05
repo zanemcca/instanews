@@ -9,7 +9,14 @@
         </button>
       </div>
     </div>
-    <md-progress-linear value="{{upload.progress.loaded}}" md-mode="determinate" max="{{upload.progress.total}}"></md-progress-linear>
+    <md-progress-linear value="{{upload.progress.loaded}}"
+      ng-show="!upload.isPosting"
+      md-mode="determinate">
+    </md-progress-linear>
+    <md-progress-linear
+      ng-show="upload.isPosting"
+      md-mode="query">
+    </md-progress-linear>
     <inMedia media="upload.subarticle._file"></inMedia>
   </div>
   <div class="item card" ng-if="upload.subarticle.text" class="item">
@@ -17,5 +24,9 @@
       ng-click="upload.remove()">
     </button>
     <p>{{upload.subarticle.text}}</p>
+    <md-progress-linear
+      ng-show="upload.isPosting"
+      md-mode="query">
+    </md-progress-linear>
   </div>
 </div>
