@@ -19,6 +19,7 @@ app.service('Uploads', [
    User
   ){
     var articles = [];
+    var pending = [];
 
     var findOrCreate = function (parentId) {
       parentId = parentId || 'newArticle';
@@ -49,6 +50,44 @@ app.service('Uploads', [
       }
 
       return parent.uploads;
+    };
+
+    var moveToPending = function (parentId, newId) {
+      parentId = parentId || 'newArticle';
+      newId = newId || parentId;
+
+      var i = 0;
+      var pend;
+      for(; i < articles.length; i++) {
+        var article = articles[i];
+        if(article.spec.options.id === parentId) {
+          console.log('Found cached copy of uploads');
+          pend = article;
+          break;
+        }
+      }
+
+      if(!pend) {
+        console.log('Error: There are no uploads for ' + parentId);
+        return;
+      }
+
+      pend = articles.splice(i,1)[0];
+      pend.spec.options.id = newId;
+
+      pending.push(pend);
+      return pend;
+    };
+
+    var getPending = function () {
+      var i = pending.length;
+      while(i > 0) {
+        i--;
+        if(!pending[i].uploads.get().length) {
+          pending.splice(i,1);
+        }
+      }
+      return pending;
     };
 
     var uploadList = function (spec) {
@@ -229,6 +268,8 @@ app.service('Uploads', [
     };
 
     return {
+      moveToPending: moveToPending,
+      getPending: getPending,
       findOrCreate: findOrCreate 
     };
   }

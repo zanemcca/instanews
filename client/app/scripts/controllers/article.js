@@ -82,8 +82,11 @@ app.controller('ArticleCtrl', [
    }).then( function (modal) {
       $scope.uploadModal = modal;
       $scope.post = function (){
-        Post.post($scope.Uploads, $stateParams.id);
-        modal.hide();
+        Post.post($scope.Uploads, $stateParams.id, function (err) {
+          if(!err) {
+            modal.hide();
+          }
+        });
       };
 
       //TODO Add a delete function to each upload instance and deal with deletion

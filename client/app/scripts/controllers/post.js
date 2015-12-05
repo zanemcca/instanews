@@ -166,8 +166,11 @@ app.controller('PostCtrl', [
               title: $scope.newArticle.title
             };
 
-            Post.post($scope.Uploads, article);
-            exit();
+            Post.post($scope.Uploads, article, function (err) {
+              if(!err) {
+                exit();
+              }
+            });
           }
           else {
             console.log('Error: Cannot post article without both position and title');

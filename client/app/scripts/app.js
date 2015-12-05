@@ -64,11 +64,17 @@ angular.module('instanews', [
 )
 
 .controller('AppCtrl', [
+  '$ionicModal',
   '$scope',
+  'Platform',
   'User',
+  'Uploads',
   function (
+    $ionicModal,
     $scope,
-    User
+    Platform,
+    User,
+    Uploads
   ) {
     //Update user function
     var updateUser = function() {
@@ -80,6 +86,18 @@ angular.module('instanews', [
 
     $scope.login = User.login;
     $scope.logout = User.logout;
+
+    $scope.pending = [];
+
+    $scope.Uploads = Uploads;
+    $scope.Platform = Platform;
+
+     $ionicModal.fromTemplateUrl('templates/modals/pending.html', {
+        scope: $scope,
+        animation: 'slide-in-up'
+     }).then( function (modal) {
+        $scope.pendingModal = modal;
+     });
   }
 ])
 
@@ -189,7 +207,7 @@ angular.module('instanews', [
   })
 
   .state('articlePost', {
-//    cache: false,
+    cache: false,
     url: '/post/article',
     templateUrl: 'templates/articlePost.html',
     controller: 'PostCtrl'

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<div class="item card no-padding" ng-if="upload.subarticle._file" id="progressWrap">
+<div class="item card no-padding" ng-if="upload.subarticle._file">
   <div class="item item-divider no-padding">
     <div class="buttons">
       <button class="button button-small button-clear icon ion-close-round"
@@ -8,13 +8,16 @@
       </button>
     </div>
   </div>
-  <md-progress-linear value="{{upload.loaded}}"
-    md-mode="determinate">
-  </md-progress-linear>
-  <md-progress-linear
-    ng-if="upload.isPosting && upload.loaded >= 100"
-    md-mode="query">
-  </md-progress-linear>
+  <div ng-if="!upload.isPosting">
+    <md-progress-linear value="{{upload.loaded}}"
+      md-mode="determinate">
+    </md-progress-linear>
+  </div>
+  <div ng-if="upload.isPosting">
+    <md-progress-linear
+      md-mode="query">
+    </md-progress-linear>
+  </div>
   <inMedia media="upload.subarticle._file"></inMedia>
 </div>
 <div class="item card" ng-if="upload.subarticle.text">

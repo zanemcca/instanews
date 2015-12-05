@@ -10,12 +10,14 @@ app.factory('Post', [
   'Maps',
   'observable',
   'Platform',
+  'Uploads',
   function(
     Article,
     Camera,
     Maps,
     observable,
-    Platform
+    Platform,
+    Uploads
   ) {
 
     var posting = false;
@@ -49,53 +51,64 @@ app.factory('Post', [
 
     var postSubarticles = function (uploads, parentId) {
       var completed = 0;
+      var failed = 0;
       var total = uploads.length;
+
+      var done = function () {
+        completed++;
+        if(completed === total) {
+          posting = false;
+          var message = 'Your content has finished uploading and should be available soon';
+          if(failed) {
+            message = 'Uh-Oh! Some of your content failed to upload!';
+          }
+          Platform.showToast(message);
+        }
+      };
+
       uploads.slice().forEach(function (upload) {
         var failed = false;
+        upload.isPosting = true;
         upload.complete.promise.then( function () {
           var sub = upload.subarticle;
           sub.parentId = parentId;
           sub.id = parentId;
 
-          upload.isPosting = true;
 
           Article.subarticles.create(sub)
           .$promise
           .then(function () {
             upload.remove();
             upload.isPosting = false;
-            completed++;
-            if(completed === total) {
-              posting = false;
-              var message = 'Your content has finished uploading and should be available soon';
-              if(failed) {
-                message = 'Uh-Oh! Some of your content failed to upload!';
-              }
-              Platform.showToast(message);
-            }
+            done();
           }, 
           // istanbul ignore next
           function(err) {
-            failed = true;
+            failed++;
             console.log('Failed to upload subarticle');
             console.log(err);
+            done();
           });
         }, 
         // istanbul ignore next
         function (err) {
+          failed++;
           console.log(err);
+          done();
         });
       });
     };
 
-    var post = function (Uploads, article) {
-      var uploads = Uploads.get();
+    var post = function (uploads, article, cb) {
+      uploads = uploads.get();
       posting = true;
 
       // istanbul ignore else
       if(uploads.length) {
         if(typeof article === 'string') {
+          Uploads.moveToPending(article);
           postSubarticles(uploads, article);
+          cb();
           // istanbul ignore else 
         } else if(isValidArticle(article)) { 
           Maps.getPlace(article.location, function (place) {
@@ -117,20 +130,27 @@ app.factory('Post', [
             Article.create(article)
             .$promise
             .then( function(res) {
+              Uploads.moveToPending('newArticle',res.id);
               postSubarticles(uploads, res.id);
+              cb();
             }, function (err) {
               posting = false;
               var message = 'Your article failed to upload. Please make sure you included a title and at least one piece of content.';
               Platform.showToast(message);
               console.log('Failed to create article');
               console.log(err);
+              cb(err);
             });
           });
         } else {
-          console.log('Cannot post malformed article');
+          var err = new Error('Cannot post malformed article');
+          console.log(err);
+          cb(err);
         }
       } else {
-        console.log('Cannot post anything without subarticles');
+        var e = new Error('Cannot post anything without subarticles');
+        console.log(e);
+        cb(e);
       }
     };
 
