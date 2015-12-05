@@ -177,7 +177,6 @@ exports.run = function () {
 
         describe('video', function () {
           it('should get the video transcoder paramaters', function (done) {
-
             createJob = function (params, cb) {
               expect(params).to.exist;
               expect(params.PipelineId).to.exist;
@@ -187,6 +186,21 @@ exports.run = function () {
             run();
           }); 
 
+          it('should not combine the names of consecutive video posts', function (done) {
+            var callCount = 0;
+            createJob = function (params, cb) {
+              callCount++;
+              if(callCount === 1) {
+                expect(params.Outputs[0].Key).to.equal('video-2M');
+              } else {
+                expect(params.Outputs[0].Key).to.equal('secondVideo-2M');
+                done();
+              }
+            };
+
+            run();
+            Storage.triggerTranscoding(containerName, 'secondVideo.mp4', cb);
+          }); 
 
           it('should not cause a problem if there are not params', function (done) {
             containerName = 'videos.container';
