@@ -6,11 +6,15 @@ var app = angular.module('instanews.service.uploads', ['ionic', 'ngResource']);
 app.service('Uploads', [
   '$q',
   'Camera',
+  'ENV',
+  'FileTransfer',
   'observable',
   'User',
   function(
    $q,
    Camera,
+   ENV,
+   FileTransfer,
    observable,
    User
   ){
@@ -62,6 +66,28 @@ app.service('Uploads', [
           var removed = uploadItems.splice(uploadItems.indexOf(item), 1);
           uploads.notifyObservers();
           return removed;
+        };
+
+        item.resolve = function () {
+          if(item.subarticle._file) {
+            var getServer = function() {
+              var urlBase = ENV.apiEndpoint;
+              return urlBase + '/storages/' + item.container + '/upload/';
+            };
+            item.loaded = 0;
+
+            FileTransfer.upload(getServer(), item.uri, item.options)
+            .then(function () {
+              item.complete.resolve();
+            }, function (err) {
+              item.complete.reject(err);
+              console.log(err);
+            }, function (progress) {
+              item.loaded = progress.loaded/progress.total * 100;
+            });
+          } else {
+            item.complete.resolve();
+          }
         };
 
         uploadItems.unshift(item);

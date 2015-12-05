@@ -189,7 +189,7 @@ angular.module('instanews', [
   })
 
   .state('articlePost', {
-    cache: false,
+//    cache: false,
     url: '/post/article',
     templateUrl: 'templates/articlePost.html',
     controller: 'PostCtrl'
