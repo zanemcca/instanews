@@ -18,9 +18,13 @@
             </div>
          </div>
 
-         <div class="item" nav-clear menu-close ui-sref="app.feed" >
-            <i class="icon ion-home"></i>
-            Home
+         <div class="item" 
+           ng-show="Uploads.getPending().length"
+           nav-clear menu-close ng-click="pendingModal.show();">
+          <i class="icon dark"
+            style="position:absolute;right:0;margin-right:16px;font-size:x-large"
+            ng-class="Platform.isIOS() ? 'ion-ios-upload-outline' : 'ion-android-upload'"></i>
+            {{Uploads.getPending().length}} Pending Uploads
          </div>
 
          <ul class="list">

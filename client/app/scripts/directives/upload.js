@@ -32,7 +32,6 @@ app.controller(
 app.directive(
   'inupload', [
     function () {
-
       return {
         restrict: 'E',
         scope: {
