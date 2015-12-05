@@ -2,10 +2,11 @@
 <ion-view view-title="{{article.title}}" 
   style="background: #C0C0C0">
    <ion-nav-buttons side="secondary">
-      <!--a class="button button-clear icon ion-plus-round"
-         ui-sref="subarticlePost({id: article.id})">
-      </a-->
-    <in-speed-dial position="'top-right'" uploads="Uploads"></in-speed-dial>
+    <button ng-if="Uploads.get().length > 0"
+      ng-click="uploadModal.show();"
+      class="button button-clear icon ion-plus-round">
+    </button>
+    <in-speed-dial style="width:34px;" ng-if="Uploads.get().length === 0" position="'top-right'" uploads="Uploads"></in-speed-dial>
    </ion-nav-buttons>
    <ion-content delegate-handle="subarticle" on-swipe-down="onSwipeDown()" overflow-scroll="true" class="gpu">
       <in-list list="Subarticles"
