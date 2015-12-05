@@ -175,7 +175,7 @@ exports.run = function () {
           });
         });
 
-        describe.only('video', function () {
+        describe('video', function () {
           it('should get the video transcoder paramaters', function (done) {
             createJob = function (params, cb) {
               expect(params).to.exist;
@@ -189,7 +189,6 @@ exports.run = function () {
           it('should not combine the names of consecutive video posts', function (done) {
             var callCount = 0;
             createJob = function (params, cb) {
-              console.dir(params);
               callCount++;
               if(callCount === 1) {
                 expect(params.Outputs[0].Key).to.equal('video-2M');
