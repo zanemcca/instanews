@@ -47,59 +47,63 @@ module.exports = function(Storage) {
     });
   }
 
-  var containers = [{
-    Name: 'instanews-videos-in',
-    Type: 'video',
-    Output: 'instanews-videos',
-    Params: {
-      PipelineId: '1444324496785-65xn4p',
-      Input: {
-        Key: null,
-        AspectRatio: 'auto', 
-        Container: 'auto',
-        FrameRate: 'auto',
-        Resolution: 'auto',
-        Interlaced: 'auto'
-      },
-      Outputs: [
-        {
-          Key: '2M',
-          SegmentDuration: '5', //Seconds/segment
-          Rotate: 'auto',
-          //HLS 2M
-          PresetId: '1351620000001-200010' 
+  var containers =  [function () {
+    return {
+      Name: 'instanews-videos-in',
+      Type: 'video',
+      Output: 'instanews-videos',
+      Params: { 
+        PipelineId: '1444324496785-65xn4p',
+        Input: { 
+          Key: null,
+          AspectRatio: 'auto', 
+          Container: 'auto',
+          FrameRate: 'auto',
+          Resolution: 'auto',
+          Interlaced: 'auto'
         },
-        {
-          Key: 'HD.mp4',
-          Rotate: 'auto',
-          //iPhone4S+ (1920x1080 Mp4 High-profile AAC)
-          PresetId: '1351620000001-100020' 
-        },
-        {
-          Key: 'SD.mp4',
-          Rotate: 'auto',
-          ThumbnailPattern: '-SD-{count}',
-          //iPhone1-3 (640x480 Mp4 baseline AAC)
-          PresetId: '1445198308687-fnaxk5' 
-        }]
-        //TODO webM
-    }
+        Outputs: [
+          {
+            Key: '2M',
+            SegmentDuration: '5', //Seconds/segment
+            Rotate: 'auto',
+            //HLS 2M
+            PresetId: '1351620000001-200010' 
+          }, 
+          { 
+            Key: 'HD.mp4',
+            Rotate: 'auto',
+            //iPhone4S+ (1920x1080 Mp4 High-profile AAC)
+            PresetId: '1351620000001-100020' 
+          },
+          {
+            Key: 'SD.mp4',
+            Rotate: 'auto',
+            ThumbnailPattern: '-SD-{count}',
+            //iPhone1-3 (640x480 Mp4 baseline AAC)
+            PresetId: '1445198308687-fnaxk5' 
+          }] 
+          //TODO webM
+      }
+    };
   },
-  {
-    Name: 'instanews-photos-in',
-    Type: 'photo',
-    Params: {
-      FunctionName: 'imageTranscoder',
-      Payload: '{}',
-      InvocationType: 'Event'
-    }
+  function () {
+    return {
+      Name: 'instanews-photos-in',
+      Type: 'photo',
+      Params: {
+        FunctionName: 'imageTranscoder',
+        Payload: '{}',
+        InvocationType: 'Event'
+      }
+    };
   }];
 
   var getContainer = function (name) {
     for(var i in containers) {
       var cntr = containers[i];
-      if(cntr.Name === name) {
-        return cntr;
+      if(cntr().Name === name) {
+        return cntr();
       }
     }
   };
@@ -125,6 +129,7 @@ module.exports = function(Storage) {
           }
           cntr.Params.Outputs[j].ThumbnailPattern = thumbnail;
         }
+        console.dir(cntr.Params);
         return cntr.Params;
       } else if(cntr.Type === 'photo') {
         cntr.Params.Payload = JSON.stringify({
@@ -299,57 +304,57 @@ module.exports = function(Storage) {
               case 'Notification':
                 var message = job.Message;
 
-              try {
-                message = JSON.parse(message);
-                console.dir(message, { colors: true });
-              } catch(e) {
-                err = new Error('Failed to parse the notification message');
-                console.log(e);
-                return next(err);
-              }
-
-              if(!message.jobId) {
-                var e = new Error('No JobId was given in the notification message');
-                e.status = 400;
-                console.log(e);
-                return next(e);
-              }
-
-              Storage.clearPending(message, function (err) {
-                console.log('Transcoding Job ' + message.jobId + ' has finished!');
-                if(err) {
-                  console.error(err);
+                try {
+                  message = JSON.parse(message);
+                  console.dir(message, { colors: true });
+                } catch(e) {
+                  err = new Error('Failed to parse the notification message');
+                  console.log(e);
+                  return next(err);
                 }
-                next(err);
-              });
 
-              break;
+                if(!message.jobId) {
+                  var e = new Error('No JobId was given in the notification message');
+                  e.status = 400;
+                  console.log(e);
+                  return next(e);
+                }
+
+                Storage.clearPending(message, function (err) {
+                  console.log('Transcoding Job ' + message.jobId + ' has finished!');
+                  if(err) {
+                    console.error(err);
+                  }
+                  next(err);
+                });
+
+                break;
               case 'SubscriptionConfirmation':
                 if(sns) {
-                sns.confirmSubscription({
-                  Token: job.Token,
-                  TopicArn: job.TopicArn
-                }, function(err, data) {
-                  if( err) {
-                    console.error(err.stack);
-                    next(err);
-                  } else {
-                    // TODO Set pending flag
-                    //TODO Clear pending flag from subarticle and article
-                    console.dir(data, {colors: true});
-                    next();
-                  }
-                });
-              } else {
-                console.warn('No SNS connection established');
-                next();
-              }
-              break;
+                  sns.confirmSubscription({
+                    Token: job.Token,
+                    TopicArn: job.TopicArn
+                  }, function(err, data) {
+                    if( err) {
+                      console.error(err.stack);
+                      next(err);
+                    } else {
+                      // TODO Set pending flag
+                      //TODO Clear pending flag from subarticle and article
+                      console.dir(data, {colors: true});
+                      next();
+                    }
+                  });
+                } else {
+                  console.warn('No SNS connection established');
+                  next();
+                }
+                break;
               default:
                 var er = new Error('Unknown message type ' + job.Type);
-              er.status = 403;
-              next(er);
-              break;
+                er.status = 403;
+                next(er);
+                break;
             }
           }
         });
