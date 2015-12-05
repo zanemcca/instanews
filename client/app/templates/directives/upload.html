@@ -1,10 +1,21 @@
 <!DOCTYPE html>
 <div ng-controller="uploadCtrl">
   <div class="item card no-padding" ng-if="upload.subarticle._file" id="progressWrap">
+    <div class="item item-divider no-padding">
+      <div class="buttons">
+        <button class="button button-small button-clear icon ion-close-round"
+          style="position:absolute;right:0;"
+          ng-click="upload.remove()">
+        </button>
+      </div>
+    </div>
     <md-progress-linear value="{{upload.progress.loaded}}" md-mode="determinate" max="{{upload.progress.total}}"></md-progress-linear>
     <inMedia media="upload.subarticle._file"></inMedia>
   </div>
   <div class="item card" ng-if="upload.subarticle.text" class="item">
+    <button class="button button-clear icon icon-right ion-close-round"
+      ng-click="upload.remove()">
+    </button>
     <p>{{upload.subarticle.text}}</p>
   </div>
 </div>
