@@ -10,24 +10,26 @@ var app = angular.module('instanews.directive.upload', [
 app.controller(
   'uploadCtrl', [
     '$scope',
+    '_',
     'FileTransfer',
     'ENV',
     function (
       $scope,
+      _,
       FileTransfer,
       ENV
     ) {
-      if($scope.upload.noFile) {
-        $scope.upload.complete.resolve();
-      } else {
-        $scope.upload.progress = {};
-      }
 
       if($scope.upload.subarticle._file) {
         var getServer = function() {
           var urlBase = ENV.apiEndpoint;
           return urlBase + '/storages/' + $scope.upload.container + '/upload/';
         };
+
+        var loaded = 0;
+        var updateProgress = _.debounce(function () {
+          $scope.upload.progress.loaded = loaded;
+        }, 16);
 
         FileTransfer.upload(getServer(), $scope.upload.uri, $scope.upload.options)
         .then(function () {
@@ -36,8 +38,8 @@ app.controller(
           $scope.upload.complete.reject(err);
           console.log(err);
         }, function (progress) {
-          $scope.upload.progress = progress;
-          console.log('Progress: ' + JSON.stringify(progress));
+          loaded = progress.loaded/progress.total * 100;
+          updateProgress();
         });
       } else {
         $scope.upload.complete.resolve();
@@ -57,6 +59,15 @@ app.directive(
         restrict: 'E',
         scope: {
           upload: '='
+        },
+        link: function ($scope) {
+          if($scope.upload.noFile) {
+            $scope.upload.complete.resolve();
+          } else {
+            $scope.upload.progress = {
+              loaded: 0
+            };
+          }
         },
         templateUrl: 'templates/directives/upload.html'
       };

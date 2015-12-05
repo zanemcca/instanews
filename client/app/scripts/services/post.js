@@ -50,41 +50,32 @@ app.factory('Post', [
     var postSubarticles = function (uploads, parentId) {
       var completed = 0;
       var total = uploads.length;
-      var successful = [];
-      uploads.forEach(function (upload) {
+      uploads.slice().forEach(function (upload) {
         var failed = false;
         upload.complete.promise.then( function () {
           var sub = upload.subarticle;
           sub.parentId = parentId;
           sub.id = parentId;
 
-          console.log(sub);
+          upload.isPosting = true;
 
           Article.subarticles.create(sub)
           .$promise
           .then(function () {
-            successful.push(upload);
+            upload.remove();
+            upload.isPosting = false;
             completed++;
             if(completed === total) {
-              successful.forEach(function(upload) {
-                //Remove all successful ones
-                upload.remove();
-              });
               posting = false;
               var message = 'Your content has finished uploading and should be available soon';
               if(failed) {
                 message = 'Uh-Oh! Some of your content failed to upload!';
-                //TODO Allow retrying
               }
               Platform.showToast(message);
-              //uploads = [];
             }
           }, 
           // istanbul ignore next
           function(err) {
-            //TODO Remove this once retrying is completed
-            successful.push(upload);
-
             failed = true;
             console.log('Failed to upload subarticle');
             console.log(err);
