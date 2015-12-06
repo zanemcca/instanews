@@ -266,7 +266,7 @@ app.service('Uploads', [
 
       uploads.getText = function (txt) {
         txt = txt || {partial:''};
-        var textInput = TextInput.get();
+        var textInput = TextInput.get('modal');
         textInput.placeholder = 'What\'s the story?';
         textInput.text = txt.partial;
 
