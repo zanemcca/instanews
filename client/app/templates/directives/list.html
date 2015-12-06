@@ -6,7 +6,7 @@
 <ul class="list">
   <ion-item ng-repeat="item in list.get() track by item.id"
     class="no-padding"
-    ng-class="{'card' : isCard }">
+    ng-class="{'card' : isCard || isTablet(), 'margin-10' : isTablet() }">
     <in-list-item item="item"
       pre-load="list.preLoad">
     </in-list-item>

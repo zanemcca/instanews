@@ -6,6 +6,11 @@
   margin: 0px !important;
 }
 
+.margin-10 {
+  margin-left: 10% !important;
+  margin-right: 10% !important;
+}
+
 @mixin box-invalid {
   box-shadow: inset 1px 1px 3px #FF0000, inset -1px -1px 3px #FF0000 !important;
 }
@@ -45,4 +50,12 @@
 
 .item-input-wrapper {
   background: white !important;
+}
+
+.md-dark {
+  background-color: $dark !important;
+}
+
+.md-positive {
+  background-color: $positive !important;
 }

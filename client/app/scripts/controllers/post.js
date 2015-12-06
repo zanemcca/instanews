@@ -1,4 +1,3 @@
-
 'use strict';
 var app = angular.module('instanews.controller.post', ['ionic', 'ngResource', 'uuid']);
 
@@ -13,8 +12,7 @@ app.controller('PostCtrl', [
   'Platform',
   'Maps',
   'User',
-  'Upload',
-  'Camera',
+  'Uploads',
   function(
     $stateParams,
     $scope,
@@ -26,19 +24,28 @@ app.controller('PostCtrl', [
     Platform,
     Maps,
     User,
-    Upload,
-    Camera
+    Uploads
   ) {
 
     $scope.user = User.get();
     $scope.getMarker = Maps.getMarker;
-    $scope.uploads = [];
+
+    $scope.Uploads = Uploads.findOrCreate();
 
     var updateUser = function() {
       $scope.user = User.get();
     };
 
     User.registerObserver(updateUser);
+
+    $scope.$watch('newArticle.title', function (newTitle, oldTitle) {
+      if(newTitle !== oldTitle) {
+        if(newTitle && newTitle.length > 0) {
+          // jshint undef: false
+          $scope.newArticle.title = Case.title(newTitle);
+        }
+      }
+    });
 
     $scope.place = {
       getMap: Maps.getPostMap,
@@ -54,18 +61,19 @@ app.controller('PostCtrl', [
       localize: function () {}    // localize is filled in by the autocomplete directive
     };
 
-    //If we have an ID given then we know we are posting subarticles within an article
-    // istanbul ignore else 
-    if( !$stateParams.id ) {
-      $scope.newArticle = {
-        title: ''
-      };
-      //Refresh the map everytime we enter the view
-      $scope.$on('$ionicView.afterEnter', function() {
-        console.log('Post after enter');
+    $scope.newArticle = {
+      title: ''
+    };
+
+    var pendingPost = false;
+
+    //Refresh the map everytime we enter the view
+    $scope.$on('$ionicView.afterEnter', function() {
+      if(!pendingPost) {
+        pendingPost = true;
         $scope.place.localize();
-      });
-    }
+      }
+    });
 
     $scope.map = {
       id: 'postMap'
@@ -107,10 +115,8 @@ app.controller('PostCtrl', [
        }
      });
 
-    $scope.data = {
-      text: '',
-    };
-
+     //TODO Either use this everytime or not at all
+     //TODO DEPRICATE this. Use an always save policy
     $scope.goBack = function() {
       Platform.showSheet({
         destructiveText: 'Delete',
@@ -122,7 +128,7 @@ app.controller('PostCtrl', [
         },
         destructiveButtonClicked: function() {
           console.log('post goback button was clicked');
-          Upload.destroy($scope.uploads);
+          //$scope.Upload.destroy(Uploads);
           $ionicHistory.goBack();
         }
       });
@@ -133,12 +139,15 @@ app.controller('PostCtrl', [
         Platform.showToast('We\'ll let you know when your content is uploaded');
       }
 
+      $scope.newArticle = {
+        title: ''
+      };
+
       $ionicHistory.goBack();
     };
 
     $scope.post = function () {
-      if($scope.uploads.length) {
-        if(!$stateParams.id) {
+      if($scope.Uploads.get().length) {
           var marker = Maps.getMarker();
           if(marker && $scope.newArticle.title) {
             var position = {
@@ -152,91 +161,19 @@ app.controller('PostCtrl', [
               title: $scope.newArticle.title
             };
 
-            Post.post($scope.uploads, article);
-            exit();
+            Post.post($scope.Uploads, article, function (err) {
+              if(!err) {
+                pendingPost = false;
+                exit();
+              }
+            });
           }
           else {
             console.log('Error: Cannot post article without both position and title');
           }
-
-        } else {
-          Post.post($scope.uploads, $stateParams.id);
-          exit();
-        }
       } else {
         console.log('Cannot post without subarticles');
       }
     };
-
-    /* Text Posting */
-
-    //Modal for posting text
-    $ionicModal.fromTemplateUrl('templates/postTextModal.html', {
-      scope: $scope,
-      animation: 'slide-in-up'
-    }).then( function (modal) {
-      $scope.postTextModal = modal;
-    });
-
-    //Clean up the temp text value and hide the modal
-    $scope.trashText = function() {
-      $scope.data.text = '';
-      $scope.postTextModal.hide();
-    };
-
-    //Move the text out of the form so that it is ready to be submitted
-    $scope.saveText = function() {
-      $scope.uploads.push(Upload.text($scope.data.text));
-      $scope.trashText();
-    };
-
-    /* Video posting */
-    //Capture video using the video camera
-    $scope.captureVideo = function() {
-      Camera.captureVideo()
-      .then( function(video) {
-        if(video) {
-          $scope.uploads.push(Upload.video(video));
-        }
-      },
-      // istanbul ignore next
-      function(err) {
-        console.log(err);
-      });
-    };
-
-    /* Photo posting */
-
-    //Get a photo(s) from the gallery
-    $scope.openMediaGallery = function() {
-      Camera.openMediaGallery()
-      .then( function(media) {
-        if(media) {
-          console.log(media);
-          if(media.type.indexOf('image') > -1) {
-            $scope.uploads.push(Upload.picture(media));
-          } else if (media.type.indexOf('video') > -1) {
-            $scope.uploads.push(Upload.video(media));
-          }
-        }
-      },
-      // istanbul ignore next
-      function(err) {
-        console.log(err);
-      });
-    };
-
-    //Capture a photo using the camera and store it into the new article
-    $scope.capturePicture = function() {
-      Camera.capturePicture()
-      .then( function(photo) {
-        if(photo) {
-          $scope.uploads.push(Upload.picture(photo));
-        }
-      }, 
-      // istanbul ignore next
-      function(err) {
-        console.log('Error: Failed to capture a new photo: ' + JSON.stringify(err));
-      });
-    };
-  }]);
+  }
+]);
