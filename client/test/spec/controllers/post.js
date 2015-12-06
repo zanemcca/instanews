@@ -180,6 +180,18 @@ describe('Post: ', function(){
         }
       });
 
+      $provide.service('Uploads', function() {
+        return {
+          findOrCreate: function(id) {
+            return {
+              get: function() {
+                return uploads;
+              }
+            };
+          }
+        };
+      });
+
       $provide.service('Camera', function() {
         return {
           capturePicture: function() {
@@ -291,6 +303,7 @@ describe('Post: ', function(){
     Maps,
     User,
     Upload,
+    Uploads,
     Camera
   ){
     ionicModal = $ionicModal;
@@ -303,6 +316,7 @@ describe('Post: ', function(){
     maps = Maps;
     user = User;
     upload = Upload;
+    uploads = Uploads;
     camera = Camera;
     ctrl = $controller;
 
