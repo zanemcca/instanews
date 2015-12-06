@@ -401,7 +401,8 @@ describe('Post: ', function(){
       expect(scope.article.id).to.equal(art.id);
     });
 
-    it('should setup the postTextModal', function() {
+    //TODO Move this into textInput test
+    it.skip('should setup the postTextModal', function() {
       sinon.stub(ionicModal, 'fromTemplateUrl', function(text, obj) {
         expect(text).to.equal('templates/postTextModal.html');
         return {
@@ -504,7 +505,8 @@ describe('Post: ', function(){
       });
     });
 
-    describe('goBack', function() {
+    //TODO Redo or delete
+    describe.skip('goBack', function() {
 
       // No saving for the first version of the app
       it.skip('should pass in a single button titled "<b>Save</b>"', function() {
@@ -680,7 +682,8 @@ describe('Post: ', function(){
     });
    */
 
-    describe('trashText', function() {
+  //TODO Move these to uploads test
+    describe.skip('trashText', function() {
 
       it('should reset data.text', function() {
         scope.postTextModal = {
@@ -706,7 +709,7 @@ describe('Post: ', function(){
       });
     });
 
-    describe('saveText', function() {
+    describe.skip('saveText', function() {
 
       beforeEach(function() {
         scope.postTextModal = {
@@ -731,7 +734,7 @@ describe('Post: ', function(){
       });
     });
 
-    describe('captureVideo', function() {
+    describe.skip('captureVideo', function() {
       it('should call Camera.captureVideo', function() {
         sinon.spy(camera, 'captureVideo');
         scope.captureVideo();
@@ -754,7 +757,7 @@ describe('Post: ', function(){
 
     });
 
-    describe('openMediaGallery', function() {
+    describe.skip('openMediaGallery', function() {
       it('should call Camera.openMediaGallery', function() {
         sinon.spy(camera, 'openMediaGallery');
 
@@ -790,7 +793,7 @@ describe('Post: ', function(){
       });
     });
 
-    describe('capturePicture', function() {
+    describe.skip('capturePicture', function() {
       it('should call Camera.getPicture', function() {
         sinon.spy(camera, 'capturePicture');
 
