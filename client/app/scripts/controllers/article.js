@@ -56,7 +56,15 @@ app.controller('ArticleCtrl', [
       uploadObserver = $scope.Uploads.registerObserver(function () {
         var uploads = $scope.Uploads.get();
         if(uploads.length > 0) {
-          $scope.uploadModal.show();
+          var noFile = true;
+          uploads.forEach(function (upload) {
+            noFile = noFile && upload.noFile;
+          });
+          if(!noFile) {
+            $scope.uploadModal.show();
+          } else {
+            $scope.post();
+          }
         }
       });
     });
@@ -89,8 +97,6 @@ app.controller('ArticleCtrl', [
         });
       };
 
-      //TODO Add a delete function to each upload instance and deal with deletion
-      //from the upload directive instead of here
       $scope.clear = function () {
         $scope.Uploads.clear();
         modal.hide();

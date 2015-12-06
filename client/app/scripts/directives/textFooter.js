@@ -81,4 +81,5 @@ app.directive('inTextFooter', [
       },
       templateUrl: 'templates/directives/textFooter.html'
     };
-  }]);
+  }
+]);
