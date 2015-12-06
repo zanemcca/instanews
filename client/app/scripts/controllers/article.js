@@ -29,6 +29,7 @@ app.controller('ArticleCtrl', [
     $scope.Platform = Platform;
     $scope.Subarticles = Subarticles.findOrCreate($stateParams.id);
     $scope.Uploads = Uploads.findOrCreate($stateParams.id);
+    $scope.uploads = [];
 
     var spec = $scope.Subarticles.getSpec();
     spec.options.filter.limit = 5;
@@ -55,6 +56,7 @@ app.controller('ArticleCtrl', [
 
       uploadObserver = $scope.Uploads.registerObserver(function () {
         var uploads = $scope.Uploads.get();
+        $scope.uploads = uploads;
         if(uploads.length > 0) {
           var noFile = true;
           uploads.forEach(function (upload) {

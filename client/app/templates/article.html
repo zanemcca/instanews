@@ -2,11 +2,14 @@
 <ion-view view-title="{{article.title}}" 
   style="background: #C0C0C0">
    <ion-nav-buttons side="secondary">
-    <button ng-if="Uploads.get().length > 0"
-      ng-click="uploadModal.show();"
-      class="button button-clear icon ion-plus-round">
-    </button>
-    <in-speed-dial style="width:34px;" ng-if="Uploads.get().length === 0" position="'top-right'" uploads="Uploads"></in-speed-dial>
+    <div ng-show="uploads.length > 0">
+      <button  ng-click="uploadModal.show();"
+        class="button button-clear icon ion-plus-round">
+      </button>
+    </div>
+    <div ng-hide="uploads.length > 0">
+      <in-speed-dial style="width:34px;" position="'top-right'" uploads="Uploads"></in-speed-dial>
+    </div>
    </ion-nav-buttons>
    <ion-content delegate-handle="subarticle" on-swipe-down="onSwipeDown()" overflow-scroll="true" class="gpu">
       <in-list list="Subarticles"
