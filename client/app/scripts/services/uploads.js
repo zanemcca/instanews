@@ -8,6 +8,7 @@ app.service('Uploads', [
   'Camera',
   'ENV',
   'FileTransfer',
+  'TextInput',
   'observable',
   'User',
   function(
@@ -15,6 +16,7 @@ app.service('Uploads', [
     Camera,
     ENV,
     FileTransfer,
+    TextInput,
     observable,
     User
   ){
@@ -262,9 +264,19 @@ app.service('Uploads', [
         uploads.notifyObservers();
       };
 
-      uploads.getText = function () {
-        //TODO Link to textinput footer
-        addUpload(text('Hello'));
+      uploads.getText = function (txt) {
+        txt = txt || {partial:''};
+        var textInput = TextInput.get();
+        textInput.placeholder = 'What\'s the story?';
+        textInput.text = txt.partial;
+
+        textInput.open(function (newText) {
+          addUpload(text(newText));
+          txt.partial = '';
+        }, function (partialText) {
+          //Interruption function
+          txt.partial = partialText;
+        });
       };
 
       return uploads;

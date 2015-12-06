@@ -12,6 +12,17 @@ app.directive('inSpeedDial', [
         position: '=',
         uploads: '='
       },
+      controller: function(
+        $scope
+      ){ 
+        var text = {
+          partial: ''
+        };
+
+        $scope.getText = function () {
+          return $scope.uploads.getText(text);
+        };
+      },
       link: function($scope) {
         if(!$scope.position) {
           $scope.position = 'bottom-right';
