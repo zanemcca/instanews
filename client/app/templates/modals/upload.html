@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<ion-modal-view>
+   <ion-header-bar class="bar-dark">
+     <button class="button buttons back-button button-clear"
+      ng-click="uploadModal.hide()">
+      <i class="icon"
+        ng-class="Platform.isIOS() ? 'ion-ios-arrow-back' : 'ion-android-arrow-back'"></i>
+     </button>
+     <h1 class="title">{{article.title}}</h1>
+     <button class="button buttons button-clear" ng-click="post()">
+       ADD 
+     </button>
+   </ion-header-bar>
+   <ion-content>
+      <div class="list">
+        <div ng-repeat="upload in Uploads.get()">
+          <inUpload upload="upload"></inUpload>
+        </div>
+      </div>
+   </ion-content>
+</ion-modal-view>
+
