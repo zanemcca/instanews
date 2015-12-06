@@ -34,6 +34,7 @@ app.factory('TextInput', [
         };
 
         var unregister = $rootScope.$on('modal.hidden', function() {
+          Platform.keyboard.hide();
           unregister();
           interrupted(modal.text);
         });
