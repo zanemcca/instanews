@@ -72,16 +72,18 @@ app.controller('PostCtrl', [
       localize: function () {}    // localize is filled in by the autocomplete directive
     };
 
-    //If we have an ID given then we know we are posting subarticles within an article
-    // istanbul ignore else 
     $scope.newArticle = {
       title: ''
     };
 
+    var pendingPost = false;
+
     //Refresh the map everytime we enter the view
     $scope.$on('$ionicView.afterEnter', function() {
-      console.log('Post after enter');
-      $scope.place.localize();
+      if(!pendingPost) {
+        pendingPost = true;
+        $scope.place.localize();
+      }
     });
 
     $scope.map = {
@@ -148,6 +150,10 @@ app.controller('PostCtrl', [
         Platform.showToast('We\'ll let you know when your content is uploaded');
       }
 
+      $scope.newArticle = {
+        title: ''
+      };
+
       $ionicHistory.goBack();
     };
 
@@ -168,6 +174,7 @@ app.controller('PostCtrl', [
 
             Post.post($scope.Uploads, article, function (err) {
               if(!err) {
+                pendingPost = false;
                 exit();
               }
             });

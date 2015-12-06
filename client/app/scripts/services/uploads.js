@@ -11,12 +11,12 @@ app.service('Uploads', [
   'observable',
   'User',
   function(
-   $q,
-   Camera,
-   ENV,
-   FileTransfer,
-   observable,
-   User
+    $q,
+    Camera,
+    ENV,
+    FileTransfer,
+    observable,
+    User
   ){
     var articles = [];
     var pending = [];
@@ -108,24 +108,27 @@ app.service('Uploads', [
         };
 
         item.resolve = function () {
-          if(item.subarticle._file) {
-            var getServer = function() {
-              var urlBase = ENV.apiEndpoint;
-              return urlBase + '/storages/' + item.container + '/upload/';
-            };
-            item.loaded = 0;
+          if(!item.resolved) {
+            item.resolved = true;
+            if(item.subarticle._file) {
+              var getServer = function() {
+                var urlBase = ENV.apiEndpoint;
+                return urlBase + '/storages/' + item.container + '/upload/';
+              };
+              item.loaded = 0;
 
-            FileTransfer.upload(getServer(), item.uri, item.options)
-            .then(function () {
+              FileTransfer.upload(getServer(), item.uri, item.options)
+              .then(function () {
+                item.complete.resolve();
+              }, function (err) {
+                item.complete.reject(err);
+                console.log(err);
+              }, function (progress) {
+                item.loaded = progress.loaded/progress.total * 100;
+              });
+            } else {
               item.complete.resolve();
-            }, function (err) {
-              item.complete.reject(err);
-              console.log(err);
-            }, function (progress) {
-              item.loaded = progress.loaded/progress.total * 100;
-            });
-          } else {
-            item.complete.resolve();
+            }
           }
         };
 
