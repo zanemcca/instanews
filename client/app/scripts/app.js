@@ -21,6 +21,7 @@ angular.module('instanews', [
   'instanews.directive.list',
   'instanews.directive.map',
   'instanews.directive.media',
+  'instanews.directive.speedDial',
   'instanews.directive.textFooter',
   'instanews.directive.upload',
   'instanews.directive.votes',
@@ -33,12 +34,13 @@ angular.module('instanews', [
   'instanews.service.maps',
   'instanews.service.navigate',
   //'instanews.service.notifications',
+  'instanews.service.observable',
   'instanews.service.platform',
   'instanews.service.position',
   'instanews.service.post',
   'instanews.service.subarticles',
   'instanews.service.textInput',
-  'instanews.service.upload',
+  'instanews.service.uploads',
   'instanews.service.user',
   'instanews.service.votes',
   'lbServices',
@@ -62,13 +64,19 @@ angular.module('instanews', [
 )
 
 .controller('AppCtrl', [
+  '$ionicModal',
   '$scope',
   'Navigate',
+  'Platform',
   'User',
+  'Uploads',
   function (
+    $ionicModal,
     $scope,
     Navigate,
-    User
+    Platform,
+    User,
+    Uploads
   ) {
     //Update user function
     var updateUser = function() {
@@ -82,6 +90,17 @@ angular.module('instanews', [
     $scope.logout = User.logout;
 
     $scope.Navigate = Navigate;
+    $scope.pending = [];
+
+    $scope.Uploads = Uploads;
+    $scope.Platform = Platform;
+
+     $ionicModal.fromTemplateUrl('templates/modals/pending.html', {
+        scope: $scope,
+        animation: 'slide-in-up'
+     }).then( function (modal) {
+        $scope.pendingModal = modal;
+     });
   }
 ])
 
@@ -99,8 +118,12 @@ angular.module('instanews', [
 .config(function(
   $stateProvider,
   $urlRouterProvider,
-  $ionicConfigProvider
+  $ionicConfigProvider,
+  $mdGestureProvider
 ) {
+
+  // Fix ionic ng-click from firing twice when using ngMaterial
+  $mdGestureProvider.skipClickHijack();
 
   // jshint undef: false
   moment.locale('en', {
@@ -198,7 +221,6 @@ angular.module('instanews', [
   })
 
   .state('app.articlePost', {
-    cache: false,
     url: '/post/article',
     views: {
       'menuContent': {

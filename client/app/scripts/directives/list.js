@@ -4,7 +4,9 @@
 var app = angular.module('instanews.directive.list', ['ionic']);
 
 app.directive('inList', [
+  'Platform',
   function (
+    Platform
   ) {
     return {
       restrict: 'E',
@@ -15,6 +17,8 @@ app.directive('inList', [
         isNotInfinite: '='
       },
       controller: function ($scope, _) {
+        $scope.isTablet = Platform.isTablet;
+
         $scope.safeApply  = function(fn) {
           var phase = this.$root.$$phase;
           if(phase === '$apply' || phase === '$digest') {
@@ -103,13 +107,13 @@ app.directive('inListItem', [
               whitelist.shift();
             }
 
-            console.log(zoom);
-            console.log(whitelist);
+            //console.log(zoom);
+            //console.log(whitelist);
             var place = $scope.item.place;
             if(place) {
               for(var i in place) {
                 if(whitelist.indexOf(place[i].types[0]) > -1) {
-                  console.log(place[i].long_name);
+                  //console.log(place[i].long_name);
                   $scope.location.name = place[i].long_name;
                   return;
                 }
@@ -157,7 +161,7 @@ app.directive('inListItem', [
             .then(
               // istanbul ignore next 
               function() {
-                console.log('View created: ' + $scope.item.id);
+                //console.log('View created: ' + $scope.item.id);
               }, 
               // istanbul ignore next 
               function(err) {
@@ -169,7 +173,7 @@ app.directive('inListItem', [
 
 
 
-        console.log($scope.item);
+        //console.log($scope.item);
         if($scope.preLoad instanceof Function) {
           $scope.preLoad($scope.item, createView);
         } else {

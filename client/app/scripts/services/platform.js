@@ -117,7 +117,7 @@ app.factory('Platform', [
           sizeClass = Math.floor(pr -1);
         break;
         case 'tablet':
-          sizeClass = Math.floor(pr*3/2);
+          sizeClass = Math.ceil(pr*3/2);
         break;
         default:
           sizeClass = 0;
@@ -139,6 +139,10 @@ app.factory('Platform', [
       }
 
       return sizes[getSizeClass(max)];
+    };
+
+    var isTablet = function () {
+      return 'tablet' === getDeviceType();
     };
 
     /* Initialization */
@@ -234,6 +238,7 @@ app.factory('Platform', [
       isBrowser: isBrowser,
       isCameraPresent: isCameraPresent,
       isVideoPresent: isVideoPresent,
+      isTablet: isTablet,
       getDevice: getDevice,
       setDevice: setDevice,
       setDeviceToken: setDeviceToken,
