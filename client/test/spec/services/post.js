@@ -34,10 +34,20 @@ describe('Post service', function() {
       this.subarticle = {
         text: text
       }
+      this.remove = function () {};
       return this;
     };
 
-    uploads = [new Upload()];
+    var Uplds = [new Upload()];
+
+    uploads = {
+      get: function () {
+        return Uplds;
+      },
+      add: function(upld) {
+        Uplds.push(upld);
+      }
+    };
 
     newArticle = { 
       title: 'Title',
@@ -143,9 +153,50 @@ describe('Post service', function() {
         };
       });
 
+      $provide.service('Uploads', function() {
+        return {
+          findOrCreate: function(id) {
+            return {
+              get: function() {
+                return uploads;
+              }
+            };
+          },
+          moveToPending: function () {}
+        };
+      });
+
+      $provide.service('Camera', function() {
+        return {
+          capturePicture: function (cb, err) {
+            cb();
+          },
+          captureVideo: function (cb, err) {
+            cb();
+          },
+          getFromGallery: function (cb, err) {
+            cb();
+          }
+        };
+      });
+
       $provide.service('rfc4122', function() {
         return {
           v4: function() { return 'uuid'; }
+        };
+      });
+
+      $provide.service('observable', function() {
+        return function (spec) {
+          return {
+            registerObserver: function (cb) {
+              return {
+                unregister: function () {
+                  cb();
+                }
+              };
+            }
+          };
         };
       });
 
@@ -162,10 +213,12 @@ describe('Post service', function() {
   var env;
   var user;
   var RFC4122;
+  var camera;
 
   beforeEach(inject(function(
     Post,
     Article,
+    Camera,
     LocalStorage,
     ENV,
     FileTransfer,
@@ -175,6 +228,7 @@ describe('Post service', function() {
   ) {
     post = Post;
     article = Article;
+    camera = Camera;
     localStorage = LocalStorage;
     fileTransfer = FileTransfer;
     env = ENV;
@@ -562,6 +616,11 @@ describe('Post service', function() {
 
   describe('post', function() {
 
+    var cb;
+    beforeEach(function () {
+      cb = function () {};
+    });
+
     describe('Article create', function() {
       it('should pass in the correct object to Article.create', function() {
 
@@ -582,7 +641,7 @@ describe('Post service', function() {
           }
         });
 
-        post.post(uploads, newArticle);
+        post.post(uploads, newArticle, cb);
 
         expect(article.create.calledOnce).to.be.true;
       });
@@ -590,7 +649,7 @@ describe('Post service', function() {
       it('should call Article.subarticles.create through postSubarticles', function() {
         sinon.spy(article.subarticles, 'create');
 
-        post.post(uploads, newArticle);
+        post.post(uploads, newArticle, cb);
 
         expect(article.subarticles.create.calledOnce).to.be.true;
       });
@@ -607,7 +666,7 @@ describe('Post service', function() {
           expect(message).to.equal('Your content has finished uploading and should be available soon');
         });
 
-        post.post(uploads, parentId);
+        post.post(uploads, parentId, cb);
 
         expect(platform.showToast.calledOnce).to.be.true;
       });
@@ -617,7 +676,7 @@ describe('Post service', function() {
 
           expect(sub.id).to.equal(parentId);
           expect(sub.parentId).to.equal(parentId);
-          expect(sub.text).to.equal(uploads[0].subarticle.text);
+          expect(sub.text).to.equal(uploads.get()[0].subarticle.text);
 
           return {
             $promise: {
@@ -630,20 +689,20 @@ describe('Post service', function() {
           };
         });
 
-        post.post(uploads, parentId);
+        post.post(uploads, parentId, cb);
 
         expect(article.subarticles.create.calledOnce).to.be.true;
       });
 
       it('should post more than one text subarticle', function() {
-        uploads.push(new Upload('another subarticle'));
+        uploads.add(new Upload('another subarticle'));
 
         sinon.stub(article.subarticles, 'create', function(sub) {
 
           var idx = article.subarticles.create.callCount - 1;
           expect(sub.id).to.equal(parentId);
           expect(sub.parentId).to.equal(parentId);
-          expect(sub.text).to.equal(uploads[idx].subarticle.text);
+          expect(sub.text).to.equal(uploads.get()[idx].subarticle.text);
 
           return {
             $promise: {
@@ -657,7 +716,7 @@ describe('Post service', function() {
         });
         sinon.spy(platform, 'showToast');
 
-        post.post(uploads, parentId);
+        post.post(uploads, parentId, cb);
 
         expect(article.subarticles.create.calledTwice).to.be.true;
       });

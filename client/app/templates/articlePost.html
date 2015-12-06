@@ -1,31 +1,28 @@
 <!DOCTYPE html>
-<ion-view view-title="{{newArticle.title}}">
-   <!--ion-nav-back-button class="button-clear" ng-click="goBack()"></button>
-   </ion-nav-back-button-->
-   <ion-nav-buttons side="secondary">
-      <button class="button button-clear icon ion-forward" ng-click="post()"
-         ng-disabled="!newArticle.title || !getMarker() || !uploads.length"></button>
-   </ion-nav-buttons>
-   <ion-content>
+<ion-view view-title="{{newArticle.title}}"
+  style="background-color: #F0F0F0">
+  <!--ion-nav-back-button class="button-clear" ng-click="goBack()"></button>
+  </ion-nav-back-button-->
+  <ion-nav-buttons side="secondary">
+      <button class="button button-clear" ng-click="post()"
+        ng-disabled="!newArticle.title || !getMarker() || !Uploads.get().length">
+        POST
+      </button>
+  </ion-nav-buttons>
+  <ion-content>
       <inAutocomplete place="place"></inAutocomplete>
       <inMap map="map"></inMap>
 
       <div class="list">
          <label class="item item-input">
-            <input type="text" placeholder="Title" ng-model="newArticle.title" required>
+           <input type="text" placeholder="What's the title?" ng-model="newArticle.title" required>
          </label>
 
-         <div ng-repeat="upload in uploads">
+         <div ng-repeat="upload in Uploads.get()">
            <inUpload upload="upload"></inUpload>
          </div>
       </div>
-   </ion-content>
-   <ion-footer-bar class="bar-dark">
-      <div class="row">
-         <button class="col button button-clear icon ion-camera" ng-click="capturePicture()"></button>
-         <button class="col button button-clear icon ion-image" ng-click="openMediaGallery()"></button>
-         <button class="col button button-clear icon ion-videocamera" ng-click="captureVideo()"></button>
-         <button class="col button button-clear icon ion-compose" ng-click="postTextModal.show()"></button>
-      </div>
-   </ion-footer-bar>
+  </ion-content>
+  <in-speed-dial position="'bottom-right'" uploads="Uploads"></in-speed-dial>
+  <in-text-footer></in-text-footer>
 </ion-view>

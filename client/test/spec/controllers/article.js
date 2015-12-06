@@ -2,9 +2,16 @@
 describe('Article controller: ', function(){
 
   var deferred;
+  var art;
 
   //Load the module and create mocks for all dependencies
   beforeEach( function() {
+    art = {
+      location: {
+        lat: 45,
+        lng: 45
+      }
+    };
 
     module('instanews.controller.article');
 
@@ -13,7 +20,52 @@ describe('Article controller: ', function(){
       $provide.service('Article', function() {
         return {
           find: function(filter) {
+            return art;
           },
+        };
+      });
+
+      $provide.service('$ionicModal', function($q) {
+        return {
+          fromTemplateUrl: function(uri, obj) {
+            deferred = $q.defer()
+            return deferred.promise;
+          }
+        };
+      });
+
+      $provide.service('Post', function() {
+        return {
+          post: function(uploads, cb) {
+            cb();
+          },
+        };
+      });
+
+      $provide.service('Platform', function() {
+        return {
+          isIOS: function() {
+            return true;
+          },
+        };
+      });
+
+      $provide.service('Uploads', function() {
+        return {
+          findOrCreate: function(id) {
+            return {
+              get: function() {
+                return uploads;
+              },
+              registerObserver: function (cb) {
+                return {
+                  unregister: function () {
+                    cb();
+                  }
+                };
+              }
+            };
+          }
         };
       });
 
@@ -98,17 +150,23 @@ describe('Article controller: ', function(){
     $controller, 
     $rootScope,
     $stateParams,
+    $ionicModal,
     Article,
     Articles,
     Subarticles,
+    Post,
+    Platform,
+    Uploads,
     Maps
   ){
     scope = $rootScope.$new(); 
     stateParams = $stateParams;
+    ionicModal = $ionicModal;
     article = Article;
     maps = Maps;
     subarticles = Subarticles;
     articles = Articles;
+    uploads = Uploads;
     ctrl = $controller;
   }));
 
@@ -117,9 +175,11 @@ describe('Article controller: ', function(){
     var controller = ctrl('ArticleCtrl', {
       $scope: scope,
       $stateParams: stateParams,
+      $ionicModal: ionicModal,
       Article: article,
       Articles: articles,
       Subarticles: subarticles,
+      Uploads: uploads,
       Maps: maps,
     });
 
@@ -190,6 +250,13 @@ describe('Article controller: ', function(){
   describe('on $ionicView.afterLeave', function() {
     beforeEach(function() {
       initController();
+      scope.article = {
+        location: {
+          lat: 45,
+          lng: -64
+        }
+      };
+      scope.$broadcast('$ionicView.afterEnter');
     });
 
     it('should call Maps.deleteMarker', function() {
