@@ -22,6 +22,7 @@ angular.module('instanews', [
   'instanews.directive.map',
   'instanews.directive.media',
   'instanews.directive.speedDial',
+  'instanews.directive.sidemenu',
   'instanews.directive.textFooter',
   'instanews.directive.upload',
   'instanews.directive.votes',
