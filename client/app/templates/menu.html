@@ -7,8 +7,33 @@
       </ion-side-menu-content>
 
       <ion-side-menu side="left">
-         <ion-content>
-         <div class="item item-avatar" nav-clear menu-close ui-sref="app.profile({username: user.userId})">
+         <ion-content sidemenu="sidemenu-glass">
+         <div profile="profile-large-transparant">
+          <div class="avatar">
+            <img src="images/instanews.png">
+          </div>
+          <div ng-if="user.userId">
+            <p>
+               {{user.userId}}
+            </p>
+          </div>
+          <div ng-if="!user.userId">
+            <p>
+               anonymous
+            </p>
+          </div>
+
+          <div class="leftcol">
+            <p><i class="icon ion-ios-people-outline"></i> 28</p>
+          </div>
+          <div class="middlecol">
+            <p><i class="icon ion-ios-upload-outline"></i> 6</p>
+          </div>
+          <div class="rightcol">
+            <p><i class="icon ion-ios-personadd-outline"></i> 2</p>
+          </div>
+       </div>
+         <!--div class="item item-avatar" nav-clear menu-close ui-sref="app.profile({username: user.userId})">
             <img src="images/ionic.png">
             <div ng-if="user.userId">
                {{user.userId}}
@@ -16,18 +41,20 @@
             <div ng-if="!user.userId">
                Anonymous
             </div>
-         </div>
+           style="position:absolute;right:0;margin-right:16px;font-size:x-large"
+         </div-->
 
-         <div class="item" 
+         <div class="sidemenu-item" 
+           nav-clear menu-close 
            ng-show="Uploads.getPending().length"
-           nav-clear menu-close ng-click="pendingModal.show();">
-          <i class="icon dark"
-            style="position:absolute;right:0;margin-right:16px;font-size:x-large"
+           ng-click="pendingModal.show();">
+          <i class="icon"
             ng-class="Platform.isIOS() ? 'ion-ios-upload-outline' : 'ion-android-upload'"></i>
-            {{Uploads.getPending().length}} Pending Uploads
-         </div>
+             Uploads
+            <span class="badge badge-assertive spanposition">{{Uploads.getPending().length}}</span>
+          </div>
 
-         <ul class="list">
+         <!--ul class="sidemenu-list">
             <div class="item item-text-wrap"
                ng-repeat="note in notifications"
                ng-if="note.message"
@@ -35,7 +62,7 @@
                ng-click="handleNotification(note)">
                   {{note.message}}
             </div>
-         </ul>
+         </ul-->
          </ion-content>
          <ion-footer-bar class="bar-dark">
             <div class="row">
