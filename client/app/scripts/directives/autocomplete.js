@@ -33,7 +33,6 @@ app.directive('inautocomplete', [
 
         $scope.place.predictions = [];
 
-
         var defaultPlaceholder = 'Search for a location';
 
         $scope.input = {
@@ -100,7 +99,7 @@ app.directive('inautocomplete', [
             });
           }
 
-          Platform.hideKeyboard();
+          Platform.keyboard.hide();
         };
 
         Platform.ready

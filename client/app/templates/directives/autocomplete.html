@@ -6,11 +6,13 @@
 
     <input ng-if="!isIOS()" class=" col col-80" ng-focus="disableTap()"
     ng-click="click(this)" onClick="this.select();" type="text" id="search-input"
+    on-return="search()"
     ng-model="input.value" placeholder="{{input.placeholder}}">
     <input ng-if="isIOS()"
       class=" col col-80"
       ng-focus="disableTap()"
       ng-click="click()"
+      on-return="search()"
       onClick="this.setSelectionRange(0, this.input.value.length);"
       type="text" id="search-input"
       ng-model="input.value"
