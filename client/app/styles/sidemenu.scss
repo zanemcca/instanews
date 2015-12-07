@@ -1,0 +1,401 @@
+/* profile section of sidemenu, 3 designs to choose from: small, frosted glass or large */
+
+/* profile small-transparant - minimalistic profile pic in the sidemenu */
+.profile-small-transparant {
+  height: 100px;
+  overflow: hidden;
+  position: relative;
+}
+
+.profile-small-transparant .avatar img{
+    position: absolute;
+    top: 0px;
+    left: -70px;
+    width: 50px;
+    height: 50px;
+    margin-top: 10%;
+    margin-left: 33%;
+    -webkit-border-radius: 50%;
+    -moz-border-radius: 50%;
+    border-radius: 50%;
+    -webkit-box-shadow: 0 0 0 2px #fff;
+    box-shadow: 0 0 0 2px #fff;
+}
+.profile-small-transparant p {
+  color:white;
+  top: 40px;
+  left:80px;
+  padding:1px 10px 1px 10px;
+  font-weight: 900;
+  display: block;
+  text-align: center;
+  margin-right: auto;
+  position: absolute;
+}
+.profile-small-transparant .leftcol {
+  color:white;
+  top: 20px;
+  left: -3px;
+  width: 100%;
+  font-weight: 900;
+  display: block;
+  text-align: center;
+  margin-right: auto;
+  position: absolute;
+}
+.profile-small-transparant .middlecol {
+  color:white;
+  top: 20px;
+  left: 43px;
+  width: 100%;
+  font-weight: 900;
+  display: block;
+  text-align: center;
+  margin-right: auto;
+  position: absolute;
+}
+.profile-small-transparant .rightcol {
+  color:white;
+  top: 20px;
+  left: 93px;
+  width: 100%;
+  font-weight: 900;
+  display: block;
+  text-align: center;
+  margin-right: auto;
+  position: absolute;
+}
+/* profile small-glass - minimalistic profile pic in the sidemenu with frosted glass effect based on the selected profilepic*/
+.profile-small-glass {
+  position: relative;
+  z-index: 100;
+  padding: 0px;
+  height: 100px;
+  background: rgba(34,34,34,0.75);
+  overflow: hidden;
+}
+
+.profile-small-glass::before {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: -1;
+  width: 100%;
+  height: 100%;
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  background-size: auto;
+  content: "";
+  -webkit-filter: blur(30px) opacity(0.9) hue-rotate(0deg);
+  filter: blur(30px) opacity(0.9) hue-rotate(0deg);
+  transform: scale(1)
+}
+
+.profile-small-glass p {
+  color:white;
+  top: 40px;
+  left:80px;
+  padding:1px 10px 1px 10px;
+  font-weight: 900;
+  display: block;
+  text-align: center;
+  margin-right: auto;
+  position: absolute;
+}
+
+.profile-small-glass .avatar img{
+    position: absolute;
+    top: 0px;
+    left: -70px;
+    width: 50px;
+    height: 50px;
+    margin-top: 10%;
+    margin-left: 33%;
+    -webkit-border-radius: 50%;
+    -moz-border-radius: 50%;
+    border-radius: 50%;
+    -webkit-box-shadow: 0 0 0 2px #fff;
+    box-shadow: 0 0 0 2px #fff;
+}
+
+.profile-small-glass .leftcol {
+  color:white;
+  top: 20px;
+  left: -3px;
+  width: 100%;
+  font-weight: 900;
+  display: block;
+  text-align: center;
+  margin-right: auto;
+  position: absolute;
+}
+.profile-small-glass .middlecol {
+  color:white;
+  top: 20px;
+  left: 43px;
+  width: 100%;
+  font-weight: 900;
+  display: block;
+  text-align: center;
+  margin-right: auto;
+  position: absolute;
+}
+.profile-small-glass .rightcol {
+  color:white;
+  top: 20px;
+  left: 93px;
+  width: 100%;
+  font-weight: 900;
+  display: block;
+  text-align: center;
+  margin-right: auto;
+  position: absolute;
+}
+
+/* profile-large-glass - neatly implemented with frosted glass effect based on the selected profile pic */
+
+.profile-large-glass {
+  position: relative;
+  z-index: 100;
+  padding: 0px;
+  background: rgba(34,34,34,0.75);
+  overflow: hidden;
+}
+
+.profile-large-glass::before {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: -1;
+  width: 100%;
+  height: 200px;
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  background-size: auto;
+  content: "";
+  -webkit-filter: blur(30px) opacity(0.9) hue-rotate(0deg);
+  filter: blur(30px) opacity(0.9) hue-rotate(0deg);
+  transform: scale(1.2)
+}
+
+.profile-large-glass p {
+    color:white;
+    font-size: 105%;
+    display: block;
+    text-align: center;
+    margin-right: auto;
+}
+.profile-large-glass .avatar img{
+    width: 90px;
+    height: 90px;
+    margin-top: 10%;
+    margin-left: 33%;
+    -webkit-border-radius: 50%;
+    border-radius: 50%;
+    -webkit-box-shadow: 0 0 0 2px #fff;
+    box-shadow: 0 0 0 2px #fff;
+}
+
+.profile-large-glass .leftcol {
+    float: left;
+    width: 33%;
+    text-align: center;
+    vertical-align: middle;
+    margin-top: 5px;
+    color:white;
+    font-weight:bold;
+}
+.profile-large-glass .middlecol {
+    float: left;
+    width: 34%;
+    text-align: center;
+    vertical-align: middle;
+    margin-top: 5px;
+    color:white;
+    font-weight:bold;
+}
+.profile-large-glass .rightcol {
+    float: left;
+    width: 33%;
+    text-align: center;
+    vertical-align: middle;
+    margin-top: 5px;
+    color:white;
+    font-weight:bold;
+}
+
+/* profile-glass-trasnsparant - large transparant profile pic area */
+
+.profile-large-transparant {
+  position: relative;
+  z-index: 100;
+  padding: 0px;
+  overflow: hidden;
+}
+
+.profile-large-transparant p {
+    color:white;
+    font-size: 105%;
+    display: block;
+    text-align: center;
+    margin-right: auto;
+}
+.profile-large-transparant .avatar img{
+    width: 90px;
+    height: 90px;
+    margin-top: 10%;
+    margin-left: 33%;
+    -webkit-border-radius: 50%;
+    border-radius: 50%;
+    -webkit-box-shadow: 0 0 0 2px #fff;
+    box-shadow: 0 0 0 2px #fff;
+}
+
+.profile-large-transparant .leftcol {
+    float: left;
+    width: 33%;
+    text-align: center;
+    vertical-align: middle;
+    margin-top: 5px;
+    color:white;
+    font-weight:bold;
+}
+.profile-large-transparant .middlecol {
+    float: left;
+    width: 34%;
+    text-align: center;
+    vertical-align: middle;
+    margin-top: 5px;
+    color:white;
+    font-weight:bold;
+}
+.profile-large-transparant .rightcol {
+    float: left;
+    width: 33%;
+    text-align: center;
+    vertical-align: middle;
+    margin-top: 5px;
+    color:white;
+    font-weight:bold;
+}
+
+/* profile-large - showing a large profile pic on the sidemenu */
+.profile-large {
+    height: 200px;
+    width: auto;
+    background-size: 100% 100%;
+    box-shadow: 0.1px 2px 3px rgba(0,0,0,0.16), 0 2px 3px rgba(0,0,0,0.23);
+    overflow: hidden;
+}
+.profile-large .avatar img {
+  width: 100%;
+}
+
+/* Sidemenu styling, choose between gradient or frosted glass
+=========================================================== */
+
+/* sidemenu-gradient - change the 2 colors to get a gradient styling, use same color to have flat style */
+.sidemenu-gradient {
+  background: linear-gradient(#c1a67b, #5b6293);
+  background: -webkit-linear-gradient(#c1a67b, #5b6293);
+}
+
+/* sidemenu-fill - single color sidemenu */
+.sidemenu-fill {
+  background-color: #5b6293;
+}
+
+
+/* sidemenu-glass - frosted glass effect based on pre-chosen picture as background
+   the strongness of frosted glass can be modified via 'blur'
+   modify the hue value to give a different color to the frosted glass */
+
+.sidemenu-glass::before {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: -1;
+  width: 100%;
+  height: 800px;
+  //background: url("https://36.media.tumblr.com/f89ccb412c2bea305f7e54f570d54a2e/tumblr_n6mg88w2kO1ssyc2jo1_500.jpg");
+  background: url("../images/tumblr_n6mg88w2kO1ssyc2jo1_500.jpg");
+  -webkit-background-size: cover;
+  background-size: cover;
+  content: "";
+  -webkit-filter: blur(30px) opacity(0.9) hue-rotate(0deg);
+  filter: blur(30px) opacity(0.9) hue-rotate(0deg);
+  transform: scale(1.2)
+}
+
+/* sidemenu-glass-avatar - frosted glass effect as background based on profile picture
+   the strongness of frosted glass can be modified via 'blur'
+   modify the hue value to give a different color to the frosted glass */
+
+.sidemenu-glass-avatar::before {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: -1;
+  width: 100%;
+  height: 800px;
+  -webkit-background-size: cover;
+  background-size: cover;
+  content: "";
+  -webkit-filter: blur(30px) opacity(0.9) hue-rotate(0deg);
+  filter: blur(30px) opacity(0.9) hue-rotate(0deg);
+  transform: scale(1.2)
+}
+
+/* main styling of sidemenu items */
+.sidemenu-list {
+  list-style-type: none;
+}
+
+.sidemenu-item {
+  border: 1px;
+  position: relative;
+  z-index: 2;
+  padding: 16px 49px 16px 16px;
+  background-color: none;
+  color: #fff;
+  font-size: 120%;
+  margin:0;
+  border-style: solid;
+  border-width: 0px;
+  border-left-color: transparent;
+  border-left-width: 5px;
+
+}
+
+/* current selected menu item indicator, 3 styling possible */
+.current-indicator {
+  color: white;
+  border-style: solid;
+  border-width: 0px;
+  border-left-color: #e96d8a;
+  border-left-width: 5px;
+}
+
+.current-highlight {
+  color: white;
+  background-color: #efe2cd;
+}
+
+.current-pressed {
+  color: white;
+  border-style: solid;
+  border-width: 0px;
+  border-top-color: #4d9a77;
+  border-top-width: 2px;
+  border-bottom-color: #4d9a77;
+  border-bottom-width: 2px;
+  background-color: #55bf8f;
+}
+
+/*notification bubble */
+.spanposition{
+  position: absolute;
+  left:200px;
+  opacity: 0.8;
+  color: white;
+}
