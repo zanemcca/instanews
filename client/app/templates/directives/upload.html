@@ -21,9 +21,12 @@
   <inMedia media="upload.subarticle._file"></inMedia>
 </div>
 <div class="item card" ng-if="upload.subarticle.text">
-  <button class="button button-clear icon icon-right ion-close-round"
-    ng-click="upload.remove()">
-  </button>
+  <div class="buttons">
+    <button class="button button-small button-clear icon ion-close-round"
+      style="position:absolute;right:0;"
+      ng-click="upload.remove()">
+    </button>
+  </div>
   <p>{{upload.subarticle.text}}</p>
   <md-progress-linear
     ng-if="upload.isPosting"
