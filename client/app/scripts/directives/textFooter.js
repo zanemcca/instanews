@@ -15,7 +15,9 @@ app.directive('inTextFooter', [
     return {
       restrict: 'E',
       scope: true, 
-      controller: function($scope) {
+      controller: function(
+        $scope
+      ) {
         var defaultPlaceholder = 'Write a comment...';
         $scope.input = {
           placeholder: defaultPlaceholder,
@@ -55,14 +57,15 @@ app.directive('inTextFooter', [
 
         var onSubmit,
           interruptionCB;
+
         //TODO Move this into the service
         $scope.input.open = function (done, interrupted) {
+          window.addEventListener('native.keyboardhide', keyboardHideHandler);
           $scope.box.visible = true;
           onSubmit = done;
           interruptionCB = interrupted;
           Platform.keyboard.show();
           Navigate.focus($scope.input.id);
-          window.addEventListener('native.keyboardhide', keyboardHideHandler);
         };
 
         $scope.onSubmit = function () {
