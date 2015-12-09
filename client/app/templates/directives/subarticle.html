@@ -10,12 +10,53 @@
 <div class="item item-body"
   ng-if="item._file" 
   style="border-bottom:0;margin-bottom:0;padding-right:0;padding-left:0;padding-top:0px;padding-bottom:1px">
+  <div class="item item-divider row no-padding">
+    <div class="buttons col col-10  col-offset-90 col-top no-padding">
+      <button class="no-margin button button-small button-clear icon ion-close-round"
+        style="color:#E0E0E0;text-align:right;padding-right:0;"
+        ng-click="upload.remove()">
+      </button>
+    </div>
+  </div>
    <inMedia media="item._file" id="item.id"></inMedia>
+        <!--div class="col col-10 col-top no-padding">
+          <div class="row no-padding">
+            <div class="col no-padding">
+              <i class="icon ion-checkmark positive"
+                style="font-size:large"
+                 ng-if="item.verified"></i>
+            </div>
+            <div class="col no-padding"
+              ng-if="item">
+              <button class="button button-small button-clear"
+              ng-click="upload.remove()">
+              <i class="icon ion-close-round no-margin"
+                style="color:#E0E0E0"></i>
+              </button>
+            </div>
+         </div-->
 </div>
 
-<div class="item item-body"> 
-  <b>{{item.username}}</b> &bull; <span am-time-ago="item.created"></span>
-  <p ng-if="item.text">{{item.text}}</p>
+<div class="item item-body"
+  style="padding-bottom:0;"> 
+  <div class="row no-padding">
+    <div class="col col-90 no-padding">
+      <b>{{item.username}}</b> &bull; <span am-time-ago="item.created"></span>
+    </div>
+    <div class="buttons col col-10 col-top no-padding">
+      <button class="no-margin button button-small button-clear icon ion-close-round"
+        style="color:#E0E0E0;text-align:right;padding-right:0;"
+        ng-click="upload.remove()">
+      </button>
+    </div>
+  </div>
+  <div ng-if="item.text">
+    <p class="no-margin">{{item.text}} <button class="no-margin button button-small button-clear icon ion-edit"
+        ng-if="item"
+        ng-click="upload.remove()">
+      </button>
+    </p>
+  </div>
 </div>
 
 <div class="item" style="border:0px;padding-top:0px;padding-bottom:0px">
