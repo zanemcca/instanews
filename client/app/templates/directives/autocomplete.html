@@ -3,17 +3,21 @@
 <form ng-submit="search()" class="list" style="margin-bottom:-1px; padding-bottom: 0;">
   <div class="item item-input row" style="border:0px;margin:0px;padding-top:0;padding-bottom:0;">
     <div class="icon ion-search col col-10"></div>
-
-    <input ng-if="!isIOS()" class=" col col-80" ng-focus="disableTap()"
-    ng-click="click(this)" onClick="this.select();" type="text" id="search-input"
-    on-return="search()"
-    ng-model="input.value" placeholder="{{input.placeholder}}">
+    <input ng-if="!isIOS()"
+      class=" col col-80"
+      ng-focus="disableTap()"
+      ng-click="click(this)"
+      on-return="search()"
+      onClick="this.select();"
+      type="text" id="search-input"
+      ng-model="input.value"
+      placeholder="{{input.placeholder}}">
     <input ng-if="isIOS()"
       class=" col col-80"
       ng-focus="disableTap()"
       ng-click="click()"
       on-return="search()"
-      onClick="this.setSelectionRange(0, this.input.value.length);"
+      onclick="this.setSelectionRange(0, this.value.length);"
       type="text" id="search-input"
       ng-model="input.value"
       placeholder="{{input.placeholder}}">

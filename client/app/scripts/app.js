@@ -173,7 +173,7 @@ angular.module('instanews', [
   }); 
 
   //No transitions for performance
-  $ionicConfigProvider.views.transition('none');
+  //$ionicConfigProvider.views.transition('none');
 
   //Setup back button to not have text
   $ionicConfigProvider.backButton.text('').previousTitleText(false);

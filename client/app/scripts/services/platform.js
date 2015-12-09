@@ -16,7 +16,6 @@ app.factory('Platform', [
     $q
   ) {
 
-
     var ready = $q.defer();
 
     var device = {
@@ -185,7 +184,6 @@ app.factory('Platform', [
       }
     };
 
-
     var loading = {
       show: function () {
         if(!loading.loader ) {
@@ -213,6 +211,10 @@ app.factory('Platform', [
       // for form inputs)
       if (window.cordova && window.cordova.plugins.Keyboard) {
         cordova.plugins.Keyboard.hideKeyboardAccessoryBar(true);
+        if(isIOS()) {
+          console.log('Disabling keyboard scroll!');
+          cordova.plugins.Keyboard.disableScroll(true);
+        }
       }
 
       if (window.StatusBar) {
@@ -246,5 +248,5 @@ app.factory('Platform', [
       getSizeClassPrefix: getSizeClassPrefix,
       ready: ready.promise
     };
-  }]);
-
+  }
+]);

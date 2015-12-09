@@ -3,9 +3,11 @@
 var app = angular.module('instanews.directive.autocomplete', ['ionic', 'ngResource']);
 
 app.directive('inautocomplete', [
+  '$timeout',
   'Platform',
   'Maps',
   function (
+    $timeout,
     Platform,
     Maps
   ) {
@@ -15,7 +17,10 @@ app.directive('inautocomplete', [
       scope: {
         place: '='
       },
-      controller: function($scope) {
+      controller: function(
+        $scope,
+        $timeout
+      ) {
 
         // istanbul ignore next
         $scope.safeApply = function(fn) {
@@ -36,13 +41,14 @@ app.directive('inautocomplete', [
         var defaultPlaceholder = 'Search for a location';
 
         $scope.input = {
+          value: '', 
           placeholder: defaultPlaceholder 
         };
 
         // Localize the map on the users position
         $scope.place.localize = function() {
           $scope.done = true;
-          $scope.input.value = null;
+          $scope.input.value = '';
           $scope.input.placeholder = defaultPlaceholder;
 
           var cb = $scope.place.localizeCallback;
@@ -55,7 +61,7 @@ app.directive('inautocomplete', [
             var localizeMap = function (time) {
               // istanbul ignore else 
               if(time > 0) {
-                setTimeout(function () {
+                $timeout(function () {
                   map = $scope.place.getMap();
                   if(map) {
                     Maps.localize(map, cb);
@@ -79,7 +85,7 @@ app.directive('inautocomplete', [
           $scope.done = true;
           console.log(prediction);
           $scope.place.value = prediction;
-          $scope.input.value = null;
+          $scope.input.value = '';
           $scope.input.placeholder = prediction.description;
           $scope.safeApply();
         };
@@ -88,7 +94,7 @@ app.directive('inautocomplete', [
 
         $scope.search = function () {
           $scope.done = true;
-          if($scope.input.value) {
+          if($scope.input.value && $scope.input.value.length > 0) {
             Maps.autocomplete($scope.input.value, $scope.place, function (predictions) {
               // istanbul ignore else 
               if(predictions && predictions.length) {
@@ -109,7 +115,9 @@ app.directive('inautocomplete', [
           }, function (newValue, oldValue) {
             // istanbul ignore else 
             if(newValue !== oldValue) {
-              if(newValue) {
+              if(!newValue) {
+                $scope.input.value = '';
+              } else if(newValue.length) {
                 Maps.autocomplete($scope.input.value, $scope.place, function (predictions){
                   if(predictions) {
                     $scope.place.predictions = predictions;
@@ -149,6 +157,7 @@ app.directive('inautocomplete', [
           angular.element(container).on('click', function(){
             document.getElementById('search-input').blur();
           });
+
         };
       },
       templateUrl: 'templates/directives/autocomplete.html'
