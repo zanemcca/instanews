@@ -29,6 +29,7 @@ app.controller('PostCtrl', [
 
     $scope.user = User.get();
     $scope.getMarker = Maps.getMarker;
+    $scope.Platform = Platform;
 
     $scope.Uploads = Uploads.findOrCreate();
 
