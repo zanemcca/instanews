@@ -4,9 +4,31 @@
    ui-sref="app.article({id: item.id})">
    <div class="item"
       style="border-bottom:0px;">
-      <b>{{item.title}}</b>
-      <div style="float: right" class="icon ion-checkmark positive button-small"
-         ng-if="item.verified">
+      <div class="row no-padding">
+        <div class="col col-90 no-padding">
+          <b>{{item.title}} </b>
+          <button class="no-margin button button-small button-clear icon ion-edit"
+            ng-if="item"
+            ng-click="upload.remove()">
+          </button>
+        </div>
+        <div class="col col-10 col-top no-padding">
+          <div class="row no-padding">
+            <div class="col no-padding">
+              <i class="icon ion-checkmark positive"
+                style="font-size:large"
+                 ng-if="item.verified"></i>
+            </div>
+            <div class="col no-padding"
+              ng-if="item">
+              <button class="button button-small button-clear"
+              ng-click="upload.remove()">
+              <i class="icon ion-close-round no-margin"
+                style="color:#E0E0E0"></i>
+              </button>
+            </div>
+         </div>
+        </div>
       </div>
       <p>{{item.topSub.text}}</p>
    </div>
