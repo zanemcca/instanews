@@ -81,8 +81,8 @@ app.directive('inListItem', [
         item: '=',
         isCard: '=',
         preLoad: '='
-      },
-      controller: function($scope, $timeout, Maps) {
+      }, 
+      controller: function($scope, $timeout, Maps, User) {
         var WHITELIST = [
           'route',
           'neighborhood',
@@ -93,6 +93,8 @@ app.directive('inListItem', [
 
         var feedMap = Maps.getFeedMap();
         $scope.location = {};
+
+        $scope.isMine = User.isMine;
 
         var setPlaceName = function () {
           $timeout(function () {
