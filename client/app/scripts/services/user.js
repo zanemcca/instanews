@@ -102,8 +102,6 @@ app.service('User', [
     };
 
     var isMine = function(item) {
-      console.log(user);
-      console.log(item);
       return (user && user.userId === item.username);
     };
 

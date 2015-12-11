@@ -62,9 +62,6 @@ app.controller('FeedCtrl', [
           }
         };
 
-        console.log('New place!');
-        console.log(newValue);
-
         if(newValue.geometry) {
           centerMap(newValue);
         } else {
