@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "devDependencies": {
-    "cordova": "~4.2.0",
+    "cordova": "^5.4.1",
     "elementtree": "0.1.6",
     "glob": "~4.3.5",
     "grunt": "~0.4.5",
