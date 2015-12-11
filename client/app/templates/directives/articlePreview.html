@@ -1,15 +1,15 @@
 <!DOCTYPE html>
-<a class="item no-padding item-text-wrap"
+<div class="item no-padding item-text-wrap"
    style="border:transparent"
-   ui-sref="app.article({id: item.id})">
+   ng-click="openArticle()">
    <div class="item"
       style="border-bottom:0px;">
       <div class="row no-padding">
         <div class="col col-90 no-padding">
           <b>{{item.title}} </b>
           <button class="no-margin button button-small button-clear icon ion-edit"
-            ng-if="isMine(item)"
-            ng-click="upload.remove()">
+            ng-if="isMine()"
+            ng-click="editTitle($event)">
           </button>
         </div>
         <div class="col col-10 col-top no-padding"
@@ -27,7 +27,7 @@
          media="item.topSub._file" id="item.topSub.id">
       </inMediaPreview>
    </div>
-</a>
+</div>
 
 <div class="item"
   style="padding-top:1px;padding-bottom:1px;border:0;"> 

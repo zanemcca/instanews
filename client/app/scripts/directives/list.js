@@ -44,12 +44,16 @@ app.directive('inList', [
 ]);
 
 app.directive('inListItem', [
+  '$state',
   '$timeout',
+  'TextInput',
   'Position',
   'User',
   'View',
   function (
+    $state,
     $timeout,
+    TextInput,
     Position,
     User,
     View
@@ -82,7 +86,14 @@ app.directive('inListItem', [
         isCard: '=',
         preLoad: '='
       }, 
-      controller: function($scope, $timeout, Maps, User) {
+      controller: function(
+        $scope,
+        $state,
+        $timeout,
+        TextInput,
+        Maps,
+        User
+      ) {
         var WHITELIST = [
           'route',
           'neighborhood',
@@ -94,7 +105,35 @@ app.directive('inListItem', [
         var feedMap = Maps.getFeedMap();
         $scope.location = {};
 
-        $scope.isMine = User.isMine;
+        $scope.isMine = function () {
+          return User.isMine($scope.item);
+        };
+
+        if($scope.item.modelName === 'article') {
+          $scope.openArticle = function () {
+            //TODO Change to use Navigate
+            $state.go('app.article', { id: $scope.item.id });
+          };
+
+          var newTitle = '';
+          $scope.editTitle = function ($event) {
+            if($event) {
+              $event.stopPropagation();
+            }
+            var textInput = TextInput.get();
+            textInput.placeholder = 'What\'s the title?';
+            newTitle = newTitle || $scope.item.title;
+            textInput.text = newTitle;
+
+            textInput.open(function (text) {
+              $scope.item.title = text;
+              //TODO Save to the server
+            }, function (partialText) {
+              //Interruption function
+              newTitle = partialText;
+            });
+          };
+        }
 
         var setPlaceName = function () {
           $timeout(function () {
