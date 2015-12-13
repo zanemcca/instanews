@@ -64,6 +64,49 @@ angular.module('instanews', [
   window._
 )
 
+//Return should closing keyboard with return
+.directive('input', function($timeout) {
+  return {
+    restrict: 'E',
+    scope: {
+      'returnClose': '=',
+      'onReturn': '&',
+      'onFocus': '&',
+      'onBlur': '&'
+    },
+    link: function(scope, element) {
+      element.bind('focus', function() {
+        if(scope.onFocus) {
+          $timeout(function() {
+            scope.onFocus();
+          });
+        }
+      });
+
+      element.bind('blur', function() {
+        if(scope.onBlur) {
+          $timeout(function() {
+            scope.onBlur();
+          });
+        }
+      });
+
+      element.bind('keydown', function(e) {
+        if(e.which === 13) {
+          if (scope.returnClose) {
+            element[0].blur();
+          }
+          if(scope.onReturn) {
+            $timeout(function() {
+              scope.onReturn();
+            });
+          }
+        }
+      });
+    }
+  };
+})
+
 .controller('AppCtrl', [
   '$ionicModal',
   '$scope',
@@ -146,7 +189,7 @@ angular.module('instanews', [
   }); 
 
   //No transitions for performance
-  $ionicConfigProvider.views.transition('none');
+  //$ionicConfigProvider.views.transition('none');
 
   //Setup back button to not have text
   $ionicConfigProvider.backButton.text('').previousTitleText(false);
