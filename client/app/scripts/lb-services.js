@@ -1,3 +1,4 @@
+// istanbul ignore next
 (function(window, angular, undefined) {'use strict';
 
 var urlBase = "/api";
@@ -311,6 +312,43 @@ module.factory(
           isArray: true,
           url: urlBase + "/articles",
           method: "GET"
+        },
+
+        /**
+         * @ngdoc method
+         * @name lbServices.Article#prototype$updateAttributes
+         * @methodOf lbServices.Article
+         *
+         * @description
+         *
+         * Update attributes for a model instance and persist it into the data source.
+         *
+         * @param {Object=} parameters Request parameters.
+         *
+         *  - `id` – `{*}` - base id
+         *
+         * @param {Object} postData Request data.
+         *
+         * This method expects a subset of model properties as request parameters.
+         *
+         * @param {function(Object,Object)=} successCb
+         *   Success callback with two arguments: `value`, `responseHeaders`.
+         *
+         * @param {function(Object)=} errorCb Error callback with one argument:
+         *   `httpResponse`.
+         *
+         * @returns {Object} An empty reference that will be
+         *   populated with the actual data once the response is returned
+         *   from the server.
+         *
+         * <em>
+         * (The remote method definition does not provide any description.
+         * This usually means the response is a `Article` object.)
+         * </em>
+         */
+        "prototype$updateAttributes": {
+          url: urlBase + "/articles/:id",
+          method: "PUT"
         },
 
         /**
