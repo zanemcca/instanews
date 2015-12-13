@@ -42,6 +42,24 @@ app.service('Articles', [
       var inView = [];
 
       arts.forEach(function(article) {
+
+        article.saveTitle = function () {
+          console.log(article.title);
+          Article.prototype$updateAttributes({
+            id: article.id
+          },
+          {
+            title: article.title
+          },
+          function (res) {
+            console.log('Successful title update');
+            console.log(res);
+          },
+          function (err) {
+            console.log(err);
+          });
+        };
+
         var position = Position.posToLatLng(article.location);
         if(Position.withinBounds(position)) {
           inView.push(article);

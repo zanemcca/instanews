@@ -127,7 +127,7 @@ app.directive('inListItem', [
 
             textInput.open(function (text) {
               $scope.item.title = text;
-              //TODO Save to the server
+              $scope.item.saveTitle(); 
             }, function (partialText) {
               //Interruption function
               newTitle = partialText;
