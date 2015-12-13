@@ -48,7 +48,6 @@ app.factory('TextInput', [
 
     var count = 0;
 
-
     $ionicModal.fromTemplateUrl('templates/modals/textInput.html', {
       scope: $rootScope,
       animation: 'slide-in-up'
@@ -56,7 +55,6 @@ app.factory('TextInput', [
       modal.modal = textModal;
       $rootScope.textInput = modal;
     });
-
 
     var register = function (input) {
       current = input;

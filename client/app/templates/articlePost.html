@@ -15,7 +15,7 @@
 
       <div class="list">
          <label class="item item-input">
-           <input type="text" placeholder="What's the title?" ng-model="newArticle.title" required>
+           <input type="text" placeholder="What's the title?" on-return="Platform.keyboard.hide();" ng-model="newArticle.title" required>
          </label>
 
          <div ng-repeat="upload in Uploads.get()">
