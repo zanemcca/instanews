@@ -1,25 +1,19 @@
 {
   "initial:before": {
-    "loopback#favicon": {
-    }
+    "loopback#favicon": {}
   },
   "initial": {
     "compression": {}
   },
-  "session": {
-  },
-  "auth": {
-  },
-  "parse": {
-  },
-  "routes": {
-  },
-  "files": {
-  },
+  "session": {},
+  "auth": {},
+  "parse": {},
+  "routes": {},
+  "files": {},
   "final": {
     "loopback#urlNotFound": {}
   },
   "final:after": {
-    "./middleware/errorHandler" : {}
+    "./middleware/errorHandler": {}
   }
 }

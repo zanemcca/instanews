@@ -2,20 +2,34 @@
 
 describe('instanews.service.navigate', function() {
 
-  var navigate, ionicSideMenuDelegate, ionicScrollDelegate, ionicHistory;
+  var navigate,
+  user,
+  ionicSideMenuDelegate,
+  ionicScrollDelegate,
+  ionicHistory;
 
   beforeEach(function() {
 
     module('instanews.service.navigate');
+
+    module(function($provide) {
+      $provide.service('User', function() {
+        return {
+          get: function () {}
+        };
+      });
+    });
   });
 
   beforeEach(inject(function(
     $ionicSideMenuDelegate,
     $ionicScrollDelegate,
     $ionicHistory,
-    Navigate
+    Navigate,
+    User
   ) {
     navigate = Navigate;
+    user = User;
     ionicSideMenuDelegate = $ionicSideMenuDelegate;
     ionicScrollDelegate = $ionicScrollDelegate;
     ionicHistory = $ionicHistory;
@@ -24,7 +38,7 @@ describe('instanews.service.navigate', function() {
   var spec;
   beforeEach(function () {
     spec = {};
-    navigate = navigate(spec);
+    scroll = navigate.scroll(spec);
   });
 
   describe('toggleMenu', function() {
@@ -48,7 +62,7 @@ describe('instanews.service.navigate', function() {
   describe('scrollTop', function() {
     it('should call $ionicScrollDelegate.scrollTop', function() {
       sinon.spy(ionicScrollDelegate, 'scrollTop');
-      navigate.scrollTop();
+      scroll.scrollTop();
       expect(ionicScrollDelegate.scrollTop.calledOnce).to.be.true;
     });
   });

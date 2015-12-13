@@ -1,4 +1,5 @@
 // Generated on 2015-04-24 using generator-ionic 0.7.3
+// jshint camelcase: false
 'use strict';
 
 var _ = require('lodash');
@@ -47,7 +48,6 @@ module.exports = function (grunt) {
 
   // Define the configuration for all the tasks
   grunt.initConfig({
-
     // Project settings
     yeoman: {
       // configurable paths
@@ -57,6 +57,42 @@ module.exports = function (grunt) {
       images: 'images',
       test: 'test',
       dist: 'www'
+    },
+    cordovacli: {
+      options: {
+        path: '.'
+      },
+      add_plugins: {
+        options: {
+          command: 'plugin',
+          action: 'add',
+          plugins: [
+            'com.ionic.keyboard',
+       //     'com.phonegap.plugins.PushPlugin',
+            'cordova-plugin-crosswalk-webview',
+            'cordova-plugin-network-information',
+            'cordova-plugin-whitelist',
+            'cordova-plugin-x-toast',
+            'cordova-plugin-camera',
+            'cordova-plugin-console',
+            'cordova-plugin-device',
+            'cordova-plugin-dialogs',
+            'cordova-plugin-file',
+            'cordova-plugin-file-transfer',
+            'cordova-plugin-geolocation',
+            'cordova-plugin-media-capture',
+            'cordova-plugin-splashscreen',
+            'cordova-plugin-statusbar'
+          ]
+        }
+      },
+      add_platforms: {
+        options: {
+          command: 'platform',
+          action: 'add',
+          platforms: ['ios', 'android']
+        }
+      }
     },
 
     // Environment Variables for Angular App
@@ -465,6 +501,8 @@ module.exports = function (grunt) {
 
   });
 
+  grunt.loadNpmTasks('grunt-cordovacli');
+
   // Register tasks for all Cordova commands
   _.functions(cordovaCli).forEach(function (name) {
     grunt.registerTask(name, function () {
@@ -580,6 +618,7 @@ module.exports = function (grunt) {
     return grunt.task.run(['init', 'ionic:resources', 'ionic:build:' + this.args.join(':')]);
   });
 
+
   grunt.registerTask('init', [
     'clean',
     'ngconstant:development',
@@ -621,6 +660,8 @@ module.exports = function (grunt) {
     ['karma:continuous',
     'connect:coverage:keepalive'
   ]);
+
+  grunt.registerTask('add', ['cordovacli:add_plugins', 'cordovacli:add_platforms', 'ionic:resources' ]);
 
   grunt.registerTask('default', [
     'wiredep',

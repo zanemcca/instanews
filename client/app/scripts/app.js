@@ -110,12 +110,14 @@ angular.module('instanews', [
 .controller('AppCtrl', [
   '$ionicModal',
   '$scope',
+  'Navigate',
   'Platform',
   'User',
   'Uploads',
   function (
     $ionicModal,
     $scope,
+    Navigate,
     Platform,
     User,
     Uploads
@@ -131,6 +133,7 @@ angular.module('instanews', [
     $scope.login = User.login;
     $scope.logout = User.logout;
 
+    $scope.Navigate = Navigate;
     $scope.pending = [];
 
     $scope.Uploads = Uploads;
@@ -142,6 +145,17 @@ angular.module('instanews', [
      }).then( function (modal) {
         $scope.pendingModal = modal;
      });
+  }
+])
+
+.controller('NavCtrl', [
+  '$scope',
+  'Navigate',
+  function (
+    $scope,
+    Navigate
+  ) {
+    $scope.Navigate = Navigate;
   }
 ])
 
@@ -250,18 +264,25 @@ angular.module('instanews', [
     }
   })
 
-  .state('articlePost', {
-//    cache: false,
+  .state('app.articlePost', {
     url: '/post/article',
-    templateUrl: 'templates/articlePost.html',
-    controller: 'PostCtrl'
+    views: {
+      'menuContent': {
+        templateUrl: 'templates/articlePost.html',
+        controller: 'PostCtrl'
+      }
+    }
   })
 
-  .state('subarticlePost', {
+  .state('app.subarticlePost', {
     cache: false,
     url: '/post/article/{id}',
-    templateUrl: 'templates/subarticlePost.html',
-    controller: 'PostCtrl'
+    views: {
+      'menuContent': {
+        templateUrl: 'templates/subarticlePost.html',
+        controller: 'PostCtrl'
+      }
+    }
   });
 
   // if none of the above states are matched, use this as the fallback

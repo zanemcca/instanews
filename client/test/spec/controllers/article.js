@@ -137,6 +137,11 @@ describe('Article controller: ', function(){
           }
         };
       });
+
+      $provide.service('Navigate', function() {
+        return {
+        };
+      });
     });
   });
 
