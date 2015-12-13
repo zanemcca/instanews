@@ -88,6 +88,8 @@ app.service('User', [
 
     //Load the login page
     var login = function() {
+      //TODO Should probably use Navigate.go just in case
+      //    It unfortunately adds a circular dependency
       $state.go('app.login');
     };
 

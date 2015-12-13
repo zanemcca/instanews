@@ -8,7 +8,7 @@ app.directive('inTextFooter', [
   'TextInput',
   function (
     Platform,
-    navigate,
+    Navigate,
     TextInput
   ) {
 
@@ -28,8 +28,6 @@ app.directive('inTextFooter', [
         $scope.box = {
           visible: false
         };
-
-        var Navigate = navigate();
 
         function keyboardHideHandler(){
           $scope.$apply(function () {
