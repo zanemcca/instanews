@@ -10,6 +10,7 @@ app.controller('ArticleCtrl', [
   'Articles',
   'Subarticles',
   'Maps',
+  'Navigate',
   'Post',
   'Platform',
   'Uploads',
@@ -21,6 +22,7 @@ app.controller('ArticleCtrl', [
     Articles,
     Subarticles,
     Maps,
+    Navigate,
     Post,
     Platform,
     Uploads
@@ -75,6 +77,12 @@ app.controller('ArticleCtrl', [
       marker = Maps.deleteMarker(marker);
       uploadObserver.unregister();
     });
+
+    $scope.post = function () {
+      Navigate.go('app.subarticlePost', {
+        id: $scope.article.id
+      });
+    };
 
     /*
        $scope.onRefresh = function () {

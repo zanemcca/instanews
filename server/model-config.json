@@ -7,6 +7,10 @@
       "../common/models"
     ]
   },
+  "Email": {
+    "dataSource": "sendgrid",
+    "public": false
+  },
   "User": {
     "dataSource": "db",
     "public": false

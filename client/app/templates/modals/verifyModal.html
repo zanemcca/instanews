@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<ion-modal-view>
+  <ion-content>
+    <div class="list list-inset" style="margin-top:10px;">
+      <div class="item item-text-wrap">
+        We sent a confirmation code to verify your email. Please enter it below.
+      </div>
+      <label class="item item-input item-floating-label"
+        style="border-top:0;border-left:0;border-right:0"
+        ng-class="{'box-invalid' : invalidLogin}">
+        <span class="input-label" >Confirmation Code</span>
+        <input type="text" placeholder="Confirmation Code" ng-model="verify.token" required>
+      </label>
+      <button class="button button-positive button-block no-padding" 
+        ng-disabled="verify.token.length !== 6"
+        ng-click="verify()">
+        Submit
+      </button>
+      <button class="button button-stable button-block no-padding" ng-click="verifyLater()">
+        Verify Later 
+      </button>
+      <button class="button button-clear button-block no-padding" 
+        ng-click="resendConfirmation()">
+        Resend 
+      </button>
+    </div>
+  </ion-content>
+</ion-modal-view>

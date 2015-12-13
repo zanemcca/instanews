@@ -3,14 +3,266 @@ var common = require('./common');
 
 module.exports = function(Journalist) {
 
+  var loopback = require('loopback');
+  var path = require('path');
+  var crypto = require('crypto');
+
+  function randomToken(len) {
+    if(!len) {
+      len = 6;
+    }
+
+    var buf = crypto.randomBytes(len);
+    var res = '';
+    for(var i in buf) {
+      res += buf[i].toString(36).toUpperCase();
+      if(res.length >= len) {
+        return res.slice(0,len);
+      }
+    }
+    console.log('Error: Failed to create a randomToken');
+  }
+
+  Journalist.sendConfirmation = function (user, next) {
+    var options = {
+      type: 'email',
+      to: user.email,
+      from: 'noreply@instanews.com',
+      //redirect: '/',
+      //protocol: ctx.req.protocol,
+      //host: '192.168.1.9',
+      subject: 'Verify Your Email Address',
+      template: path.resolve(__dirname, '../views/verify.ejs'),
+      generateVerificationToken: function (user, cb) {
+        var token = randomToken(6);
+        cb(null, token);
+      }
+    };
+
+    user.verify(options, function(err, res) {
+      if( err) {
+        console.error('Error: Failed to verify the email ' + user.email);
+        console.error(err.stack);
+        next(err);
+      }
+      else {
+        next();
+      }
+    });
+  }; 
+
+  Journalist.resendConfirmation = function (user, next) {
+    var query = {
+      where: {}
+    };
+
+    if(!user || !(user.email || user.username)) {
+      var e = new Error('The user is invalid');
+      e.status = 422;
+      return next(e);
+    }
+    if(user.email) {
+      query.where.email = user.email.toLowerCase();
+    } else {
+      query.where.username = user.username.toLowerCase();
+    }
+
+    Journalist.findOne(query, function (err, res) {
+      if(err) {
+        return next(err);
+      }
+      if(!res) {
+        err = new Error('There is no user under that search');
+        err.status = 404;
+        return next(err);
+      } else {
+        if(res.__data.emailVerified) {
+          err = new Error('This users email is already verified: ' + res.username);
+          err.status = 403;
+          return next(err);
+        } else {
+          Journalist.sendConfirmation(res, next);
+        }
+      }
+    });
+  };
+
+  Journalist.requestPasswordReset = function (user, next) {
+    var query = {
+      where: {}
+    };
+
+    if(!user || !(user.email || user.username)) {
+      var e = new Error('The user is invalid');
+      e.status = 422;
+      return next(e);
+    }
+    if(user.email) {
+      query.where.email = user.email.toLowerCase();
+    } else {
+      query.where.username = user.username.toLowerCase();
+    }
+
+    Journalist.findOne(query, function (err, res) {
+      if(err) {
+        return next(err);
+      }
+      if(!res) {
+        err = new Error('There is no user under that search');
+        err.status = 404;
+        return next(err);
+      } else {
+        var options = {
+          to: user.email,
+          generateVerificationToken: function (user, cb) {
+            var token = randomToken(6);
+            cb(null, token);
+          }
+        };
+
+        res.requestPasswordReset(options, function(err, res) {
+          if( err) {
+            console.error('Error: Failed to verify the email ' + user.email);
+            console.error(err.stack);
+            next(err);
+          }
+          else {
+            next();
+          }
+        });
+      }
+    });
+  }; 
+
+  Journalist.on('resetPasswordRequest', function (info) {
+    //TODO randomToken does not set the accesstoken at all
+    //  Solve by adding generateAccessToken function to options of resetPassword
+    var html = '<p>Password reset code: <b>' + info.accessToken.id + '</b></p>';
+    Journalist.app.models.Email.send({
+      to: info.email,
+      from: 'noreply@instanews.com',
+      subject: 'Password Reset',
+      html: html
+    }, function (err) {
+      if (err) {
+        console.error(err.stack);
+      } else {
+        console.log('Successful password reset email sent');
+      }
+    });
+  });
+
+  var checkPasswordStrength = function (password) {
+    var p = password;
+    var strength = 0;
+
+    // istanbul ignore if
+    if( !p || p.length === 0 ) {
+      strength = 0;
+    }
+    else if (p.length < 8) {
+      strength = -1;
+    }
+    else {
+      //lowercase && (numbers || uppercase || special)
+      var strong = /^(?=.*[a-z])((?=.*[A-Z])|(?=.*\d)|(?=.*[-+_!@#$%^&*.,?~])).+$/;
+      //lowercase && 2 of (numbers || uppercase || special)
+      var excellent = /^(?=.*[a-z])(((?=.*[A-Z])(?=.*\d))|((?=.*[A-Z])(?=.*[-+_!@#$%^&*.,?~]))|((?=.*\d)(?=.*[-+_!@#$%^&*.,?]))).+$/;
+      if (excellent.test(p) || (p.length >= 12 && strong.test(p))) {
+        strength = 3;
+      }
+      else if (strong.test(p) || p.length >= 12) {
+        strength = 2;
+      }
+      else {
+        strength = 1;
+      }
+    }
+
+    return strength;
+  };
+
+  Journalist.passwordReset = function (user, next) {
+    var query = {
+      where: {}
+    };
+
+    if(!user ||
+       !(user.email || user.username) ||
+       !(user.token) ||
+       checkPasswordStrength(user.password) <= 0) {
+       console.dir(user);
+      var e = new Error('The input is invalid');
+      e.status = 422;
+      return next(e);
+    }
+
+    if(user.email) {
+      query.where.email = user.email.toLowerCase();
+    } else {
+      query.where.username = user.username.toLowerCase();
+    }
+
+    Journalist.findOne(query, function (err, res) {
+      if(err) {
+        return next(err);
+      }
+      if(!res) {
+        err = new Error('There is no user under that search');
+        err.status = 404;
+        return next(err);
+      } else {
+        Journalist.app.models.AccessToken.findById(user.token, function (err, token) {
+          if ( err) {
+            err = new Error('The token is invalid');
+            err.status = 404;
+            next(err);
+          } else {
+            console.log(token);
+            if(!token || token.userId !== res.username) {
+              err = new Error('Unauthorized password reset request');
+              err.status = 401;
+              next(err);
+            } else {
+              res.updateAttribute('password', user.password, function (err, res) {
+                next(err);
+              });
+            }
+          }
+        });
+      }
+    });
+  };
+
+  Journalist.remoteMethod(
+    'resendConfirmation',
+    {
+      accepts: { arg: 'user', type: 'object', required: true}
+    }
+   );
+
+  Journalist.remoteMethod(
+    'requestPasswordReset',
+    {
+      accepts: { arg: 'user', type: 'object', required: true}
+    }
+   );
+
+  Journalist.remoteMethod(
+    'passwordReset',
+    {
+      accepts: { arg: 'user', type: 'object', required: true}
+    }
+   );
+
    var staticDisable = [
       'exists',
       'find',
-      'findOne',
+ //     'findOne',
       'upsert',
       'prototype.updateAttributes',
       'deleteById',
-      'confirm',
+ //     'confirm',
       'resetPassword',
       'createChangeStream',
       'createChangeStream_0',

@@ -3,12 +3,16 @@
 var app = angular.module('instanews.directive.comments', ['ionic', 'ngResource']);
 
 app.directive('incomments', [
+  '$timeout',
   'Comment',
   'Comments',
+  'Navigate',
   'TextInput',
   function (
+    $timeout,
     Comment,
     Comments,
+    Navigate,
     TextInput
   ) {
 
@@ -32,32 +36,45 @@ app.directive('incomments', [
 
         var newComment = '';
 
-        $scope.create = function () {
-          var textInput = TextInput.get();
-          if($scope.owner.commentableId) {
-            textInput.placeholder = 'Write a reply...';
-          }
-          textInput.text = newComment;
+        var scrollSpec = {
+          scrollHandle: 'feed'
+        };
 
-          textInput.open(function (text) {
-            Comment.create({
-              content: text,
-              commentableId: $scope.owner.id,
-              commentableType: $scope.owner.modelName
-            }).$promise
-            .then(function(res,err) {
-              // istanbul ignore if 
-              if(err) {
-                console.log(err);
-              }
-              else {
-                //TODO Add to the Comment list
-                //$scope.owner.comments.push(res);
-              }
+        var Scroll = Navigate.scroll(scrollSpec);
+
+        $scope.create = function () {
+          Navigate.ensureLogin( function () {
+            var textInput = TextInput.get();
+            if($scope.owner.commentableId) {
+              textInput.placeholder = 'Write a reply...';
+            }
+            textInput.text = newComment;
+
+            textInput.open(function (text) {
+              Comment.create({
+                content: text,
+                commentableId: $scope.owner.id,
+                commentableType: $scope.owner.modelName
+              }).$promise
+              .then(function(res,err) {
+                // istanbul ignore if 
+                if(err) {
+                  console.log(err);
+                }
+                else {
+                  //TODO Add to the Comment list
+                  //$scope.owner.comments.push(res);
+                }
+              });
+            }, function (partialText) {
+              //Interruption function
+              newComment = partialText;
             });
-          }, function (partialText) {
-            //Interruption function
-            newComment = partialText;
+
+            // Wait a frame
+            $timeout(function () {
+              Scroll.anchorScroll($scope.owner.id);
+            }, 16);
           });
         };
       },

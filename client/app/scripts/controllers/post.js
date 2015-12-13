@@ -5,7 +5,7 @@ app.controller('PostCtrl', [
   '$stateParams',
   '$scope',
   '$ionicModal',
-  '$ionicHistory',
+  'Navigate',
   'Article',
   'Articles',
   'Post',
@@ -17,7 +17,7 @@ app.controller('PostCtrl', [
     $stateParams,
     $scope,
     $ionicModal,
-    $ionicHistory,
+    Navigate,
     Article,
     Articles,
     Post,
@@ -125,12 +125,11 @@ app.controller('PostCtrl', [
         cancelText: 'Cancel',
         cancel:  function() {},
         buttonClicked: function() {
-          $ionicHistory.goBack();
+          Navigate.goBack();
         },
         destructiveButtonClicked: function() {
           console.log('post goback button was clicked');
-          //$scope.Upload.destroy(Uploads);
-          $ionicHistory.goBack();
+          Navigate.goBack();
         }
       });
     };
@@ -144,7 +143,7 @@ app.controller('PostCtrl', [
         title: ''
       };
 
-      $ionicHistory.goBack();
+      Navigate.goBack();
     };
 
     $scope.post = function () {
