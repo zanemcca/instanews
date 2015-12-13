@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<ion-modal-view>
+  <ion-content>
+    <div class="list list-inset" style="margin-top:10px;">
+      <label class="item item-input item-floating-label"
+        style="border-top:0;border-left:0;border-right:0"
+        ng-class="{'box-invalid' : invalidLogin}">
+        <span class="input-label" >Username or Email</span>
+        <input type="text" placeholder="Username or Email" ng-model="cred.username" required>
+      </label>
+      <label class="item item-input item-floating-label"
+        style="border-top:0;border-left:0;border-right:0"
+        ng-class="{'box-invalid' : invalidLogin}">
+        <span class="input-label" >Password</span>
+        <input type="password" placeholder="Password" ng-model="cred.password" required>
+      </label>
+      <button class="button button-positive button-block no-padding" 
+        ng-disabled="!cred.username || !cred.password"
+        ng-click="login()">
+        Login
+      </button>
+      <button class="button button-stable button-block no-padding" ng-click="loginModal.hide()">
+        Cancel 
+      </button>
+      <button class="button button-clear button-full" ng-click="reset.forgotModal.show()">
+        Forgot Password
+      </button>
+    </div>
+  </ion-content>
+</ion-modal-view>

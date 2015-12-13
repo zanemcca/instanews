@@ -251,6 +251,22 @@ describe('Post: ', function(){
         };
       });
 
+      $provide.service('Navigate', function() {
+        return {
+          goBack: function () {},
+          disableNextBack: function() {},
+          scroll: function (spec) {
+            return {
+              onScroll: function() {
+                return false;
+              },
+              scrollTop: function() {}
+            };
+          },
+          toggleMenu: function() {}
+        };
+      });
+
       $provide.service('Position', function() {
         return {
           registerObserver: function(cb) {
@@ -301,6 +317,7 @@ describe('Post: ', function(){
     Post,
     Platform,
     Maps,
+    Navigate,
     User,
     Upload,
     Uploads,
@@ -314,6 +331,7 @@ describe('Post: ', function(){
     post = Post;
     platform = Platform;
     maps = Maps;
+    navigate = Navigate;
     user = User;
     upload = Upload;
     uploads = Uploads;
@@ -551,8 +569,8 @@ describe('Post: ', function(){
       });
 
 
-      it('should call $ionicHistory.goBack() when save is called', function() {
-        sinon.spy(ionicHistory, 'goBack');
+      it('should call Navigate.goBack() when save is called', function() {
+        sinon.spy(navigate, 'goBack');
         sinon.stub(platform, 'showSheet', function(sheet) {
           sheet.buttonClicked();
         });
@@ -560,11 +578,11 @@ describe('Post: ', function(){
         scope.goBack();
 
         expect(platform.showSheet.calledOnce).to.be.true;
-        expect(ionicHistory.goBack.calledOnce).to.be.true;
+        expect(navigate.goBack.calledOnce).to.be.true;
       });
 
-      it('should call Upload.destroy then $ionicHistory.goBack() when delete is clicked', function() {
-        sinon.spy(ionicHistory, 'goBack');
+      it('should call Upload.destroy then Navigate.goBack() when delete is clicked', function() {
+        sinon.spy(navigate, 'goBack');
         sinon.spy(upload, 'destroy');
         sinon.stub(platform, 'showSheet', function(sheet) {
           sheet.destructiveButtonClicked();
@@ -574,7 +592,7 @@ describe('Post: ', function(){
 
         expect(platform.showSheet.calledOnce).to.be.true;
         expect(upload.destroy.calledOnce).to.be.true;
-        expect(ionicHistory.goBack.calledOnce).to.be.true;
+        expect(navigate.goBack.calledOnce).to.be.true;
       });
     });
 
@@ -631,10 +649,10 @@ describe('Post: ', function(){
 
     describe('postSubarticle', function() {
       beforeEach(function() {
-          scope.user = {
-            username: 'username'
-          };
-          stateParams.id = 'parent id';
+        scope.user = {
+          username: 'username'
+        };
+        stateParams.id = 'parent id';
       });
 
       it('should call Post.post', function() {
@@ -673,16 +691,17 @@ describe('Post: ', function(){
           expect(platform.showToast.calledOnce).to.be.true;
         });
 
-        it('should call $ionicHistory.goBack()', function() {
-          sinon.spy(ionicHistory, 'goBack');
-          scope.postSubarticle();
-          expect(ionicHistory.goBack.calledOnce).to.be.true;
-        });
+      it('should call $ionicHistory.goBack()', function() {
+        sinon.spy(ionicHistory, 'goBack');
+        scope.postSubarticle();
+        expect(ionicHistory.goBack.calledOnce).to.be.true;
+      });
       });
     });
-   */
+    */
 
-  //TODO Move these to uploads test
+    //TODO Move these to uploads test
+
     describe.skip('trashText', function() {
 
       it('should reset data.text', function() {
@@ -704,10 +723,8 @@ describe('Post: ', function(){
         sinon.spy(scope.postTextModal, 'hide');
 
         scope.trashText();
-
-        expect(scope.postTextModal.hide.calledOnce).to.be.true;
       });
-    });
+    }); 
 
     describe.skip('saveText', function() {
 
@@ -754,7 +771,6 @@ describe('Post: ', function(){
         expect(scope.uploads.length).to.equal(1);
         expect(scope.uploads[0]).to.equal(upld);
       });
-
     });
 
     describe.skip('openMediaGallery', function() {
