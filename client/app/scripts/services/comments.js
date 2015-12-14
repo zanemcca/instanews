@@ -75,6 +75,21 @@ app.service('Comments', [
         }
       };
 
+    var save = function () {
+      Comment.prototype$updateAttributes({
+        id: this.id
+      },
+      {
+        content: this.content
+      },
+      function () {
+        console.log('Successful comment update');
+      },
+      function (err) {
+        console.log(err);
+      });
+    };
+
       var filter = {
         skip: 0,
         limit: 5,
@@ -92,6 +107,7 @@ app.service('Comments', [
       }
 
       spec.update = spec.update || update;
+      spec.save = spec.save || save;
 
       spec.options.filter = spec.options.filter || filter;
       spec.options.filter.where = spec.options.filter.where || filter.where;

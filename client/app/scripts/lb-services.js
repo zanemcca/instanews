@@ -83,6 +83,43 @@ module.factory(
           method: "GET"
         },
 
+        /**
+         * @ngdoc method
+         * @name lbServices.Subarticle#prototype$updateAttributes
+         * @methodOf lbServices.Subarticle
+         *
+         * @description
+         *
+         * Update attributes for a model instance and persist it into the data source.
+         *
+         * @param {Object=} parameters Request parameters.
+         *
+         *  - `id` – `{*}` - base id
+         *
+         * @param {Object} postData Request data.
+         *
+         * This method expects a subset of model properties as request parameters.
+         *
+         * @param {function(Object,Object)=} successCb
+         *   Success callback with two arguments: `value`, `responseHeaders`.
+         *
+         * @param {function(Object)=} errorCb Error callback with one argument:
+         *   `httpResponse`.
+         *
+         * @returns {Object} An empty reference that will be
+         *   populated with the actual data once the response is returned
+         *   from the server.
+         *
+         * <em>
+         * (The remote method definition does not provide any description.
+         * This usually means the response is a `Subarticle` object.)
+         * </em>
+         */
+        "prototype$updateAttributes": {
+          url: urlBase + "/subarticles/:id",
+          method: "PUT"
+        },
+
         // INTERNAL. Use Article.subarticles() instead.
         "::get::article::subarticles": {
           isArray: true,
@@ -1395,6 +1432,44 @@ module.factory(
           isArray: true,
           url: urlBase + "/comments",
           method: "POST"
+        },
+
+        /**
+         * @ngdoc method
+         * @name lbServices.Comment#prototype$updateAttributes
+         * @methodOf lbServices.Comment
+         *
+         * @description
+         *
+         * Update attributes for a model instance and persist it into the data source.
+         *
+         * @param {Object=} parameters Request parameters.
+         *
+         *   This method does not accept any parameters.
+         *   Supply an empty object or omit this argument altogether.
+         *
+         * @param {Object} postData Request data.
+         *
+         * This method expects a subset of model properties as request parameters.
+         *
+         * @param {function(Object,Object)=} successCb
+         *   Success callback with two arguments: `value`, `responseHeaders`.
+         *
+         * @param {function(Object)=} errorCb Error callback with one argument:
+         *   `httpResponse`.
+         *
+         * @returns {Object} An empty reference that will be
+         *   populated with the actual data once the response is returned
+         *   from the server.
+         *
+         * <em>
+         * (The remote method definition does not provide any description.
+         * This usually means the response is a `Comment` object.)
+         * </em>
+         */
+        "prototype$updateAttributes": {
+          url: urlBase + "/comments/:id",
+          method: "PUT"
         },
 
         // INTERNAL. Use Subarticle.comments() instead.
