@@ -105,10 +105,14 @@ app.directive('inListItem', [
         var feedMap = Maps.getFeedMap();
         $scope.location = {};
 
-        $scope.isMine = function () {
-          return User.isMine($scope.item);
+        $scope.is = {
+          mine: function () {
+            return User.isMine($scope.item);
+          }
         };
 
+        var textInput;
+        var newText = '';
         if($scope.item.modelName === 'article') {
           $scope.openArticle = function () {
             //TODO Change to use Navigate
@@ -120,7 +124,7 @@ app.directive('inListItem', [
             if($event) {
               $event.stopPropagation();
             }
-            var textInput = TextInput.get();
+            textInput = TextInput.get();
             textInput.placeholder = 'What\'s the title?';
             newTitle = newTitle || $scope.item.title;
             textInput.text = newTitle;
@@ -134,36 +138,44 @@ app.directive('inListItem', [
             });
           };
         } else if ($scope.item.modelName === 'subarticle') {
-            var newText = '';
-
-            $scope.edit = function () {
-              if($scope.item.__file) {
-                var textInput = TextInput.get();
-                textInput.placeholder = 'What\'s the caption?';
-                newText = newText || $scope.item.__file.caption;
-              } else {
-                var textInput = TextInput.get('modal');
+            newText = '';
+            if($scope.item.text) {
+              $scope.edit = function () {
+                textInput = TextInput.get('modal');
                 textInput.placeholder = 'What\'s the story?';
                 newText = newText || $scope.item.text;
-              }
-              textInput.text = newText;
+                textInput.text = newText;
 
-              textInput.open(function (text) {
-                if($scope.item.__file) {
-                  $scope.item.__file.caption = text;
-                } else {
+                textInput.open(function (text) {
                   $scope.item.text = text;
+                  $scope.item.save(); 
+                }, function (partialText) {
+                  //Interruption function
+                  newText = partialText;
+                });
+              };
+            } else {
+              $scope.caption = {
+                edit: function () {
+                  textInput = TextInput.get();
+                  textInput.placeholder = 'What\'s the caption?';
+                  newText = newText || $scope.item._file.caption;
+                  textInput.text = newText;
+
+                  textInput.open(function (text) {
+                    $scope.item._file.caption = text;
+                    $scope.item.save(); 
+                    }, function (partialText) {
+                    //Interruption function
+                    newText = partialText;
+                  });
                 }
-                $scope.item.save(); 
-              }, function (partialText) {
-                //Interruption function
-                newText = partialText;
-              });
-            };
+              };
+            }
         } else if ($scope.item.modelName === 'comment') {
-            var newText = '';
+            newText = '';
             $scope.edit = function () {
-              var textInput = TextInput.get();
+              textInput = TextInput.get();
               textInput.placeholder = 'Add a comment...';
               newText = newText || $scope.item.content;
               textInput.text = newText;
