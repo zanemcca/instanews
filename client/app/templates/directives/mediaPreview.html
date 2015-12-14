@@ -4,10 +4,11 @@
   <img height="auto" width:"auto" alt="Oops! There was a problem loading this image" ng-src="{{source}}">
 </div>
 
-<div class="item"
-  ng-if="media.caption"
-  style="padding-bottom:0px">
-  <p class="no-margin">
-  {{media.caption}}
+<div class="item" 
+  ng-if="media.caption">
+  <p class="no-margin">{{media.caption}} <button class="no-margin button button-small button-clear icon ion-edit"
+      ng-if="isMine()"
+      ng-click="edit()">
+    </button>
   </p>
 </div>
