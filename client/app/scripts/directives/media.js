@@ -130,6 +130,7 @@ app.controller(
     }]
 );
 
+
 //This directive will display subarticle media in a consumable format
 // istanbul ignore next
 app.directive(
@@ -139,6 +140,8 @@ app.directive(
       return {
         restrict: 'E',
         scope: {
+          isMine: '=',
+          editCaption: '=',
           media: '='
         },
         templateUrl: 'templates/directives/media.html'
@@ -150,14 +153,16 @@ app.directive(
 // istanbul ignore next
 app.directive(
   'inmediapreview', [
-    function () {
+    function (
+    ) {
 
       return {
         restrict: 'E',
         scope: {
           media: '='
         },
-        controller: function() {
+        controller: function(
+        ) {
         },
         templateUrl: 'templates/directives/mediaPreview.html'
       };

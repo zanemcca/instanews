@@ -63,9 +63,9 @@ app.service('Subarticles', [
 
       var save = function () {
         var data = {};
-        if(this.__file) {
+        if(this._file) {
           data = {
-            '_file.caption': this.__file.caption
+            '_file.caption': this._file.caption
           };
         } else {
           data = {
