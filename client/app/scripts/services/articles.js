@@ -43,22 +43,6 @@ app.service('Articles', [
 
       arts.forEach(function(article) {
 
-        article.saveTitle = function () {
-          console.log(article.title);
-          Article.prototype$updateAttributes({
-            id: article.id
-          },
-          {
-            title: article.title
-          },
-          function (res) {
-            console.log('Successful title update');
-            console.log(res);
-          },
-          function (err) {
-            console.log(err);
-          });
-        };
 
         var position = Position.posToLatLng(article.location);
         if(Position.withinBounds(position)) {
@@ -73,6 +57,21 @@ app.service('Articles', [
         hiddenArticles.add(hidden);
       }
       return inView;
+    };
+
+    var save = function () {
+      Article.prototype$updateAttributes({
+        id: this.id
+      },
+      {
+        title: this.title
+      },
+      function () {
+        console.log('Successful title update');
+      },
+      function (err) {
+        console.log(err);
+      });
     };
 
     var preLoad = function (article, cb) {
@@ -101,6 +100,8 @@ app.service('Articles', [
 
     var spec = {};
     spec.preLoad = preLoad;
+    spec.save = save;
+
     spec.find = Article.find;
     spec.update = update;
     spec.addFilter = spec.addFilter || addFilter;

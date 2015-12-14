@@ -127,12 +127,55 @@ app.directive('inListItem', [
 
             textInput.open(function (text) {
               $scope.item.title = text;
-              $scope.item.saveTitle(); 
+              $scope.item.save(); 
             }, function (partialText) {
               //Interruption function
               newTitle = partialText;
             });
           };
+        } else if ($scope.item.modelName === 'subarticle') {
+            var newText = '';
+
+            $scope.edit = function () {
+              if($scope.item.__file) {
+                var textInput = TextInput.get();
+                textInput.placeholder = 'What\'s the caption?';
+                newText = newText || $scope.item.__file.caption;
+              } else {
+                var textInput = TextInput.get('modal');
+                textInput.placeholder = 'What\'s the story?';
+                newText = newText || $scope.item.text;
+              }
+              textInput.text = newText;
+
+              textInput.open(function (text) {
+                if($scope.item.__file) {
+                  $scope.item.__file.caption = text;
+                } else {
+                  $scope.item.text = text;
+                }
+                $scope.item.save(); 
+              }, function (partialText) {
+                //Interruption function
+                newText = partialText;
+              });
+            };
+        } else if ($scope.item.modelName === 'comment') {
+            var newText = '';
+            $scope.edit = function () {
+              var textInput = TextInput.get();
+              textInput.placeholder = 'Add a comment...';
+              newText = newText || $scope.item.content;
+              textInput.text = newText;
+
+              textInput.open(function (text) {
+                $scope.item.content = text;
+                $scope.item.save(); 
+              }, function (partialText) {
+                //Interruption function
+                newText = partialText;
+              });
+            };
         }
 
         var setPlaceName = function () {

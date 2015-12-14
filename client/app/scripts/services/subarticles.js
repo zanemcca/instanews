@@ -5,9 +5,11 @@ var app = angular.module('instanews.service.subarticles', ['ionic', 'ngResource'
 
 app.service('Subarticles', [
   'Article',
+  'Subarticle',
   'list',
   function(
     Article,
+    Subarticle,
     list
   ){
     var articles = [];
@@ -59,6 +61,29 @@ app.service('Subarticles', [
         }
       };
 
+      var save = function () {
+        var data = {};
+        if(this.__file) {
+          data = {
+            '_file.caption': this.__file.caption
+          };
+        } else {
+          data = {
+            text: this.text
+          };
+        }
+
+        Subarticle.prototype$updateAttributes({
+          id: this.id
+        }, data,
+        function () {
+          console.log('Succesfully updated subarticle');
+        },
+        function (err) {
+          console.log(err);
+        });
+      };
+
       var filter = {
         skip: 0,
         limit: 1,
@@ -83,6 +108,7 @@ app.service('Subarticles', [
 
       spec.find = Article.subarticles;
       spec.update = spec.update || update;
+      spec.save = spec.save || save;
 
       // Create a list for articles within view
       var subarticles = list(spec);

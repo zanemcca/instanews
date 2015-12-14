@@ -65,6 +65,13 @@
       "principalType": "ROLE",
       "principalId": "$owner",
       "permission": "ALLOW",
+      "property": "updateAttributes"
+    },
+    {
+      "accessType": "EXECUTE",
+      "principalType": "ROLE",
+      "principalId": "$owner",
+      "permission": "ALLOW",
       "property": "deleteById"
     }
   ],
