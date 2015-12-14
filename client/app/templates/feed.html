@@ -9,7 +9,7 @@
       <button ng-click="toggleMenu()" class="button button-icon icon ion-ios-gear-outline"></button>
    </ion-nav-buttons>
 
-   <ion-content delegate-handle="feed" on-swipe-down="onSwipeDown()" overflow-scroll="true" class="gpu">
+   <ion-content delegate-handle="feed" overflow-scroll="true" class="gpu">
       <in-list list="Articles"
         is-card="true"> 
         <inAutocomplete place="place"></inAutocomplete>
@@ -18,7 +18,4 @@
    </ion-content>
    <in-text-footer>
    </in-text-footer>
-  <!--button class="float-button button button-dark icon ion-chevron-up"
-    ng-show="scrollTopVisible" ng-click="scrollTop()">
-  </button-->
 </ion-view>

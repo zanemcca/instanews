@@ -58,18 +58,18 @@ app.directive('inTextFooter', [
 
         //TODO Move this into the service
         $scope.input.open = function (done, interrupted) {
-          window.addEventListener('native.keyboardhide', keyboardHideHandler);
           $scope.box.visible = true;
           onSubmit = done;
           interruptionCB = interrupted;
           Platform.keyboard.show();
+          window.addEventListener('native.keyboardhide', keyboardHideHandler);
           Navigate.focus($scope.input.id);
         };
 
         $scope.onSubmit = function () {
+          $scope.box.visible = false;
           if(onSubmit) {
             onSubmit($scope.input.text);
-            $scope.box.visible = false;
             $scope.input.text = '';
             $scope.input.placeholder = defaultPlaceholder;
             onSubmit = null;

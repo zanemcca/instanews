@@ -87,7 +87,7 @@ module.exports = function(Article) {
     'findOne',
     'findById',
     'upsert',
-    'prototype.updateAttributes',
+    //'prototype.updateAttributes',
     'deleteById',
     'createChangeStream',
     'createChangeStream_0',
@@ -135,6 +135,7 @@ module.exports = function(Article) {
     '__updateById__subarticles',
     '__count__subarticles',
     //disable all journalist REST endpoints
+    '__get__journalist',
     '__get__journalists',
     '__delete__journalists',
     '__destroyById__journalists',

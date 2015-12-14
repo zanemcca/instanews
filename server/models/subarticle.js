@@ -15,7 +15,7 @@ module.exports = function(Subarticle) {
       'count',
       'findOne',
       'upsert',
-      'prototype.updateAttributes',
+ //     'prototype.updateAttributes',
       'deleteById',
       'createChangeStream',
       'createChangeStream_0',

@@ -103,6 +103,10 @@ app.service('User', [
       });
     };
 
+    var isMine = function(item) {
+      return (user && user.userId === item.username);
+    };
+
     // If a user is logged in already then request a new token
      // istanbul ignore else 
     if(LoopBackAuth.accessTokenId && LoopBackAuth.currentUserId) {
@@ -125,6 +129,7 @@ app.service('User', [
       install: install,
       login: login,
       logout: logout,
+      isMine: isMine,
       get: get,
       getToken: getToken,
       set: set,
