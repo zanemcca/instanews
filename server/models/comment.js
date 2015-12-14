@@ -15,7 +15,7 @@ module.exports = function(Comment) {
       'findOne',
       'findById',
       'upsert',
-      'prototype.updateAttributes',
+ //     'prototype.updateAttributes',
       'deleteById',
       'createChangeStream',
       'createChangeStream_0',

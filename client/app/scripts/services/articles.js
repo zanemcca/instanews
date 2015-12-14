@@ -42,6 +42,8 @@ app.service('Articles', [
       var inView = [];
 
       arts.forEach(function(article) {
+
+
         var position = Position.posToLatLng(article.location);
         if(Position.withinBounds(position)) {
           inView.push(article);
@@ -55,6 +57,21 @@ app.service('Articles', [
         hiddenArticles.add(hidden);
       }
       return inView;
+    };
+
+    var save = function () {
+      Article.prototype$updateAttributes({
+        id: this.id
+      },
+      {
+        title: this.title
+      },
+      function () {
+        console.log('Successful title update');
+      },
+      function (err) {
+        console.log(err);
+      });
     };
 
     var preLoad = function (article, cb) {
@@ -83,6 +100,8 @@ app.service('Articles', [
 
     var spec = {};
     spec.preLoad = preLoad;
+    spec.save = save;
+
     spec.find = Article.find;
     spec.update = update;
     spec.addFilter = spec.addFilter || addFilter;

@@ -44,12 +44,16 @@ app.directive('inList', [
 ]);
 
 app.directive('inListItem', [
+  '$state',
   '$timeout',
+  'TextInput',
   'Position',
   'User',
   'View',
   function (
+    $state,
     $timeout,
+    TextInput,
     Position,
     User,
     View
@@ -81,8 +85,15 @@ app.directive('inListItem', [
         item: '=',
         isCard: '=',
         preLoad: '='
-      },
-      controller: function($scope, $timeout, Maps) {
+      }, 
+      controller: function(
+        $scope,
+        $state,
+        $timeout,
+        TextInput,
+        Maps,
+        User
+      ) {
         var WHITELIST = [
           'route',
           'neighborhood',
@@ -93,6 +104,79 @@ app.directive('inListItem', [
 
         var feedMap = Maps.getFeedMap();
         $scope.location = {};
+
+        $scope.isMine = function () {
+          return User.isMine($scope.item);
+        };
+
+        if($scope.item.modelName === 'article') {
+          $scope.openArticle = function () {
+            //TODO Change to use Navigate
+            $state.go('app.article', { id: $scope.item.id });
+          };
+
+          var newTitle = '';
+          $scope.editTitle = function ($event) {
+            if($event) {
+              $event.stopPropagation();
+            }
+            var textInput = TextInput.get();
+            textInput.placeholder = 'What\'s the title?';
+            newTitle = newTitle || $scope.item.title;
+            textInput.text = newTitle;
+
+            textInput.open(function (text) {
+              $scope.item.title = text;
+              $scope.item.save(); 
+            }, function (partialText) {
+              //Interruption function
+              newTitle = partialText;
+            });
+          };
+        } else if ($scope.item.modelName === 'subarticle') {
+            var newText = '';
+
+            $scope.edit = function () {
+              if($scope.item.__file) {
+                var textInput = TextInput.get();
+                textInput.placeholder = 'What\'s the caption?';
+                newText = newText || $scope.item.__file.caption;
+              } else {
+                var textInput = TextInput.get('modal');
+                textInput.placeholder = 'What\'s the story?';
+                newText = newText || $scope.item.text;
+              }
+              textInput.text = newText;
+
+              textInput.open(function (text) {
+                if($scope.item.__file) {
+                  $scope.item.__file.caption = text;
+                } else {
+                  $scope.item.text = text;
+                }
+                $scope.item.save(); 
+              }, function (partialText) {
+                //Interruption function
+                newText = partialText;
+              });
+            };
+        } else if ($scope.item.modelName === 'comment') {
+            var newText = '';
+            $scope.edit = function () {
+              var textInput = TextInput.get();
+              textInput.placeholder = 'Add a comment...';
+              newText = newText || $scope.item.content;
+              textInput.text = newText;
+
+              textInput.open(function (text) {
+                $scope.item.content = text;
+                $scope.item.save(); 
+              }, function (partialText) {
+                //Interruption function
+                newText = partialText;
+              });
+            };
+        }
 
         var setPlaceName = function () {
           $timeout(function () {

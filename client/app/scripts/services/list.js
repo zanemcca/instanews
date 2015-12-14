@@ -30,6 +30,8 @@ function ListFactory (Platform) {
         newItems = [newItems];
       }
 
+      console.log('newItems');
+      console.log(newItems);
       newItems = spec.addFilter(newItems);
 
       if(newItems.length) {
@@ -44,6 +46,7 @@ function ListFactory (Platform) {
             }
           }
           if(!update) {
+            newItem.save = spec.save.bind(newItem);
             spec.items.push(newItem);
           }
         });
@@ -179,6 +182,7 @@ function ListFactory (Platform) {
         oldVal[i] = newVal[i];
       }
     };
+    spec.save = spec.save || function () {};
 
     spec.options = spec.options || {};
     spec.options.filter = spec.options.filter || {};

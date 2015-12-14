@@ -40,6 +40,11 @@
       "type": "hasMany",
       "model": "comment",
       "polymorphic": "commentable"
+    },
+    "journalist": {
+      "type": "belongsTo",
+      "model": "journalist",
+      "foreignKey": "username"
     }
   },
   "acls": [
@@ -174,6 +179,20 @@
       "principalId": "$authenticated",
       "permission": "ALLOW",
       "property": "__create__upVotes"
+    },
+    {
+      "accessType": "EXECUTE",
+      "principalType": "ROLE",
+      "principalId": "$owner",
+      "permission": "ALLOW",
+      "property": "updateAttributes"
+    },
+    {
+      "accessType": "EXECUTE",
+      "principalType": "ROLE",
+      "principalId": "$owner",
+      "permission": "ALLOW",
+      "property": "__get__journalist"
     }
   ],
   "methods": {}
