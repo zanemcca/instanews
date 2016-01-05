@@ -4,6 +4,7 @@
     <div class="buttons">
       <button class="button button-small button-clear icon ion-close-round"
         style="position:absolute;right:0;"
+        ng-if="!upload.isPosting"
         ng-click="upload.remove()">
       </button>
     </div>
@@ -18,19 +19,21 @@
       md-mode="query">
     </md-progress-linear>
   </div>
-  <inMedia media="upload.subarticle._file"></inMedia>
+  <inMedia edit-caption="caption.edit" is-mine="is.mine" media="upload.subarticle._file"></inMedia>
 </div>
 <div class="card" ng-if="upload.subarticle.text">
   <div class="item item-divider no-padding">
     <div class="buttons">
       <button class="button button-small button-clear icon ion-close-round"
         style="position:absolute;right:0;"
+        ng-if="!upload.isPosting"
         ng-click="upload.remove()">
       </button>
     </div>
   </div>
   <p class="item item-text-wrap">{{upload.subarticle.text}} <button class="no-margin button button-small button-clear icon ion-edit"
-      ng-click="edit(upload.subarticle.text)">
+      ng-if="!upload.isPosting"
+      ng-click="edit()">
     </button>
   </p>
   <md-progress-linear
