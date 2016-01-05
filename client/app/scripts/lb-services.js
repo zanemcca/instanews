@@ -1,4 +1,3 @@
-// istanbul ignore next
 (function(window, angular, undefined) {'use strict';
 
 var urlBase = "/api";
@@ -85,6 +84,39 @@ module.factory(
 
         /**
          * @ngdoc method
+         * @name lbServices.Subarticle#deleteById
+         * @methodOf lbServices.Subarticle
+         *
+         * @description
+         *
+         * Delete a model instance by id from the data source.
+         *
+         * @param {Object=} parameters Request parameters.
+         *
+         *  - `id` – `{*}` - Model id
+         *
+         * @param {function(Object,Object)=} successCb
+         *   Success callback with two arguments: `value`, `responseHeaders`.
+         *
+         * @param {function(Object)=} errorCb Error callback with one argument:
+         *   `httpResponse`.
+         *
+         * @returns {Object} An empty reference that will be
+         *   populated with the actual data once the response is returned
+         *   from the server.
+         *
+         * <em>
+         * (The remote method definition does not provide any description.
+         * This usually means the response is a `Subarticle` object.)
+         * </em>
+         */
+        "deleteById": {
+          url: urlBase + "/subarticles/:id",
+          method: "DELETE"
+        },
+
+        /**
+         * @ngdoc method
          * @name lbServices.Subarticle#prototype$updateAttributes
          * @methodOf lbServices.Subarticle
          *
@@ -143,6 +175,66 @@ module.factory(
     );
 
 
+
+        /**
+         * @ngdoc method
+         * @name lbServices.Subarticle#destroyById
+         * @methodOf lbServices.Subarticle
+         *
+         * @description
+         *
+         * Delete a model instance by id from the data source.
+         *
+         * @param {Object=} parameters Request parameters.
+         *
+         *  - `id` – `{*}` - Model id
+         *
+         * @param {function(Object,Object)=} successCb
+         *   Success callback with two arguments: `value`, `responseHeaders`.
+         *
+         * @param {function(Object)=} errorCb Error callback with one argument:
+         *   `httpResponse`.
+         *
+         * @returns {Object} An empty reference that will be
+         *   populated with the actual data once the response is returned
+         *   from the server.
+         *
+         * <em>
+         * (The remote method definition does not provide any description.
+         * This usually means the response is a `Subarticle` object.)
+         * </em>
+         */
+        R["destroyById"] = R["deleteById"];
+
+        /**
+         * @ngdoc method
+         * @name lbServices.Subarticle#removeById
+         * @methodOf lbServices.Subarticle
+         *
+         * @description
+         *
+         * Delete a model instance by id from the data source.
+         *
+         * @param {Object=} parameters Request parameters.
+         *
+         *  - `id` – `{*}` - Model id
+         *
+         * @param {function(Object,Object)=} successCb
+         *   Success callback with two arguments: `value`, `responseHeaders`.
+         *
+         * @param {function(Object)=} errorCb Error callback with one argument:
+         *   `httpResponse`.
+         *
+         * @returns {Object} An empty reference that will be
+         *   populated with the actual data once the response is returned
+         *   from the server.
+         *
+         * <em>
+         * (The remote method definition does not provide any description.
+         * This usually means the response is a `Subarticle` object.)
+         * </em>
+         */
+        R["removeById"] = R["deleteById"];
 
 
     /**

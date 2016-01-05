@@ -16,7 +16,7 @@ module.exports = function(Subarticle) {
       'findOne',
       'upsert',
  //     'prototype.updateAttributes',
-      'deleteById',
+ //     'deleteById',
       'createChangeStream',
       'createChangeStream_0',
       'updateAll'
