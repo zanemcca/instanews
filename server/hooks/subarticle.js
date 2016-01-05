@@ -136,6 +136,8 @@ module.exports = function(app) {
     }
   });
 
+  //TODO After delete
+
   /* istanbul ignore next */
   /*
    Subarticle.observe('after save', function(ctx, next) {

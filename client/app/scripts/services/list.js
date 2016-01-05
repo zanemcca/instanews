@@ -47,6 +47,7 @@ function ListFactory (Platform) {
           }
           if(!update) {
             newItem.save = spec.save.bind(newItem);
+            newItem.destroy = spec.destroy.bind(newItem);
             spec.items.push(newItem);
           }
         });
@@ -175,6 +176,7 @@ function ListFactory (Platform) {
 
     spec.sortingFunction = spec.sortingFunction || sortingFunction;
 
+
     //For simple cases this will do but the update function should
     //have a smarter version given 
     spec.update = spec.update || function (newVal, oldVal) {
@@ -183,6 +185,7 @@ function ListFactory (Platform) {
       }
     };
     spec.save = spec.save || function () {};
+    spec.destroy = spec.destroy || function () {};
 
     spec.options = spec.options || {};
     spec.options.filter = spec.options.filter || {};
