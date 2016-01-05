@@ -93,7 +93,7 @@ module.exports = function(Storage) {
       Type: 'video',
       Output: 'instanews-videos-test',
       Params: { 
-        PipelineId: '1444324496785-65xn4p',
+        PipelineId: '1452020851595-e01yyt',
         Input: { 
           Key: null,
           AspectRatio: 'auto', 
