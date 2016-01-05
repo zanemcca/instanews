@@ -160,6 +160,11 @@ app.service('Uploads', [
           subarticle: subarticle
         };
 
+        if(ENV.name === 'staging') {
+          subarticle._file.container = 'instanews-videos-test-in';
+          upload.container = 'instanews-videos-test-in';
+        }
+
         upload.complete = $q.defer();
 
         return upload;
@@ -187,6 +192,11 @@ app.service('Uploads', [
           },
           subarticle: subarticle
         };
+
+        if(ENV.name === 'staging') {
+          subarticle._file.container = 'instanews-photos-test-in';
+          upload.container = 'instanews-photos-test-in';
+        }
 
         upload.complete = $q.defer();
 

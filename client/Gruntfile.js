@@ -116,6 +116,16 @@ module.exports = function (grunt) {
           }
         }
       },
+      staging: {
+        constants: {
+          ENV: {
+            name: 'staging',
+            apiEndpoint: 'https://turtle.instanews.com/api',
+            videoEndpoint: 'https://turtlevideos.instanews.com',
+            photoEndpoint: 'https://turtlephotos.instanews.com'
+          }
+        }
+      },
       production: {
         constants: {
           ENV: {
@@ -608,6 +618,9 @@ module.exports = function (grunt) {
     if(this.args.indexOf('production') > -1) {
       this.args.splice(this.args.indexOf('production'),1);
       return grunt.task.run(['newer:jshint', 'init:production', 'ionic:resources', 'ionic:run:' + this.args.join(':')]);
+    } else if(this.args.indexOf('staging') > -1) {
+      this.args.splice(this.args.indexOf('staging'),1);
+      return grunt.task.run(['newer:jshint', 'init:staging', 'ionic:resources', 'ionic:run:' + this.args.join(':')]);
     } else {
       grunt.config('concurrent.ionic.tasks', ['ionic:run:' + this.args.join(':')]);
       return grunt.task.run(['init', 'ionic:resources', 'ionic:run:' + this.args.join(':')]);
@@ -617,7 +630,6 @@ module.exports = function (grunt) {
   grunt.registerTask('build', function() {
     return grunt.task.run(['init', 'ionic:resources', 'ionic:build:' + this.args.join(':')]);
   });
-
 
   grunt.registerTask('init', [
     'clean',
@@ -639,6 +651,15 @@ module.exports = function (grunt) {
     'newer:copy:tmp'
   ]);
 
+  grunt.registerTask('init:staging', [
+    'clean',
+    'ngconstant:staging',
+    'wiredep',
+    'concurrent:dist',
+    'autoprefixer',
+    'newer:copy:app',
+    'newer:copy:tmp'
+  ]);
 
   grunt.registerTask('compress', [
     'clean',
