@@ -142,9 +142,20 @@ exports.run = function () {
         describe('photo', function () {
           beforeEach(function () {
             containerName = 'instanews-photos-in';
-          });
+          }); 
 
           it('should get the photo transcoder paramaters', function (done) {
+            invoke = function (params, cb) {
+              expect(params).to.exist;
+              expect(params.Payload).to.exist;
+              done();
+            };
+
+            run();
+          }); 
+
+          it('should get the photo transcoder test paramaters', function (done) {
+            containerName = 'instanews-photos-test-in';
             invoke = function (params, cb) {
               expect(params).to.exist;
               expect(params.Payload).to.exist;
@@ -177,6 +188,17 @@ exports.run = function () {
 
         describe('video', function () {
           it('should get the video transcoder paramaters', function (done) {
+            createJob = function (params, cb) {
+              expect(params).to.exist;
+              expect(params.PipelineId).to.exist;
+              done();
+            };
+
+            run();
+          }); 
+
+          it('should get the video transcoder test paramaters', function (done) {
+            containerName = 'instanews-videos-test-in';
             createJob = function (params, cb) {
               expect(params).to.exist;
               expect(params.PipelineId).to.exist;
