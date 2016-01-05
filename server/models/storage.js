@@ -89,7 +89,58 @@ module.exports = function(Storage) {
   },
   function () {
     return {
+      Name: 'instanews-videos-test-in',
+      Type: 'video',
+      Output: 'instanews-videos-test',
+      Params: { 
+        PipelineId: '1444324496785-65xn4p',
+        Input: { 
+          Key: null,
+          AspectRatio: 'auto', 
+          Container: 'auto',
+          FrameRate: 'auto',
+          Resolution: 'auto',
+          Interlaced: 'auto'
+        },
+        Outputs: [
+          {
+            Key: '2M',
+            SegmentDuration: '5', //Seconds/segment
+            Rotate: 'auto',
+            //HLS 2M
+            PresetId: '1351620000001-200010' 
+          }, 
+          { 
+            Key: 'HD.mp4',
+            Rotate: 'auto',
+            //iPhone4S+ (1920x1080 Mp4 High-profile AAC)
+            PresetId: '1351620000001-100020' 
+          },
+          {
+            Key: 'SD.mp4',
+            Rotate: 'auto',
+            ThumbnailPattern: '-SD-{count}',
+            //iPhone1-3 (640x480 Mp4 baseline AAC)
+            PresetId: '1445198308687-fnaxk5' 
+          }] 
+          //TODO webM
+      }
+    };
+  },
+  function () {
+    return {
       Name: 'instanews-photos-in',
+      Type: 'photo',
+      Params: {
+        FunctionName: 'imageTranscoder',
+        Payload: '{}',
+        InvocationType: 'Event'
+      }
+    };
+  },
+  function () {
+    return {
+      Name: 'instanews-photos-test-in',
       Type: 'photo',
       Params: {
         FunctionName: 'imageTranscoder',
