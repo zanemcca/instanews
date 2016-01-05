@@ -6,7 +6,7 @@
       <i class="icon"
         ng-class="Platform.isIOS() ? 'ion-ios-arrow-back' : 'ion-android-arrow-back'"></i>
      </button>
-     <h1 class="title">What's the story?</h1>
+     <h1 class="title">{{textInput.placeholder}}</h1>
      <button
        ng-disabled="!textInput || !textInput.text || !textInput.text.length"
        class="button buttons button-clear" ng-click="textInput.saveText()">
