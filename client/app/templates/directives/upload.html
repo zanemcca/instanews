@@ -20,14 +20,19 @@
   </div>
   <inMedia media="upload.subarticle._file"></inMedia>
 </div>
-<div class="item card" ng-if="upload.subarticle.text">
-  <div class="buttons">
-    <button class="button button-small button-clear icon ion-close-round"
-      style="position:absolute;right:0;"
-      ng-click="upload.remove()">
-    </button>
+<div class="card" ng-if="upload.subarticle.text">
+  <div class="item item-divider no-padding">
+    <div class="buttons">
+      <button class="button button-small button-clear icon ion-close-round"
+        style="position:absolute;right:0;"
+        ng-click="upload.remove()">
+      </button>
+    </div>
   </div>
-  <p>{{upload.subarticle.text}}</p>
+  <p class="item item-text-wrap">{{upload.subarticle.text}} <button class="no-margin button button-small button-clear icon ion-edit"
+      ng-click="edit(upload.subarticle.text)">
+    </button>
+  </p>
   <md-progress-linear
     ng-if="upload.isPosting"
     md-mode="query">
