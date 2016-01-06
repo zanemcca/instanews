@@ -23,10 +23,18 @@ module.exports = function(Storage) {
   var validator = new MessageValidator();
 
   var transcoder,
+  s3,
   lambda;
 
   var credentials = cred.get('aws');
   if(credentials) {
+    s3 = new aws.S3({
+      apiVersion: '2006-03-01',
+      region: 'us-east-1',
+      accessKeyId: credentials.keyId,
+      secretAccessKey: credentials.key
+    });
+
     transcoder = new aws.ElasticTranscoder({
       region: 'us-east-1',
       accessKeyId: credentials.keyId,
@@ -412,6 +420,35 @@ module.exports = function(Storage) {
       } else {
         console.log('No data passed into transcodingComplete');
         next();
+      }
+    });
+  };
+
+  Storage.getObject = s3.getObject.bind(s3);
+
+  Storage.destroy = function(container, name, next) {
+    var params = {
+      Bucket: container + '-delete',
+      CopySource: container + '/' + name,
+      Key: name
+    };
+
+    s3.copyObject(params, function(err, data) {
+      if( err) {
+        console.error(err.stack);
+        next(err);
+      } else {
+        s3.deleteObject({
+          Bucket: container,
+          Key: name
+        }, function (err, data) {
+          if(err) {
+            console.error(err);
+            next(err);
+          } else {
+            next();
+          }
+        });
       }
     });
   };
