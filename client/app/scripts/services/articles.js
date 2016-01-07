@@ -78,9 +78,22 @@ app.service('Articles', [
       //TODO This should be within a $scope.$apply in order to be rendered
       var update = function () {
         //console.log('Trying to get topSubarticle');
-        var subarticle = article.Subarticles.getTop();
-        if(subarticle) {
-          article.topSub = subarticle;
+
+        //If all the subarticles have been removed then remove the article
+        if(article.Subarticles.get().length === 0) {
+          //Attempt to load more subarticles
+          article.Subarticles.load(function (subs) {
+            if(subs.length === 0) {
+              articles.remove(function (art) {
+                return (art.id === article.id);
+              });
+            }
+          });
+        } else {
+          var subarticle = article.Subarticles.getTop();
+          if(subarticle) {
+            article.topSub = subarticle;
+          }
         }
       };
 
@@ -96,7 +109,8 @@ app.service('Articles', [
       article.Subarticles.load();
 
       cb(article);
-    };
+    }; 
+
 
     var spec = {};
     spec.preLoad = preLoad;

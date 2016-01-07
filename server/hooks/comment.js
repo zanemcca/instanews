@@ -7,6 +7,7 @@ module.exports = function(app) {
   var Click = app.models.click;
   var Notification = app.models.notif;
   var Stat = app.models.stat;
+  var Storage = app.models.storage;
   var Base = app.models.base;
 
   var debug = app.debug('hooks:comment');
@@ -65,7 +66,67 @@ next();
     }
   });
 
+  Comment.observe('before delete', function(ctx, next) {
+    debug('before delete', ctx, next);
+    Comment.find({ where: ctx.where }, function (err, res) {
+      if(err) {
+        console.error(err.stack);
+        next(err);
+      } else if(res.length > 0) {
+        res.forEach(function(inst) {
+          Storage.archive(inst, function(err) {
+            if(err) {
+              console.error(err.stack);
+              return next(err);
+            } 
 
+            inst.comments.destroyAll(function (err, res) {
+              if(err) {
+                console.error(err.stack);
+                return next(err);
+              }
+
+              var id = ctx.where.id || ctx.where._id;
+              // Rerank the parent if this element was deleted individually 
+              if(JSON.stringify(id) === JSON.stringify(inst.id)) {
+                //TODO Use Base.updateStats
+                inst.commentable(function (err, res) {
+                  var data = {
+                    $mul: {
+                      'notCommentRating': 1/(1 - inst.rating)
+                    }
+                  };
+
+                  res.updateAttributes(data, function (err, res) {
+                    if(err) {
+                      console.error(err.stack);
+                      return next(err);
+                    }
+
+                    Stat.triggerRating({
+                      id: res.id
+                    }, 
+                    res.modelName,
+                    null, 
+                    function(err, res) {
+                      if(err) {
+                        console.log(err.stack);
+                      }
+                      next(err);
+                    });
+                  });
+                });
+              } else {
+                next();
+              }
+            });
+          });
+        });
+      } else {
+        next();
+      }
+    });
+  });
   /* istanbul ignore next */
 
   /*
