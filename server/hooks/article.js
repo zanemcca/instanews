@@ -107,7 +107,6 @@ module.exports = function(app) {
         console.error(err.stack);
         next(err);
       } else if(res.length > 0) {
-        console.log(res);
         res.forEach(function(inst) {
           Storage.archive(inst, function(err) {
             var error;
