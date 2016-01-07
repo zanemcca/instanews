@@ -47,6 +47,17 @@ function ListFactory (Platform) {
           }
           if(!update) {
             newItem.save = spec.save.bind(newItem);
+            newItem.destroy = function() {
+              Platform.showSheet({
+                destructiveText: '<i class="icon ion-trash-b assertive"></i> Delete',
+                titleText: 'Are you sure you want to delete this?',
+                cancelText: 'Cancel',
+                destructiveButtonClicked: function() {
+                  spec.destroy.call(newItem);
+                  return true;
+                }
+              });
+            };
             spec.items.push(newItem);
           }
         });
@@ -175,6 +186,7 @@ function ListFactory (Platform) {
 
     spec.sortingFunction = spec.sortingFunction || sortingFunction;
 
+
     //For simple cases this will do but the update function should
     //have a smarter version given 
     spec.update = spec.update || function (newVal, oldVal) {
@@ -183,6 +195,7 @@ function ListFactory (Platform) {
       }
     };
     spec.save = spec.save || function () {};
+    spec.destroy = spec.destroy || function () {};
 
     spec.options = spec.options || {};
     spec.options.filter = spec.options.filter || {};

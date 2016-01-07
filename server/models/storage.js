@@ -23,10 +23,18 @@ module.exports = function(Storage) {
   var validator = new MessageValidator();
 
   var transcoder,
+  s3,
   lambda;
 
   var credentials = cred.get('aws');
   if(credentials) {
+    s3 = new aws.S3({
+      apiVersion: '2006-03-01',
+      region: 'us-east-1',
+      accessKeyId: credentials.keyId,
+      secretAccessKey: credentials.key
+    });
+
     transcoder = new aws.ElasticTranscoder({
       region: 'us-east-1',
       accessKeyId: credentials.keyId,
@@ -412,6 +420,62 @@ module.exports = function(Storage) {
       } else {
         console.log('No data passed into transcodingComplete');
         next();
+      }
+    });
+  };
+
+  if(s3 && s3.getObject) {
+    Storage.getObject = s3.getObject.bind(s3);
+  }
+
+  Storage.archive = function(instance, cb) {
+    if(!process.env.NODE_ENV || process.env.NODE_ENV === 'development') {
+      cb();
+    } else {
+      if(instance.modelName) {
+        var container = 'instanews-' + instance.modelName + 's';
+        if(process.env.NODE_ENV !== 'production') {
+          container += '-test';
+        }
+        container += '-delete';
+
+        s3.putObject({
+          Bucket: container,
+          Body: JSON.stringify(instance),
+          Key: instance.id + '.json'
+        }, cb);
+      } else {
+        var e = new Error('There was no modelName on the given instance. Archiving cancelled');
+        e.status = 403;
+        console.warn(e.message);
+        cb(e);
+      }
+    }
+  };
+
+  Storage.destroy = function(container, name, next) {
+    var params = {
+      Bucket: container + '-delete',
+      CopySource: container + '/' + name,
+      Key: name
+    };
+
+    s3.copyObject(params, function(err, data) {
+      if( err) {
+        console.error(err.stack);
+        next(err);
+      } else {
+        s3.deleteObject({
+          Bucket: container,
+          Key: name
+        }, function (err, data) {
+          if(err) {
+            console.error(err);
+            next(err);
+          } else {
+            next();
+          }
+        });
       }
     });
   };

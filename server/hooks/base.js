@@ -68,6 +68,7 @@ module.exports = function(app) {
     }
 
     ctx.query.where = ctx.query.where || {};
+    //Limit the requests to be within the last two weeks
     ctx.query.where.id = ctx.query.where.id || { gt: app.utils.objectIdWithTimestamp(Date.now() - 2 * ONE_WEEK) };
 
     /*
@@ -127,7 +128,6 @@ module.exports = function(app) {
     }
     if(inst) {
 
-
       inst.modified = new Date();
       inst.ratingModified = new Date();
       delete inst.comments;
@@ -182,6 +182,15 @@ module.exports = function(app) {
         inst.rating = rating;
       }
       else {
+        if(!ctx.data) {
+          ctx.data = ctx.instance.toObject();
+          delete ctx.instance;
+          ctx.instance = {
+            id: ctx.data.id
+          };
+          delete ctx.data.id;
+        }
+
         //TODO move versioning into a mixin for everyone
         //The version cannot be set explicitly
         if(ctx.data.hasOwnProperty('version')) {

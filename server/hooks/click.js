@@ -140,6 +140,9 @@ module.exports = function(app) {
     var inst = ctx.instance;
     if(inst && ctx.isNewInstance) {
       var where;
+      if(inst.clickableId === null) {
+        return next();
+      }
       if( inst.clickableId && inst.clickableType) {
         where = {
           username: inst.username,

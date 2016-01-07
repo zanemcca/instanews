@@ -5,10 +5,12 @@ var app = angular.module('instanews.service.subarticles', ['ionic', 'ngResource'
 
 app.service('Subarticles', [
   'Article',
+  'Navigate',
   'Subarticle',
   'list',
   function(
     Article,
+    Navigate,
     Subarticle,
     list
   ){
@@ -82,6 +84,24 @@ app.service('Subarticles', [
         function (err) {
           console.log(err);
         });
+      }; 
+
+      var destroy = function () {
+        var id = this.id;
+        Subarticle.deleteById({id: this.id})
+        .$promise
+        .then(function () {
+          console.log('Succesfully deleted the subarticle');
+          if(subarticles.get().length === 1) {
+            Navigate.goBack();
+          }
+          subarticles.remove(function (subarticle) {
+            return (subarticle.id === id); 
+          });
+        },
+        function (err) {
+          console.log(err);
+        });
       };
 
       var filter = {
@@ -109,6 +129,7 @@ app.service('Subarticles', [
       spec.find = Article.subarticles;
       spec.update = spec.update || update;
       spec.save = spec.save || save;
+      spec.destroy = spec.destroy || destroy;
 
       // Create a list for articles within view
       var subarticles = list(spec);
