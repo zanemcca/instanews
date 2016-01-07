@@ -428,6 +428,31 @@ module.exports = function(Storage) {
     Storage.getObject = s3.getObject.bind(s3);
   }
 
+  Storage.archive = function(instance, cb) {
+    if(!process.env.NODE_ENV || process.env.NODE_ENV === 'development') {
+      cb();
+    } else {
+      if(instance.modelName) {
+        var container = 'instanews-' + instance.modelName + 's';
+        if(process.env.NODE_ENV !== 'production') {
+          container += '-test';
+        }
+        container += '-delete';
+
+        s3.putObject({
+          Bucket: container,
+          Body: JSON.stringify(instance),
+          Key: instance.id + '.json'
+        }, cb);
+      } else {
+        var e = new Error('There was no modelName on the given instance. Archiving cancelled');
+        e.status = 403;
+        console.warn(e.message);
+        cb(e);
+      }
+    }
+  };
+
   Storage.destroy = function(container, name, next) {
     var params = {
       Bucket: container + '-delete',

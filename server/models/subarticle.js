@@ -8,6 +8,10 @@ module.exports = function(Subarticle) {
      common.readModifyWrite(Subarticle, query, modify, cb, options);
    };
 
+   //NOTE Deletion of multiple objects in a single requres implies that the parent will be deleted
+   // as well and therefore it does not rerank the parent in this case. If batch deletion is needed then 
+   // this dependency must be modified.
+
    var staticDisable = [
       'exists',
       'create',
