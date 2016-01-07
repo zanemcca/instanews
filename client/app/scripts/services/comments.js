@@ -90,6 +90,21 @@ app.service('Comments', [
       });
     };
 
+      var destroy = function () {
+        var id = this.id;
+        Comment.deleteById({id: this.id})
+        .$promise
+        .then(function () {
+          console.log('Succesfully deleted the comment');
+          comments.remove(function (comment) {
+            return (comment.id === id); 
+          });
+        },
+        function (err) {
+          console.log(err);
+        });
+      };
+
       var filter = {
         skip: 0,
         limit: 5,
@@ -108,6 +123,7 @@ app.service('Comments', [
 
       spec.update = spec.update || update;
       spec.save = spec.save || save;
+      spec.destroy = spec.destroy || destroy;
 
       spec.options.filter = spec.options.filter || filter;
       spec.options.filter.where = spec.options.filter.where || filter.where;

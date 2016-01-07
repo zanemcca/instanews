@@ -7,14 +7,14 @@
     </div>
     <div class="buttons col col-10 col-top no-padding">
       <button class="no-margin button button-small button-clear icon ion-close-round"
+        ng-if="is.mine()"
         style="color:#E0E0E0;text-align:right;padding-right:0;"
-        ng-if="isMine()"
-        ng-click="upload.remove()">
+        ng-click="item.destroy()">
       </button>
     </div>
   </div>
   <p class="no-margin">{{item.content}} <button class="no-margin button button-small button-clear icon ion-edit"
-      ng-if="isMine()"
+      ng-if="is.mine()"
       ng-click="edit()">
     </button>
   </p>
