@@ -11,6 +11,7 @@ module.exports = function(app) {
    var Base = app.models.base;
    var View = app.models.view;
    var Subarticle = app.models.Subarticle;
+   var Storage = app.models.Storage;
    var Stat = app.models.Stat;
 
   var debug = app.debug('hooks:article');
@@ -97,6 +98,44 @@ module.exports = function(app) {
       }
       next();
     }
+  });
+
+  Article.observe('before delete', function(ctx, next) {
+    debug('before delete', ctx, next);
+    Article.find({ where: ctx.where }, function (err, res) {
+      if(err) {
+        console.error(err.stack);
+        next(err);
+      } else if(res.length > 0) {
+        console.log(res);
+        res.forEach(function(inst) {
+          Storage.archive(inst, function(err) {
+            var error;
+            if(err) {
+              console.error(err.stack);
+              error = error || err;
+            } 
+
+            inst.comments.destroyAll(function (err, res) {
+              if(err) {
+                console.error(err.stack);
+                error = error || err;
+              }
+
+              inst.subarticles.destroyAll(function (err, res) {
+                if(err) {
+                  console.error(err.stack);
+                  error = error || err;
+                }
+                next(error);
+              });
+            });
+          });
+        });
+      } else {
+        next();
+      }
+    });
   });
 
   /*
