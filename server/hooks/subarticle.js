@@ -234,13 +234,11 @@ module.exports = function(app) {
           Storage.archive(inst, function(err) {
             if(err) {
               console.error(err.stack);
-              return next(err);
             } 
 
             inst.comments.destroyAll(function (err, res) {
               if(err) {
                 console.error(err.stack);
-                return next(err);
               }
 
               var id = ctx.where.id || ctx.where._id;
