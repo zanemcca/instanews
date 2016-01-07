@@ -47,7 +47,17 @@ function ListFactory (Platform) {
           }
           if(!update) {
             newItem.save = spec.save.bind(newItem);
-            newItem.destroy = spec.destroy.bind(newItem);
+            newItem.destroy = function() {
+              Platform.showSheet({
+                destructiveText: '<i class="icon ion-trash-b assertive"></i> Delete',
+                titleText: 'Are you sure you want to delete this?',
+                cancelText: 'Cancel',
+                destructiveButtonClicked: function() {
+                  spec.destroy.call(newItem);
+                  return true;
+                }
+              });
+            };
             spec.items.push(newItem);
           }
         });
