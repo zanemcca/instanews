@@ -144,7 +144,8 @@ module.exports = function(app) {
       if(err) {
         console.error(err.stack);
         next(err);
-      } else {
+      } else if(res.length > 0) {
+        console.log(res);
         res.forEach(function(inst) {
           //TODO Archive item
           //TODO Trigger deletion of comments
@@ -162,6 +163,20 @@ module.exports = function(app) {
 
               items = inst._file.sources.slice(0);
 
+              var processObject = function (err, res) {
+                if(err) {
+                  console.error(err);
+                } else {
+                  var contents = res.Body.toString().split('\n');
+                  for(var i = 0 ; i < contents.length - 1; i++) {
+                    if(contents[i].indexOf('#EXTINF') === 0) {
+                      console.log(contents[i+1]);
+                      items.push(contents[i+1]);
+                    }
+                  }
+                }
+                waiting--;
+              };
               //M3U8 holds a playlist of files. This reads the .m3u8 file and adds the playlist files to the list
               for(var i = 0; i < items.length; i++) {
                 var name = items[i];
@@ -170,20 +185,7 @@ module.exports = function(app) {
                   Storage.getObject({
                     Bucket: container,
                     Key: name
-                  }, function (err, res) {
-                    if(err) {
-                      console.error(err);
-                    } else {
-                      var contents = res.Body.toString().split('\n');
-                      for(var i = 0 ; i < contents.length - 1; i++) {
-                        if(contents[i].indexOf('#EXTINF') === 0) {
-                          console.log(contents[i+1]);
-                          items.push(contents[i+1]);
-                        }
-                      }
-                    }
-                    waiting--;
-                  });
+                  }, processObject);
                 }
               }
               // Add the poster
@@ -231,6 +233,8 @@ module.exports = function(app) {
             next();
           }
         });
+      } else {
+        next();
       }
     });
   });

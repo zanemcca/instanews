@@ -424,7 +424,9 @@ module.exports = function(Storage) {
     });
   };
 
-  Storage.getObject = s3.getObject.bind(s3);
+  if(s3 && s3.getObject) {
+    Storage.getObject = s3.getObject.bind(s3);
+  }
 
   Storage.destroy = function(container, name, next) {
     var params = {
