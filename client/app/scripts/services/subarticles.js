@@ -88,19 +88,21 @@ app.service('Subarticles', [
 
       var destroy = function () {
         var id = this.id;
+        if(subarticles.get().length === 1) {
+          Navigate.goBack();
+        }
+
         Subarticle.deleteById({id: this.id})
         .$promise
         .then(function () {
           console.log('Succesfully deleted the subarticle');
-          if(subarticles.get().length === 1) {
-            Navigate.goBack();
-          }
-          subarticles.remove(function (subarticle) {
-            return (subarticle.id === id); 
-          });
         },
         function (err) {
           console.log(err);
+        });
+
+        subarticles.remove(function (subarticle) {
+          return (subarticle.id === id); 
         });
       };
 
