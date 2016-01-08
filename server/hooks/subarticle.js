@@ -152,7 +152,7 @@ module.exports = function(app) {
 
         items = inst._file.sources.slice(0);
 
-        var processObject = function (err, res) {
+        var processM3U8 = function (err, res) {
           if(err) {
             console.error(err);
           } else {
@@ -174,7 +174,7 @@ module.exports = function(app) {
             Storage.getObject({
               Bucket: container,
               Key: name
-            }, processObject);
+            }, processM3U8);
           }
         }
         // Add the poster
@@ -201,6 +201,7 @@ module.exports = function(app) {
 
         async.parallel(functions, function(err, res) {
           if(err) {
+            console.log('Destroy failed!');
             console.log(items);
             console.error(err.stack);
           }
@@ -232,11 +233,14 @@ module.exports = function(app) {
         res.forEach(function(inst) {
           Storage.archive(inst, function(err) {
             if(err) {
+              console.error('Failed to archive the item');
+              console.error(inst);
               console.error(err.stack);
             } 
 
             inst.comments.destroyAll(function (err, res) {
               if(err) {
+                console.error('Failed to delete subarticles comments');
                 console.error(err.stack);
               }
 
@@ -247,17 +251,18 @@ module.exports = function(app) {
                   parentId: inst.parentId
                 }, function (err, count) {
                   if(err) {
+                    console.error('Failed to count subarticles');
                     console.error(err.stack);
                   }
 
                   if(count <= 1) {
                     deleteMedia(inst, function (err) {
                       if(err) {
-                        console.error(err.stack);
+                        console.error('Failed to delete final subarticle media');
                       }
                       Article.destroyById(inst.parentId, function(err) {
                         if(err) {
-                          console.log(err.stack);
+                          console.error('Failed to delete subarticles article');
                         }
                         next(err);
                       });

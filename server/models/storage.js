@@ -443,7 +443,14 @@ module.exports = function(Storage) {
           Bucket: container,
           Body: JSON.stringify(instance),
           Key: instance.id + '.json'
-        }, cb);
+        }, function(err) {
+          if(err) {
+            console.error('Failed to archive the given instance');
+            console.error(instance);
+            console.error(err.stack);
+          }
+          cb(err);
+        });
       } else {
         var e = new Error('There was no modelName on the given instance. Archiving cancelled');
         e.status = 403;
@@ -460,18 +467,23 @@ module.exports = function(Storage) {
       Key: name
     };
 
-    console.log(params);
     s3.copyObject(params, function(err, data) {
       if( err) {
+        console.error('Failed to copy the given instance');
+        console.log(params);
         console.error(err.stack);
         next(err);
       } else {
-        s3.deleteObject({
+        params = { 
           Bucket: container,
           Key: name
-        }, function (err, data) {
+        };
+
+        s3.deleteObject(params, function (err, data) {
           if(err) {
-            console.error(err);
+            console.error('Failed to delete the given instance');
+            console.log(params);
+            console.error(err.stack);
             next(err);
           } else {
             next();

@@ -111,7 +111,6 @@ app.service('Articles', [
       cb(article);
     }; 
 
-
     var spec = {};
     spec.preLoad = preLoad;
     spec.save = save;

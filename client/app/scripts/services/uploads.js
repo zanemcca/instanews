@@ -9,6 +9,7 @@ app.service('Uploads', [
   'ENV',
   'FileTransfer',
   'TextInput',
+  'Platform',
   'observable',
   'User',
   function(
@@ -17,6 +18,7 @@ app.service('Uploads', [
     ENV,
     FileTransfer,
     TextInput,
+    Platform,
     observable,
     User
   ){
@@ -104,6 +106,13 @@ app.service('Uploads', [
 
       var addUpload = function (item) {
         item.remove = function () {
+          Platform.removeFile(item.options.fileName, function(err) {
+            if(err) {
+              console.log(err);
+            } else {
+              console.log(item.options.fileName + ' was removed successfully!');
+            }
+          });
           var removed = uploadItems.splice(uploadItems.indexOf(item), 1);
           uploads.notifyObservers();
           return removed;
