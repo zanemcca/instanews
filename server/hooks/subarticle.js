@@ -201,9 +201,8 @@ module.exports = function(app) {
 
         async.parallel(functions, function(err, res) {
           if(err) {
+            console.log(items);
             console.error(err.stack);
-            next(err);
-          } else {
             next();
           }
         });
