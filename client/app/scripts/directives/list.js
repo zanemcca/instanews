@@ -267,8 +267,6 @@ app.directive('inListItem', [
           }
         };
 
-
-
         //console.log($scope.item);
         if($scope.preLoad instanceof Function) {
           $scope.preLoad($scope.item, createView);

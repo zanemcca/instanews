@@ -72,7 +72,7 @@ describe('instanews.service.camera', function() {
      file: function(succ,err) {
       succ(fileObj);
      },
-     copyTo: function(fs, name, succ, err) {
+     moveTo: function(fs, name, succ, err) {
        succ(copyToResult);
      }
     };

@@ -96,12 +96,13 @@ app.service('Comments', [
         .$promise
         .then(function () {
           console.log('Succesfully deleted the comment');
-          comments.remove(function (comment) {
-            return (comment.id === id); 
-          });
         },
         function (err) {
           console.log(err);
+        });
+
+        comments.remove(function (comment) {
+          return (comment.id === id); 
         });
       };
 
