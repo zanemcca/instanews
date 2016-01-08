@@ -5,12 +5,14 @@ var app = angular.module('instanews.service.platform', ['ionic', 'ngCordova']);
 app.factory('Platform', [
   '$cordovaDevice',
   '$cordovaDialogs',
+  '$cordovaFile',
   '$ionicActionSheet',
   '$ionicLoading',
   '$q',
   function(
     $cordovaDevice,
     $cordovaDialogs,
+    $cordovaFile,
     $ionicActionSheet,
     $ionicLoading,
     $q
@@ -228,6 +230,13 @@ app.factory('Platform', [
      return 'InstaNews'; 
     };
 
+    var removeFile = function (name, cb) {
+      $cordovaFile.removeFile(getDataDir(), name)
+      .then(function () {
+        cb();
+      }, cb);
+    };
+
     return {
       keyboard: keyboard,
       getAppNameLogo: getAppNameLogo,
@@ -237,6 +246,7 @@ app.factory('Platform', [
       showSheet: showSheet,
       showAlert: showAlert,
       showToast: showToast,
+      removeFile: removeFile,
       isIOS: isIOS,
       isBrowser: isBrowser,
       isCameraPresent: isCameraPresent,
