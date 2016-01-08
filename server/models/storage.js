@@ -460,6 +460,7 @@ module.exports = function(Storage) {
       Key: name
     };
 
+    console.log(params);
     s3.copyObject(params, function(err, data) {
       if( err) {
         console.error(err.stack);
