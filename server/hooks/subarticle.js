@@ -230,6 +230,9 @@ module.exports = function(app) {
         console.error(err.stack);
         next(err);
       } else if(res.length > 0) {
+        ctx.options = ctx.options || {};
+        ctx.options.instances = res;
+
         res.forEach(function(inst) {
           Storage.archive(inst, function(err) {
             if(err) {
@@ -247,51 +250,28 @@ module.exports = function(app) {
               var id = ctx.where.id || ctx.where._id;
               // Rerank the parent if this element was deleted individually 
               if(JSON.stringify(id) === JSON.stringify(inst.id)) {
-                Subarticle.count({
-                  parentId: inst.parentId
-                }, function (err, count) {
-                  if(err) {
-                    console.error('Failed to count subarticles');
-                    console.error(err.stack);
-                  }
+                inst.article(function (err, res) {
+                  var data = {
+                    $mul: {
+                      'notSubarticleRating': 1/(1 - inst.rating)
+                    }
+                  };
 
-                  if(count <= 1) {
-                    deleteMedia(inst, function (err) {
+                  res.updateAttributes(data, function (err, res) {
+                    if(err) {
+                      console.error(err.stack);
+                      return deleteMedia(inst, next);
+                    }
+
+                    Article.triggerRating({
+                      id: res.id
+                    }, null, function(err, res) {
                       if(err) {
-                        console.error('Failed to delete final subarticle media');
+                        console.log(err.stack);
                       }
-                      Article.destroyById(inst.parentId, function(err) {
-                        if(err) {
-                          console.error('Failed to delete subarticles article');
-                        }
-                        next(err);
-                      });
+                      deleteMedia(inst, next);
                     });
-                  } else {
-                    inst.article(function (err, res) {
-                      var data = {
-                        $mul: {
-                          'notSubarticleRating': 1/(1 - inst.rating)
-                        }
-                      };
-
-                      res.updateAttributes(data, function (err, res) {
-                        if(err) {
-                          console.error(err.stack);
-                          return deleteMedia(inst, next);
-                        }
-
-                        Article.triggerRating({
-                          id: res.id
-                        }, null, function(err, res) {
-                          if(err) {
-                            console.log(err.stack);
-                          }
-                          deleteMedia(inst, next);
-                        });
-                      });
-                    });
-                  }
+                  });
                 });
               } else {
                 deleteMedia(inst, next);
@@ -303,6 +283,36 @@ module.exports = function(app) {
         next();
       }
     });
+  });
+
+  Subarticle.observe('after delete', function(ctx, next) {
+    debug('before delete', ctx, next);
+    //If one subarticle was deleted then destroy the parent article
+    if(ctx.options && ctx.options.instances && ctx.options.instances.length === 1) {
+      var inst = ctx.options.instances[0];
+      // Rerank the parent if this element was deleted individually 
+      Subarticle.count({
+        parentId: inst.parentId
+      }, function (err, count) {
+        if(err) {
+          console.error('Failed to count subarticles');
+          console.error(err.stack);
+        }
+
+        if(count === 0) {
+            Article.destroyById(inst.parentId, function(err) {
+              if(err) {
+                console.error('Failed to delete subarticles article');
+              }
+              next(err);
+            });
+        } else {
+          next();
+        }
+      });
+    } else {
+      next();
+    }
   });
 
   /* istanbul ignore next */
