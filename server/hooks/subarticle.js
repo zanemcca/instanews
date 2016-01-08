@@ -203,8 +203,8 @@ module.exports = function(app) {
           if(err) {
             console.log(items);
             console.error(err.stack);
-            next();
           }
+          next();
         });
       };
 
@@ -256,6 +256,9 @@ module.exports = function(app) {
                         console.error(err.stack);
                       }
                       Article.destroyById(inst.parentId, function(err) {
+                        if(err) {
+                          console.log(err.stack);
+                        }
                         next(err);
                       });
                     });
