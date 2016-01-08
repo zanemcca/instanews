@@ -64,7 +64,7 @@ app.factory('Camera', [
               var newName = rfc4122.v4() + '.' + baseType;
 
               window.resolveLocalFileSystemURL(Platform.getDataDir(), function(filesystem2) {
-                fileEntry.copyTo(filesystem2, newName, function(entry) {
+                fileEntry.moveTo(filesystem2, newName, function(entry) {
                   entry.lastModified = fileObj.lastModified;
                   console.log(entry);
                   cb(entry);
