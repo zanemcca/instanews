@@ -1,7 +1,9 @@
 <!DOCTYPE html>
 
-<form ng-submit="search()" class="list" style="margin-bottom:-1px; padding-bottom: 0;">
-  <div class="item item-input row" style="border:0px;margin:0px;padding-top:0;padding-bottom:0;">
+<form ng-submit="search()" class="list dynamic-box dynamic-autocomplete"
+  ng-class="{'card' : Platform.getWidth() >= 768}"
+  style="padding-bottom: 0;">
+  <div class="item item-input row" style="border:0px;margin:0px;padding-bottom:0px;padding-top:0px;">
     <div class="icon ion-search col col-10"></div>
     <input ng-if="!isIOS()"
       class=" col col-80"
@@ -27,10 +29,13 @@
     <button type="submit" class="button" style="position:absolute;left:-9999px;top:-9999px;height:0;width:0;"></button>
   </div>
 </form>
-<div ng-if="!done" class="list" style="height: 0; overflow:visible; z-index:100;">
+<div ng-if="!done" class="list dynamic-box" 
+  ng-class="{'card' : Platform.getWidth() >= 768}"
+  style="height: 0; overflow:visible; z-index:100;">
   <div ng-repeat="prediction in place.predictions">
     <div class="item" ng-click="set(prediction)">
       {{prediction.description}}
     </div>
   </div>
 </div>
+
