@@ -100,6 +100,10 @@ app.factory('Platform', [
       return (navigator.device && navigator.device.capture && navigator.device.capture.captureVideo);
     };
 
+    var getWidth = function () {
+      return window.innerWidth;
+    };
+
     var getDeviceType = function () {
       var height = window.innerHeight;
       var type = 'phone';
@@ -252,6 +256,7 @@ app.factory('Platform', [
       isCameraPresent: isCameraPresent,
       isVideoPresent: isVideoPresent,
       isTablet: isTablet,
+      getWidth: getWidth,
       getDevice: getDevice,
       setDevice: setDevice,
       setDeviceToken: setDeviceToken,

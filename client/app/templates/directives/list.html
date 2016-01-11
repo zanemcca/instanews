@@ -6,7 +6,7 @@
 <ul class="list">
   <ion-item ng-repeat="item in list.get() track by item.id"
     class="no-padding"
-    ng-class="{'card' : isCard || isTablet(), 'margin-10' : isTablet() }">
+    ng-class="{ 'dynamic-box': list.get()[0].modelName !== 'comment', 'card' : isCard || isTablet(), 'margin-10' : isTablet() && Platform.getWidth < 768}">
     <in-list-item item="item"
       pre-load="list.preLoad">
     </in-list-item>
