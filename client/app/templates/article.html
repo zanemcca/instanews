@@ -15,7 +15,9 @@
       <in-list list="Subarticles"
         is-card="true"> 
         <inMap map="map"></inMap>
-        <div class="item" style="border:0px;padding-top:0px;padding-bottom:0px">
+        <div class="item dynamic-box"
+          ng-class="{'card' : Platform.getWidth() >= 768}"
+          style="border:0px;padding-top:0px;padding-bottom:0px">
            <inVotes style="border: transparent"
               votable="article">
            </inVotes>

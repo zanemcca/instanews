@@ -36,6 +36,8 @@ app.directive('inautocomplete', [
 
         $scope.isIOS = Platform.isIOS;
 
+        $scope.Platform = Platform;
+
         $scope.place.predictions = [];
 
         var defaultPlaceholder = 'Search for a location';
