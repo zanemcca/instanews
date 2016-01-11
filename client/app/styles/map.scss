@@ -8,14 +8,25 @@
   height:100%;
 }
 
-.map-exterior {
-  height: 0;
-  width:100%;
-  padding-bottom:75%;
-  padding-left:0;
-  padding-right:0;
-  padding-top:0;
-  position:relative;
-  border:0px;
-  margin:0px;
+@media only screen and (max-width: 767px) {
+  .map-exterior {
+    height: 0;
+    width:100%;
+    padding-bottom:75%;
+    padding-left:0;
+    padding-right:0;
+    padding-top:0;
+    position:relative;
+    border:0px;
+    margin:0px;
+  }
+}
+
+@media only screen and (min-width: 768px) {
+  .map-exterior {
+    height: 450px;
+    width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+  }
 }

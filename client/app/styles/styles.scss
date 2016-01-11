@@ -71,3 +71,24 @@
 .positive {
   color: $positive !important;
 }
+
+.dynamic-box {
+}
+
+@media only screen and (min-width: 768px) {
+  .dynamic-box {
+    width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+}
+
+.dynamic-autocomplete {
+  margin-bottom:-1px;
+}
+
+@media only screen and (min-width: 768px) {
+  .dynamic-autocomplete {
+    margin-bottom:20px !important;
+  }
+}
