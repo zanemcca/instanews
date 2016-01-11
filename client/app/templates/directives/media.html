@@ -15,7 +15,8 @@
     </vg-media>
 
     <div ng-if="!Platform.isIOS()">
-    <vg-media vg-src="sources">
+      <vg-media vg-src="sources"
+        vg-preload="preload">
     </vg-media>
 
     <vg-controls>
@@ -30,7 +31,7 @@
 
     <vg-overlay-play></vg-overlay-play>
     <vg-buffering></vg-buffering>
-    <!--vg-poster ng-if="poster" vg-url='poster'></vg-poster-->
+    <vg-poster ng-if="poster && Platform.isAndroid()" vg-url='poster'></vg-poster>
     </div>
   </videogular>
 </div>
