@@ -38,11 +38,13 @@ app.service('Articles', [
     // Triggered when a new batch of articles wants to be added to the list
     // allows for additional filtering
     var addFilter = function(arts) {
+      /*
+       * Disable add filter because we are not caching out of view articles
+       * so if they are out of view they should be cleaned up after a map move
       var hidden = [];
       var inView = [];
 
       arts.forEach(function(article) {
-
 
         var position = Position.posToLatLng(article.location);
         if(Position.withinBounds(position)) {
@@ -57,6 +59,8 @@ app.service('Articles', [
         hiddenArticles.add(hidden);
       }
       return inView;
+      */
+      return arts;
     };
 
     var save = function () {
@@ -132,19 +136,23 @@ app.service('Articles', [
     var articles = list(spec);
 
     // Create a headless list for out of view articles
+    /*
     var hiddenArticles = list({
       update: update
     });
+    */
 
     // Reorganize the articles into the viewable array and the hidden array
     var reorganize = function() {
-      var total = articles.get().length + hiddenArticles.get().length;
+      var total = articles.get().length;// + hiddenArticles.get().length;
       console.log('Reorganizing ' + total + ' articles!');
-      var toOutView = articles.remove(function (article) {
+      //var toOutView = 
+      articles.remove(function (article) {
         var position = Position.posToLatLng(article.location);
         return !Position.withinBounds(position);
       });
 
+      /*
       var toInView = hiddenArticles.remove(function (article) {
         var position = Position.posToLatLng(article.location);
         return Position.withinBounds(position);
@@ -153,6 +161,7 @@ app.service('Articles', [
       //      console.log(toOutView.length + ' going out of view and ' + toInView.length + ' going into the view');
       articles.add(toInView);
       hiddenArticles.add(toOutView);
+     */
     };
 
     //Update the filter bounds 
