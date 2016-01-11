@@ -28,6 +28,8 @@ app.controller(
         return url;
       };
 
+      $scope.Platform = Platform;
+
       $scope.sources = [];
       for(var i in $scope.media.sources) {
         var src = $scope.media.sources[i];
