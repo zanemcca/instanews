@@ -18,6 +18,7 @@ app.directive('inList', [
       },
       controller: function ($scope, _) {
         $scope.isTablet = Platform.isTablet;
+        $scope.Platform = Platform;
 
         $scope.safeApply  = function(fn) {
           var phase = this.$root.$$phase;
