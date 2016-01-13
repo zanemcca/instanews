@@ -48,6 +48,10 @@ app.factory('Platform', [
       return ionic.Platform.isIOS();
     };
 
+    var isAndroid = function() {
+      return ionic.Platform.isAndroid();
+    };
+
     var isBrowser = function() {
       var ip = ionic.Platform;
       if(ip.isIOS()) {
@@ -252,6 +256,7 @@ app.factory('Platform', [
       showToast: showToast,
       removeFile: removeFile,
       isIOS: isIOS,
+      isAndroid: isAndroid,
       isBrowser: isBrowser,
       isCameraPresent: isCameraPresent,
       isVideoPresent: isVideoPresent,

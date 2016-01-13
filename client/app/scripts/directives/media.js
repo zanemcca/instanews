@@ -28,12 +28,14 @@ app.controller(
         return url;
       };
 
+      $scope.Platform = Platform;
+
       $scope.sources = [];
       for(var i in $scope.media.sources) {
         var src = $scope.media.sources[i];
         if(src.indexOf('.m3u8') > -1) {
           if(Platform.isIOS()) {
-            $scope.sources.push({
+            $scope.sources.unshift({
               src: $sce.trustAsResourceUrl(getUrl($scope.media.container, src)),
               type: 'application/vnd.apple.mpegURL'
             });
