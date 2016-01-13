@@ -78,18 +78,21 @@ module.exports = function(Storage) {
             //HLS 2M
             PresetId: '1351620000001-200010' 
           }, 
+          /*
           { 
             Key: 'HD.mp4',
             Rotate: 'auto',
             //iPhone4S+ (1920x1080 Mp4 High-profile AAC)
             PresetId: '1351620000001-100020' 
           },
+          */
           {
             Key: 'SD.mp4',
             Rotate: 'auto',
             ThumbnailPattern: '-SD-{count}',
             //iPhone1-3 (640x480 Mp4 baseline AAC)
-            PresetId: '1445198308687-fnaxk5' 
+            //PresetId: '1445198308687-fnaxk5' 
+            PresetId: '1452644707524-dm853y' 
           }] 
           //TODO webM
       }
@@ -118,18 +121,21 @@ module.exports = function(Storage) {
             //HLS 2M
             PresetId: '1351620000001-200010' 
           }, 
+          /*
           { 
             Key: 'HD.mp4',
             Rotate: 'auto',
             //iPhone4S+ (1920x1080 Mp4 High-profile AAC)
             PresetId: '1351620000001-100020' 
           },
+          */
           {
             Key: 'SD.mp4',
             Rotate: 'auto',
             ThumbnailPattern: '-SD-{count}',
             //iPhone1-3 (640x480 Mp4 baseline AAC)
-            PresetId: '1445198308687-fnaxk5' 
+            PresetId: '1452644707524-dm853y' 
+            //PresetId: '1445198308687-fnaxk5' 
           }] 
           //TODO webM
       }
