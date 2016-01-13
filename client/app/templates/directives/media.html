@@ -36,6 +36,12 @@
   </videogular>
 </div>
 
+<div class="item" ng-if="!media.type">
+  <p><i>Preparing your content.
+    This may take a while...</i>
+  </p>
+</div>
+
 <div class="item" 
   ng-if="media.caption">
   <p class="no-margin">{{media.caption}} <button class="no-margin button button-small button-clear icon ion-edit"

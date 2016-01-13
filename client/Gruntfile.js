@@ -77,7 +77,7 @@ module.exports = function (grunt) {
             'cordova-plugin-console',
             'cordova-plugin-device',
             'cordova-plugin-dialogs',
-            'cordova-plugin-file',
+            'cordova-plugin-file@4.0.0',
             'cordova-plugin-file-transfer',
             'cordova-plugin-geolocation',
             'cordova-plugin-media-capture',

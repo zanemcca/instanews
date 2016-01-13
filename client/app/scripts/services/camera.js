@@ -7,81 +7,17 @@ app.factory('Camera', [
     'rfc4122',
     '$cordovaCapture',
     'Platform',
+    'FileTransfer',
     '$q',
     function(
       rfc4122,
       $cordovaCapture,
       Platform,
+      FileTransfer,
       $q
       ) {
 
-
-      //Copy the file into the app directory and rename the file with a UUID
-      var copyFile = function (fileURI, cb) {
-        if(fileURI.indexOf('content://') === 0) {
-          if(fileURI.indexOf('video') === -1 && fileURI.indexOf('image') === -1) {
-            var message = 'Sorry but you can only upload videos and photos!';
-            Platform.showToast(message);
-            return;
-          }
-        } else if(fileURI.indexOf('file:/') !== 0) {
-          fileURI = 'file://' + fileURI;
-        }
-
-        window.resolveLocalFileSystemURL(fileURI, function(fileEntry) {
-          console.log(fileEntry);
-          fileEntry.file(function(fileObj) {
-            console.log(fileObj);
-            var whitelist = ['mov', 'mp4', 'jpg', 'jpeg', 'png'];
-            var videos = ['mov', 'mp4'];
-            var baseType = '';
-            if(fileObj.type) {
-              baseType = fileObj.type.slice(fileObj.type.lastIndexOf('/') + 1);
-              if(baseType === 'jpeg'){
-                baseType = 'jpg';
-              }
-            } else {
-              baseType  = fileObj.name.slice(fileObj.name.lastIndexOf('.') + 1);
-            }
-
-            if(whitelist.indexOf(baseType.toLowerCase()) > -1) {
-              var message;
-              if(videos.indexOf(baseType.toLowerCase()) > -1) {
-                if(fileObj.size > 250*1024*1024) {
-                  //100Mb video size limit
-                  message = 'Sorry but videos must be less than 250Mb';
-                }
-              } else if(fileObj.size > 5*1024*1024) {
-                //5Mb photo size limit
-                message = 'Sorry but photos must be less than 5Mb';
-              }
-
-              if(message) {
-                Platform.showToast(message);
-                return;
-              }
-
-              var newName = rfc4122.v4() + '.' + baseType;
-
-              window.resolveLocalFileSystemURL(Platform.getDataDir(), function(filesystem2) {
-                fileEntry.moveTo(filesystem2, newName, function(entry) {
-                  entry.lastModified = fileObj.lastModified;
-                  console.log(entry);
-                  cb(entry);
-                }, function(err) {
-                  console.log('Error: Failed to move the file: ' + err);
-                });
-              });
-            } else {
-              var e = new Error('Cannot upload content type ' + baseType);
-              console.log(e);
-            }
-          });
-        }, function(err) {
-          console.log('Error: Failed to resolve filesystem URL');
-          console.log(err);
-        });
-      };
+        var copyFile = FileTransfer.copy;
 
       var captureVideo = function() {
         var q = $q.defer();
@@ -124,7 +60,13 @@ app.factory('Camera', [
 
             //Copy all of the videos into the app directory and create a thumbnail for each
             for(var  i = 0; i < videoData.length; i++) {
-              copyFile(videoData[i].fullPath, afterCopy);
+              if(Platform.isAndroid()) {
+                //Android video is compressed later so copying would be redundunt.
+                //Also android videos are too large to copy sometimes
+                FileTransfer.resolve(videoData[i].fullPath, afterCopy);
+              } else {
+                copyFile(videoData[i].fullPath, afterCopy);
+              }
             }
           }, function (err) {
             q.reject(err);
@@ -147,6 +89,12 @@ app.factory('Camera', [
 
         if(map.hasOwnProperty(type)) {
           return map[type];
+        } else {
+          if(name.indexOf('video') > -1) {
+              return 'video';
+          } else if (name.indexOf('image') > -1) {
+              return 'image';
+          }
         }
       };
 
@@ -156,7 +104,14 @@ app.factory('Camera', [
 
         if (Platform.isCameraPresent()) {
           navigator.camera.getPicture(function(uri) {
-            copyFile(uri, function(fileEntry) {
+            var copy = copyFile;
+            if(Platform.isAndroid() && uri.indexOf('video') > -1) {
+              //Android videos tend to be larger and they are compressed later 
+              // therefore copying would be redundent.
+              copy = FileTransfer.resolve;
+            }
+
+            copy(uri, function(fileEntry) {
               fileEntry.type = getType(fileEntry.name);
               q.resolve(fileEntry);
             }, function (err) {

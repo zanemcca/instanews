@@ -10,6 +10,7 @@ app.service('Uploads', [
   'FileTransfer',
   'TextInput',
   'Platform',
+  'rfc4122',
   'observable',
   'User',
   function(
@@ -19,6 +20,7 @@ app.service('Uploads', [
     FileTransfer,
     TextInput,
     Platform,
+    rfc4122,
     observable,
     User
   ){
@@ -128,16 +130,29 @@ app.service('Uploads', [
                 var urlBase = ENV.apiEndpoint;
                 return urlBase + '/storages/' + item.container + '/upload/';
               };
-              item.loaded = 0;
 
-              FileTransfer.upload(getServer(), item.uri, item.options)
-              .then(function () {
-                item.complete.resolve();
+              var waitForTranscoding;
+              if(item.progress && item.progress.complete) {
+                waitForTranscoding = item.progress.complete;
+              } else {
+                waitForTranscoding = $q.defer();
+                waitForTranscoding.resolve();
+              }
+
+              waitForTranscoding.promise.then(function () {
+                item.loaded = 0;
+                FileTransfer.upload(getServer(), item.uri, item.options)
+                .then(function () {
+                  item.complete.resolve();
+                }, function (err) {
+                  item.complete.reject(err);
+                  console.log(err);
+                }, function (progress) {
+                  item.loaded = progress.loaded/progress.total * 100;
+                });
               }, function (err) {
-                item.complete.reject(err);
                 console.log(err);
-              }, function (progress) {
-                item.loaded = progress.loaded/progress.total * 100;
+                console.log('Error transcoding!');
               });
             } else {
               item.complete.resolve();
@@ -150,22 +165,25 @@ app.service('Uploads', [
       };
 
       function video(vid) {
+        function completeSetup(vid) {
+          upload.subarticle._file.sources = [vid.nativeURL];
+          upload.subarticle._file.size = vid.size;
+          upload.subarticle._file.type = vid.type;
+          upload.subarticle._file.name = vid.name;
+          upload.uri = vid.nativeURL;
+          upload.options.fileName = vid.name;
+          upload.options.mimeType = vid.type;
+        }
+
         var subarticle = {
           _file: {
-            name: vid.name,
-            sources: [vid.nativeURL],
             container: 'instanews-videos-in',
-            size: vid.size,
-            type: vid.type
           }
         };
 
         var upload = {
           container: 'instanews-videos-in',
-          uri: vid.nativeURL,
           options: {
-            fileName: vid.name,
-            mimeType: vid.type,
             headers: { 'Authorization': User.getToken()}
           },
           subarticle: subarticle
@@ -176,10 +194,107 @@ app.service('Uploads', [
           upload.container = 'instanews-videos-test-in';
         }
 
+        if( Platform.isAndroid()) {
+          upload.progress = {
+            current: 0,
+            duration: 0,
+            complete: $q.defer()
+          };
+          upload.loaded = 0;
+
+          /* jshint undef: false */
+          VideoEditor.transcodeVideo(function (result) {
+            FileTransfer.resolve(result, function(fileEntry) {
+              console.log('Transcoding complete!');
+              console.log(fileEntry);
+              if(fileEntry) {
+                fileEntry.type = 'video/mp4';
+                completeSetup(fileEntry);
+                upload.progress.complete.resolve();
+              } else {
+                Platform.showToast('There was an error uploading your video. Please try again!');
+                upload.progress.complete.reject();
+              }
+            });
+          },
+          function (err) {
+            console.log(err);
+            Platform.showToast('There was an error preparing your video. Please try again!');
+            upload.progress.complete.reject();
+          },
+          {
+            fileUri: vid.nativeURL,
+            outputFileName: rfc4122.v4(),
+            quality: VideoEditorOptions.Quality.HIGH_QUALITY,
+            outputFileType: VideoEditorOptions.OutputFileType.MPEG4,
+            saveToLibrary: true,
+            deleteInputFile: true,
+            optimizeForNetworkUse: VideoEditorOptions.OptimizeForNetworkUse.YES,
+            progress: function (info) {
+              // info on android will be shell output from android-ffmpeg-java 
+              // info on ios will be a number from 0 to 100 
+              if (Platform.isIOS()) {
+                  upload.loaded = info;
+                  return; // the code below is for android 
+              }
+           
+              // for android this arithmetic below can be used to track the progress  
+              // of ffmpeg by using info provided by the android-ffmpeg-java shell output 
+              // this is a modified version of http://stackoverflow.com/a/17314632/1673842 
+           
+              // get duration of source 
+              var matches, ar;
+              if (!upload.progress.duration) {
+                  matches = (info) ? info.match(/Duration: (.*?), start:/) : [];
+                  if (matches && matches.length > 0) {
+                      var rawDuration = matches[1];
+                      // convert rawDuration from 00:00:00.00 to seconds. 
+                      ar = rawDuration.split(':').reverse();
+                      upload.progress.duration = parseFloat(ar[0]);
+                      if (ar[1]) {
+                        upload.progress.duration += parseInt(ar[1]) * 60;
+                      }
+                      if (ar[2]) {
+                        upload.progress.duration += parseInt(ar[2]) * 60 * 60;  
+                      }
+                  }
+                  return;
+              }
+           
+              // get the time  
+              matches = info.match(/time=(.*?) bitrate/g);
+           
+              if (matches && matches.length > 0) {
+                  var time = 0;
+                  var completed = 0;
+                  var rawTime = matches.pop();
+                  rawTime = rawTime.replace('time=', '').replace(' bitrate', '');
+           
+                  // convert rawTime from 00:00:00.00 to seconds. 
+                  ar = rawTime.split(':').reverse();
+                  time = parseFloat(ar[0]);
+                  if (ar[1]) {
+                    time += parseInt(ar[1]) * 60;
+                  }
+                  if (ar[2]) {
+                    time += parseInt(ar[2]) * 60 * 60;
+                  }
+           
+                  //calculate the progress 
+                  completed = Math.round((time / upload.progress.duration) * 100);
+           
+                  upload.progress.current = time;
+                  upload.loaded = completed; 
+              }
+            }
+          });
+        } else {
+          completeSetup(vid);
+        }
         upload.complete = $q.defer();
 
-        return upload;
-      }
+        addUpload(upload);
+    } 
 
       function picture(photo) {
         var subarticle = {
@@ -211,7 +326,7 @@ app.service('Uploads', [
 
         upload.complete = $q.defer();
 
-        return upload;
+        addUpload(upload);
       }
 
       function text(content) {
@@ -225,7 +340,7 @@ app.service('Uploads', [
           complete: $q.defer()
         };
 
-        return upload;
+        addUpload(upload);
       }
 
       // Public functions
@@ -238,12 +353,13 @@ app.service('Uploads', [
         Camera.captureVideo()
         .then( function(vid) {
           if(vid) {
-            addUpload(video(vid));
+            video(vid);
           }
         },
         // istanbul ignore next
         function(err) {
           console.log(err);
+          Platform.showToast('There was an error capturing your video. Please try again!');
         });
       };
 
@@ -253,15 +369,18 @@ app.service('Uploads', [
         .then( function(media) {
           if(media) {
             if(media.type.indexOf('image') > -1) {
-              addUpload(picture(media));
+              picture(media);
             } else if (media.type.indexOf('video') > -1) {
-              addUpload(video(media));
+              video(media);
+            } else {
+              Platform.showToast('Sorry but you can only upload photos and videos. Please try again!');
             }
           }
         },
         // istanbul ignore next
         function(err) {
           console.log(err);
+          Platform.showToast('There was an error while trying to get something from the gallery. Please try again!');
         });
       };
 
@@ -270,12 +389,13 @@ app.service('Uploads', [
         Camera.capturePicture()
         .then( function(photo) {
           if(photo) {
-            addUpload(picture(photo));
+            picture(photo);
           }
         }, 
         // istanbul ignore next
         function(err) {
           console.log('Error: Failed to capture a new photo: ' + JSON.stringify(err));
+          Platform.showToast('There was an error capturing your photo. Please try again!');
         });
       };
 
@@ -292,7 +412,7 @@ app.service('Uploads', [
         textInput.text = txt.partial;
 
         textInput.open(function (newText) {
-          addUpload(text(newText));
+          text(newText);
           txt.partial = '';
         }, function (partialText) {
           //Interruption function
