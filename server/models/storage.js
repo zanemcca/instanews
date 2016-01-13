@@ -92,7 +92,8 @@ module.exports = function(Storage) {
             ThumbnailPattern: '-SD-{count}',
             //iPhone1-3 (640x480 Mp4 baseline AAC)
             //PresetId: '1445198308687-fnaxk5' 
-            PresetId: '1452644707524-dm853y' 
+            //PresetId: '1452644707524-dm853y' 
+            PresetId: '1452650735370-1grufa' 
           }] 
           //TODO webM
       }
@@ -134,7 +135,8 @@ module.exports = function(Storage) {
             Rotate: 'auto',
             ThumbnailPattern: '-SD-{count}',
             //iPhone1-3 (640x480 Mp4 baseline AAC)
-            PresetId: '1452644707524-dm853y' 
+            PresetId: '1452650735370-1grufa' 
+            //PresetId: '1452644707524-dm853y' 
             //PresetId: '1445198308687-fnaxk5' 
           }] 
           //TODO webM
