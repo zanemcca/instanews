@@ -77,8 +77,8 @@ app.service('Position', [
 
       //Set the position
       var set = function(position) {
-        console.log('Setting position');
-        console.log(position);
+        //console.log('Setting position');
+        //console.log(position);
         if(position && position.coords && position.coords.latitude && position.coords.longitude) {
           mPosition = position;
 
