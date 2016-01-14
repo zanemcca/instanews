@@ -2,7 +2,9 @@
 
 describe('instanews.service.fileTransfer', function() {
 
-  var fileTransfer, cordovaFileTransfer;
+  var fileTransfer,
+  rfc4122,
+  cordovaFileTransfer;
 
   beforeEach(function() {
 
@@ -15,13 +17,28 @@ describe('instanews.service.fileTransfer', function() {
           download: function() {}
         };
       });
+
+      $provide.service('rfc4122', function() {
+        return {
+        };
+      });
+
+      $provide.service('Platform', function() {
+        return {
+          isAndroid: function() {
+            return true;
+          }
+        };
+      });
     });
   });
 
   beforeEach(inject(function(
     $cordovaFileTransfer,
+    _rfc4122_,
     FileTransfer
   ) {
+    rfc4122 = _rfc4122_;
     cordovaFileTransfer = $cordovaFileTransfer;
     fileTransfer = FileTransfer;
   }));
