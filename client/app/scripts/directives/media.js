@@ -110,12 +110,18 @@ app.controller(
 
       var src = prefix + '-' + $scope.media.name;
 
+      var isVideo = false;
+      $scope.isVideo = function () {
+        return isVideo;
+      };
+
       // If this is a video then it will
       // have a poster which should be used
       // instead of other sources
       if($scope.media.poster) {
         urlBase = ENV.videoEndpoint;
         src = $scope.media.poster;
+        isVideo = true;
       } else if($scope.media.source) {
         // Local source
         src = $scope.media.source;
@@ -131,7 +137,6 @@ app.controller(
       }
     }]
 );
-
 
 //This directive will display subarticle media in a consumable format
 // istanbul ignore next
@@ -157,7 +162,6 @@ app.directive(
   'inmediapreview', [
     function (
     ) {
-
       return {
         restrict: 'E',
         scope: {

@@ -109,7 +109,7 @@ app.factory('Platform', [
     };
 
     var getDeviceType = function () {
-      var height = window.innerHeight;
+      var height = Math.max(window.innerHeight, window.innerWidth);
       var type = 'phone';
       if( 900 <= height ) {
         type = 'tablet';
@@ -238,7 +238,9 @@ app.factory('Platform', [
      return 'InstaNews'; 
     };
 
+    //TODO Move to FileTransfer
     var removeFile = function (name, cb) {
+      //TODO Add a directory option
       $cordovaFile.removeFile(getDataDir(), name)
       .then(function () {
         cb();

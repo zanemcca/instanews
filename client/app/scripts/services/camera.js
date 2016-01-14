@@ -132,7 +132,7 @@ app.factory('Camera', [
       var capturePicture = function() {
         /*jshint undef: false */
         var options = {
-          savePhotoToAlbum: true,
+          saveToPhotoAlbum: true,
           targetWidth: 1920,
           targetHeight: 1920,
           sourceType : Camera.PictureSourceType.CAMERA,
@@ -150,7 +150,7 @@ app.factory('Camera', [
           targetHeight: 1920,
           sourceType : Camera.PictureSourceType.PHOTOLIBRARY,
           mediaType: Camera.MediaType.ALLMEDIA,
-          correctOrientation: true
+          //correctOrientation: true
         };
 
         return getPicture(options);

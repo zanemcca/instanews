@@ -27,7 +27,7 @@ app.service('LocalStorage', [
       }
       $cordovaFile.writeFile(path, filename, data, true)
       .then( function() {
-        console.log('Successful write of ' + filename);
+        //console.log('Successful write of ' + filename);
       }, function(err) {
         console.log('Error: Failed to write ' + dataDir + dir + '/' + filename + ': ' + JSON.stringify(err));
       });

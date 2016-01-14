@@ -227,8 +227,8 @@ app.service('Uploads', [
             outputFileName: rfc4122.v4(),
             quality: VideoEditorOptions.Quality.HIGH_QUALITY,
             outputFileType: VideoEditorOptions.OutputFileType.MPEG4,
-            saveToLibrary: true,
-            deleteInputFile: true,
+            saveToLibrary: false,
+            deleteInputFile: false,
             optimizeForNetworkUse: VideoEditorOptions.OptimizeForNetworkUse.YES,
             progress: function (info) {
               // info on android will be shell output from android-ffmpeg-java 
