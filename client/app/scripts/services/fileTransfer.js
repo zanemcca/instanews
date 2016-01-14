@@ -60,7 +60,6 @@ app.factory('FileTransfer', [
               var newName = rfc4122.v4() + '.' + baseType;
 
               window.resolveLocalFileSystemURL(Platform.getDataDir(), function(filesystem2) {
-                //TODO Must use copyTo if the original is from the gallery
                 fileEntry.copyTo(filesystem2, newName, function(entry) {
                   entry.lastModified = fileObj.lastModified;
                   cb(entry);
