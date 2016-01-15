@@ -31,7 +31,7 @@ app.directive('inList', [
           }
         };
 
-        $scope.load = _.debounce(function() {
+        $scope.load = _.throttle(function() {
           $scope.list.load( function() {
             $scope.safeApply(function(){
               $scope.$broadcast('scroll.infiniteScrollComplete');
@@ -127,7 +127,7 @@ app.directive('inListItem', [
             }
             textInput = TextInput.get();
             textInput.placeholder = 'What\'s the title?';
-            newTitle = newTitle || $scope.item.title;
+            newTitle = newTitle || $scope.item.title || '';
             textInput.text = newTitle;
 
             textInput.open(function (text) {
@@ -144,7 +144,7 @@ app.directive('inListItem', [
               $scope.edit = function () {
                 textInput = TextInput.get('modal');
                 textInput.placeholder = 'What\'s the story?';
-                newText = newText || $scope.item.text;
+                newText = newText || $scope.item.text || '';
                 textInput.text = newText;
 
                 textInput.open(function (text) {
@@ -160,7 +160,7 @@ app.directive('inListItem', [
                 edit: function () {
                   textInput = TextInput.get();
                   textInput.placeholder = 'What\'s the caption?';
-                  newText = newText || $scope.item._file.caption;
+                  newText = newText || $scope.item._file.caption || '';
                   textInput.text = newText;
 
                   textInput.open(function (text) {
@@ -178,7 +178,7 @@ app.directive('inListItem', [
             $scope.edit = function () {
               textInput = TextInput.get();
               textInput.placeholder = 'Add a comment...';
-              newText = newText || $scope.item.content;
+              newText = newText || $scope.item.content || '';
               textInput.text = newText;
 
               textInput.open(function (text) {
