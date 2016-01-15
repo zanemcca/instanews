@@ -228,11 +228,8 @@ app.service('Uploads', [
 
               /* jshint undef: false */
               //VideoEditor.transcodeVideo(function (result) {
-              VideoEditor.execFFMPEG(function (result) {
-                console.log('Result: ' + result);
+              VideoEditor.execFFMPEG(function () {
                 FileTransfer.resolve(outputFile.nativeURL, function(fileEntry) {
-                  console.log('Transcoding complete!');
-                  console.log(fileEntry);
                   if(fileEntry) {
                     fileEntry.type = 'video/mp4';
                     completeSetup(fileEntry);
@@ -260,7 +257,6 @@ app.service('Uploads', [
                */
                 cmd: ffmpegCmd,
                 progress: function (info) {
-                  console.log(info);
                   // info on android will be shell output from android-ffmpeg-java 
                   // info on ios will be a number from 0 to 100 
                   if (Platform.isIOS()) {
