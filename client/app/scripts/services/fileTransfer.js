@@ -76,6 +76,29 @@ app.factory('FileTransfer', [
         });
       };
 
+      function createFile(path, fileName, cb) {
+        window.requestFileSystem( window.PERSISTENT, 100*1024*1024, function() {
+          window.resolveLocalFileSystemURL(path, function(dirEntry) {
+            dirEntry.getFile(fileName, { create: true, exclusive: false }, function(fileEntry) {
+              console.log('successfully created file');
+              return cb(fileEntry);
+            }, function(err) {
+              console.log('error creating file, err: ' + err);
+              return cb(null);
+            });
+          },
+          function(err) {
+            console.log('error finding specified path, err: ' + err);
+            return cb(null);
+          });
+        },
+        function(err) {
+          console.log('error accessing file system, err: ' + err);
+          Platform.message('Storage space is unavailable!');
+          return cb(null);
+        });
+      } 
+
       var resolve = function (fileURI, cb) {
         if(fileURI.indexOf('content://') === 0) {
           if(fileURI.indexOf('video') === -1 && fileURI.indexOf('image') === -1) {
@@ -102,6 +125,7 @@ app.factory('FileTransfer', [
   return {
     resolve: resolve,
     copy: copy,
+    createFile: createFile,
     upload: upload,
     download: download
   };

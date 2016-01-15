@@ -96,6 +96,10 @@ app.factory('Platform', [
       return cordova.file.dataDirectory;
     };
 
+    var getCacheDir = function() {
+      return cordova.file.cacheDirectory;
+    };
+
     var isCameraPresent = function () {
       return (navigator.camera && navigator.camera.getPicture);
     };
@@ -253,6 +257,7 @@ app.factory('Platform', [
       loading: loading,
       getUUID: getUUID,
       getDataDir: getDataDir,
+      getCacheDir: getCacheDir,
       showSheet: showSheet,
       showAlert: showAlert,
       showToast: showToast,
