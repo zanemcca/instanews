@@ -70,7 +70,7 @@ module.exports = function(app) {
       next(new Error('Bad user given for creation!'));
     }
 
-    var checkPasswordStrength = function (password) {
+    function checkPasswordStrength(password) {
       var p = password;
       var strength = 0;
 
@@ -98,6 +98,13 @@ module.exports = function(app) {
       }
 
       return strength;
+    }; 
+
+    user.username.toLowerCase();
+
+    function validUsername(username) {
+      var valid =  /^[a-z0-9_-]{3,16}$/;
+      return valid.test(username);
     };
 
     if(checkPasswordStrength(user.password) <= 0) {
@@ -106,26 +113,32 @@ module.exports = function(app) {
       next(e);
     }
     else {
-      Journalist.count({
-        or: [{
-              email: user.email
-            },
-        {
-          username: user.username
-        }]
-      }, function(err, count) {
-        if( err) {
-          next(err);
-        }
-        else if(count === 0) {
-          next();
-        }
-        else {
-          var er = new Error('Username or email is already used!'); 
-          er.status = 403;
-          next(er);
-        }
-      });
+      if(validUsername(user.username)) {
+        Journalist.count({
+          or: [{
+                email: user.email
+              },
+          {
+            username: user.username
+          }]
+        }, function(err, count) {
+          if( err) {
+            next(err);
+          }
+          else if(count === 0) {
+            next();
+          }
+          else {
+            var er = new Error('Username or email is already used!'); 
+            er.status = 403;
+            next(er);
+          }
+        });
+      } else {
+        var e = new Error('Username is invalid!');
+        e.status = 403;
+        next(e);
+      }
     }
   });
 
