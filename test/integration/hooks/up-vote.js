@@ -14,7 +14,7 @@ var Articles = app.models.Article;
 
 exports.run = function() {
   describe('UpVote', function() {
-    on.article().describe('Create upvote', function() {
+    on.article().by('ted').describe('Create upvote', function() {
       it('should update the upVoteCount of the artcle voted on and not verify the article', function(done) {
         var res = on.Instances.getActionableInstance();
         UpVote.create({
@@ -41,6 +41,7 @@ exports.run = function() {
       it('should update the upVoteCount of the artcle voted on and verify the article', function(done) {
         var res = on.Instances.getActionableInstance();
         UpVote.create({
+          username: 'bill',
           clickableType: 'article',
           clickableId: res.id,
           location: res.location
