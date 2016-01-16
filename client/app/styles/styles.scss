@@ -92,3 +92,10 @@
     margin-bottom:20px !important;
   }
 }
+
+//Hack to fix recuring textarea indent issue in ionic
+.platform-android {
+  textarea {
+    text-indent: 0px;
+  }
+}
