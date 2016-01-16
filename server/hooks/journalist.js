@@ -98,17 +98,18 @@ module.exports = function(app) {
       }
 
       return strength;
-    }; 
+    } 
 
     user.username.toLowerCase();
 
     function validUsername(username) {
       var valid =  /^[a-z0-9_-]{3,16}$/;
       return valid.test(username);
-    };
+    }
 
+    var e;
     if(checkPasswordStrength(user.password) <= 0) {
-      var e = new Error('Password is too weak!');
+      e = new Error('Password is too weak!');
       e.status = 403;
       next(e);
     }
@@ -135,7 +136,7 @@ module.exports = function(app) {
           }
         });
       } else {
-        var e = new Error('Username is invalid!');
+        e = new Error('Username is invalid!');
         e.status = 403;
         next(e);
       }
