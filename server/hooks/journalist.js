@@ -70,33 +70,76 @@ module.exports = function(app) {
       next(new Error('Bad user given for creation!'));
     }
 
-  //TODO make this the same as front end password check
-    if( !user.password || user.password.length < 8) {
-      var e = new Error('Password is too weak!');
+    function checkPasswordStrength(password) {
+      var p = password;
+      var strength = 0;
+
+      // istanbul ignore if
+      if( !p || p.length === 0 ) {
+        strength = 0;
+      }
+      else if (p.length < 8) {
+        strength = -1;
+      }
+      else {
+        //lowercase && (numbers || uppercase || special)
+        var strong = /^(?=.*[a-z])((?=.*[A-Z])|(?=.*\d)|(?=.*[-+_!@#$%^&*.,?~])).+$/;
+        //lowercase && 2 of (numbers || uppercase || special)
+        var excellent = /^(?=.*[a-z])(((?=.*[A-Z])(?=.*\d))|((?=.*[A-Z])(?=.*[-+_!@#$%^&*.,?~]))|((?=.*\d)(?=.*[-+_!@#$%^&*.,?]))).+$/;
+        if (excellent.test(p) || (p.length >= 12 && strong.test(p))) {
+          strength = 3;
+        }
+        else if (strong.test(p) || p.length >= 12) {
+          strength = 2;
+        }
+        else {
+          strength = 1;
+        }
+      }
+
+      return strength;
+    } 
+
+    user.username.toLowerCase();
+
+    function validUsername(username) {
+      var valid =  /^[a-z0-9_-]{3,16}$/;
+      return valid.test(username);
+    }
+
+    var e;
+    if(checkPasswordStrength(user.password) <= 0) {
+      e = new Error('Password is too weak!');
       e.status = 403;
       next(e);
     }
     else {
-      Journalist.count({
-        or: [{
-              email: user.email
-            },
-        {
-          username: user.username
-        }]
-      }, function(err, count) {
-        if( err) {
-          next(err);
-        }
-        else if(count === 0) {
-          next();
-        }
-        else {
-          var er = new Error('Username or email is already used!'); 
-          er.status = 403;
-          next(er);
-        }
-      });
+      if(validUsername(user.username)) {
+        Journalist.count({
+          or: [{
+                email: user.email
+              },
+          {
+            username: user.username
+          }]
+        }, function(err, count) {
+          if( err) {
+            next(err);
+          }
+          else if(count === 0) {
+            next();
+          }
+          else {
+            var er = new Error('Username or email is already used!'); 
+            er.status = 403;
+            next(er);
+          }
+        });
+      } else {
+        e = new Error('Username is invalid!');
+        e.status = 403;
+        next(e);
+      }
     }
   });
 
