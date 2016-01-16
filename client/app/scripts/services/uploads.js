@@ -10,6 +10,7 @@ app.service('Uploads', [
   'FileTransfer',
   'TextInput',
   'Platform',
+  'Navigate',
   'rfc4122',
   'observable',
   'User',
@@ -20,6 +21,7 @@ app.service('Uploads', [
     FileTransfer,
     TextInput,
     Platform,
+    Navigate,
     rfc4122,
     observable,
     User
@@ -382,52 +384,58 @@ app.service('Uploads', [
 
       //Capture video using the video camera
       uploads.captureVideo = function() {
-        Camera.captureVideo()
-        .then( function(vid) {
-          if(vid) {
-            video(vid);
-          }
-        },
-        // istanbul ignore next
-        function(err) {
-          console.log(err);
-          Platform.showToast('There was an error capturing your video. Please try again!');
+        Navigate.ensureLogin( function () {
+          Camera.captureVideo()
+          .then( function(vid) {
+            if(vid) {
+              video(vid);
+            }
+          },
+          // istanbul ignore next
+          function(err) {
+            console.log(err);
+            Platform.showToast('There was an error capturing your video. Please try again!');
+          });
         });
       };
 
       //Get a photo(s) from the gallery
       uploads.getFromGallery = function() {
-        Camera.openMediaGallery()
-        .then( function(media) {
-          if(media) {
-            if(media.type.indexOf('image') > -1) {
-              picture(media);
-            } else if (media.type.indexOf('video') > -1) {
-              video(media);
-            } else {
-              Platform.showToast('Sorry but you can only upload photos and videos. Please try again!');
+        Navigate.ensureLogin( function () {
+          Camera.openMediaGallery()
+          .then( function(media) {
+            if(media) {
+              if(media.type.indexOf('image') > -1) {
+                picture(media);
+              } else if (media.type.indexOf('video') > -1) {
+                video(media);
+              } else {
+                Platform.showToast('Sorry but you can only upload photos and videos. Please try again!');
+              }
             }
-          }
-        },
-        // istanbul ignore next
-        function(err) {
-          console.log(err);
-          Platform.showToast('There was an error while trying to get something from the gallery. Please try again!');
+          },
+          // istanbul ignore next
+          function(err) {
+            console.log(err);
+            Platform.showToast('There was an error while trying to get something from the gallery. Please try again!');
+          });
         });
       };
 
       //Capture a photo using the camera and store it into the new article
       uploads.capturePicture = function() {
-        Camera.capturePicture()
-        .then( function(photo) {
-          if(photo) {
-            picture(photo);
-          }
-        }, 
-        // istanbul ignore next
-        function(err) {
-          console.log('Error: Failed to capture a new photo: ' + JSON.stringify(err));
-          Platform.showToast('There was an error capturing your photo. Please try again!');
+        Navigate.ensureLogin( function () {
+          Camera.capturePicture()
+          .then( function(photo) {
+            if(photo) {
+              picture(photo);
+            }
+          }, 
+          // istanbul ignore next
+          function(err) {
+            console.log('Error: Failed to capture a new photo: ' + JSON.stringify(err));
+            Platform.showToast('There was an error capturing your photo. Please try again!');
+          });
         });
       };
 
@@ -438,17 +446,19 @@ app.service('Uploads', [
       };
 
       uploads.getText = function (txt) {
-        txt = txt || {partial:''};
-        var textInput = TextInput.get('modal');
-        textInput.placeholder = 'What\'s the story?';
-        textInput.text = txt.partial;
+        Navigate.ensureLogin( function () {
+          txt = txt || {partial:''};
+          var textInput = TextInput.get('modal');
+          textInput.placeholder = 'What\'s the story?';
+          textInput.text = txt.partial;
 
-        textInput.open(function (newText) {
-          text(newText);
-          txt.partial = '';
-        }, function (partialText) {
-          //Interruption function
-          txt.partial = partialText;
+          textInput.open(function (newText) {
+            text(newText);
+            txt.partial = '';
+          }, function (partialText) {
+            //Interruption function
+            txt.partial = partialText;
+          });
         });
       };
 
