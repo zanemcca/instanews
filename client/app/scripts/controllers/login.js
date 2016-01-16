@@ -87,13 +87,6 @@ app.controller('LoginCtrl', [
         $scope.reset.forgotModal = modal;
       });
 
-      //TODO Remove
-      $scope.skip = function () {
-        $scope.cred.username = 'zane';
-        $scope.cred.password = 'password';
-        $scope.login();
-      };
-
       $scope.validEmail = function() { 
         var re = /^([\w-]+(?:\.[\w-]+)*)@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$/i;
         var valid = re.test($scope.newUser.email);
@@ -135,9 +128,17 @@ app.controller('LoginCtrl', [
         return strength;
       };
 
+      function validUsername(username) {
+        var valid =  /^[A-Za-z0-9_-]{3,16}$/;
+        return valid.test(username);
+      }
+
       $scope.$watch('newUser', function(newVal, oldVal) {
         if (newVal.password !== oldVal.password) {
           $scope.passwordStrength = checkPasswordStrength(newVal.password);
+        }
+        if (newVal.username !== oldVal.username) {
+          $scope.invalid.username = !validUsername(newVal.username);
         }
       }, true );
 
