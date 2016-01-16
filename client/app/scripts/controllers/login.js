@@ -131,7 +131,7 @@ app.controller('LoginCtrl', [
       function validUsername(username) {
         var valid =  /^[A-Za-z0-9_-]{3,16}$/;
         return valid.test(username);
-      };
+      }
 
       $scope.$watch('newUser', function(newVal, oldVal) {
         if (newVal.password !== oldVal.password) {
