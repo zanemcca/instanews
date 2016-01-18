@@ -100,7 +100,12 @@ module.exports = function(app) {
       return strength;
     } 
 
-    user.username.toLowerCase();
+    if(user.username) {
+      user.username = user.username.toLowerCase();
+    }
+    if(user.email) {
+      user.email = user.email.toLowerCase();
+    }
 
     function validUsername(username) {
       var valid =  /^[a-z0-9_-]{3,16}$/;
