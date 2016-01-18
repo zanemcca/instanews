@@ -75,6 +75,14 @@
 .dynamic-box {
 }
 
+@media only screen and (orientation: landscape) and (max-width: 767px) {
+  .dynamic-box {
+    width: 80%;
+    margin-left: auto;
+    margin-right: auto;
+  }
+}
+
 @media only screen and (min-width: 768px) {
   .dynamic-box {
     width: 600px;
