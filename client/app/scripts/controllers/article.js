@@ -69,6 +69,10 @@ app.controller('ArticleCtrl', [
           } else {
             $scope.post();
           }
+        } else {
+          if($scope.uploadModal) {
+            $scope.uploadModal.hide();
+          }
         }
       });
     });
