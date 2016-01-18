@@ -87,6 +87,18 @@ app.service('Uploads', [
       return pend;
     };
 
+    var isPending = function(parentId) {
+      parentId = parentId || 'newArticle';
+
+      var found = false;
+      pending.forEach(function(article) {
+        if(article.spec.options.id === parentId) {
+          found = true;
+        }
+      });
+      return found;
+    };
+
     var getPending = function () {
       var i = pending.length;
       while(i > 0) {
@@ -468,6 +480,7 @@ app.service('Uploads', [
     return {
       moveToPending: moveToPending,
       getPending: getPending,
+      isPending: isPending,
       findOrCreate: findOrCreate 
     };
   }
