@@ -18,7 +18,20 @@
     padding-top:0;
     position:relative;
     border:0px;
+  }
+}
+
+@media only screen and (max-width: 767px) and (orientation: portrait) {
+  .map-exterior {
     margin:0px;
+  }
+}
+
+@media only screen and (max-width: 767px) and (orientation: landscape) {
+  .map-exterior {
+    width:80%;
+    margin-left: auto;
+    margin-right: auto;
   }
 }
 
