@@ -12,6 +12,8 @@
     </div>
    </ion-nav-buttons>
    <ion-content delegate-handle="subarticle" on-swipe-down="onSwipeDown()" overflow-scroll="true" class="gpu">
+      <ion-refresher pulling-text="Fresh Stuff" on-refresh="onRefresh()">
+      </ion-refresher>
       <in-list list="Subarticles"
         is-card="true"> 
         <inMap map="map"></inMap>

@@ -89,20 +89,18 @@ app.controller('ArticleCtrl', [
       });
     };
 
-    /*
-       $scope.onRefresh = function () {
-       console.log('Refresh');
-       Subarticles.deleteAll($stateParams.id);
-       Subarticles.load($stateParams.id, function() {
-       $scope.$broadcast('scroll.refreshComplete');
-       });
-       };
-       */
+    $scope.onRefresh = function () {
+      console.log('Refresh');
+//      Subarticles.deleteAll($stateParams.id);
+      $scope.Subarticles.load(function() {
+        $scope.$broadcast('scroll.refreshComplete');
+      });
+    };
 
-   $ionicModal.fromTemplateUrl('templates/modals/upload.html', {
+    $ionicModal.fromTemplateUrl('templates/modals/upload.html', {
       scope: $scope,
       animation: 'slide-in-up'
-   }).then( function (modal) {
+    }).then( function (modal) {
       $scope.uploadModal = modal;
       $scope.post = function (){
         Post.post($scope.Uploads, $stateParams.id, function (err) {
@@ -120,7 +118,7 @@ app.controller('ArticleCtrl', [
         $scope.Uploads.clear();
         modal.hide();
       };
-   });
+    });
   }
 ]);
 
