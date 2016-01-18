@@ -78,6 +78,7 @@ app.controller('ArticleCtrl', [
       uploadObserver.unregister();
     });
 
+    //TODO Remove this and the template that goes with it
     $scope.post = function () {
       Navigate.go('app.subarticlePost', {
         id: $scope.article.id
@@ -105,6 +106,10 @@ app.controller('ArticleCtrl', [
             modal.hide();
           }
         });
+      };
+
+      $scope.isPosting = function () {
+        return Uploads.isPending($stateParams.id);
       };
 
       $scope.clear = function () {
