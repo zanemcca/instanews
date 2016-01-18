@@ -16,7 +16,7 @@
         is-card="true"> 
         <inMap map="map"></inMap>
         <div class="item dynamic-box"
-          ng-class="{'card' : Platform.getWidth() >= 768}"
+          ng-class="{'card' : Platform.getWidth() >= 768 || Platform.isLandscape()}"
           style="border:0px;padding-top:0px;padding-bottom:0px">
            <inVotes style="border: transparent"
               votable="article">
