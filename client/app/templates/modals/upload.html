@@ -7,7 +7,9 @@
         ng-class="Platform.isIOS() ? 'ion-ios-arrow-back' : 'ion-android-arrow-back'"></i>
      </button>
      <h1 class="title">{{article.title}}</h1>
-     <button class="button buttons button-clear" ng-click="post()">
+     <button class="button buttons button-clear" 
+       ng-disabled="isPosting()"
+       ng-click="post()">
        ADD 
      </button>
    </ion-header-bar>
