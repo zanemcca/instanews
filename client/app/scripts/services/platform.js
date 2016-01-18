@@ -112,6 +112,10 @@ app.factory('Platform', [
       return window.innerWidth;
     };
 
+    var isLandscape = function () {
+      return (window.innerHeight < window.innerWidth);
+    };
+
     var getDeviceType = function () {
       var height = Math.max(window.innerHeight, window.innerWidth);
       var type = 'phone';
@@ -268,6 +272,7 @@ app.factory('Platform', [
       isCameraPresent: isCameraPresent,
       isVideoPresent: isVideoPresent,
       isTablet: isTablet,
+      isLandscape: isLandscape,
       getWidth: getWidth,
       getDevice: getDevice,
       setDevice: setDevice,
