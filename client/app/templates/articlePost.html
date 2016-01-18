@@ -13,8 +13,8 @@
       <inAutocomplete place="place"></inAutocomplete>
       <inMap map="map"></inMap>
 
-      <div class="list">
-        <label class="item dynamic-box item-input"
+      <div class="list dynamic-box">
+        <label class="item item-input"
           ng-class="{'card' : Platform.getWidth() >= 768}">
            <input type="text" placeholder="What's the title?" on-return="Platform.keyboard.hide();" ng-model="newArticle.title" required>
          </label>

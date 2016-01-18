@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<div class="item card dynamic-box no-padding" ng-if="upload.subarticle._file">
+<div class="item card no-padding"
+  ng-if="upload.subarticle._file">
   <div class="item item-divider no-padding">
     <div class="buttons">
       <button class="button button-small button-clear icon ion-close-round"
@@ -21,7 +22,7 @@
   </div>
   <inMedia edit-caption="caption.edit" is-mine="is.mine" media="upload.subarticle._file"></inMedia>
 </div>
-<div class="card dynamic-box" ng-if="upload.subarticle.text">
+<div class="card" ng-if="upload.subarticle.text">
   <div class="item item-divider no-padding">
     <div class="buttons">
       <button class="button button-small button-clear icon ion-close-round"
