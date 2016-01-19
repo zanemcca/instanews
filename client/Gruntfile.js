@@ -308,12 +308,6 @@ module.exports = function (grunt) {
     },
 
     // The following *-min tasks produce minified files in the dist folder
-    cssmin: {
-      options: {
-        //root: '<%= yeoman.app %>',
-        noRebase: true
-      }
-    },
     htmlmin: {
       dist: {
         options: {
@@ -417,28 +411,37 @@ module.exports = function (grunt) {
     // By default, your `index.html`'s <!-- Usemin block --> will take care of
     // minification. These next options are pre-configured if you do not wish
     // to use the Usemin blocks.
-    // cssmin: {
-    //   dist: {
-    //     files: {
-    //       '<%= yeoman.dist %>/<%= yeoman.styles %>/main.css': [
-    //         '.temp/<%= yeoman.styles %>/**/*.css',
-    //         '<%= yeoman.app %>/<%= yeoman.styles %>/**/*.css'
-    //       ]
-    //     }
-    //   }
-    // },
-    // uglify: {
-    //   dist: {
-    //     files: {
-    //       '<%= yeoman.dist %>/<%= yeoman.scripts %>/scripts.js': [
-    //         '<%= yeoman.dist %>/<%= yeoman.scripts %>/scripts.js'
-    //       ]
-    //     }
-    //   }
-    // },
-    // concat: {
-    //   dist: {}
-    // },
+    cssmin: {
+      options: {
+        //root: '<%= yeoman.app %>',
+        noRebase: true
+      },
+      dist: {
+        files: {
+          '<%= yeoman.dist %>/<%= yeoman.styles %>/main.css': [
+            '.temp/<%= yeoman.styles %>/**/*.css',
+            '<%= yeoman.app %>/<%= yeoman.styles %>/**/*.css'
+          ]
+        }
+      }
+    },
+    uglify: {
+      options: {
+        compress: {
+          drop_console: true
+        }
+      },
+      dist: {
+        files: {
+          '<%= yeoman.dist %>/<%= yeoman.scripts %>/scripts.js': [
+            '<%= yeoman.dist %>/<%= yeoman.scripts %>/scripts.js'
+          ]
+        }
+      }
+    },
+    concat: {
+      dist: {}
+    },
 
     // Test settings
     // These will override any config options in karma.conf.js if you create it.
@@ -615,7 +618,10 @@ module.exports = function (grunt) {
   });
 
   grunt.registerTask('run', function() {
-    if(this.args.indexOf('production') > -1) {
+    if(this.args.indexOf('release') > -1) {
+      this.args.splice(this.args.indexOf('release'),1);
+      return grunt.task.run(['default', 'ionic:resources', 'ionic:run:' + this.args.join(':')]);
+    } else if(this.args.indexOf('production') > -1) {
       this.args.splice(this.args.indexOf('production'),1);
       return grunt.task.run(['newer:jshint', 'init:production', 'ionic:resources', 'ionic:run:' + this.args.join(':')]);
     } else if(this.args.indexOf('staging') > -1) {
