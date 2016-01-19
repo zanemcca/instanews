@@ -426,6 +426,11 @@ module.exports = function (grunt) {
       }
     },
     uglify: {
+      options: {
+        compress: {
+          drop_console: true
+        }
+      },
       dist: {
         files: {
           '<%= yeoman.dist %>/<%= yeoman.scripts %>/scripts.js': [
@@ -613,7 +618,10 @@ module.exports = function (grunt) {
   });
 
   grunt.registerTask('run', function() {
-    if(this.args.indexOf('production') > -1) {
+    if(this.args.indexOf('release') > -1) {
+      this.args.splice(this.args.indexOf('release'),1);
+      return grunt.task.run(['default', 'ionic:resources', 'ionic:run:' + this.args.join(':')]);
+    } else if(this.args.indexOf('production') > -1) {
       this.args.splice(this.args.indexOf('production'),1);
       return grunt.task.run(['newer:jshint', 'init:production', 'ionic:resources', 'ionic:run:' + this.args.join(':')]);
     } else if(this.args.indexOf('staging') > -1) {
