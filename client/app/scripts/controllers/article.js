@@ -91,7 +91,7 @@ app.controller('ArticleCtrl', [
 
     $scope.onRefresh = function () {
       console.log('Refresh');
-//      Subarticles.deleteAll($stateParams.id);
+      spec.options.filter.skip = 0;
       $scope.Subarticles.load(function() {
         $scope.$broadcast('scroll.refreshComplete');
       });
