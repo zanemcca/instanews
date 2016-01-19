@@ -86,3 +86,38 @@
   font-size:100px;
   color: #FFFFFF;
 }
+
+// Videogular customizations
+
+//Override videogular font
+videogular .iconButton, [videogular] .iconButton {
+  font-family: $ionicons-font-family;
+}
+
+//Disable videogular focus button border
+videogular .iconButton:focus, [videogular] .iconButton:focus {
+  border: 0 !important;
+}
+
+//Replace fullscreen icon
+videogular .enter:before, [videogular] .enter:before {
+  content: $ionicon-var-arrow-expand !important;
+}
+
+//Replace shrink icon
+videogular .exit:before, [videogular] .exit:before {
+  content: $ionicon-var-arrow-shrink !important;
+}
+
+//Replace play icon
+videogular .play:before, [videogular] .play:before {
+  content: $ionicon-var-ios-play !important;
+}
+
+videogular .pause:before, [videogular] .pause:before {
+  content: $ionicon-var-ios-pause !important;
+}
+
+videogular vg-overlay-play .overlayPlayContainer, [videogular] vg-overlay-play .overlayPlayContainer {
+  opacity: 1.0 !important;
+}
