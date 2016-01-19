@@ -1,19 +1,21 @@
 /* Empty. Add your own CSS if you like */
 
-@import "variables";
+@import "_variables";
 
 @import "../bower_components/ionic/scss/ionic.scss";
 
-@import "transitions";
+@import "../bower_components/videogular-themes-default/videogular.css";
 
-@import "styles";
+@import "_transitions";
 
-@import "sidemenu";
+@import "_styles";
 
-@import "map";
+@import "_sidemenu";
 
-@import "media";
+@import "_map";
 
-@import "progress";
+@import "_media";
 
-@import "buttons";
+@import "_progress";
+
+@import "_buttons";
