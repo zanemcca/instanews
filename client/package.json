@@ -28,7 +28,7 @@
     "grunt-postcss": "^0.7.1",
     "grunt-usemin": "~3.0.0",
     "grunt-wiredep": "^2.0.0",
-    "ionic": "^1.7.12",
+    "ionic": "^1.7.13",
     "jshint-stylish": "~1.0.0",
     "karma": "~0.12.31",
     "karma-chai": "~0.1.0",
