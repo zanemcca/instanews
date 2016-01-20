@@ -154,11 +154,11 @@ module.exports = function (grunt) {
       },
       compass: {
         files: ['<%= yeoman.app %>/<%= yeoman.styles %>/**/*.{scss,sass}'],
-        tasks: ['compass:server', 'autoprefixer', 'newer:copy:tmp']
+        tasks: ['compass:server', 'postcss', 'newer:copy:tmp']
       },
 //      styles: {
 //        files: ['<%= yeoman.app %>/<%= yeoman.styles %>/**/*.css'],
-//        tasks: ['newer:copy:styles', 'autoprefixer', 'newer:copy:tmp']
+//        tasks: ['newer:copy:styles', 'postcss', 'newer:copy:tmp']
 //      },
       gruntfile: {
         files: ['Gruntfile.js'],
@@ -220,9 +220,13 @@ module.exports = function (grunt) {
       server: '.temp'
     },
 
-    autoprefixer: {
+    postcss: {
       options: {
-        browsers: ['last 1 version']
+        processors: [
+          require('autoprefixer')({
+            browsers: ['last 5 version']
+          })
+        ]
       },
       dist: {
         files: [{
@@ -599,7 +603,7 @@ module.exports = function (grunt) {
     'wiredep',
     'clean',
     'concurrent:test',
-    'autoprefixer',
+    'postcss',
     'karma:unit:start',
     'watch:karma'
   ]);
@@ -642,7 +646,7 @@ module.exports = function (grunt) {
     'ngconstant:development',
     'wiredep',
     'concurrent:server',
-    'autoprefixer',
+    'postcss',
     'newer:copy:app',
     'newer:copy:tmp'
   ]);
@@ -652,7 +656,7 @@ module.exports = function (grunt) {
     'ngconstant:production',
     'wiredep',
     'concurrent:dist',
-    'autoprefixer',
+    'postcss',
     'newer:copy:app',
     'newer:copy:tmp'
   ]);
@@ -662,7 +666,7 @@ module.exports = function (grunt) {
     'ngconstant:staging',
     'wiredep',
     'concurrent:dist',
-    'autoprefixer',
+    'postcss',
     'newer:copy:app',
     'newer:copy:tmp'
   ]);
@@ -673,7 +677,7 @@ module.exports = function (grunt) {
     'wiredep',
     'useminPrepare',
     'concurrent:dist',
-    'autoprefixer',
+    'postcss',
     'concat',
     'ngAnnotate',
     'copy:dist',
