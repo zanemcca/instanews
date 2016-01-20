@@ -113,7 +113,11 @@ app.factory('Platform', [
     };
 
     var isLandscape = function () {
-      return (window.innerHeight < window.innerWidth);
+      if(window.orientation) {
+        return (window.orientation % 180);
+      } else {
+        return (window.innerHeight < window.innerWidth);
+      }
     };
 
     var getDeviceType = function () {

@@ -38,25 +38,28 @@
   overflow: hidden;
 }
 
-@media only screen and (orientation:portrait) and (max-height : 499px), only screen and (orientation:landscape) and (max-width : 499px) {
+//(orientation:landscape) ~== (min-aspect-ratio: 13/9)
+//(orientation:portrait) ~== (max-aspect-ratio: 13/9)
+
+@media only screen and (max-aspect-ratio: 13/9) and (max-height : 499px), only screen and (min-aspect-ratio: 13/9) and (max-width : 499px) {
   .image-container {
     max-height: 300px;
   }
 }
 
-@media only screen and (orientation:portrait) and (min-height : 500px) and (max-height : 599px), only screen and (orientation:landscape) and (min-width : 500px) and (max-width : 599px) {
+@media only screen and (max-aspect-ratio: 13/9) and (min-height : 500px) and (max-height : 599px), only screen and  (min-aspect-ratio: 13/9) and (min-width : 500px) and (max-width : 599px) {
   .image-container {
     max-height: 500px;
   }
 }
 
-@media only screen and (orientation:portrait) and (min-height : 600px) and (max-height : 699px), only screen and (orientation:landscape) and (min-width : 600px) and (max-width : 699px) {
+@media only screen and (max-aspect-ratio: 13/9) and (min-height : 600px) and (max-height : 699px), only screen and (min-aspect-ratio: 13/9) and (min-width : 600px) and (max-width : 699px) {
   .image-container {
     max-height: 600px;
   }
 }
 
-@media only screen and (orientation:portrait) and (min-height : 700px) and (max-height : 799px), only screen and (orientation:landscape) and (min-width : 700px) and (max-width : 799px) {
+@media only screen and (max-aspect-ratio: 13/9) and (min-height : 700px) and (max-height : 799px), only screen and (min-aspect-ratio: 13/9) and (min-width : 700px) and (max-width : 799px) {
   .image-container {
     max-height: 700px;
   }
