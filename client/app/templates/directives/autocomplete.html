@@ -3,10 +3,13 @@
 <form ng-submit="search()" class="list dynamic-box dynamic-autocomplete"
   ng-class="{'card' : Platform.getWidth() >= 768 || Platform.isLandscape() }"
   style="padding-bottom: 0;">
-  <div class="item item-input row" style="border:0px;margin:0px;padding-bottom:0px;padding-top:0px;">
-    <div class="icon ion-search col col-10"></div>
-    <input ng-if="!isIOS()"
-      class=" col col-80"
+  <div class="bar bar-white item-input">
+    <label class="item item-input-wrapper"
+      style="border:0px;">
+     <i class="icon ion-search placeholder-icon"></i>
+     <input ng-if="!isIOS()"
+      type="search"
+      style="max-width: 80%"
       ng-focus="disableTap()"
       ng-click="click(this)"
       on-return="search()"
@@ -15,7 +18,8 @@
       ng-model="input.value"
       placeholder="{{input.placeholder}}">
     <input ng-if="isIOS()"
-      class=" col col-80"
+      type="search"
+      style="max-width: 80%"
       ng-focus="disableTap()"
       ng-click="click()"
       on-return="search()"
@@ -23,9 +27,11 @@
       type="text" id="search-input"
       ng-model="input.value"
       placeholder="{{input.placeholder}}">
-
-    <div class="no-padding button button-icon dark icon ion-android-locate col col-10" ng-click="place.localize()">
-    </div>
+    </label>
+    <button class="button button-clear"
+      ng-click="place.localize()">
+      <i class="icon ion-android-locate dark"></i>
+     </button>
     <button type="submit" class="button" style="position:absolute;left:-9999px;top:-9999px;height:0;width:0;"></button>
   </div>
 </form>
