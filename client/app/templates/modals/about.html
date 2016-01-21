@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<ion-modal-view>
+   <ion-header-bar class="bar-dark">
+     <button class="button buttons back-button button-clear"
+      ng-click="aboutModal.hide()">
+      <i class="icon"
+        ng-class="Platform.isIOS() ? 'ion-ios-arrow-back' : 'ion-android-arrow-back'"></i>
+     </button>
+     <h1 class="title">
+       About 
+     </h1>
+   </ion-header-bar>
+   <ion-content>
+      <div class="list">
+        <div class="item item-divider">
+          Version
+        </div>
+        <div class="item" style="text-align: center;">
+          1.0.0 
+        </div>
+        <div class="item item-divider">
+          Contact 
+        </div>
+        <div class="item" style="text-align: center;">
+          support@instanews.com 
+        </div>
+        <div class="item item-divider">
+          Terms & Conditions
+        </div>
+        <div class="item item-text-wrap">
+          ...
+        </div>
+        <div class="item item-divider">
+          Privacy Policy 
+        </div>
+        <div class="item item-text-wrap">
+          ...
+        </div>
+      </div>
+   </ion-content>
+</ion-modal-view>
+
