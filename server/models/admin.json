@@ -3,11 +3,6 @@
   "base": "Model",
   "strict": false,
   "idInjection": true,
-  "indexes": {
-    "username": {
-      "username": -1
-    }
-  },
   "properties": {
     "username": {
       "type": "string",
