@@ -1,9 +1,5 @@
 module.exports = function(app) {
-  var AdminDB = app.dataSources.Admins;
-  var Admin;
-
-  Admin = AdminDB.buildModelFromInstance('admin', { username: 'user' }, { idInjection: true});
-
+  var Admin = app.models.Admin;;
   var Role = app.models.Role;
 
   Role.registerResolver('admin', function(role, context, cb) {
