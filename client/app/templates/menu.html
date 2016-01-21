@@ -23,7 +23,7 @@
             </p>
           </div>
 
-          <div class="leftcol">
+          <!--div class="leftcol">
             <p><i class="icon ion-ios-people-outline"></i> 28</p>
           </div>
           <div class="middlecol">
@@ -31,7 +31,7 @@
           </div>
           <div class="rightcol">
             <p><i class="icon ion-ios-personadd-outline"></i> 2</p>
-          </div>
+          </div-->
          </div>
          <div class="sidemenu-item" 
            nav-clear menu-close 
@@ -41,7 +41,15 @@
             ng-class="Platform.isIOS() ? 'ion-ios-upload-outline' : 'ion-android-upload'"></i>
              Uploads
             <span class="badge badge-assertive spanposition">{{Uploads.getPending().length}}</span>
-          </div>
+         </div>
+         <div class="sidemenu-item center-horizontal" 
+           nav-clear menu-close
+           style="bottom:0;padding-right:16px;color:#AAAAAA;"
+           ng-click="aboutModal.show();">
+          <i class="icon"
+            ng-class="Platform.isIOS() ? 'ion-ios-information-outline' : 'ion-information-circled'"></i>
+              About
+         </div>
 
          <!--ul class="sidemenu-list">
             <div class="item item-text-wrap"
