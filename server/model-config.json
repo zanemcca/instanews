@@ -39,6 +39,10 @@
     "dataSource": "Articles",
     "public": true
   },
+  "admin": {
+    "dataSource": "Admins",
+    "public": false
+  },
   "base": {
     "dataSource": null,
     "public": false
