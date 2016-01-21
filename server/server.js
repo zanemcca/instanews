@@ -197,8 +197,7 @@ if(cluster.isMaster && numCPUs > 1 && process.env.NODE_ENV === 'production') {
   var setupLogging = function () {
     app.debug = require('./logging.js').debug;
     // istanbul ignore if
-    if( process.env.NODE_ENV !== 'production') {
-      /*
+    if( process.env.NODE_ENV === 'production') {
          var loggerFmt = 'method: :method,,' +
          'url: :url,,' +
          'status: :status,,' +
@@ -210,7 +209,7 @@ if(cluster.isMaster && numCPUs > 1 && process.env.NODE_ENV === 'production') {
          'user-agent: :user-agent';
 
          app.use(loopback.logger(loggerFmt));
-         */
+    } else {
       app.use(loopback.logger('dev'));
     }
   };
