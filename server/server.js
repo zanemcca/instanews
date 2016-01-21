@@ -246,10 +246,8 @@ if(cluster.isMaster && numCPUs > 1 && process.env.NODE_ENV === 'production') {
     var dataSource;
 
     for(var name in app.dataSources) {
-      if(name !== 'Admins') {
-        dataSource = app.dataSources[name];
-        dataSource.on('connected', onConnected.bind(onConnected, dataSource)); 
-      }
+      dataSource = app.dataSources[name];
+      dataSource.on('connected', onConnected.bind(onConnected, dataSource)); 
     }
   };
 

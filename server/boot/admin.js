@@ -1,5 +1,5 @@
 module.exports = function(app) {
-  var Admin = app.models.Admin;;
+  var Admin = app.models.Admin;
   var Role = app.models.Role;
 
   Role.registerResolver('admin', function(role, context, cb) {
