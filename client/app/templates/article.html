@@ -1,32 +1,33 @@
 <!DOCTYPE html>
 <ion-view view-title="{{article.title}}" 
   style="background: #F0F0F0">
-  <ion-nav-buttons side="secondary"
-    ng-if="!Platform.isBrowser()">
-    <div ng-show="uploads.length > 0">
-      <button  ng-click="uploadModal.show();"
-        class="button button-clear icon ion-plus">
-      </button>
+  <ion-nav-buttons side="secondary">
+    <div ng-if="!Platform.isBrowser()">
+      <div ng-show="uploads.length > 0">
+        <button  ng-click="uploadModal.show();"
+          class="button button-clear icon ion-plus">
+        </button>
+      </div>
+      <div ng-hide="uploads.length > 0">
+        <in-speed-dial style="width:34px;" position="'top-right'" uploads="Uploads"></in-speed-dial>
+      </div>
     </div>
-    <div ng-hide="uploads.length > 0">
-      <in-speed-dial style="width:34px;" position="'top-right'" uploads="Uploads"></in-speed-dial>
-    </div>
-   </ion-nav-buttons>
-   <ion-content delegate-handle="subarticle" on-swipe-down="onSwipeDown()" overflow-scroll="true" class="gpu">
-      <ion-refresher pulling-text="Fresh Stuff" on-refresh="onRefresh()">
-      </ion-refresher>
-      <in-list list="Subarticles"
-        is-card="true"> 
-        <inMap map="map"></inMap>
-        <div class="item dynamic-box"
-          ng-class="{'card' : Platform.getWidth() >= 768 || Platform.isLandscape()}"
-          style="border:0px;padding-top:0px;padding-bottom:0px">
-           <inVotes style="border: transparent"
-              votable="article">
-           </inVotes>
-           <inComments owner="article"></inComments>
-        </div>
-      </in-list>
-   </ion-content>
-   <in-text-footer></in-text-footer>
+  </ion-nav-buttons>
+  <ion-content delegate-handle="subarticle" on-swipe-down="onSwipeDown()" overflow-scroll="true" class="gpu">
+    <ion-refresher pulling-text="Fresh Stuff" on-refresh="onRefresh()">
+    </ion-refresher>
+    <in-list list="Subarticles"
+      is-card="true"> 
+      <inMap map="map"></inMap>
+      <div class="item dynamic-box"
+        ng-class="{'card' : Platform.getWidth() >= 768 || Platform.isLandscape()}"
+        style="border:0px;padding-top:0px;padding-bottom:0px">
+         <inVotes style="border: transparent"
+            votable="article">
+         </inVotes>
+         <inComments owner="article"></inComments>
+      </div>
+    </in-list>
+  </ion-content>
+  <in-text-footer></in-text-footer>
 </ion-view>
