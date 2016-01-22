@@ -223,8 +223,10 @@ app.directive('inListItem', [
           });
         };
 
-        setPlaceName();
-        feedMap.addListener('zoom_changed', setPlaceName);
+        if(feedMap) {
+          setPlaceName();
+          feedMap.addListener('zoom_changed', setPlaceName);
+        }
       },
       templateUrl: 'templates/directives/listItem.html',
       //link: function($scope,element, attributes) {
