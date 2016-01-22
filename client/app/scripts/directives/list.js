@@ -109,6 +109,9 @@ app.directive('inListItem', [
         $scope.is = {
           mine: function () {
             return User.isMine($scope.item);
+          },
+          admin: function () {
+            return User.isAdmin();
           }
         };
 
