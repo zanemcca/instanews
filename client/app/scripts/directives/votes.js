@@ -11,6 +11,7 @@ app.directive('invotes', [
   'DownVote',
   'Votes',
   'Navigate',
+  'Platform',
   'Position',
   function (
     $timeout,
@@ -21,6 +22,7 @@ app.directive('invotes', [
     DownVote,
     Votes,
     Navigate,
+    Platform,
     Position) {
 
       return {
@@ -29,6 +31,8 @@ app.directive('invotes', [
           votable: '='
         },
         controller: function($scope, $location) {
+
+          $scope.Platform = Platform;
 
           var update = function () {
             $timeout(function () {

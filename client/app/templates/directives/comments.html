@@ -4,18 +4,20 @@
     is-card="false"
     is-not-infinite="true"> 
   </in-list>
-    <button class="button ion-refresh button-icon dark"
-      style="float: left;"
-      ng-show="Comments.areItemsAvailable()"
-      ng-click="Comments.load()">
-      Load more
-    </button>
-    <button class="button button-icon dark"
-      style="float: right;"
-      ng-class="(owner.modelName !== 'comment') ? 'ion-edit': 'ion-forward'"
-      ng-click="create()">
-      <i ng-if="owner.modelName !== 'comment'">Comment</i>
-      <i ng-if="owner.modelName === 'comment'">Reply</i>
-    </button>
+  <button class="button ion-refresh button-icon dark"
+    style="float: left;"
+    ng-show="Comments.areItemsAvailable()"
+    ng-click="Comments.load()">
+    Load more
+  </button>
+  <button 
+    ng-disabled="Platform.isBrowser()"
+    class="button button-icon dark"
+    style="float: right;"
+    ng-class="(owner.modelName !== 'comment') ? 'ion-edit': 'ion-forward'"
+    ng-click="create()">
+    <i ng-if="owner.modelName !== 'comment'">Comment</i>
+    <i ng-if="owner.modelName === 'comment'">Reply</i>
+  </button>
 </div>
 
