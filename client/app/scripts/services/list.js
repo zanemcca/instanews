@@ -151,12 +151,25 @@ function ListFactory (Platform) {
     };
 
     // Find by id
-    var findById = function (id) {
+    var findById = function (id , cb) {
       for(var i in spec.items) {
         if(spec.items[i].id === id) {
-          return spec.items[i];
+          return cb(spec.items[i]);
         }
       }
+
+      spec.findById({ id: id }).$promise.then( function(item) {
+        if(item) {
+          that.add([item], function() {
+            return findById(id, cb);
+          });
+        } else {
+          cb();
+        }
+      }, function(err) {
+        console.log(err);
+        cb();
+      });
     };
 
     // Register and notify observers of the list
@@ -186,7 +199,6 @@ function ListFactory (Platform) {
 
     spec.sortingFunction = spec.sortingFunction || sortingFunction;
 
-
     //For simple cases this will do but the update function should
     //have a smarter version given 
     spec.update = spec.update || function (newVal, oldVal) {
@@ -196,6 +208,15 @@ function ListFactory (Platform) {
     };
     spec.save = spec.save || function () {};
     spec.destroy = spec.destroy || function () {};
+    spec.findById = spec.findById || function () {
+      return {
+        $promise: {
+          then: function (succ) {
+            succ();
+          }
+        }
+      };
+    };
 
     spec.options = spec.options || {};
     spec.options.filter = spec.options.filter || {};

@@ -138,25 +138,45 @@ app.directive('inmap', [
                 break;
               }
               case 'articleMap': {
+
                 // istanbul ignore else
                 if ( $stateParams.id) {
-                  scope.article = Articles.findById($stateParams.id);
-                  mapOptions.center = new google.maps.LatLng(scope.article.location.lat, scope.article.location.lng);
-                  mapOptions.zoom = 18;
-                  mapOptions.minZoom = 9;
-                  mapOptions.mapTypeId = google.maps.MapTypeId.HYBRID;
-                  mapOptions.styles = [
-                    {
-                      featureType: 'poi',
-                      elementType: 'labels',
-                      stylers: [{visibility: 'off'}]
+                  scope.article = {};
+                  Articles.findById($stateParams.id, function(article) {
+                    scope.article = article;
+                    if(article) {
+                      mapOptions.center = new google.maps.LatLng(scope.article.location.lat, scope.article.location.lng);
+                      mapOptions.zoom = 18;
+                      //mapOptions.minZoom = 9;
+                      mapOptions.tilt = 45;
+                      if(map) {
+                        map.setOptions(mapOptions);
+                        map.setCenter(mapOptions.center);
+                        map.setZoom(mapOptions.zoom);
+                        map.setTilt(mapOptions.tilt);
+                      }
+                    } else {
+                      console.log('Failed to find article!');
+                      //TODO Replace the map with something
                     }
-                  ];
+                  });
                 }
                 else {
                   console.log('No id given! The article map is dependent on knowing the article location!');
+                  //TODO Replace the map with something
                 }
+
+                mapOptions.mapTypeId = google.maps.MapTypeId.HYBRID;
+                mapOptions.styles = [
+                  {
+                    featureType: 'poi',
+                    elementType: 'labels',
+                stylers: [{visibility: 'off'}]
+                  }
+                ];
+
                 map = new google.maps.Map(element, mapOptions);
+                /*
                 map.mapTypes.set(instanewsMapTypeId, instanewsMapType);
                 map.setTilt(45);
 
@@ -168,6 +188,7 @@ app.directive('inmap', [
                     map.setMapTypeId(google.maps.MapTypeId.HYBRID);
                   }
                 });
+               */
 
                 google.maps.event.addDomListener(map, 'center_changed', _.debounce(function() {
                   if(!map.getBounds().contains(mapOptions.center)) {

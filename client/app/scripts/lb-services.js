@@ -411,6 +411,41 @@ module.factory(
 
         /**
          * @ngdoc method
+         * @name lbServices.Article#findById
+         * @methodOf lbServices.Article
+         *
+         * @description
+         *
+         * Find a model instance by id from the data source.
+         *
+         * @param {Object=} parameters Request parameters.
+         *
+         *  - `id` – `{*}` - Model id
+         *
+         *  - `filter` – `{object=}` - Filter defining fields and include
+         *
+         * @param {function(Object,Object)=} successCb
+         *   Success callback with two arguments: `value`, `responseHeaders`.
+         *
+         * @param {function(Object)=} errorCb Error callback with one argument:
+         *   `httpResponse`.
+         *
+         * @returns {Object} An empty reference that will be
+         *   populated with the actual data once the response is returned
+         *   from the server.
+         *
+         * <em>
+         * (The remote method definition does not provide any description.
+         * This usually means the response is a `Article` object.)
+         * </em>
+         */
+        "findById": {
+          url: urlBase + "/articles/:id",
+          method: "GET"
+        },
+
+        /**
+         * @ngdoc method
          * @name lbServices.Article#find
          * @methodOf lbServices.Article
          *

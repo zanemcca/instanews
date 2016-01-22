@@ -7,12 +7,14 @@ app.directive('incomments', [
   'Comment',
   'Comments',
   'Navigate',
+  'Platform',
   'TextInput',
   function (
     $timeout,
     Comment,
     Comments,
     Navigate,
+    Platform,
     TextInput
   ) {
 
@@ -22,6 +24,8 @@ app.directive('incomments', [
         owner: '='
       }, 
       controller: function($scope) {
+
+        $scope.Platform = Platform;
 
         $scope.Comments = Comments.findOrCreate($scope.owner.modelName, $scope.owner.id);
         var spec = $scope.Comments.getSpec();
