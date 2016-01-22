@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <ion-view view-title="{{title}}"
   style="background-color: #F0F0F0">
-   <ion-nav-buttons side="secondary">
+  <ion-nav-buttons side="secondary"
+    ng-if="!Platform.isBrowser()">
       <!--button class="button button-clear icon ion-plus-round" ui-sref="articlePost"></buttoni-->
       <button class="button button-clear icon ion-plus" ng-click="post()"></button>
    </ion-nav-buttons>
-   <ion-nav-buttons side="primary">
+   <ion-nav-buttons side="primary"
+    ng-if="!Platform.isBrowser()">
       <button ng-click="toggleMenu()" class="button button-icon icon ion-navicon"></button>
    </ion-nav-buttons>
 
