@@ -36,6 +36,14 @@
     "allowExtendedOperators": true,
     "connector": "mongodb"
   },
+  "Admins": {
+    "host": "localhost",
+    "port": 27017,
+    "database": "admins",
+    "name": "Admins",
+    "connector": "mongodb",
+    "debug": true
+  },
   "push": {
     "name": "push",
     "connector": "loopback-component-push",
