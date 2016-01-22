@@ -44,6 +44,7 @@ describe('Article controller: ', function(){
 
       $provide.service('Platform', function() {
         return {
+          initBackButton: function() {},
           isIOS: function() {
             return true;
           },

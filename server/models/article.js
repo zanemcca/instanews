@@ -85,7 +85,7 @@ module.exports = function(Article) {
     'exists',
     'count',
     'findOne',
-    'findById',
+ //   'findById',
     'upsert',
     //'prototype.updateAttributes',
     'deleteById',

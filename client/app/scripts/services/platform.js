@@ -8,6 +8,7 @@ app.factory('Platform', [
   '$cordovaFile',
   '$ionicActionSheet',
   '$ionicLoading',
+  '$ionicNavBarDelegate',
   '$q',
   function(
     $cordovaDevice,
@@ -15,6 +16,7 @@ app.factory('Platform', [
     $cordovaFile,
     $ionicActionSheet,
     $ionicLoading,
+    $ionicNavBarDelegate,
     $q
   ) {
 
@@ -54,17 +56,26 @@ app.factory('Platform', [
 
     var isBrowser = function() {
       var ip = ionic.Platform;
-      if(ip.isIOS()) {
-        return false;
-      }
-      else if(ip.isAndroid()) {
-        return false;
-      }
-      else if(ip.isWindowsPhone()) {
-        return false;
-      }
-      else {
+      if(ip && window.cordova) {
+        if(ip.isIOS() || ip.isAndroid() || ip.isWindowsPhone()) {
+          return false;
+        } else {
+          return true;
+        }
+      } else {
         return true;
+      }
+    };
+
+    /*
+     * Sets or unsets the back button depending on if we are
+     * running on a device or in the browser respectivelly
+     */
+    var initBackButton = function () {
+      if(isBrowser()) {
+        $ionicNavBarDelegate.showBackButton(false);
+      } else {
+        $ionicNavBarDelegate.showBackButton(true);
       }
     };
 
@@ -184,7 +195,9 @@ app.factory('Platform', [
             }
           });
         } else {
-          ready.resolve( device);
+          setTimeout(function () {
+            ready.resolve( device);
+          });
 
           setTimeout(function () {
             console.log('Splashscreen timeout');
@@ -273,6 +286,7 @@ app.factory('Platform', [
       showAlert: showAlert,
       showToast: showToast,
       removeFile: removeFile,
+      initBackButton: initBackButton,
       isIOS: isIOS,
       isAndroid: isAndroid,
       isBrowser: isBrowser,
