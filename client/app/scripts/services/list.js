@@ -211,7 +211,7 @@ function ListFactory (Platform) {
     spec.findById = spec.findById || function () {
       return {
         $promise: {
-          then( succ) {
+          then: function (succ) {
             succ();
           }
         }
