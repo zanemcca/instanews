@@ -59,6 +59,13 @@ module.exports = {
     connector: 'mongodb',
     debug: true
   },
+  Admins: {
+    url: mongodb + 'admins' + options,
+    database: 'admins',
+    name: 'Admins',
+    connector: 'mongodb',
+    debug: false
+  },
   Users: {
     url: mongodb + 'users' + options,
     database: 'users',

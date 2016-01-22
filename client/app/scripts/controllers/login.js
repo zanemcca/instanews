@@ -145,8 +145,16 @@ app.controller('LoginCtrl', [
       $scope.login = function () {
 
         var successLogin = function(res) {
-          User.set(res);
+          Journalist.findOne({ filter: query}, function (user) {
+            res.user = user;
+            User.set(res);
 
+            $scope.cred = {
+              username: '',
+              password: '',
+              email: '',
+              remember: true
+            };
           /*
              if($scope.cred.remember) {
 
@@ -163,19 +171,18 @@ console.log('Error: Cannot save user!');
 }
 */
 
-          $scope.cred = {
-username: '',
-          password: '',
-          email: '',
-          remember: true
-          };
+            $scope.invalidLogin = false;
 
-          $scope.invalidLogin = false;
+            if($scope.loginModal) {
+              $scope.loginModal.hide();
+            }
 
-          if($scope.loginModal) {
-            $scope.loginModal.hide();
-          }
-          Navigate.goOrGoBack();
+            Navigate.goOrGoBack();
+
+          }, function (err) {
+            console.log(err);
+            Platform.showToast('Unknown error!');
+          });
         }; 
 
         var failedLogin = function (err) {
