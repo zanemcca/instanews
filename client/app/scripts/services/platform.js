@@ -8,6 +8,7 @@ app.factory('Platform', [
   '$cordovaFile',
   '$ionicActionSheet',
   '$ionicLoading',
+  '$ionicNavBarDelegate',
   '$q',
   function(
     $cordovaDevice,
@@ -15,6 +16,7 @@ app.factory('Platform', [
     $cordovaFile,
     $ionicActionSheet,
     $ionicLoading,
+    $ionicNavBarDelegate,
     $q
   ) {
 
@@ -62,6 +64,18 @@ app.factory('Platform', [
         }
       } else {
         return true;
+      }
+    };
+
+    /*
+     * Sets or unsets the back button depending on if we are
+     * running on a device or in the browser respectivelly
+     */
+    var initBackButton = function () {
+      if(isBrowser()) {
+        $ionicNavBarDelegate.showBackButton(false);
+      } else {
+        $ionicNavBarDelegate.showBackButton(true);
       }
     };
 
@@ -272,6 +286,7 @@ app.factory('Platform', [
       showAlert: showAlert,
       showToast: showToast,
       removeFile: removeFile,
+      initBackButton: initBackButton,
       isIOS: isIOS,
       isAndroid: isAndroid,
       isBrowser: isBrowser,

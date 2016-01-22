@@ -28,6 +28,8 @@ app.controller('ArticleCtrl', [
     Uploads
   ) {
 
+    Platform.initBackButton();
+
     $scope.Platform = Platform;
     $scope.Subarticles = Subarticles.findOrCreate($stateParams.id);
     $scope.Uploads = Uploads.findOrCreate($stateParams.id);
