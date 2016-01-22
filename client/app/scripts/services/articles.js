@@ -120,6 +120,7 @@ app.service('Articles', [
     spec.save = save;
 
     spec.find = Article.find;
+    spec.findById = Article.findById;
     spec.update = update;
     spec.addFilter = spec.addFilter || addFilter;
     spec.options = spec.options || {};
