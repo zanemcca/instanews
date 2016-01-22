@@ -8,7 +8,7 @@
         ng-disabled="!uploads.length">
       </button>
    </ion-nav-buttons>
-   <ion-content>
+   <ion-content overflow-scroll="true">
      <div class="list" ng-repeat="upload in uploads">
        <inUpload upload="upload"></inUpload>
      </div>
