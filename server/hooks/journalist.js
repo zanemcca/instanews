@@ -3,6 +3,8 @@ var LIMIT = 10;
 
 module.exports = function(app) {
 
+  var loopback = require('loopback');
+
   var Journalist = app.models.journalist;
 
   if(process.env.NODE_ENV === 'production') {
@@ -12,27 +14,28 @@ module.exports = function(app) {
   }
 
   var Stat = app.models.stat;
+  var Role = app.models.Role;
+  var RoleMapping = app.models.RoleMapping;
   var debug = app.debug('hooks:journalist');
 
-  Journalist.afterRemote('prototype.__get__articles',
-      function(ctx, instance, next) {
-        debug('afterRemote __get__articles', ctx, instance, next);
-        //Automatically remove all duplicate articles
-        //Duplicates can be present since the articles associated
-        //with a journalist come through their subarticles
-        var uniqueIds = [];
-        for(var i = 0; i < instance.length; i++) {
-          if(uniqueIds.indexOf(instance[i].id) > -1 ) {
-            instance.splice(i,1);
-            i--;
-          }
-          else {
-            uniqueIds.push(instance[i].id);
-          }
-        }
+  Journalist.afterRemote('prototype.__get__articles', function(ctx, instance, next) {
+    debug('afterRemote __get__articles', ctx, instance, next);
+    //Automatically remove all duplicate articles
+    //Duplicates can be present since the articles associated
+    //with a journalist come through their subarticles
+    var uniqueIds = [];
+    for(var i = 0; i < instance.length; i++) {
+      if(uniqueIds.indexOf(instance[i].id) > -1 ) {
+        instance.splice(i,1);
+        i--;
+      }
+      else {
+        uniqueIds.push(instance[i].id);
+      }
+    }
 
-        next();
-      });
+    next();
+  });
 
   Journalist.afterRemoteError('login', function(ctx, next) {
     app.dd.increment('journalist.login.error');
@@ -122,8 +125,8 @@ module.exports = function(app) {
       if(validUsername(user.username)) {
         Journalist.count({
           or: [{
-                email: user.email
-              },
+            email: user.email
+          },
           {
             username: user.username
           }]
@@ -163,4 +166,51 @@ module.exports = function(app) {
     next();
   });
 
+  Journalist.observe('loaded', function(ctx, next) {
+    debug('observe loaded', ctx, next);
+
+    var instance = ctx.instance;
+
+    if(instance) {
+      var userId;
+
+      var checkAdminStatus = function () {
+        //Only admins can see who else is an admin
+        Role.isInRole('admin', {
+          principalType: RoleMapping.USER,
+          principalId: userId 
+        }, function(err, exists) {
+          if(exists) {
+            Role.isInRole('admin', {
+              principalType: RoleMapping.USER,
+              principalId: instance.username
+            }, function(err, exists) {
+              if(exists) {
+                instance.isAdmin = true;
+              }
+              next();
+            });
+          } else {
+            next();
+          }
+        });
+      };
+
+      var context = loopback.getCurrentContext();
+
+      if(context) {
+        var token = context.get('accessToken');
+        if(token) {
+          userId = token.userId;
+          if(userId) {
+            return checkAdminStatus();
+          }
+        }
+      }
+
+      next();
+    } else {
+      next();
+    }
+  });
 };
