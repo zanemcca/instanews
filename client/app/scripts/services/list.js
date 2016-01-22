@@ -160,15 +160,16 @@ function ListFactory (Platform) {
 
       spec.findById({ id: id }).$promise.then( function(item) {
         if(item) {
-          that.add([item], function(items) {
+          that.add([item], function() {
             return findById(id, cb);
           });
         } else {
           cb();
         }
       }, function(err) {
+        console.log(err);
         cb();
-      })
+      });
     };
 
     // Register and notify observers of the list
@@ -210,7 +211,7 @@ function ListFactory (Platform) {
     spec.findById = spec.findById || function () {
       return {
         $promise: {
-          then( succ, fail) {
+          then( succ) {
             succ();
           }
         }
