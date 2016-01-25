@@ -291,13 +291,8 @@ module.exports = function(Storage) {
     }
   };
 
-  //Recieves the transcoding message as the input
-  Storage.clearPending = function (message, next) {
-    var Subarticle = Storage.app.models.Subarticle;
-    Subarticle.clearPending(message.jobId, next);
-  };
-
   Storage.transcodingComplete = function (ctx, next) {
+    var Subarticle = Storage.app.models.Subarticle;
     var req = ctx.req;
 
     var chunks = [];
@@ -348,7 +343,7 @@ module.exports = function(Storage) {
                   return next(e);
                 }
 
-                Storage.clearPending(message, function (err) {
+                Subarticle.clearPending(message, function (err) {
                   console.log('Transcoding Job ' + message.jobId + ' has finished!');
                   if(err) {
                     console.error(err);
