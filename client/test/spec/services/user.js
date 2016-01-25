@@ -173,7 +173,7 @@ describe('instanews.service.user', function() {
   describe('install', function() {
     beforeEach(function() {
       var usr = {
-        username: 'bob'
+        userId: 'bob'
       };
       user.set(usr);
     });
@@ -189,7 +189,7 @@ describe('instanews.service.user', function() {
         var dev = platform.getDevice();
         expect(conf).to.deep.equal({
           appId: 'instanews',
-          userId: user.get().username,
+          userId: user.get().userId,
           deviceType: dev.type,
           deviceToken: dev.token,
           status: 'Active'
