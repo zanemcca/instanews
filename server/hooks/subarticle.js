@@ -118,6 +118,8 @@ module.exports = function(app) {
             'Error: Failed to create a click for subarticle creation');
           next(err);
         } else if(!inst._file) {
+          Subarticle.notify(inst);
+
           Article.clearPending(inst.parentId, function(err) {
             if(err) {
               console.log('Failed to clear pending flag on article ' + inst.parentId);
@@ -314,59 +316,4 @@ module.exports = function(app) {
       next();
     }
   });
-
-  /* istanbul ignore next */
-  /*
-   Subarticle.observe('after save', function(ctx, next) {
-    debug('after save', ctx, next);
-     
-      var inst = ctx.instance;
-
-      if (inst && ctx.isNewInstance) {
-         //Find all subarticles associated with this article
-         Subarticle.find({
-            where: {
-               parentId: inst.parentId
-            }
-         }, function(err, res) {
-            //Error checking
-            if(err) console.error(err.stack);
-            else {
-
-               var report = function(err, res) {
-                  if (err) console.error(err.stack);
-                  else {
-                     //console.log('Created a notification!');
-                  }
-               };
-
-               //List of already notified users
-               var users = [
-                  inst.username
-               ];
-               for( var  i = 0; i < res.length; i++) {
-                  if ( users.indexOf(res[i].username) === -1) {
-                     //Send a notification to each user
-                     //associated with the parent article
-                     var username = res[i].username;
-                     var message = inst.username +
-                        ' collaborated with you on an article';
-
-                     Notification.create({
-                        message: message,
-                        notifiableId: inst.parentId,
-                        notifiableType: 'article',
-                        messageFrom: inst.username,
-                        username: username
-                     }, report);
-
-                     users.push(res[i].username);
-                  }
-               }
-            }
-         });
-      }
-      next();
-   });
-  */
 };

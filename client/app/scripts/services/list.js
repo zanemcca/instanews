@@ -30,8 +30,6 @@ function ListFactory (Platform) {
         newItems = [newItems];
       }
 
-      console.log('newItems');
-      console.log(newItems);
       newItems = spec.addFilter(newItems);
 
       if(newItems.length) {
