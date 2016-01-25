@@ -4,7 +4,7 @@ module.exports = function(app) {
    require('./view.js')(app);
    require('./file.js')(app);
    require('./installation.js')(app);
-   //require('./notification.js')(app);
+   require('./notification.js')(app);
    require('./up-vote.js')(app);
    require('./down-vote.js')(app);
    require('./subarticle.js')(app);

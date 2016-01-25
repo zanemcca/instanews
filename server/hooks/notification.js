@@ -1,8 +1,6 @@
 
 var LIMIT = 20;
 
-/* istanbul ignore next */
-
 module.exports = function(app) {
 
   var Notification = app.models.notif;
@@ -56,12 +54,14 @@ module.exports = function(app) {
               }
               //console.log('Creating notification: ' + note.toString());
 
+              debug('after save: Creating a notification!', note);
+
               //Push the notification
               Push.notifyById(res[i].id , note, report);
             }
           }
           else {
-            //  console.log('No devices found for ' + username);
+            console.log('No devices found for ' + note.username);
           }
         }
       });
@@ -80,16 +80,13 @@ module.exports = function(app) {
 
   Notification.observe('before save', function(ctx, next) {
     debug('before save', ctx, next);
-    var note = ctx.instance;
-    if(!note) {
-      note = ctx.data;
-    }
+    var note = ctx.instance || ctx.data;
 
     if (note) {
       if(ctx.isNewInstance) {
-        note.created = Date.now();
+        note.created = new Date();
       }
-      note.modified = Date.now();
+      note.modified = new Date();
     }
     next();
   });

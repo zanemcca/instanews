@@ -60,7 +60,7 @@ app.service('User', [
 
       //TODO check if device is already installed
       if ( user &&
-          user.username &&
+          user.userId &&
             device &&
               device.type &&
                 device.token &&
@@ -70,7 +70,7 @@ app.service('User', [
 
            var appConfig = {
              appId: 'instanews',
-             userId: user.username,
+             userId: user.userId,
              deviceType: device.type,
              deviceToken: device.token,
              status: 'Active'

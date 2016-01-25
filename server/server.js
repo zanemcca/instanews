@@ -320,7 +320,7 @@ if(cluster.isMaster && numCPUs > 1 && process.env.NODE_ENV === 'production') {
   boot(app, __dirname);
 
   //Setup the push server
-  //setupPush(app);
+  setupPush(app);
   //Setup all the back end hooks
   hookSetup(app);
   // Call autoupdate on the databases
