@@ -39,6 +39,10 @@
     "dataSource": "Articles",
     "public": true
   },
+  "notif": {
+    "dataSource": "Articles",
+    "public": true
+  },
   "admin": {
     "dataSource": "Admins",
     "public": false

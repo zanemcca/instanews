@@ -294,46 +294,7 @@ module.exports = function(Storage) {
   //Recieves the transcoding message as the input
   Storage.clearPending = function (message, next) {
     var Subarticle = Storage.app.models.Subarticle;
-    var Article = Storage.app.models.Article;
-
-    Subarticle.findOne({
-      where: {
-        pending: message.jobId
-      }
-    }, function (err, res) {
-      if(err) {
-        console.log('Failed to find the subarticle');
-        return next(err);
-      }
-
-      if(res) {
-
-        var query = {
-          $unset: {
-            pending: ''
-          }
-        };
-
-        console.log(res);
-        if(message.sources) {
-          query.$set = {
-            '_file.sources': message.sources 
-          };
-        }
-
-        var parentId = res.parentId;
-
-        res.updateAttributes(query, function (err, res) {
-          if(err) {
-            return next(err);
-          }
-          Article.clearPending(parentId, next);
-        });
-      } else {
-        console.log('No Subarticle found with pending: ' + message.jobId);
-        return next();
-      }
-    });
+    Subarticle.clearPending(message.jobId, next);
   };
 
   Storage.transcodingComplete = function (ctx, next) {
