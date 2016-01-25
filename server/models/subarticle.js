@@ -8,51 +8,6 @@ module.exports = function(Subarticle) {
     common.readModifyWrite(Subarticle, query, modify, cb, options);
   };
 
-  Subarticle.clearPending = function(pendingId, next) {
-    var Article = Subarticle.app.models.Article;
-
-    Subarticle.findOne({
-      where: {
-        pending: pendingId
-      }
-    }, function (err, res) {
-      if(err) {
-        console.log('Failed to find the subarticle');
-        return next(err);
-      }
-
-      if(res) {
-
-        var query = {
-          $unset: {
-            pending: ''
-          }
-        };
-
-        console.log(res);
-        if(message.sources) {
-          query.$set = {
-            '_file.sources': message.sources 
-          };
-        }
-
-        var parentId = res.parentId;
-        Subarticle.notify(res);
-
-        res.updateAttributes(query, function (err, res) {
-          if(err) {
-            return next(err);
-          }
-
-          Article.clearPending(parentId, next);
-        });
-      } else {
-        console.log('No Subarticle found with pending: ' + message.jobId);
-        return next();
-      }
-    });
-  };
-
   Subarticle.notify = function (inst) {
     var Notification = Subarticle.app.models.notif;
 
@@ -107,6 +62,51 @@ module.exports = function(Subarticle) {
               users.push(res[i].username);
           }
         }
+      }
+    });
+  };
+
+  Subarticle.clearPending = function(message, next) {
+    var Article = Subarticle.app.models.Article;
+
+    Subarticle.findOne({
+      where: {
+        pending: message.jobId
+      }
+    }, function (err, res) {
+      if(err) {
+        console.log('Failed to find the subarticle');
+        return next(err);
+      }
+
+      if(res) {
+
+        var query = {
+          $unset: {
+            pending: ''
+          }
+        };
+
+        console.log(res);
+        if(message.sources) {
+          query.$set = {
+            '_file.sources': message.sources 
+          };
+        }
+
+        var parentId = res.parentId;
+        Subarticle.notify(res);
+
+        res.updateAttributes(query, function (err, res) {
+          if(err) {
+            return next(err);
+          }
+
+          Article.clearPending(parentId, next);
+        });
+      } else {
+        console.log('No Subarticle found with pending: ' + message.jobId);
+        return next();
       }
     });
   };
