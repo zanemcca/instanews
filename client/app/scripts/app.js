@@ -34,7 +34,7 @@ angular.module('instanews', [
   'instanews.service.localStorage',
   'instanews.service.maps',
   'instanews.service.navigate',
-  //'instanews.service.notifications',
+  'instanews.service.notifications',
   'instanews.service.observable',
   'instanews.service.platform',
   'instanews.service.position',
@@ -111,6 +111,7 @@ angular.module('instanews', [
   '$ionicModal',
   '$scope',
   'Navigate',
+  'Notifications',
   'Platform',
   'User',
   'Uploads',
@@ -118,17 +119,24 @@ angular.module('instanews', [
     $ionicModal,
     $scope,
     Navigate,
+    Notifications,
     Platform,
     User,
     Uploads
   ) {
+
     //Update user function
     var updateUser = function() {
       $scope.user = User.get();
     };
 
+    var updateNotifications = function () {
+      $scope.notifications = Notifications.get();
+    };
+
     //Set up an observer on the user model
     User.registerObserver(updateUser);
+    Notifications.registerObserver(updateNotifications);
 
     $scope.login = User.login;
     $scope.logout = User.logout;

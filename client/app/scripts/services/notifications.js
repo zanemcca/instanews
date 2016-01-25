@@ -4,187 +4,216 @@ var app = angular.module('instanews.service.notifications', ['ionic', 'ngResourc
 
 /* istanbul ignore next */
 app.service('Notifications', [
-      '$rootScope',
-      '$cordovaPush',
-      'Platform',
-      'User',
-      '$filter',
-      function(
-         $rootScope,
-         $cordovaPush,
-         Platform,
-         User,
-         $filter
-         ){
-        //NOTIFICATION STUFF FROM APP.JS
-      /*
-      $scope.notifications = [];
+  '$rootScope',
+  '$cordovaPush',
+  'Platform',
+  'User',
+  '$filter',
+  function(
+    $rootScope,
+    $cordovaPush,
+    Platform,
+    User,
+    $filter
+  ){
+    console.log('Setting up notifications!!!!');
+    //NOTIFICATION STUFF FROM APP.JS
+    /*
+       $scope.notifications = [];
 
-      var updateNotifications = function() {
-         $scope.notifications = Notifications.get();
-      }; 
+       var updateNotifications = function() {
+       $scope.notifications = Notifications.get();
+       }; 
 
-      //Notifications.registerObserver(updateNotifications);
-      */
-      /*
-      $scope.handleNotification = function(note) {
-         if(note.notifiableType === 'article') {
-            $state.go('app.article',{ id: note.notifiableId});
-         }
-         else {
-            $state.go('app.notif', { id: note.id});
-         }
-         Navigate.toggleMenu();
-         note.seen = true;
+    //Notifications.registerObserver(updateNotifications);
+    */
+    /*
+       $scope.handleNotification = function(note) {
+       if(note.notifiableType === 'article') {
+       $state.go('app.article',{ id: note.notifiableId});
+       }
+       else {
+       $state.go('app.notif', { id: note.id});
+       }
+       Navigate.toggleMenu();
+       note.seen = true;
 
-         Journalist.notifications.updateById({
-            id: $scope.user.username,
-            fk: note.id,
-         },note ).$promise
-         .then(function(res) {
-            console.log('Notification updated: ' + res);
-         });
-      };
+       Journalist.notifications.updateById({
+id: $scope.user.username,
+fk: note.id,
+},note ).$promise
+.then(function(res) {
+console.log('Notification updated: ' + res);
+});
+};
+*/
 
-      var loadNotifications = function() {
-         if( $scope.user && $scope.user.username ){
-            var filter = {
-               limit: 25,
-               skip: 0,
-               order: 'date DESC',
-            };
+    /*
+       var loadNotifications = function() {
+       if( $scope.user && $scope.user.username ){
+       var filter = {
+limit: 25,
+skip: 0,
+order: 'date DESC',
+};
 
-            Journalist.prototype$__get__notifications({
-               id: $scope.user.username,
-               filter: filter
-            }).$promise
-            .then( function(res) {
-               Notifications.set(res);
-            });
-         }
-         else {
-            console.log('Cannot load notifications because user is not set yet');
-         }
-      };
-     */
-         /*
-           var registerPush = function () {
-         var config = {};
+Journalist.prototype$__get__notifications({
+id: $scope.user.username,
+filter: filter
+}).$promise
+.then( function(res) {
+Notifications.set(res);
+});
+}
+else {
+console.log('Cannot load notifications because user is not set yet');
+}
+};
+*/
 
-         var device = Platform.getDevice();
+    Platform.ready.then( function () {
+      console.log('Setting up notifications!');
+      var config = {};
 
-         if( ionic.Platform.isAndroid()) {
-            config = {
-               senderID: '1081316781214'
-            };
-            device.type = 'android';
-         }
-         else if( ionic.Platform.isIOS()) {
-            config = {
-               badge: true,
-               sounde: true,
-               alert: true
-            };
-            device.type = 'ios';
-         }
-         else {
-            console.log('Cannot register! Unknown device!');
-            return;
-         }
+      var device = Platform.getDevice();
 
-               console.log('Attempting to register device for push notifications');
-               $cordovaPush.register(config)
-               .then( function (res) {
-
-                  console.log('Registered for push notification with cordovaPush: ', res);
-                  device.token = res;
-                  Platform.setDevice(device);
-
-               }, function(err) {
-                  console.log(err);
-               });
-            }
-         });
-         };
-            */
-
-
-   var notifications = [];
-
-   $rootScope.$on('$cordovaPush:notificationReceived', function (event, notification) {
-
-      console.log('Notification recieved');
-
-      if(ionic.Platform.isIOS()) {
-         iosPushHandler(notification);
+      if(Platform.isAndroid()) {
+        config = {
+          android: {
+            senderID: '1081316781214'
+          }
+        };
+        device.type = 'android';
       }
-      else if (ionic.Platform.isAndroid()) {
-         androidPushHandler(notification);
+      else if(Platform.isIOS()) {
+        config = {
+          ios: {
+            badge: true,
+            sound: true,
+            alert: true
+          }
+        };
+        device.type = 'ios';
       }
       else {
-         console.log('Unkown platform cannot handle notification!');
+        console.log('Cannot register! Unknown device!');
+        return;
       }
-   });
 
-   var iosPushHandler = function(notification) {
+      console.log('Attempting to register device for push notifications');
+      // jshint undef: false 
+      var push = PushNotification.init(config);
+
+      push.on('registration', function(data) {
+        console.log('Registered: ' + data.registrationId);
+        device.token = data.registrationId;
+        Platform.setDevice(device);
+        User.install();
+      });
+
+      push.on('notification', function(data) {
+        console.log(data.message);
+        console.log(data.title);
+        console.log(data.count);
+        console.log(data.sound);
+        console.log(data.image);
+        console.log(data.additionalData);
+      });
+
+      /*
+         $cordovaPush.register(config)
+         .then( function (res) {
+
+         console.log('Registered for push notification with cordovaPush: ', res);
+         device.token = res;
+         Platform.setDevice(device);
+
+         }, function(err) {
+         console.log(err);
+         });
+         */
+    });
+
+    var notifications = [];
+
+    /*
+       $rootScope.$on('$cordovaPush:notificationReceived', function (event, notification) {
+
+       console.log('Notification recieved');
+
+       if(ionic.Platform.isIOS()) {
+       iosPushHandler(notification);
+       }
+       else if (ionic.Platform.isAndroid()) {
+       androidPushHandler(notification);
+       }
+       else {
+       console.log('Unkown platform cannot handle notification!');
+       }
+       });
+       */
+
+      /*
+    var iosPushHandler = function(notification) {
       if(notification.alert) {
-         notification.message = notification.alert;
+        notification.message = notification.alert;
       }
       notifications.push(notification);
       notifyObservers();
 
       Platform.showAlert(notification.message, 'Notification');
-   };
+    };
 
-   var androidPushHandler = function(notification) {
+    var androidPushHandler = function(notification) {
       if( notification.event === 'registered' ) {
-         Platform.setDeviceToken(notification.regid);
-         User.install();
+        Platform.setDeviceToken(notification.regid);
+        User.install();
       }
       else if (notification.event === 'message') {
-         //Save the notification
-         notifications.push(notification);
-         notifyObservers();
+        //Save the notification
+        notifications.push(notification);
+        notifyObservers();
 
-         Platform.showAlert(notification.message, 'Notification');
+        Platform.showAlert(notification.message, 'Notification');
       }
       else {
-         console.log('Un-handled notification!');
+        console.log('Un-handled notification!');
       }
-   };
+    };
+   */
 
-   var get = function() {
+    var get = function() {
       return notifications;
-   };
+    };
 
-   var set = function(notes) {
+    var set = function(notes) {
       notifications = notes;
       notifyObservers();
-   };
+    };
 
-   var observerCallbacks = [];
+    var observerCallbacks = [];
 
-   var registerObserver = function(cb) {
+    var registerObserver = function(cb) {
       observerCallbacks.push(cb);
-   };
+    };
 
-   var notifyObservers = function() {
+    var notifyObservers = function() {
       angular.forEach(observerCallbacks, function(cb) {
-         cb();
+        cb();
       });
-   };
+    };
 
-   var getOne = function (id) {
+    var getOne = function (id) {
       var val = $filter('filter')(notifications, {id: id});
       if (val.length > 0) {
-         return val[0];
+        return val[0];
       }
-   };
+    };
 
-   return {
+    return {
       set: set,
       get: get,
       getOne: getOne,
       registerObserver: registerObserver
-   };
-}]);
+    };
+  }]);
