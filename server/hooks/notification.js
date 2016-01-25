@@ -1,8 +1,6 @@
 
 var LIMIT = 20;
 
-/* istanbul ignore next */
-
 module.exports = function(app) {
 
   var Notification = app.models.notif;
