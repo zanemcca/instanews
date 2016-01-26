@@ -66,11 +66,11 @@ app.service('Subarticles', [
       var save = function () {
         var data = {};
         if(this._file) {
-          data = {
+           data = {
             '_file.caption': this._file.caption
           };
         } else {
-          data = {
+           data = {
             text: this.text
           };
         }
@@ -84,7 +84,7 @@ app.service('Subarticles', [
         function (err) {
           console.log(err);
         });
-      }; 
+      };   
 
       var destroy = function () {
         var id = this.id;
@@ -104,6 +104,17 @@ app.service('Subarticles', [
         subarticles.remove(function (subarticle) {
           return (subarticle.id === id); 
         });
+      }; 
+
+      var focus = function () {
+        var sub = this;
+        Navigate.go('app.article', { id: sub.parentId });
+        setTimeout(function () {
+          sub.rating = 1;
+          subarticles.add(sub, function() {
+            console.log('Focusing on subarticle: ' + sub.id);
+          });
+        }, 200);
       };
 
       var filter = {
@@ -129,6 +140,8 @@ app.service('Subarticles', [
       spec.options.filter.limit = spec.options.filter.limit || filter.limit;
 
       spec.find = Article.subarticles;
+      spec.findById = Subarticle.findById;
+      spec.focus = spec.focus || focus;
       spec.update = spec.update || update;
       spec.save = spec.save || save;
       spec.destroy = spec.destroy || destroy;
@@ -139,7 +152,31 @@ app.service('Subarticles', [
       return subarticles;
     };
 
+    var findById = function (id, cb) {
+      Subarticle.findById({ id: id })
+      .$promise
+      .then(function(sub) {
+        var subs =  findOrCreate(sub.parentId);
+        subs.add(sub);
+        cb(subs);
+      }, function (err) {
+        cb();
+      });
+    };
+
+    var focusById = function (id) {
+      findById(id, function(subs) {
+        if(subs) {
+          subs.focusById(id);
+        } else { 
+          console.log('No subarticles were found!');
+        }
+      });
+    };
+
     return {
+      findById: findById,
+      focusById: focusById,
       findOrCreate: findOrCreate 
     };
   }
