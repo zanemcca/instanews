@@ -7,18 +7,22 @@ app.service('Notifications', [
   '$rootScope',
   '$cordovaPush',
   'Articles',
-  'Subarticles',
   'Comments',
+  'Journalist',
+  'list',
   'Platform',
+  'Subarticles',
   'User',
   '$filter',
   function(
     $rootScope,
     $cordovaPush,
     Articles,
-    Subarticles,
     Comments,
+    Journalist,
+    list,
     Platform,
+    Subarticles,
     User,
     $filter
   ){
@@ -122,54 +126,16 @@ console.log('Cannot load notifications because user is not set yet');
       push.on('notification', function(data) {
         console.log(data);
         console.log(data.additionalData);
-        switch(data.additionalData.notifiableType) {
-          case 'subarticle':
-            Subarticles.focusById(data.additionalData.notifiableId);
-            break;
-          case 'article':
-            Articles.focusById(data.additionalData.notifiableId);
-            break;
-          case 'comment':
-            Comments.focusById(data.additionalData.notifiableId);
-            break;
-          default:
-            console.log('Unknown notification type!');
-            break;
+        if(data.additionalData) {
+          if(data.additionalData.foreground) {
+            reload();
+            //TODO update badge
+          } else {
+            focus(data.additionalData);
+          }
         }
       });
-
-      /*
-         $cordovaPush.register(config)
-         .then( function (res) {
-
-         console.log('Registered for push notification with cordovaPush: ', res);
-         device.token = res;
-         Platform.setDevice(device);
-
-         }, function(err) {
-         console.log(err);
-         });
-         */
     });
-
-    var notifications = [];
-
-    /*
-       $rootScope.$on('$cordovaPush:notificationReceived', function (event, notification) {
-
-       console.log('Notification recieved');
-
-       if(ionic.Platform.isIOS()) {
-       iosPushHandler(notification);
-       }
-       else if (ionic.Platform.isAndroid()) {
-       androidPushHandler(notification);
-       }
-       else {
-       console.log('Unkown platform cannot handle notification!');
-       }
-       });
-       */
 
       /*
     var iosPushHandler = function(notification) {
@@ -200,38 +166,132 @@ console.log('Cannot load notifications because user is not set yet');
     };
    */
 
-    var get = function() {
-      return notifications;
+    var focus = function (data) {
+      var data = data || this;
+      switch(data.notifiableType) {
+        case 'subarticle':
+          Subarticles.focusById(data.notifiableId);
+          break;
+        case 'article':
+          Articles.focusById(data.notifiableId);
+          break;
+        case 'comment':
+          Comments.focusById(data.notifiableId);
+          break;
+        default:
+          console.log('Unknown notification type!');
+          break;
+      }
+
+      setSeen(data);
     };
 
-    var set = function(notes) {
-      notifications = notes;
-      notifyObservers();
-    };
-
-    var observerCallbacks = [];
-
-    var registerObserver = function(cb) {
-      observerCallbacks.push(cb);
-    };
-
-    var notifyObservers = function() {
-      angular.forEach(observerCallbacks, function(cb) {
-        cb();
-      });
-    };
-
-    var getOne = function (id) {
-      var val = $filter('filter')(notifications, {id: id});
-      if (val.length > 0) {
-        return val[0];
+    var reload = function () {
+      if(user) {
+        console.log('Loading notifications!');
+        spec.options.filter.skip = 0;
+        spec.options.id = user.userId;
+        notifications.load();
+      } else {
+        console.log('Cannot load notifications without a user');
       }
     };
 
-    return {
-      set: set,
-      get: get,
-      getOne: getOne,
-      registerObserver: registerObserver
+
+    var setSeen = function (data) {
+      var data = data || this;
+
+      var finish = function () {
+        reload();
+        //TODO update badge
+      };
+
+      if(data.save && typeof data.save === 'function') {
+        data.seen = true;
+        data.save();
+      } else {
+        data.id = data.id || data.myId;
+        if(data.id) {
+          data.seen = true;
+          save(data);
+          notifications.add(data);
+        } else {
+          console.log('No save function or id! Cannot set "seen"');
+        }
+      }
+
+      setTimeout(finish, 300);
     };
-  }]);
+
+    // Triggered when an item in the list wants to be updated
+    var update = function (newValue, oldValue) {
+      if( newValue.modified >= oldValue.modified ) {
+        oldValue.seen = newValue.seen;
+      }
+    };
+
+    // Triggered when a new batch of articles wants to be added to the list
+    // allows for additional filtering
+    /*
+    var addFilter = function(notifications) {
+      notifications.forEach(function(note) {
+        note.focus = focus.bind(note);
+      });
+
+      return notifications;
+    };
+
+    spec.addFilter = spec.addFilter || addFilter;
+   */
+
+    var save = function (item) {
+      item = item || this;
+      Journalist.prototype$__updateById__notifications({
+        id: item.id
+      },
+      {
+        seen: item.seen
+      },
+      function () {
+        console.log('Successful notification update');
+      },
+      function (err) {
+        console.log(err);
+      });
+    };
+
+    var spec = {};
+    spec.save = save;
+    spec.focus = focus;
+
+    spec.find = Journalist.prototype$__get__notifications;
+    spec.update = update;
+    spec.options = spec.options || {};
+    spec.options.filter = {
+      order: 'created DESC' 
+    };
+
+    // Create a list for articles within view
+    var notifications = list(spec);
+
+    var user;
+
+    var userWatch = function () {
+      user = User.get();
+      if(user) {
+        reload();
+      } else {
+        notifications.clear();
+      }
+    };
+
+    User.registerObserver(userWatch);
+
+    userWatch();
+
+    console.log('Notifications fully loaded!');
+    console.log(notifications);
+
+    return notifications;
+  }
+]);

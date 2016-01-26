@@ -125,13 +125,17 @@ angular.module('instanews', [
     Uploads
   ) {
 
+    $scope.Notifications = Notifications;
+
     //Update user function
     var updateUser = function() {
       $scope.user = User.get();
     };
 
     var updateNotifications = function () {
+      console.log('Upodating notifications list!');
       $scope.notifications = Notifications.get();
+      console.log($scope.notifications);
     };
 
     //Set up an observer on the user model
