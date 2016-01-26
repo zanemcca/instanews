@@ -17,6 +17,31 @@ app.directive('inList', [
         isNotInfinite: '='
       },
       controller: function ($scope, _) {
+
+        $scope.getClasses = function () {
+          var items = $scope.list.get();
+          var classes = [];
+          if(items.length > 0) {
+            var itm = items[0];
+            console.log('Choosing classes!');
+            console.log(itm);
+            if(itm.modelName !== 'comment' && itm.modelName !== 'notif') {
+              classes.push('dynamic-box');
+            }
+            if(itm.modelName !== 'notif') {
+              classes.push('item');
+              if($scope.isCard || $scope.isTablet()) {
+                classes.push('card');
+              }
+            }
+
+            if(Platform.getWidth() < 768 && $scope.isTablet()) {
+              classes.push('margin-10');
+            }
+          }
+          return classes;
+        };
+
         $scope.isTablet = Platform.isTablet;
         $scope.Platform = Platform;
 
