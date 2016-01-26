@@ -35,6 +35,7 @@ module.exports = function(app) {
 
             for(var i = 0; i < res.length; i++) {
 
+              note.myId = note.id;
               if(res[i].deviceType === 'android') {
                 note.installationId = res[i].id;
                 note.deviceType = res[i].deviceType;
@@ -87,6 +88,7 @@ module.exports = function(app) {
     if (note) {
       if(ctx.isNewInstance) {
         note.created = new Date();
+        note.modelName = ctx.Model.modelName;
       }
       note.modified = new Date();
     }
