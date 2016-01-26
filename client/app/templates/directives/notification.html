@@ -4,7 +4,7 @@
    nav-clear menu-close
    ng-click="openNotification()">
    {{item.message}}
-   <i ng-if="!note.seen" class="icon ion-ios-circle-filled spanposition"></i>
+   <i ng-if="!item.seen" class="icon ion-ios-circle-filled spanposition"></i>
    <div style="float: right;font-size:small;">
      <span am-time-ago="item.created"></span>
    </div>

@@ -23,8 +23,6 @@ app.directive('inList', [
           var classes = [];
           if(items.length > 0) {
             var itm = items[0];
-            console.log('Choosing classes!');
-            console.log(itm);
             if(itm.modelName !== 'comment' && itm.modelName !== 'notif') {
               classes.push('dynamic-box');
             }

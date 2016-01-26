@@ -245,19 +245,24 @@ console.log('Cannot load notifications because user is not set yet');
    */
 
     var save = function (item) {
-      item = item || this;
-      Journalist.prototype$__updateById__notifications({
-        id: item.id
-      },
-      {
-        seen: item.seen
-      },
-      function () {
-        console.log('Successful notification update');
-      },
-      function (err) {
-        console.log(err);
-      });
+      if(user) {
+        item = item || this;
+        Journalist.prototype$__updateById__notifications({
+          id: user.userId,
+          fk: item.id
+        },
+        {
+          seen: item.seen
+        },
+        function () {
+          console.log('Successful notification update');
+        },
+        function (err) {
+          console.log(err);
+        });
+      } else {
+        console.log('Cannot save the notification because there is no user');
+      }
     };
 
     var spec = {};
