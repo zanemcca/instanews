@@ -1,14 +1,12 @@
 <!DOCTYPE html>
-<div class="item no-padding item-text-wrap"
+<div class="sidemenu-item item-text-wrap"
    style="border:transparent"
    nav-clear menu-close
    ng-click="openNotification()">
-   <div class="item"
-      style="border-bottom:0px;">
-      <p>{{item.message}}</p>
-      <div style="float: right;font-size:small;">
-        <span am-time-ago="item.created"></span>
-      </div>
+   {{item.message}}
+   <i ng-if="!note.seen" class="icon ion-ios-circle-filled spanposition"></i>
+   <div style="float: right;font-size:small;">
+     <span am-time-ago="item.created"></span>
    </div>
 </div>
 
