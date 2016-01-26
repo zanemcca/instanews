@@ -20,6 +20,12 @@
   margin-right: 10% !important;
 }
 
+.center-horizontal {
+  position:absolute !important;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
 @mixin box-invalid {
   box-shadow: inset 1px 1px 3px #FF0000, inset -1px -1px 3px #FF0000 !important;
 }
