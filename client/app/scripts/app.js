@@ -153,6 +153,13 @@ angular.module('instanews', [
      }).then( function (modal) {
         $scope.pendingModal = modal;
      });
+
+     $ionicModal.fromTemplateUrl('templates/modals/about.html', {
+        scope: $scope,
+        animation: 'slide-in-up'
+     }).then( function (modal) {
+        $scope.aboutModal = modal;
+     });
   }
 ])
 
