@@ -13,6 +13,8 @@ module.exports = function(app) {
     var note = ctx.instance;
     if (note && ctx.isNewInstance) {
 
+      note = note.toObject();
+
       //Find all installations for the given user
       Installation.find({
         where: {
