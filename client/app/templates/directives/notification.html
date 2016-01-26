@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<div class="item no-padding item-text-wrap"
+   style="border:transparent"
+   nav-clear menu-close
+   ng-click="openNotification()">
+   <div class="item"
+      style="border-bottom:0px;">
+      <p>{{item.message}}</p>
+      <div style="float: right;font-size:small;">
+        <span am-time-ago="item.created"></span>
+      </div>
+   </div>
+</div>
+
+ <!--     ng-class="{'item-divider': !note.seen}" -->
+<!--div class="item"
+  style="padding-top:1px;padding-bottom:1px;border:0;"> 
+</div-->

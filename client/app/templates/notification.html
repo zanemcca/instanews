@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<div class="item no-padding item-text-wrap"
+   style="border:transparent"
+   ng-click="openArticle()">
+   <div class="item"
+      style="border-bottom:0px;">
+      <div class="row no-padding">
+        <div class="col col-90 no-padding">
+          <b>{{item.title}} </b>
+          <button class="no-margin button button-small button-clear icon ion-edit"
+            ng-if="is.mine()"
+            ng-click="editTitle($event)">
+          </button>
+        </div>
+        <div class="col col-10 col-top no-padding"
+          style="text-align:right;">
+          <i class="icon ion-checkmark positive"
+            style="font-size:large"
+             ng-if="item.verified"></i>
+        </div>
+      </div>
+      <p>{{item.topSub.text}}</p>
+   </div>
+   <div class="item"
+      style="border-bottom: 0; margin-bottom:0; border-top:0px;padding-right:0px;padding-left:0px;padding-top:0px;padding-bottom:0px">
+      <inMediaPreview ng-if="item.topSub._file"
+         media="item.topSub._file" id="item.topSub.id">
+      </inMediaPreview>
+   </div>
+</div>
+
+<div class="item"
+  style="padding-top:1px;padding-bottom:1px;border:0;"> 
+  <div style="float: right;font-size:small;">
+    <b>{{item.topSub.username}}</b> &bull; 
+    {{location.name}} &bull; 
+    <span am-time-ago="item.created"></span>
+  </div>
+</div>
+<div class="item" style="border:0px;padding-top:0px;padding-bottom:0px">
+   <inVotes style="border: transparent"
+      votable="item">
+   </inVotes>
+   <inComments owner="item"></inComments>
+</div>

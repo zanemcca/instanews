@@ -72,6 +72,9 @@ app.directive('inListItem', [
         case 'comment':
           template = template.concat('comment.html'); 
         break;
+        case 'notif':
+          template = template.concat('notification.html'); 
+        break;
         default: 
           template = '';
         console.log('Error: Unknown model name: ' + item.modelName);
@@ -192,6 +195,10 @@ app.directive('inListItem', [
                 newText = partialText;
               });
             };
+        } else if ($scope.item.modelName === 'notif') {
+          $scope.openNotification = function () {
+            $scope.item.focus();
+          }
         }
 
         var setPlaceName = function () {
