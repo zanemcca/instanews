@@ -6,12 +6,18 @@ var app = angular.module('instanews.service.notifications', ['ionic', 'ngResourc
 app.service('Notifications', [
   '$rootScope',
   '$cordovaPush',
+  'Articles',
+  'Subarticles',
+  'Comments',
   'Platform',
   'User',
   '$filter',
   function(
     $rootScope,
     $cordovaPush,
+    Articles,
+    Subarticles,
+    Comments,
     Platform,
     User,
     $filter
@@ -80,6 +86,8 @@ console.log('Cannot load notifications because user is not set yet');
       if(Platform.isAndroid()) {
         config = {
           android: {
+            sound: true,
+            vibrate: true,
             senderID: '1081316781214'
           }
         };
@@ -112,12 +120,22 @@ console.log('Cannot load notifications because user is not set yet');
       });
 
       push.on('notification', function(data) {
-        console.log(data.message);
-        console.log(data.title);
-        console.log(data.count);
-        console.log(data.sound);
-        console.log(data.image);
+        console.log(data);
         console.log(data.additionalData);
+        switch(data.additionalData.notifiableType) {
+          case 'subarticle':
+            Subarticles.focusById(data.additionalData.notifiableId);
+            break;
+          case 'article':
+            Articles.focusById(data.additionalData.notifiableId);
+            break;
+          case 'comment':
+            Comments.focusById(data.additionalData.notifiableId);
+            break;
+          default:
+            console.log('Unknown notification type!');
+            break;
+        }
       });
 
       /*
