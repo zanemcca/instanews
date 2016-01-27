@@ -183,6 +183,11 @@ console.log('Cannot load notifications because user is not set yet');
           break;
       }
 
+      if(!data.save) {
+        data.id = data.id || data.myId;
+        notifications.add(data);
+      }
+
       setSeen(data);
     };
 
@@ -207,18 +212,11 @@ console.log('Cannot load notifications because user is not set yet');
       };
 
       if(!data.seen) {
-        if(data.save && typeof data.save === 'function') {
+        if(data.id) {
           data.seen = true;
-          data.save();
+          save(data);
         } else {
-          data.id = data.id || data.myId;
-          if(data.id) {
-            data.seen = true;
-            save(data);
-            notifications.add(data);
-          } else {
-            console.log('No save function or id! Cannot set "seen"');
-          }
+          console.log('No save function or id! Cannot set "seen"');
         }
       }
 
