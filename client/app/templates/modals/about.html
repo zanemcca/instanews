@@ -7,11 +7,19 @@
         ng-class="Platform.isIOS() ? 'ion-ios-arrow-back' : 'ion-android-arrow-back'"></i>
      </button>
      <h1 class="title">
-       About 
+       Settings 
      </h1>
    </ion-header-bar>
    <ion-content>
       <div class="list">
+        <div class="item">
+           <button ng-if="!user.userId" class="button button-block button-dark" nav-clear menu-close ng-click="login()">
+              Login
+           </button>
+           <button ng-if="user.userId" class="button button-outline button-block button-dark" nav-clear menu-close ng-click="logout()">
+              Logout
+           </button>
+        </div>
         <div class="item item-divider">
           Version
         </div>
