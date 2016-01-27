@@ -273,7 +273,7 @@ app.directive('inListItem', [
         //    Because of above assertion we need to wait to replace this till we have
         //    proper refreshing reinstated in the lists. 
         var createView = function () {
-          if(User.get()) {
+          if(User.get() && $scope.item.modelName !== 'notif') {
             var position = Position.getPosition();
 
             var view = {
