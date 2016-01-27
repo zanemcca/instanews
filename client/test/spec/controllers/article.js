@@ -44,6 +44,10 @@ describe('Article controller: ', function(){
 
       $provide.service('Platform', function() {
         return {
+          loading: {
+            show: function () {},
+            hide: function () {}
+          },
           initBackButton: function() {},
           isIOS: function() {
             return true;
@@ -105,6 +109,13 @@ describe('Article controller: ', function(){
           getArticleMap: function() {
             return {
               map: 'I am map'
+            };
+          },
+          registerObserver: function(cb) {
+            return {
+              unregister: function () {
+                //cb();
+              }
             };
           },
           setMarker: function(map, position) {
