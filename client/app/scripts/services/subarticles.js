@@ -7,11 +7,13 @@ app.service('Subarticles', [
   'Article',
   'Navigate',
   'Subarticle',
+  'Platform',
   'list',
   function(
     Article,
     Navigate,
     Subarticle,
+    Platform,
     list
   ){
     var articles = [];
@@ -165,6 +167,7 @@ app.service('Subarticles', [
     };
 
     var focusById = function (id) {
+      Platform.loading.show();
       findById(id, function(subs) {
         if(subs) {
           subs.focusById(id);
