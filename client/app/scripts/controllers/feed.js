@@ -83,6 +83,7 @@ app.controller('FeedCtrl', [
       if(map) {
         google.maps.event.trigger(map, 'resize');
       }
+      Articles.reorganize();
     });
 
     /*
