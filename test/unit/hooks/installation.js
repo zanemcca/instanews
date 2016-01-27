@@ -127,14 +127,14 @@ exports.run = function () {
             });
 
             describe('upsert', function () {
-              it('should pass in the proper arguments', function(done) {
+              it('should pass in the proper arguments and call next("route")', function(done) {
                 upsert = function (model, cb) {
                   expect(model).to.equal(result[0]);
                   cb();
                 };
 
                 Next = function (err) {
-                  expect(err).to.not.exist;
+                  expect(err).to.equal('route');
                   done();
                 };
 
