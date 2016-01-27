@@ -72,6 +72,7 @@ app.directive('inListItem', [
   '$timeout',
   'TextInput',
   'Position',
+  'Navigate',
   'User',
   'View',
   function (
@@ -79,6 +80,7 @@ app.directive('inListItem', [
     $timeout,
     TextInput,
     Position,
+    Navigate,
     User,
     View
   ) {
@@ -220,6 +222,7 @@ app.directive('inListItem', [
             };
         } else if ($scope.item.modelName === 'notif') {
           $scope.openNotification = function () {
+            Navigate.closeMenu();
             $scope.item.focus();
           }
         }

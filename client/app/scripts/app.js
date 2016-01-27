@@ -132,15 +132,8 @@ angular.module('instanews', [
       $scope.user = User.get();
     };
 
-    var updateNotifications = function () {
-      console.log('Upodating notifications list!');
-      $scope.notifications = Notifications.get();
-      console.log($scope.notifications);
-    };
-
     //Set up an observer on the user model
     User.registerObserver(updateUser);
-    Notifications.registerObserver(updateNotifications);
 
     $scope.login = User.login;
     $scope.logout = User.logout;
