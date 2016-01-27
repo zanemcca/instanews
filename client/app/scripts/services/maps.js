@@ -4,10 +4,12 @@ var app = angular.module('instanews.service.maps', ['ionic', 'ngResource','ngCor
 
 app.service('Maps', [
   'Article',
+  'observable',
   'Position',
   'Platform',
   function(
     Article,
+    observable,
     Position,
     Platform
   ){
@@ -20,6 +22,7 @@ app.service('Maps', [
 
     var setArticleMap = function(map) {
       articleMap = map;
+      that.notifyObservers();
     };
 
     var getPostMap = function() {
@@ -28,6 +31,7 @@ app.service('Maps', [
 
     var setPostMap = function(map) {
       postMap = map;
+      that.notifyObservers();
     };
 
     var getFeedMap = function() {
@@ -36,6 +40,7 @@ app.service('Maps', [
 
     var setFeedMap = function(map) {
       feedMap = map;
+      that.notifyObservers();
     };
 
     var heatmap;
@@ -414,18 +419,18 @@ return gradient;
        var southPole = new google.maps.LatLng(-90.0000, 0.0000);
 
 
-//Watch our accuracy so that we always know if we hit our limit
-$scope.$watch('mPos.accuracy', function(newValue, oldValue) {
-if (newValue !== oldValue) {
-if (newValue >= $scope.mPos.radius) {
-$scope.mPos.limit = true;
-$scope.mPos.radius =  newValue;
-}
-else {
-$scope.mPos.limit = false;
-}
-}
-});
+    //Watch our accuracy so that we always know if we hit our limit
+    $scope.$watch('mPos.accuracy', function(newValue, oldValue) {
+    if (newValue !== oldValue) {
+    if (newValue >= $scope.mPos.radius) {
+    $scope.mPos.limit = true;
+    $scope.mPos.radius =  newValue;
+    }
+    else {
+    $scope.mPos.limit = false;
+    }
+    }
+    });
 
 //Update our circle and markers when the radius changes
 $scope.$watch('mPos.radius', function (newValue, oldValue) {
@@ -528,23 +533,26 @@ markers.push(new google.maps.Marker(tempMarker));
 
 */
 
-Position.registerBoundsObserver(updateHeatmap);
+    Position.registerBoundsObserver(updateHeatmap);
 
-return {
-  autocomplete: autocomplete,
-  localize: localize,
-  setCenter: setCenter,
-  setMarker: setMarker,
-  getMarker: getMarker,
-  getPlace: getPlace,
-  deleteMarker: deleteMarker,
-  fitBounds: fitBounds,
-  setPostMap: setPostMap,
-  getPostMap: getPostMap,
-  setFeedMap: setFeedMap,
-  getFeedMap: getFeedMap,
-  getArticleMap: getArticleMap,
-  updateHeatmap: updateHeatmap,
-  setArticleMap: setArticleMap
-};
-  }]);
+    var that = observable();
+
+    that.autocomplete = autocomplete;
+    that.localize = localize;
+    that.setCenter = setCenter;
+    that.setMarker = setMarker;
+    that.getMarker = getMarker;
+    that.getPlace = getPlace;
+    that.deleteMarker = deleteMarker;
+    that.fitBounds = fitBounds;
+    that.setPostMap = setPostMap;
+    that.getPostMap = getPostMap;
+    that.setFeedMap = setFeedMap;
+    that.getFeedMap = getFeedMap;
+    that.getArticleMap = getArticleMap;
+    that.updateHeatmap = updateHeatmap;
+    that.setArticleMap = setArticleMap
+    
+    return that;
+  }
+]);
