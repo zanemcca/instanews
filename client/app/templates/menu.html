@@ -46,25 +46,26 @@
            is-card="false"> 
          </in-list>
 
-         <div class="sidemenu-item center-horizontal" 
+         <!--div class="sidemenu-item center-horizontal" 
            nav-clear menu-close
            style="bottom:0;padding-right:16px;color:#AAAAAA;"
            ng-click="aboutModal.show();">
-          <!--i class="icon"
-            ng-class="Platform.isIOS() ? 'ion-ios-information-outline' : 'ion-information-circled'"></i-->
               About
-         </div>
+         </div-->
 
          </ion-content>
-         <ion-footer-bar class="bar-dark">
-            <div class="row">
+         <ion-footer-bar class="bar-dark button-bar">
+           <div class="button button-clear" nav-clear menu-close ng-click="aboutModal.show()">
+             Settings 
+           </div>
+            <!--div class="row">
                <button ng-if="!user.userId" class="col button button-clear" nav-clear menu-close ng-click="login()">
                   Login
                </button>
                <button ng-if="user.userId" class="col button button-clear" nav-clear menu-close ng-click="logout()">
                   Logout
                </button>
-            </div>
+            </div-->
          </ion-footer-bar>
       </ion-side-menu>
 
