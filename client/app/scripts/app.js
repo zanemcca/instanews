@@ -135,7 +135,13 @@ angular.module('instanews', [
     //Set up an observer on the user model
     User.registerObserver(updateUser);
 
-    $scope.login = User.login;
+    $scope.login = function () {
+      if( $scope.aboutModal ){
+        $scope.aboutModal.hide();
+      }
+      return User.login();
+    }
+
     $scope.logout = User.logout;
 
     $scope.Navigate = Navigate;
