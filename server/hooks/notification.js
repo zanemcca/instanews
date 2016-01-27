@@ -82,16 +82,17 @@ module.exports = function(app) {
   });
 
   Notification.observe('before save', function(ctx, next) {
-    debug('before save', ctx, next);
     var note = ctx.instance || ctx.data;
 
     if (note) {
       if(ctx.isNewInstance) {
         note.created = new Date();
-        note.modelName = ctx.Model.modelName;
       }
       note.modified = new Date();
+      note.modelName = ctx.Model.modelName;
     }
+
+    debug('before save', ctx, next);
     next();
   });
 };
