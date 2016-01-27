@@ -206,17 +206,19 @@ console.log('Cannot load notifications because user is not set yet');
         //TODO update badge
       };
 
-      if(data.save && typeof data.save === 'function') {
-        data.seen = true;
-        data.save();
-      } else {
-        data.id = data.id || data.myId;
-        if(data.id) {
+      if(!data.seen) {
+        if(data.save && typeof data.save === 'function') {
           data.seen = true;
-          save(data);
-          notifications.add(data);
+          data.save();
         } else {
-          console.log('No save function or id! Cannot set "seen"');
+          data.id = data.id || data.myId;
+          if(data.id) {
+            data.seen = true;
+            save(data);
+            notifications.add(data);
+          } else {
+            console.log('No save function or id! Cannot set "seen"');
+          }
         }
       }
 
