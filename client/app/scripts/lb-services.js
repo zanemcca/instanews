@@ -769,6 +769,48 @@ module.factory(
 
         /**
          * @ngdoc method
+         * @name lbServices.Journalist#prototype$__updateById__notifications
+         * @methodOf lbServices.Journalist
+         *
+         * @description
+         *
+         * Update a related item by id for notifications.
+         *
+         * @param {Object=} parameters Request parameters.
+         *
+         *  - `id` – `{*}` - User id
+         *
+         *  - `fk` – `{*}` - Foreign key for notifications
+         *
+         * @param {Object} postData Request data.
+         *
+         * This method expects a subset of model properties as request parameters.
+         *
+         * @param {function(Object,Object)=} successCb
+         *   Success callback with two arguments: `value`, `responseHeaders`.
+         *
+         * @param {function(Object)=} errorCb Error callback with one argument:
+         *   `httpResponse`.
+         *
+         * @returns {Object} An empty reference that will be
+         *   populated with the actual data once the response is returned
+         *   from the server.
+         *
+         * <em>
+         * (The remote method definition does not provide any description.
+         * This usually means the response is a `Journalist` object.)
+         * </em>
+         */
+        "prototype$__updateById__notifications": {
+          params: {
+          'fk': '@fk'
+          },
+          url: urlBase + "/journalists/:id/notifications/:fk",
+          method: "PUT"
+        },
+
+        /**
+         * @ngdoc method
          * @name lbServices.Journalist#prototype$__create__accessTokens
          * @methodOf lbServices.Journalist
          *
@@ -808,6 +850,42 @@ module.factory(
         "prototype$__get__articles": {
           isArray: true,
           url: urlBase + "/journalists/:id/articles",
+          method: "GET"
+        },
+
+        /**
+         * @ngdoc method
+         * @name lbServices.Journalist#prototype$__get__notifications
+         * @methodOf lbServices.Journalist
+         *
+         * @description
+         *
+         * Queries notifications of journalist.
+         *
+         * @param {Object=} parameters Request parameters.
+         *
+         *  - `id` – `{*}` - User id
+         *
+         *  - `filter` – `{object=}` - 
+         *
+         * @param {function(Array.<Object>,Object)=} successCb
+         *   Success callback with two arguments: `value`, `responseHeaders`.
+         *
+         * @param {function(Object)=} errorCb Error callback with one argument:
+         *   `httpResponse`.
+         *
+         * @returns {Array.<Object>} An empty reference that will be
+         *   populated with the actual data once the response is returned
+         *   from the server.
+         *
+         * <em>
+         * (The remote method definition does not provide any description.
+         * This usually means the response is a `Journalist` object.)
+         * </em>
+         */
+        "prototype$__get__notifications": {
+          isArray: true,
+          url: urlBase + "/journalists/:id/notifications",
           method: "GET"
         },
 

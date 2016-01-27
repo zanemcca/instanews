@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<div class="sidemenu-item item-text-wrap"
+   style="border:transparent"
+   ng-click="openNotification()">
+   {{item.message}}
+   <i ng-if="!item.seen" class="icon ion-ios-circle-filled spanposition"></i>
+   <div style="float: right;font-size:small;">
+     <span am-time-ago="item.created"></span>
+   </div>
+</div>
+
+ <!--     ng-class="{'item-divider': !note.seen}" -->
+<!--div class="item"
+   menu-close
+  style="padding-top:1px;padding-bottom:1px;border:0;"> 
+</div-->

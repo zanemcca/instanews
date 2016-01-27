@@ -41,7 +41,7 @@
   },
   "notif": {
     "dataSource": "Articles",
-    "public": true
+    "public": false 
   },
   "admin": {
     "dataSource": "Admins",

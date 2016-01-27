@@ -44,6 +44,7 @@ function ListFactory (Platform) {
             }
           }
           if(!update) {
+            newItem.focus = spec.focus.bind(newItem);
             newItem.save = spec.save.bind(newItem);
             newItem.destroy = function() {
               Platform.showSheet({
@@ -170,6 +171,12 @@ function ListFactory (Platform) {
       });
     };
 
+    var focusById = function (id) {
+      findById(id, function(item) {
+        item.focus();
+      });
+    };
+
     // Register and notify observers of the list
     var registerObserver = function(cb) {
       spec.observerCallbacks.push(cb);
@@ -204,7 +211,9 @@ function ListFactory (Platform) {
         oldVal[i] = newVal[i];
       }
     };
+
     spec.save = spec.save || function () {};
+    spec.focus = spec.focus || function () {};
     spec.destroy = spec.destroy || function () {};
     spec.findById = spec.findById || function () {
       return {
@@ -238,6 +247,7 @@ function ListFactory (Platform) {
       clear: clear,
       getTop: getTop, 
       findById: findById,
+      focusById: focusById,
       load: load, 
       add: add,
       remove: remove,

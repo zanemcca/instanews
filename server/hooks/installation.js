@@ -38,7 +38,7 @@ module.exports = function(app) {
                        next(err);
                      } else {
                        console.log('Installation update was successful');
-                       next();
+                       next('route');
                      }
                   });
                }
