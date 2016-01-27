@@ -265,9 +265,18 @@ console.log('Cannot load notifications because user is not set yet');
       }
     };
 
+    var sortingFunction = function (a, b) {
+      a = new Date(a.created);
+      b = new Date(b.created);
+      var res = b - a;
+
+      return res;
+    };
+
     var spec = {};
     spec.save = save;
     spec.focus = focus;
+    spec.sortingFunction = sortingFunction;
 
     spec.find = Journalist.prototype$__get__notifications;
     spec.update = update;
