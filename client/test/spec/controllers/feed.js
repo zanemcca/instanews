@@ -64,12 +64,17 @@ describe('Feed: ', function(){
           getAppNameLogo: function () {
             return 'logoname';
           },
+          loading: {
+            show: function () {},
+            hide: function () {}
+          },
           showToast: function(message) {}
         }
       });
 
       $provide.service('Articles', function() {
         return {
+          reorganize: function () {},
           get: function() {
             return [];
           },
