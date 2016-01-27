@@ -30,9 +30,19 @@ module.exports = function(Subarticle) {
           }
         };
 
+        var partialMessage;
+        if(inst._file) {
+          if(inst._file.type.indexOf('video')) {
+            partialMessage = 'a video';
+          } else if(inst._file.type.indexOf('image')) {
+            partialMessage = 'a photo';
+          }
+        } else {
+          partialMessage = 'an article';
+        }
 
         Notification.create({
-          message: 'Your subarticle is ready',
+          message: 'Posted ' + partialMessage,
           notifiableId: inst.id,
           notifiableType: 'subarticle',
           messageFrom: inst.username,
@@ -48,18 +58,17 @@ module.exports = function(Subarticle) {
             //Send a notification to each user
             //associated with the parent article
             var username = res[i].username;
-            var message = inst.username +
-              ' collaborated with you on an article';
+            var message = inst.username + ' added ' + partialMessage + ' to your story';
 
-              Notification.create({
-                message: message,
-                notifiableId: inst.parentId,
-                notifiableType: 'article',
-                messageFrom: inst.username,
-                username: username
-              }, report);
+            Notification.create({
+              message: message,
+              notifiableId: inst.id,
+              notifiableType: 'subarticle',
+              messageFrom: inst.username,
+              username: username
+            }, report);
 
-              users.push(res[i].username);
+            users.push(res[i].username);
           }
         }
       }
