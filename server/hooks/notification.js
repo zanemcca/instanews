@@ -13,6 +13,8 @@ module.exports = function(app) {
     var note = ctx.instance;
     if (note && ctx.isNewInstance) {
 
+      note = note.toObject();
+
       //Find all installations for the given user
       Installation.find({
         where: {
@@ -33,6 +35,7 @@ module.exports = function(app) {
 
             for(var i = 0; i < res.length; i++) {
 
+              note.myId = note.id;
               if(res[i].deviceType === 'android') {
                 note.installationId = res[i].id;
                 note.deviceType = res[i].deviceType;
@@ -79,7 +82,6 @@ module.exports = function(app) {
   });
 
   Notification.observe('before save', function(ctx, next) {
-    debug('before save', ctx, next);
     var note = ctx.instance || ctx.data;
 
     if (note) {
@@ -87,7 +89,10 @@ module.exports = function(app) {
         note.created = new Date();
       }
       note.modified = new Date();
+      note.modelName = ctx.Model.modelName;
     }
+
+    debug('before save', ctx, next);
     next();
   });
 };

@@ -395,7 +395,8 @@
 /*notification bubble */
 .spanposition{
   position: absolute;
-  left:200px;
+//  left:200px;
+  right: 16px;
   opacity: 0.8;
-  color: white;
+  color: $dark;
 }

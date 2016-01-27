@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <ion-view view-title="{{article.title}}" 
   style="background: #F0F0F0">
+  <ion-nav-title>{{article.title}}</ion-nav-title>
   <ion-nav-buttons side="secondary">
     <div ng-if="!Platform.isBrowser()">
       <div ng-show="uploads.length > 0">

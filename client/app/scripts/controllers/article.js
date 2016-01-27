@@ -45,21 +45,26 @@ app.controller('ArticleCtrl', [
       id: $stateParams.id
     };
 
-    var markerAttempts = 50;
-    var setMarker = function () {
+    var setMarker = function (map, location) {
+      /* istanbul ignore else */
+      if(map && location) { 
+        marker = Maps.setMarker(map,location);
+      } else {
+        console.log('Failed to set the marker');
+      }
+    };
+
+    var afterLoaded = function () {
       var map = Maps.getArticleMap();
       /* istanbul ignore else */
       if(map && $scope.article.location) { 
-        marker = Maps.setMarker(map,$scope.article.location);
-      } else {
-        if(markerAttempts > 0) {
-          markerAttempts--;
-          setTimeout(setMarker, 200);
-        } else {
-          console.log('Failed to set the marker');
-        }
+        setMarker(map, $scope.article.location);
+        Platform.loading.hide();
+        mapObserver.unregister();
       }
     };
+
+    var mapObserver = Maps.registerObserver(afterLoaded);
 
     //Scope variables
     Articles.findById($stateParams.id ,function (article) {
@@ -67,7 +72,7 @@ app.controller('ArticleCtrl', [
         Platform.showToast('404: The article you were looking for is missing!');
       }
       $scope.article = article;
-      Platform.loading.hide();
+      afterLoaded();
     });
 
     $scope.map = {
@@ -79,8 +84,7 @@ app.controller('ArticleCtrl', [
 
     //Refresh the map everytime we enter the view
     $scope.$on('$ionicView.afterEnter', function() {
-      markerAttempts = 50;
-      setMarker();
+      afterLoaded();
 
       uploadObserver = $scope.Uploads.registerObserver(function () {
         var uploads = $scope.Uploads.get();

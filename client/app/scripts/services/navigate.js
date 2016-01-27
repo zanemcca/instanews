@@ -81,7 +81,7 @@ app.service('Navigate', [
           $state.go('app.login');
         } else {
           $state.go(state, params);
-         }
+        }
       } else {
         $state.go(state, params);
       }
@@ -122,6 +122,14 @@ app.service('Navigate', [
 
     var toggleMenu = function() {
       $ionicSideMenuDelegate.toggleLeft();
+    };
+
+    var closeMenu = function() {
+      $ionicSideMenuDelegate.toggleLeft(false);
+    };
+
+    var openMenu = function() {
+      $ionicSideMenuDelegate.toggleLeft(true);
     };
 
     var disableNextBack = function() {
@@ -240,6 +248,8 @@ console.log('Scroll top on ? ' + $scope.scroll.buttonOn);
     return {
       scroll: scroll,
       toggleMenu: toggleMenu,
+      openMenu: openMenu,
+      closeMenu: closeMenu,
       focus: focus,
       go: go,
       goBack: goBack,

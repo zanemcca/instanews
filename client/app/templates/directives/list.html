@@ -4,13 +4,13 @@
 
 <div ng-transclude></div>
 <ul class="list">
-  <ion-item ng-repeat="item in list.get() track by item.id"
-    class="no-padding"
-    ng-class="{ 'dynamic-box': list.get()[0].modelName !== 'comment', 'card' : isCard || isTablet(), 'margin-10' : isTablet() && Platform.getWidth < 768}">
+  <div ng-repeat="item in list.get() track by item.id"
+  class="no-padding"
+  ng-class="getClasses()">
     <in-list-item item="item"
       pre-load="list.preLoad">
     </in-list-item>
-  </ion-item>
+  </div>
 </ul>
 <ion-infinite-scroll
    immediate-check="false"
@@ -18,3 +18,4 @@
    on-infinite="load()"
    distance="10%">
 </ion-infinite-scroll>
+    <!--ng-class="{ 'dynamic-box': list.get()[0].modelName !== 'comment', 'card' : isCard || isTablet(), 'margin-10' : isTablet() && Platform.getWidth < 768}"-->

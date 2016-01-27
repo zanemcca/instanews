@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <div ng-controller="AppCtrl">
-   <ion-side-menus>
+   <ion-side-menus enable-menu-with-back-views="false">
 
-      <ion-side-menu-content enable-menu-with-back-views="true">
+      <ion-side-menu-content>
          <ion-nav-view name="menuContent"></ion-nav-view>
       </ion-side-menu-content>
 
@@ -34,7 +34,7 @@
           </div-->
          </div>
          <div class="sidemenu-item" 
-           nav-clear menu-close 
+           nav-clear menu-close
            ng-show="Uploads.getPending().length"
            ng-click="pendingModal.show();">
           <i class="icon"
@@ -42,6 +42,10 @@
              Uploads
             <span class="badge badge-assertive spanposition">{{Uploads.getPending().length}}</span>
          </div>
+         <in-list list="Notifications"
+           is-card="false"> 
+         </in-list>
+
          <div class="sidemenu-item center-horizontal" 
            nav-clear menu-close
            style="bottom:0;padding-right:16px;color:#AAAAAA;"
@@ -51,15 +55,6 @@
               About
          </div>
 
-         <!--ul class="sidemenu-list">
-            <div class="item item-text-wrap"
-               ng-repeat="note in notifications"
-               ng-if="note.message"
-               ng-class="{'item-divider': !note.seen}"
-               ng-click="handleNotification(note)">
-                  {{note.message}}
-            </div>
-         </ul-->
          </ion-content>
          <ion-footer-bar class="bar-dark">
             <div class="row">

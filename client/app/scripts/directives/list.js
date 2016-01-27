@@ -17,6 +17,29 @@ app.directive('inList', [
         isNotInfinite: '='
       },
       controller: function ($scope, _) {
+
+        $scope.getClasses = function () {
+          var items = $scope.list.get();
+          var classes = [];
+          if(items.length > 0) {
+            var itm = items[0];
+            if(itm.modelName !== 'comment' && itm.modelName !== 'notif') {
+              classes.push('dynamic-box');
+            }
+            if(itm.modelName !== 'notif') {
+              classes.push('item');
+              if($scope.isCard || $scope.isTablet()) {
+                classes.push('card');
+              }
+            }
+
+            if(Platform.getWidth() < 768 && $scope.isTablet()) {
+              classes.push('margin-10');
+            }
+          }
+          return classes;
+        };
+
         $scope.isTablet = Platform.isTablet;
         $scope.Platform = Platform;
 
@@ -49,6 +72,7 @@ app.directive('inListItem', [
   '$timeout',
   'TextInput',
   'Position',
+  'Navigate',
   'User',
   'View',
   function (
@@ -56,6 +80,7 @@ app.directive('inListItem', [
     $timeout,
     TextInput,
     Position,
+    Navigate,
     User,
     View
   ) {
@@ -71,6 +96,9 @@ app.directive('inListItem', [
         break;
         case 'comment':
           template = template.concat('comment.html'); 
+        break;
+        case 'notif':
+          template = template.concat('notification.html'); 
         break;
         default: 
           template = '';
@@ -192,6 +220,11 @@ app.directive('inListItem', [
                 newText = partialText;
               });
             };
+        } else if ($scope.item.modelName === 'notif') {
+          $scope.openNotification = function () {
+            Navigate.closeMenu();
+            $scope.item.focus();
+          }
         }
 
         var setPlaceName = function () {
@@ -240,7 +273,7 @@ app.directive('inListItem', [
         //    Because of above assertion we need to wait to replace this till we have
         //    proper refreshing reinstated in the lists. 
         var createView = function () {
-          if(User.get()) {
+          if(User.get() && $scope.item.modelName !== 'notif') {
             var position = Position.getPosition();
 
             var view = {
