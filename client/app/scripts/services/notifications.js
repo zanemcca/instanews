@@ -331,7 +331,7 @@ console.log('Cannot load notifications because user is not set yet');
       clear: function () {
         this.number = 0;
         setExternalBadge();
-        //User.clearBadge();
+        User.clearBadge();
       },
       toString: function () {
         if(!this.number || this.number < 0) {
