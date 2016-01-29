@@ -72,6 +72,34 @@ describe('Feed: ', function(){
         }
       });
 
+      $provide.service('Notifications', function() {
+        return {
+          get: function() {
+            return [];
+          },
+          getBadge: function () {
+            return {
+              number: 55
+            };
+          },
+          load: function(cb) {
+            cb();
+          },
+          registerObserver: function(cb) {
+          }
+        };
+      });
+
+      $provide.service('User', function() {
+        var set = function(cred) {
+        };
+
+        return {
+          reload: function () {},
+          set: set
+        };
+      });
+
       $provide.service('Articles', function() {
         return {
           reorganize: function () {},
