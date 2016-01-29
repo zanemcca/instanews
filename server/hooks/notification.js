@@ -14,7 +14,7 @@ module.exports = function(app) {
     var note = ctx.instance;
     if (note && ctx.isNewInstance) {
 
-      Journalist.incrementBadge(note.username, function (err) {
+      Journalist.incrementBadge(note.username, function (err, num) {
         if(err) {
           console.error(err.stack);
           return next();
@@ -54,7 +54,7 @@ module.exports = function(app) {
                   note.deviceType = res[i].deviceType;
                   note.deviceToken = res[i].deviceToken;
                   note.expirationInterval = 3600; //Expire in 1 hr
-          //        note.badge =  1;
+                  note.badge =  num;
                   note.sound = 'ping.aiff';
                   note.alert =  note.message;
                 }

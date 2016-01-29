@@ -96,13 +96,22 @@ module.exports = function(Journalist) {
         badge: 1
       }
     }, function (err, res) {
-      if(err || !res) {
+      if(err || res.count !== 1) {
         console.log('Failed to increment the badge number!');
         console.log(err);
+        next(err);
       } else {
-        console.log('Successfully incremented the badge number!');
+        Journalist.findById(userId, function (err, res) {
+          if( err) {
+            console.log('Failed to increment the badge number!');
+            console.log(err);
+            next(err);
+          } else {
+            console.log('Successfully incremented the badge number!');
+            next(null, res.badge);
+          }
+        });
       }
-      next(err);
     });
   };
 
@@ -116,13 +125,26 @@ module.exports = function(Journalist) {
         badge: -1
       }
     }, function (err, res) {
-      if(err || !res) {
+      if(err) {
         console.log('Failed to decrement the badge number!');
         console.log(err);
+        next(err);
       } else {
-        console.log('Successfully decremented the badge number!');
+        if(res.count) {
+          Journalist.findById(userId, function (err, res) {
+            if( err) {
+              console.log('Failed to decrement the badge number!');
+              console.log(err);
+              next(err);
+            } else {
+              console.log('Successfully decremented the badge number!');
+              next(null, res.badge);
+            }
+          });
+        } else {
+          next(null, 0);
+        }
       }
-      next(err);
     });
   };
 
@@ -133,7 +155,7 @@ module.exports = function(Journalist) {
     {
       badge: 0
     }, function (err, res) {
-      if(err || !res) {
+      if(err || res.count !== 1) {
         console.log('Failed to clear the badge number!');
         console.log(err);
         if(!err) {
@@ -144,7 +166,7 @@ module.exports = function(Journalist) {
         next(err);
       } else {
         console.log('Successfully cleared the badge number!');
-        next();
+        next(null, 0);
       }
     });
   };
