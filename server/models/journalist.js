@@ -88,8 +88,10 @@ module.exports = function(Journalist) {
   };
 
   Journalist.incrementBadge = function (userId, next) {
-    Journalist.upsert({
+    Journalist.updateAll({ 
       username: userId,
+    },
+    {
       '$inc': {
         badge: 1
       }
@@ -105,8 +107,11 @@ module.exports = function(Journalist) {
   };
 
   Journalist.decrementBadge = function (userId, next) {
-    Journalist.upsert({
+    Journalist.updateAll({ 
       username: userId,
+      badge: { gt: 0 }
+    },
+    {
       '$inc': {
         badge: -1
       }
@@ -121,7 +126,28 @@ module.exports = function(Journalist) {
     });
   };
 
-  //TODO Create a clear badge function
+  Journalist.clearBadge = function (id, next) {
+    Journalist.updateAll({ 
+      username: id,
+    },
+    {
+      badge: 0
+    }, function (err, res) {
+      if(err || !res) {
+        console.log('Failed to clear the badge number!');
+        console.log(err);
+        if(!err) {
+          err = new Error('Failed to clear the badge');
+          err.status = 404;
+        }
+
+        next(err);
+      } else {
+        console.log('Successfully cleared the badge number!');
+        next();
+      }
+    });
+  };
 
   Journalist.requestPasswordReset = function (user, next) {
     var query = {
@@ -269,6 +295,17 @@ module.exports = function(Journalist) {
       }
     });
   };
+
+
+  Journalist.remoteMethod(
+    'clearBadge',
+    {
+      accepts: { arg: 'id', type: 'string', required: true},
+      http: {
+        path: '/:id/clearBadge', verb: 'put'
+      }
+    }
+  );
 
   Journalist.remoteMethod(
     'resendConfirmation',

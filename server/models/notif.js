@@ -38,7 +38,7 @@ module.exports = function(Notif) {
     {
       accepts: { arg: 'id', type: 'string', required: true},
       http: {
-        path: '/:id/seen', verb: 'get'
+        path: '/:id/seen', verb: 'put'
       }
     }
   );

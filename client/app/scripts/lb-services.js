@@ -780,6 +780,11 @@ module.factory(
          *
          * @param {Object=} parameters Request parameters.
          *
+         *   This method does not accept any parameters.
+         *   Supply an empty object or omit this argument altogether.
+         *
+         * @param {Object} postData Request data.
+         *
          *  - `id` – `{string}` - 
          *
          * @param {function(Object,Object)=} successCb
@@ -796,7 +801,7 @@ module.factory(
          */
         "setSeen": {
           url: urlBase + "/notifs/:id/seen",
-          method: "GET"
+          method: "PUT"
         },
 
         // INTERNAL. Use Journalist.notifications.updateById() instead.
@@ -1240,6 +1245,43 @@ module.factory(
         "confirm": {
           url: urlBase + "/journalists/confirm",
           method: "GET"
+        },
+
+        /**
+         * @ngdoc method
+         * @name lbServices.Journalist#clearBadge
+         * @methodOf lbServices.Journalist
+         *
+         * @description
+         *
+         * <em>
+         * (The remote method definition does not provide any description.)
+         * </em>
+         *
+         * @param {Object=} parameters Request parameters.
+         *
+         *   This method does not accept any parameters.
+         *   Supply an empty object or omit this argument altogether.
+         *
+         * @param {Object} postData Request data.
+         *
+         *  - `id` – `{string}` - 
+         *
+         * @param {function(Object,Object)=} successCb
+         *   Success callback with two arguments: `value`, `responseHeaders`.
+         *
+         * @param {function(Object)=} errorCb Error callback with one argument:
+         *   `httpResponse`.
+         *
+         * @returns {Object} An empty reference that will be
+         *   populated with the actual data once the response is returned
+         *   from the server.
+         *
+         * This method returns no data.
+         */
+        "clearBadge": {
+          url: urlBase + "/journalists/:id/clearBadge",
+          method: "PUT"
         },
 
         /**
