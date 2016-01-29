@@ -121,7 +121,13 @@ app.service('Navigate', [
     };
 
     var toggleMenu = function() {
-      $ionicSideMenuDelegate.toggleLeft();
+      if($ionicSideMenuDelegate.isOpenLeft()) {
+        closeMenu();
+        return false;
+      } else {
+        openMenu();
+        return true;
+      }
     };
 
     var closeMenu = function() {
