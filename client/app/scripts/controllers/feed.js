@@ -12,6 +12,7 @@ app.controller('FeedCtrl', [
   'Articles',
   'Navigate',
   'Notifications',
+  'User',
   function(
     $scope,
     $location,
@@ -21,7 +22,8 @@ app.controller('FeedCtrl', [
     Platform,
     Articles,
     Navigate,
-    Notifications
+    Notifications,
+    User
   ) {
 
     // Local reference to articles service
@@ -93,6 +95,8 @@ app.controller('FeedCtrl', [
         google.maps.event.trigger(map, 'resize');
       }
       Articles.reorganize();
+
+      User.reload();
     });
 
     /*
