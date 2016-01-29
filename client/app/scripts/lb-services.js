@@ -744,6 +744,98 @@ module.factory(
 
 /**
  * @ngdoc object
+ * @name lbServices.Notif
+ * @header lbServices.Notif
+ * @object
+ *
+ * @description
+ *
+ * A $resource object for interacting with the `Notif` model.
+ *
+ * ## Example
+ *
+ * See
+ * {@link http://docs.angularjs.org/api/ngResource.$resource#example $resource}
+ * for an example of using this object.
+ *
+ */
+module.factory(
+  "Notif",
+  ['LoopBackResource', 'LoopBackAuth', '$injector', function(Resource, LoopBackAuth, $injector) {
+    var R = Resource(
+      urlBase + "/notifs/:id",
+      { 'id': '@id' },
+      {
+
+        /**
+         * @ngdoc method
+         * @name lbServices.Notif#setSeen
+         * @methodOf lbServices.Notif
+         *
+         * @description
+         *
+         * <em>
+         * (The remote method definition does not provide any description.)
+         * </em>
+         *
+         * @param {Object=} parameters Request parameters.
+         *
+         *  - `id` – `{string}` - 
+         *
+         * @param {function(Object,Object)=} successCb
+         *   Success callback with two arguments: `value`, `responseHeaders`.
+         *
+         * @param {function(Object)=} errorCb Error callback with one argument:
+         *   `httpResponse`.
+         *
+         * @returns {Object} An empty reference that will be
+         *   populated with the actual data once the response is returned
+         *   from the server.
+         *
+         * This method returns no data.
+         */
+        "setSeen": {
+          url: urlBase + "/notifs/:id/seen",
+          method: "GET"
+        },
+
+        // INTERNAL. Use Journalist.notifications.updateById() instead.
+        "::updateById::journalist::notifications": {
+          params: {
+          'fk': '@fk'
+          },
+          url: urlBase + "/journalists/:id/notifications/:fk",
+          method: "PUT"
+        },
+
+        // INTERNAL. Use Journalist.notifications() instead.
+        "::get::journalist::notifications": {
+          isArray: true,
+          url: urlBase + "/journalists/:id/notifications",
+          method: "GET"
+        },
+      }
+    );
+
+
+
+
+    /**
+    * @ngdoc property
+    * @name lbServices.Notif#modelName
+    * @propertyOf lbServices.Notif
+    * @description
+    * The name of the model represented by this $resource,
+    * i.e. `Notif`.
+    */
+    R.modelName = "Notif";
+
+
+    return R;
+  }]);
+
+/**
+ * @ngdoc object
  * @name lbServices.Journalist
  * @header lbServices.Journalist
  * @object
@@ -767,40 +859,7 @@ module.factory(
       { 'id': '@id' },
       {
 
-        /**
-         * @ngdoc method
-         * @name lbServices.Journalist#prototype$__updateById__notifications
-         * @methodOf lbServices.Journalist
-         *
-         * @description
-         *
-         * Update a related item by id for notifications.
-         *
-         * @param {Object=} parameters Request parameters.
-         *
-         *  - `id` – `{*}` - User id
-         *
-         *  - `fk` – `{*}` - Foreign key for notifications
-         *
-         * @param {Object} postData Request data.
-         *
-         * This method expects a subset of model properties as request parameters.
-         *
-         * @param {function(Object,Object)=} successCb
-         *   Success callback with two arguments: `value`, `responseHeaders`.
-         *
-         * @param {function(Object)=} errorCb Error callback with one argument:
-         *   `httpResponse`.
-         *
-         * @returns {Object} An empty reference that will be
-         *   populated with the actual data once the response is returned
-         *   from the server.
-         *
-         * <em>
-         * (The remote method definition does not provide any description.
-         * This usually means the response is a `Journalist` object.)
-         * </em>
-         */
+        // INTERNAL. Use Journalist.notifications.updateById() instead.
         "prototype$__updateById__notifications": {
           params: {
           'fk': '@fk'
@@ -853,36 +912,7 @@ module.factory(
           method: "GET"
         },
 
-        /**
-         * @ngdoc method
-         * @name lbServices.Journalist#prototype$__get__notifications
-         * @methodOf lbServices.Journalist
-         *
-         * @description
-         *
-         * Queries notifications of journalist.
-         *
-         * @param {Object=} parameters Request parameters.
-         *
-         *  - `id` – `{*}` - User id
-         *
-         *  - `filter` – `{object=}` - 
-         *
-         * @param {function(Array.<Object>,Object)=} successCb
-         *   Success callback with two arguments: `value`, `responseHeaders`.
-         *
-         * @param {function(Object)=} errorCb Error callback with one argument:
-         *   `httpResponse`.
-         *
-         * @returns {Array.<Object>} An empty reference that will be
-         *   populated with the actual data once the response is returned
-         *   from the server.
-         *
-         * <em>
-         * (The remote method definition does not provide any description.
-         * This usually means the response is a `Journalist` object.)
-         * </em>
-         */
+        // INTERNAL. Use Journalist.notifications() instead.
         "prototype$__get__notifications": {
           isArray: true,
           url: urlBase + "/journalists/:id/notifications",
@@ -1418,6 +1448,96 @@ module.factory(
     */
     R.modelName = "Journalist";
 
+    /**
+     * @ngdoc object
+     * @name lbServices.Journalist.notifications
+     * @header lbServices.Journalist.notifications
+     * @object
+     * @description
+     *
+     * The object `Journalist.notifications` groups methods
+     * manipulating `Notif` instances related to `Journalist`.
+     *
+     * Call {@link lbServices.Journalist#notifications Journalist.notifications()}
+     * to query all related instances.
+     */
+
+
+        /**
+         * @ngdoc method
+         * @name lbServices.Journalist#notifications
+         * @methodOf lbServices.Journalist
+         *
+         * @description
+         *
+         * Queries notifications of journalist.
+         *
+         * @param {Object=} parameters Request parameters.
+         *
+         *  - `id` – `{*}` - User id
+         *
+         *  - `filter` – `{object=}` - 
+         *
+         * @param {function(Array.<Object>,Object)=} successCb
+         *   Success callback with two arguments: `value`, `responseHeaders`.
+         *
+         * @param {function(Object)=} errorCb Error callback with one argument:
+         *   `httpResponse`.
+         *
+         * @returns {Array.<Object>} An empty reference that will be
+         *   populated with the actual data once the response is returned
+         *   from the server.
+         *
+         * <em>
+         * (The remote method definition does not provide any description.
+         * This usually means the response is a `Notif` object.)
+         * </em>
+         */
+        R.notifications = function() {
+          var TargetResource = $injector.get("Notif");
+          var action = TargetResource["::get::journalist::notifications"];
+          return action.apply(R, arguments);
+        };
+
+        /**
+         * @ngdoc method
+         * @name lbServices.Journalist.notifications#updateById
+         * @methodOf lbServices.Journalist.notifications
+         *
+         * @description
+         *
+         * Update a related item by id for notifications.
+         *
+         * @param {Object=} parameters Request parameters.
+         *
+         *  - `id` – `{*}` - User id
+         *
+         *  - `fk` – `{*}` - Foreign key for notifications
+         *
+         * @param {Object} postData Request data.
+         *
+         * This method expects a subset of model properties as request parameters.
+         *
+         * @param {function(Object,Object)=} successCb
+         *   Success callback with two arguments: `value`, `responseHeaders`.
+         *
+         * @param {function(Object)=} errorCb Error callback with one argument:
+         *   `httpResponse`.
+         *
+         * @returns {Object} An empty reference that will be
+         *   populated with the actual data once the response is returned
+         *   from the server.
+         *
+         * <em>
+         * (The remote method definition does not provide any description.
+         * This usually means the response is a `Notif` object.)
+         * </em>
+         */
+        R.notifications.updateById = function() {
+          var TargetResource = $injector.get("Notif");
+          var action = TargetResource["::updateById::journalist::notifications"];
+          return action.apply(R, arguments);
+        };
 
         /**
          * @ngdoc method

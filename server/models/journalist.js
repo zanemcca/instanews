@@ -87,6 +87,42 @@ module.exports = function(Journalist) {
     });
   };
 
+  Journalist.incrementBadge = function (userId, next) {
+    Journalist.upsert({
+      username: userId,
+      '$inc': {
+        badge: 1
+      }
+    }, function (err, res) {
+      if(err || !res) {
+        console.log('Failed to increment the badge number!');
+        console.log(err);
+      } else {
+        console.log('Successfully incremented the badge number!');
+      }
+      next(err);
+    });
+  };
+
+  Journalist.decrementBadge = function (userId, next) {
+    Journalist.upsert({
+      username: userId,
+      '$inc': {
+        badge: -1
+      }
+    }, function (err, res) {
+      if(err || !res) {
+        console.log('Failed to decrement the badge number!');
+        console.log(err);
+      } else {
+        console.log('Successfully decremented the badge number!');
+      }
+      next(err);
+    });
+  };
+
+  //TODO Create a clear badge function
+
   Journalist.requestPasswordReset = function (user, next) {
     var query = {
       where: {}
