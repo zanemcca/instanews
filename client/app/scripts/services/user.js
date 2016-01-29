@@ -150,6 +150,27 @@ app.service('User', [
       });
     }
 
+    var reload = function () {
+      if(user) {
+        Journalist.findById({
+          id: user.userId 
+        }, function (usr) {
+          user.user = usr;
+          set(user);
+        }, function (err) {
+          console.log(err);
+         });
+      }
+    };
+
+    Platform.ready
+    .then(function () {
+      document.addEventListener('resume', function () {
+        console.log('Resuming app!');
+        reload();
+      }, false);
+    });
+
     return {
       clearData: clearData,
       clearBadge: clearBadge,
@@ -158,6 +179,7 @@ app.service('User', [
       logout: logout,
       isMine: isMine,
       isAdmin: isAdmin,
+      reload: reload,
       get: get,
       getToken: getToken,
       set: set,
