@@ -2,6 +2,7 @@
 var common = require('./common');
 
 module.exports = function(DownVote) {
+  DownVote.notify = common.notify.bind(this, DownVote);
 
    var staticDisable = [
       'exists',

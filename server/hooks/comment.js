@@ -46,6 +46,7 @@ next();
     }
 
     if(inst && ctx.isNewInstance) {
+      Comment.notify(inst);
       Click.create({
         username: inst.username,
         type: 'createComment',

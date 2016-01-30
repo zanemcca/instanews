@@ -3,6 +3,8 @@ var common = require('./common');
 
 module.exports = function(UpVote) {
 
+  UpVote.notify = common.notify.bind(this, UpVote);
+
    var staticDisable = [
       'exists',
       'count',
