@@ -92,14 +92,51 @@ app.factory('Platform', [
       $ionicActionSheet.show(sheet);
     };
 
-    var showAlert = function (message, title, cb) {
+    var showAlert = function (message, title, buttonName, cb) {
       if(!cb) {
-        cb = function () {
-          console.log('Dialog was confirmed');
-        };
+        cb = buttonName;
+        if(!cb) {
+          buttonName = 'Ok';
+          cb = title;
+          if(!cb) {
+            title = 'Alert'
+
+            cb = function () {
+              console.log('Dialog was confirmed');
+            };
+          } else if (typeof cb === 'function') {
+            title = 'Alert';
+          }
+        } else if (typeof cb === 'function') {
+          buttonName = 'Ok';
+        }
       }
 
-      $cordovaDialogs.alert(message, title, 'Ok')
+      $cordovaDialogs.alert(message, title, buttonName)
+      .then(cb);
+    };
+
+    var showConfirm = function (message, title, buttonNames, cb) {
+      if(!cb) {
+        cb = buttonNames;
+        if(!cb) {
+          buttonNames = ['Ok', 'Cancel'];
+          cb = title;
+          if(!cb) {
+            title = 'Confirm';
+
+            cb = function () {
+              console.log('Dialog was confirmed');
+            };
+          } else if (typeof cb === 'function') {
+            title = 'Confirm';
+          }
+        } else if (typeof cb === 'function') {
+          buttonNames = ['Ok', 'Cancel'];
+        }
+      }
+
+      $cordovaDialogs.confirm(message, title, buttonNames)
       .then(cb);
     };
 
@@ -284,6 +321,7 @@ app.factory('Platform', [
       getCacheDir: getCacheDir,
       showSheet: showSheet,
       showAlert: showAlert,
+      showConfirm: showConfirm,
       showToast: showToast,
       removeFile: removeFile,
       initBackButton: initBackButton,
