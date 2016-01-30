@@ -103,6 +103,8 @@ module.exports = function(app) {
     if(inst && ctx.isNewInstance) {
       delete inst.id;
 
+      inst.modelName = ctx.Model.modelName;
+
       var error = new Error('Missing key information for new click!');
       error.status = 400;
 

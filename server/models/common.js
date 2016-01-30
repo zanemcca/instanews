@@ -30,6 +30,193 @@ exports.initBase = function(Model) {
   exports.disableRemotes(Model,nonStaticDisable,false);
 };
 
+exports.notify = function (Model, inst) {
+  var Notification = Model.app.models.notif;
+
+  var getParent,
+    action,
+    message,
+    notifyParentOwner = false,
+    notifyCollaborators = false,
+    query;
+
+  var someone = inst.username;
+
+  //Example Message : <someone>   <action>   <aOrAn>  <type>
+  //                     bob    commented on    an    article
+
+  // Loggin function
+  var report = function(err, res) {
+    if (err) {
+      console.error(err.stack);
+    } else {
+      //console.log('Created a notification!');
+    }
+  };
+
+
+  //TODO Add notifications for editing as well (maybe)
+
+  //List of already notified users
+  var users = [
+    inst.username
+  ];
+
+  //Setup who is going to be notified and what type of action was completed to warrant the notification
+  if(inst.modelName === 'comment') {
+    getParent = inst.commentable;
+
+    action = 'commented on';
+    if(inst.commentableType === 'comment') {
+      action = 'replied to';
+    }
+
+    notifyCollaborators = true;
+    query = {
+      where: {
+        commentableId: inst.commentableId,
+        commentableType: inst.commentableType
+      }
+    };
+
+    notifyParentOwner = true;
+  } else if(inst.modelName === 'subarticle') {
+    getParent = inst.article;
+
+    notifyCollaborators = true;
+    query = {
+      where: {
+        parentId: inst.parentId,
+      }
+    };
+
+    if(inst._file) {
+      if(inst._file.type.indexOf('video')) {
+        action = 'added a video to';
+        message = 'you posted a video';
+      } else if(inst._file.type.indexOf('image')) {
+        action = 'added a photo to';
+        message = 'you posted a photo';
+      }
+    } else {
+      action = 'added an article to';
+      message = 'you posted an article';
+    }
+
+    //Send a notification to the subarticle creator 
+    //example: = 'you posted a video'
+    Notification.create({
+      message: message,
+      notifiableId: inst.id,
+      notifiableType: inst.modelName,
+      messageFrom: inst.username,
+      username: inst.username
+    }, report);
+  } else if(inst.modelName === 'upVote' || inst.modelName === 'downVote') {
+    getParent = inst.clickable;
+    action = 'voted on';
+    if(inst.modelName === 'downVote') {
+      someone = 'someone';
+    }
+
+    notifyParentOwner = true;
+  } else {
+    console.error('Unknown instance type: ' + inst.modelName);
+    return;
+  }
+
+  getParent(function(err, parent) {
+    if(err) {
+      console.error(err.stack);
+      return;
+    } 
+
+    var type;
+    var aOrAn = 'a';
+
+    //Figure out what was acted upon
+    if(parent.modelName === 'subarticle') {
+      if(parent._file) {
+        if(parent._file.type.indexOf('video')) {
+          type = 'video';
+        } else if(parent._file.type.indexOf('image')) {
+          type = 'photo';
+        }
+      } else {
+        type = 'article';
+        aOrAn = 'an';
+      }
+    } else if(parent.modelName === 'comment') {
+      type = 'comment';
+    } else if(parent.modelName === 'article') {
+      type = 'story';
+    } else {
+      console.error('Unknown parent Type: ' + parent.modelName);
+      return;
+    }
+
+    // Notify the owner of the parent model 
+    if(notifyParentOwner) {
+      if(users.indexOf(parent.username) === -1) {
+        users.push(parent.username);
+        //example: = 'bob replied to your comment'
+        //example: = 'someone voted on your comment'
+        message = [someone, action, 'your', type].join(' ');
+        //Send a notification to the creator of the commented on material
+        Notification.create({
+          message: message,
+          notifiableId: inst.id,
+          notifiableType: inst.modelName,
+          messageFrom: inst.username,
+          username: parent.username
+        }, report);
+      }
+    }
+
+    // Notify all siblings of the parent model
+    if(notifyCollaborators) {
+      //example: 'bob also commented on a video'
+      //example: 'bob also replied to a comment'
+      message = [someone, 'also', action, aOrAn, type].join(' ');
+
+      //We want people to feel ownership over the stories they collaborate on
+      //so we say it is 'your story' not 'a story'
+      if(inst.modelName === 'subarticle') {
+        //example: 'bob posted a video on your story'
+        message = [someone, action, 'your', type].join(' ');
+      }
+
+
+      //Find all comments on the the parent item
+      Model.find(query, function(err, res) {
+        //Error checking
+        if(err) {
+          console.error(err.stack);
+        } else {
+
+          for( var  i = 0; i < res.length; i++) {
+            if ( users.indexOf(res[i].username) === -1) {
+              //Send a notification to each user
+              //associated with the parent article
+              var username = res[i].username;
+
+              Notification.create({
+                message: message,
+                notifiableId: inst.id,
+                notifiableType: inst.modelName,
+                messageFrom: inst.username,
+                username: username
+              }, report);
+
+              users.push(res[i].username);
+            }
+          }
+        }
+      });
+    }
+  });
+};
+
 //readModifyWrite
 // with an Optimistic Locking Strategy
 exports.readModifyWrite = function(Model, query, modify, cb, options) {
