@@ -91,11 +91,15 @@ console.log('Cannot load notifications because user is not set yet');
 
       var device = Platform.getDevice();
 
+
       if(Platform.isAndroid()) {
         config = {
           android: {
             sound: true,
             vibrate: true,
+            forceShow: true,
+            icon: 'notif',
+            iconColor: '#023E4F',
             senderID: '1081316781214'
           }
         };
@@ -116,8 +120,9 @@ console.log('Cannot load notifications because user is not set yet');
         return;
       }
 
-      console.log('Attempting to register device for push notifications');
       // jshint undef: false 
+      //TODO Defer this until the first time a user logs in to avoid asking for permission right after download
+      console.log('Attempting to register device for push notifications');
       var push = PushNotification.init(config);
 
       push.on('registration', function(data) {
@@ -132,8 +137,21 @@ console.log('Cannot load notifications because user is not set yet');
         console.log(data.additionalData);
         badge.increment();
         if(data.additionalData) {
+          if(!data.additionalData.save) {
+            data.additionalData.id = data.additionalData.id || data.additionalData.myId;
+            notifications.add(data.additionalData);
+          }
+
           if(data.additionalData.foreground) {
-            reload();
+            if(Platform.isIOS()) {
+              var note = data.additionalData;
+              Platform.showConfirm(note.message, 'Notification', ['Ok', 'View'], function (button) {
+                if(button === 2) {
+                  console.log('View was pressed');
+                  focus(note);
+                }
+              });
+            }
           } else {
             focus(data.additionalData);
           }
@@ -207,11 +225,6 @@ console.log('Cannot load notifications because user is not set yet');
         default:
           console.log('Unknown notification type!');
           break;
-      }
-
-      if(!data.save) {
-        data.id = data.id || data.myId;
-        notifications.add(data);
       }
 
       setSeen(data);
