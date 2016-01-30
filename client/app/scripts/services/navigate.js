@@ -11,6 +11,7 @@ app.service('Navigate', [
   '$state',
   '$timeout',
   '$window',
+  'Platform',
   'User',
   function(
     $ionicNavBarDelegate,
@@ -21,6 +22,7 @@ app.service('Navigate', [
     $state,
     $timeout,
     $window,
+    Platform,
     User
   ){
 
@@ -69,6 +71,8 @@ app.service('Navigate', [
     };
 
     var go =  function(state, params) {
+      var current = $ionicHistory.currentView();
+
       if(redirect.next && !state) {
         $state.go(redirect.next, redirect.nextParams);
       } else if(userRequiredStates.indexOf(state) > -1) {
@@ -82,6 +86,9 @@ app.service('Navigate', [
         } else {
           $state.go(state, params);
         }
+      } else if(current.stateName === state && (!params.id || params.id === current.stateParams.id)) {
+        console.log('Not navigating to the same state!');
+        Platform.loading.hide();
       } else {
         $state.go(state, params);
       }
