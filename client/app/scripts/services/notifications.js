@@ -10,6 +10,7 @@ app.service('Notifications', [
   'Comments',
   'Journalist',
   'list',
+  'Notif',
   'Platform',
   'Subarticles',
   'User',
@@ -21,6 +22,7 @@ app.service('Notifications', [
     Comments,
     Journalist,
     list,
+    Notif,
     Platform,
     Subarticles,
     User,
@@ -81,17 +83,23 @@ console.log('Cannot load notifications because user is not set yet');
 };
 */
 
+    var setExternalBadge = function () {};
+
     Platform.ready.then( function () {
       console.log('Setting up notifications!');
       var config = {};
 
       var device = Platform.getDevice();
 
+
       if(Platform.isAndroid()) {
         config = {
           android: {
             sound: true,
             vibrate: true,
+            forceShow: true,
+            icon: 'notif',
+            iconColor: '#023E4F',
             senderID: '1081316781214'
           }
         };
@@ -112,8 +120,9 @@ console.log('Cannot load notifications because user is not set yet');
         return;
       }
 
-      console.log('Attempting to register device for push notifications');
       // jshint undef: false 
+      //TODO Defer this until the first time a user logs in to avoid asking for permission right after download
+      console.log('Attempting to register device for push notifications');
       var push = PushNotification.init(config);
 
       push.on('registration', function(data) {
@@ -126,15 +135,50 @@ console.log('Cannot load notifications because user is not set yet');
       push.on('notification', function(data) {
         console.log(data);
         console.log(data.additionalData);
+        badge.increment();
         if(data.additionalData) {
+          if(!data.additionalData.save) {
+            data.additionalData.id = data.additionalData.id || data.additionalData.myId;
+            notifications.add(data.additionalData);
+          }
+
           if(data.additionalData.foreground) {
-            reload();
-            //TODO update badge
+            if(Platform.isIOS()) {
+              var note = data.additionalData;
+              Platform.showConfirm(note.message, 'Notification', ['Ok', 'View'], function (button) {
+                if(button === 2) {
+                  console.log('View was pressed');
+                  focus(note);
+                }
+              });
+            }
           } else {
             focus(data.additionalData);
           }
         }
       });
+
+      setExternalBadge = function () {
+        if(Platform.isIOS()) {
+          var succ = function () {
+            console.log('Successfully set the badge number');
+          };
+
+          var fail = function (err) {
+            console.log('Failed to set badge number');
+            console.log(err);
+          };
+
+          var num = 0;
+          if(badge.number > 0) {
+            num = badge.number;
+          }
+
+          push.setApplicationIconBadgeNumber(succ, fail, num);
+        }
+      };
+
+      setExternalBadge();
     });
 
       /*
@@ -183,11 +227,6 @@ console.log('Cannot load notifications because user is not set yet');
           break;
       }
 
-      if(!data.save) {
-        data.id = data.id || data.myId;
-        notifications.add(data);
-      }
-
       setSeen(data);
     };
 
@@ -195,6 +234,7 @@ console.log('Cannot load notifications because user is not set yet');
       if(user) {
         console.log('Loading notifications!');
         spec.options.filter.skip = 0;
+        spec.options.filter.limit = 30;
         spec.options.id = user.userId;
         notifications.load();
       } else {
@@ -202,13 +242,11 @@ console.log('Cannot load notifications because user is not set yet');
       }
     };
 
-
     var setSeen = function (data) {
       var data = data || this;
 
       var finish = function () {
         reload();
-        //TODO update badge
       };
 
       if(!data.seen) {
@@ -218,6 +256,7 @@ console.log('Cannot load notifications because user is not set yet');
         } else {
           console.log('No save function or id! Cannot set "seen"');
         }
+        badge.decrement();
       }
 
       setTimeout(finish, 300);
@@ -247,12 +286,8 @@ console.log('Cannot load notifications because user is not set yet');
     var save = function (item) {
       if(user) {
         item = item || this;
-        Journalist.prototype$__updateById__notifications({
-          id: user.userId,
-          fk: item.id
-        },
-        {
-          seen: item.seen
+        Notif.setSeen({
+          id: item.id
         },
         function () {
           console.log('Successful notification update');
@@ -288,13 +323,60 @@ console.log('Cannot load notifications because user is not set yet');
     // Create a list for articles within view
     var notifications = list(spec);
 
+    var badge = {
+      number: 0, 
+      set: function (num) {
+        if( num !== this.number && num >= 0) {
+          this.number = num;
+          setExternalBadge();
+        }
+      },
+      increment: function () {
+        this.number++;
+        setExternalBadge();
+      },
+      decrement: function () {
+        if(this.number > 0) {
+          this.number--;
+        }
+        setExternalBadge();
+      },
+      clear: function () {
+        this.number = 0;
+        setExternalBadge();
+        User.clearBadge();
+      },
+      toString: function () {
+        if(!this.number || this.number < 0) {
+          return "0";
+        } else if( this.number >= 1000000) {
+          return (Math.floor(this.number/1000000).toString()) + 'M';
+        } else if( this.number >= 1000) {
+          return (Math.floor(this.number/1000).toString()) + 'k';
+        } else {
+          return this.number.toString();
+        }
+      }
+    };
+
+    notifications.getBadge = function () {
+      return badge;
+    };
+
+    notifications.reload = reload;
+
     var user;
 
     var userWatch = function () {
       user = User.get();
       if(user) {
+        if(user.user) {
+          console.log(user.user);
+          badge.set(user.user.badge);
+        }
         reload();
       } else {
+        badge.clear();
         notifications.clear();
       }
     };
@@ -302,9 +384,6 @@ console.log('Cannot load notifications because user is not set yet');
     User.registerObserver(userWatch);
 
     userWatch();
-
-    console.log('Notifications fully loaded!');
-    console.log(notifications);
 
     return notifications;
   }

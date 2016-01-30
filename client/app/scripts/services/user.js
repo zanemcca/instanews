@@ -111,6 +111,19 @@ app.service('User', [
       return (user && user.user && user.user.isAdmin);
     };
 
+    var clearBadge = function () {
+      if(user) {
+        Journalist.clearBadge({
+          id: user.userId
+        }, function () {
+          console.log('Successfully cleared the badge');
+        }, function (err) {
+          console.log('Failed to clear the badge');
+          console.log(err);
+        });
+      }
+    };
+
     // If a user is logged in already then request a new token
      // istanbul ignore else 
     if(LoopBackAuth.accessTokenId && LoopBackAuth.currentUserId) {
@@ -120,7 +133,16 @@ app.service('User', [
         id: LoopBackAuth.currentUserId,
         ttl: 1209600
       }, null, function(user) {
-        set(user);
+        Journalist.findById({
+          id: LoopBackAuth.currentUserId
+        }, function (usr) {
+          user.user = usr;
+          console.log('Refreshed user');
+          console.log(user);
+          set(user);
+        }, function (err) {
+          console.log(err);
+        });
       }, 
       // istanbul ignore next
       function(err) {
@@ -128,13 +150,36 @@ app.service('User', [
       });
     }
 
+    var reload = function () {
+      if(user) {
+        Journalist.findById({
+          id: user.userId 
+        }, function (usr) {
+          user.user = usr;
+          set(user);
+        }, function (err) {
+          console.log(err);
+         });
+      }
+    };
+
+    Platform.ready
+    .then(function () {
+      document.addEventListener('resume', function () {
+        console.log('Resuming app!');
+        reload();
+      }, false);
+    });
+
     return {
       clearData: clearData,
+      clearBadge: clearBadge,
       install: install,
       login: login,
       logout: logout,
       isMine: isMine,
       isAdmin: isAdmin,
+      reload: reload,
       get: get,
       getToken: getToken,
       set: set,
