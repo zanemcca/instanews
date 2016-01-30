@@ -4,76 +4,12 @@ module.exports = function(Subarticle) {
 
   common.initBase(Subarticle);
 
+  //TODO Use bind instead of this crud
   Subarticle.readModifyWrite = function(query, modify, cb, options) {
     common.readModifyWrite(Subarticle, query, modify, cb, options);
   };
 
-  Subarticle.notify = function (inst) {
-    var Notification = Subarticle.app.models.notif;
-
-    //Find all subarticles associated with this article
-    Subarticle.find({
-      where: {
-        parentId: inst.parentId
-      }
-    }, function(err, res) {
-      //Error checking
-      if(err) {
-        console.error(err.stack);
-      } else {
-
-        var report = function(err, res) {
-          if (err) {
-            console.error(err.stack);
-          } else {
-            //console.log('Created a notification!');
-          }
-        };
-
-        var partialMessage;
-        if(inst._file) {
-          if(inst._file.type.indexOf('video')) {
-            partialMessage = 'a video';
-          } else if(inst._file.type.indexOf('image')) {
-            partialMessage = 'a photo';
-          }
-        } else {
-          partialMessage = 'an article';
-        }
-
-        Notification.create({
-          message: 'Posted ' + partialMessage,
-          notifiableId: inst.id,
-          notifiableType: 'subarticle',
-          messageFrom: inst.username,
-          username: inst.username
-        }, report);
-
-        //List of already notified users
-        var users = [
-          inst.username
-        ];
-        for( var  i = 0; i < res.length; i++) {
-          if ( users.indexOf(res[i].username) === -1) {
-            //Send a notification to each user
-            //associated with the parent article
-            var username = res[i].username;
-            var message = inst.username + ' added ' + partialMessage + ' to your story';
-
-            Notification.create({
-              message: message,
-              notifiableId: inst.id,
-              notifiableType: 'subarticle',
-              messageFrom: inst.username,
-              username: username
-            }, report);
-
-            users.push(res[i].username);
-          }
-        }
-      }
-    });
-  };
+  Subarticle.notify = common.notify.bind(this, Subarticle);
 
   Subarticle.clearPending = function(message, next) {
     var Article = Subarticle.app.models.Article;

@@ -60,7 +60,7 @@ module.exports = function(app) {
     var inst = ctx.instance;
 
     if(inst && ctx.isNewInstance) {
-
+      UpVote.notify(inst);
       //The click after save should have added an incrementation parameter
       if(ctx.inc && typeof(ctx.inc) === 'object') {
         ctx.inc.upVoteCount = 1;
