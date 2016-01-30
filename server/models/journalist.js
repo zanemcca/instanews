@@ -87,6 +87,90 @@ module.exports = function(Journalist) {
     });
   };
 
+  Journalist.incrementBadge = function (userId, next) {
+    Journalist.updateAll({ 
+      username: userId,
+    },
+    {
+      '$inc': {
+        badge: 1
+      }
+    }, function (err, res) {
+      if(err || res.count !== 1) {
+        console.log('Failed to increment the badge number!');
+        console.log(err);
+        next(err);
+      } else {
+        Journalist.findById(userId, function (err, res) {
+          if( err) {
+            console.log('Failed to increment the badge number!');
+            console.log(err);
+            next(err);
+          } else {
+            console.log('Successfully incremented the badge number!');
+            next(null, res.badge);
+          }
+        });
+      }
+    });
+  };
+
+  Journalist.decrementBadge = function (userId, next) {
+    Journalist.updateAll({ 
+      username: userId,
+      badge: { gt: 0 }
+    },
+    {
+      '$inc': {
+        badge: -1
+      }
+    }, function (err, res) {
+      if(err) {
+        console.log('Failed to decrement the badge number!');
+        console.log(err);
+        next(err);
+      } else {
+        if(res.count) {
+          Journalist.findById(userId, function (err, res) {
+            if( err) {
+              console.log('Failed to decrement the badge number!');
+              console.log(err);
+              next(err);
+            } else {
+              console.log('Successfully decremented the badge number!');
+              next(null, res.badge);
+            }
+          });
+        } else {
+          next(null, 0);
+        }
+      }
+    });
+  };
+
+  Journalist.clearBadge = function (id, next) {
+    Journalist.updateAll({ 
+      username: id,
+    },
+    {
+      badge: 0
+    }, function (err, res) {
+      if(err || res.count !== 1) {
+        console.log('Failed to clear the badge number!');
+        console.log(err);
+        if(!err) {
+          err = new Error('Failed to clear the badge');
+          err.status = 404;
+        }
+
+        next(err);
+      } else {
+        console.log('Successfully cleared the badge number!');
+        next(null, 0);
+      }
+    });
+  };
+
   Journalist.requestPasswordReset = function (user, next) {
     var query = {
       where: {}
@@ -233,6 +317,17 @@ module.exports = function(Journalist) {
       }
     });
   };
+
+
+  Journalist.remoteMethod(
+    'clearBadge',
+    {
+      accepts: { arg: 'id', type: 'string', required: true},
+      http: {
+        path: '/:id/clearBadge', verb: 'put'
+      }
+    }
+  );
 
   Journalist.remoteMethod(
     'resendConfirmation',

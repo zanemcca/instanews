@@ -6,6 +6,7 @@ describe('instanews.service.user', function() {
   var localStorage, platform, installation, user, journalist, loopbackAuth;
 
   var usr;
+  var journalist;
   beforeEach(function() {
     usr = {
       userId: 'sven'
@@ -28,6 +29,11 @@ describe('instanews.service.user', function() {
               token: 'adfasdf54df654asd65f14sad65f3s5'
             };
           },
+          ready: {
+            then: function (cb) {
+              cb();
+            }
+          },
           isBrowser: function() {
             return false;
           },
@@ -47,6 +53,9 @@ describe('instanews.service.user', function() {
                 }
               }
             };
+          },
+          findById: function (id, succ, fail) {
+            succ(journalist);
           },
           prototype$__create__accessTokens: function(args, dunno, succ, err) {
             succ(usr);

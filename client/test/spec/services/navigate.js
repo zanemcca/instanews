@@ -18,6 +18,14 @@ describe('instanews.service.navigate', function() {
           get: function () {}
         };
       });
+
+      $provide.service('Platform', function() {
+        return {
+          loading: {
+            hide: function () {}
+          }
+        };
+      });
     });
   });
 
@@ -26,10 +34,12 @@ describe('instanews.service.navigate', function() {
     $ionicScrollDelegate,
     $ionicHistory,
     Navigate,
+    Platform,
     User
   ) {
     navigate = Navigate;
     user = User;
+    platform = Platform;
     ionicSideMenuDelegate = $ionicSideMenuDelegate;
     ionicScrollDelegate = $ionicScrollDelegate;
     ionicHistory = $ionicHistory;

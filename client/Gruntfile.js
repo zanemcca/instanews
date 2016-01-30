@@ -67,6 +67,7 @@ module.exports = function (grunt) {
           command: 'plugin',
           action: 'add',
           plugins: [
+            'com.hiddentao.cordova.filepath',
             'com.ionic.keyboard',
        //     'com.phonegap.plugins.PushPlugin',
             'cordova-plugin-crosswalk-webview',

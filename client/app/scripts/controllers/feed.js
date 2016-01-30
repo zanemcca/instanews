@@ -11,6 +11,8 @@ app.controller('FeedCtrl', [
   'Platform',
   'Articles',
   'Navigate',
+  'Notifications',
+  'User',
   function(
     $scope,
     $location,
@@ -19,13 +21,20 @@ app.controller('FeedCtrl', [
     Position,
     Platform,
     Articles,
-    Navigate
+    Navigate,
+    Notifications,
+    User
   ) {
 
     // Local reference to articles service
     $scope.Articles = Articles;
 
-    $scope.toggleMenu = Navigate.toggleMenu;
+    $scope.toggleMenu = function () {
+      if(Navigate.toggleMenu()) {
+        Notifications.reload();
+        Notifications.getBadge().clear();
+      }
+    };
 
     // Prepare our autocompletion by linking it to out feedmap
     $scope.place = {
@@ -37,6 +46,8 @@ app.controller('FeedCtrl', [
     $scope.map = {
       id: 'feedMap'
     };
+
+    $scope.badge = Notifications.getBadge();
 
     var geocoder = new google.maps.Geocoder();
 
@@ -84,6 +95,8 @@ app.controller('FeedCtrl', [
         google.maps.event.trigger(map, 'resize');
       }
       Articles.reorganize();
+
+      User.reload();
     });
 
     /*

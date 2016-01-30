@@ -1,7 +1,9 @@
 <!DOCTYPE html>
-<ion-view view-title="{{title}}"
+<ion-view 
   style="background-color: #F0F0F0">
-  <ion-nav-title>{{title}}</ion-nav-title>
+  <ion-nav-title>
+    <img src="images/logo.svg" height="20px" style="vertical-align: middle;">
+  </ion-nav-title>
   <ion-nav-buttons side="secondary">
     <!--button class="button button-clear icon ion-plus-round" ui-sref="articlePost"></buttoni-->
     <button class="button button-clear icon ion-plus"
@@ -11,7 +13,13 @@
   <ion-nav-buttons side="primary">
     <button ng-click="toggleMenu()"
       ng-if="!Platform.isBrowser()"
-      class="button button-icon icon ion-navicon"></button>
+      class="button button-icon button-clear icon ion-navicon">
+      <span
+        ng-show="badge.number"
+        class="badge badge-assertive icon-badge">
+        {{badge.toString()}}
+      </span>
+    </button>
   </ion-nav-buttons>
 
   <ion-content delegate-handle="feed" overflow-scroll="true" class="gpu">

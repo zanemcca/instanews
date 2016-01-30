@@ -172,7 +172,8 @@ app.service('Subarticles', [
         if(subs) {
           subs.focusById(id);
         } else { 
-          console.log('No subarticles were found!');
+          Platform.loading.hide();
+          Platform.showToast('Sorry! That content seems to be missing');
         }
       });
     };

@@ -114,3 +114,24 @@
     text-indent: 0px;
   }
 }
+
+//Customize icon-badges
+.icon .icon-badge {
+  position: absolute;
+  top: 0px;
+  right: -50%;
+  font-size: 10px;
+  height: 16px;
+  min-width: 16px;
+  border-radius: 8px;
+  line-height:16px;
+  padding:0px 2px;
+}
+
+.buttons-left .icon .icon-badge {
+  right: -50%;
+}
+
+.buttons-right .icon .icon-badge {
+  right: 50%;
+}
