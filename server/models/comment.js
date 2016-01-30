@@ -8,6 +8,8 @@ module.exports = function(Comment) {
      common.readModifyWrite(Comment, query, modify, cb, options);
    };
 
+  Comment.notify = common.notify.bind(this, Comment);
+
    var staticDisable = [
       'exists',
       'count',
