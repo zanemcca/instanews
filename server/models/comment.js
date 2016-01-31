@@ -15,7 +15,7 @@ module.exports = function(Comment) {
       'count',
       'find',
       'findOne',
-      'findById',
+   //   'findById',
       'upsert',
  //     'prototype.updateAttributes',
  //     'deleteById',
