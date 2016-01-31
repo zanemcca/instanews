@@ -162,6 +162,7 @@ app.service('Subarticles', [
         subs.add(sub);
         cb(subs);
       }, function (err) {
+        console.log(err);
         cb();
       });
     };

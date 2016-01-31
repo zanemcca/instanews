@@ -1,4 +1,5 @@
 
+// jshint camelcase: false
 'use strict';
 var app = angular.module('instanews.service.notifications', ['ionic', 'ngResource','ngCordova']);
 
@@ -14,7 +15,6 @@ app.service('Notifications', [
   'Platform',
   'Subarticles',
   'User',
-  '$filter',
   function(
     $rootScope,
     $cordovaPush,
@@ -25,8 +25,7 @@ app.service('Notifications', [
     Notif,
     Platform,
     Subarticles,
-    User,
-    $filter
+    User
   ){
     console.log('Setting up notifications!!!!');
     //NOTIFICATION STUFF FROM APP.JS
@@ -211,7 +210,7 @@ console.log('Cannot load notifications because user is not set yet');
    */
 
     var focus = function (data) {
-      var data = data || this;
+      data = data || this;
       switch(data.notifiableType) {
         case 'subarticle':
           Subarticles.focusById(data.notifiableId);
@@ -243,7 +242,7 @@ console.log('Cannot load notifications because user is not set yet');
     };
 
     var setSeen = function (data) {
-      var data = data || this;
+      data = data || this;
 
       var finish = function () {
         reload();
@@ -349,7 +348,7 @@ console.log('Cannot load notifications because user is not set yet');
       },
       toString: function () {
         if(!this.number || this.number < 0) {
-          return "0";
+          return '0';
         } else if( this.number >= 1000000) {
           return (Math.floor(this.number/1000000).toString()) + 'M';
         } else if( this.number >= 1000) {

@@ -224,7 +224,7 @@ app.directive('inListItem', [
           $scope.openNotification = function () {
             Navigate.closeMenu();
             $scope.item.focus();
-          }
+          };
         }
 
         var setPlaceName = function () {

@@ -551,7 +551,7 @@ markers.push(new google.maps.Marker(tempMarker));
     that.getFeedMap = getFeedMap;
     that.getArticleMap = getArticleMap;
     that.updateHeatmap = updateHeatmap;
-    that.setArticleMap = setArticleMap
+    that.setArticleMap = setArticleMap;
     
     return that;
   }
