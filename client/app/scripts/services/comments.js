@@ -81,20 +81,20 @@ app.service('Comments', [
         }
       };
 
-    var save = function () {
-      Comment.prototype$updateAttributes({
-        id: this.id
-      },
-      {
-        content: this.content
-      },
-      function () {
-        console.log('Successful comment update');
-      },
-      function (err) {
-        console.log(err);
-      });
-    };
+      var save = function () {
+        Comment.prototype$updateAttributes({
+          id: this.id
+        },
+        {
+          content: this.content
+        },
+        function () {
+          console.log('Successful comment update');
+        },
+        function (err) {
+          console.log(err);
+        });
+      };
 
       var destroy = function () {
         var id = this.id;
@@ -180,6 +180,7 @@ app.service('Comments', [
         coms.add(com);
         cb(coms);
       }, function (err) {
+        console.log(err);
         cb();
       });
     };

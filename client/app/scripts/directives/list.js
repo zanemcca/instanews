@@ -70,7 +70,6 @@ app.directive('inList', [
 app.directive('inListItem', [
   '$state',
   '$timeout',
-  'Comments',
   'TextInput',
   'Position',
   'Navigate',
@@ -79,7 +78,6 @@ app.directive('inListItem', [
   function (
     $state,
     $timeout,
-    Comments,
     TextInput,
     Position,
     Navigate,
@@ -144,16 +142,6 @@ app.directive('inListItem', [
             return User.isAdmin();
           }
         };
-
-        var comments = Comments.findOrCreate($scope.item.modelName, $scope.item.id);
-        if(comments && comments.enableFocus) { 
-          $scope.item.showComments = true;
-          $scope.$watch('item.showComments', function(newVal, oldVal) {
-            if(!newVal && oldVal) {
-              comments.unfocusAll();
-            }
-          });
-        }
 
         var textInput;
         var newText = '';
@@ -237,7 +225,7 @@ app.directive('inListItem', [
           $scope.openNotification = function () {
             Navigate.closeMenu();
             $scope.item.focus();
-          }
+          };
         }
 
         var setPlaceName = function () {

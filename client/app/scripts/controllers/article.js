@@ -89,6 +89,7 @@ app.controller('ArticleCtrl', [
     //Refresh the map everytime we enter the view
     $scope.$on('$ionicView.afterEnter', function() {
       afterLoaded();
+      $scope.Subarticles.reload();
 
       uploadObserver = $scope.Uploads.registerObserver(function () {
         var uploads = $scope.Uploads.get();
@@ -127,8 +128,7 @@ app.controller('ArticleCtrl', [
 
     $scope.onRefresh = function () {
       console.log('Refresh');
-      spec.options.filter.skip = 0;
-      $scope.Subarticles.load(function() {
+      $scope.Subarticles.reload(function() {
         $scope.$broadcast('scroll.refreshComplete');
       });
     };
@@ -142,6 +142,8 @@ app.controller('ArticleCtrl', [
         Post.post($scope.Uploads, $stateParams.id, function (err) {
           if(!err) {
             modal.hide();
+          } else {
+            console.log(err);
           }
         });
       };

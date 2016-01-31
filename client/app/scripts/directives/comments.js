@@ -66,8 +66,7 @@ app.directive('incomments', [
                   console.log(err);
                 }
                 else {
-                  //TODO Add to the Comment list
-                  //$scope.owner.comments.push(res);
+                  $scope.Comments.reload();
                 }
               });
             }, function (partialText) {

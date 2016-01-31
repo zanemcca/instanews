@@ -140,7 +140,7 @@ angular.module('instanews', [
         $scope.aboutModal.hide();
       }
       return User.login();
-    }
+    };
 
     $scope.logout = User.logout;
 

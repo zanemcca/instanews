@@ -213,6 +213,12 @@ function ListFactory (Platform) {
       });
     };
 
+    var reload = function (cb) {
+      spec.options.filter.skip = 0;
+      spec.options.filter.limit = Math.max(get().length + 1, 5);
+      load(cb);
+    };
+
     var areItemsAvailable = function () {
       return spec.itemsAvailable;
     };
@@ -238,6 +244,7 @@ function ListFactory (Platform) {
     };
 
     spec.save = spec.save || function () {};
+    spec.reload = spec.reload || function () {};
     spec.focus = spec.focus || function () {};
     spec.destroy = spec.destroy || function () {};
     spec.findById = spec.findById || function () {
@@ -277,6 +284,7 @@ function ListFactory (Platform) {
       unfocusAll: unfocusAll,
       enableFocus: spec.enableFocus, 
       load: load, 
+      reload: reload,
       add: add,
       remove: remove,
       preLoad: preLoad,
