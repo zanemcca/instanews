@@ -96,3 +96,7 @@ The default is `server`
 - ```git remote -v``` (The push url should have been updated to point to your fork)
 - ```git push```
 - Make a pull request from Github
+
+# Scaling Cluster
+ - 1. Scale the node cluster in Tutum
+ - 2. Add the new nodes to the AWS ELB
