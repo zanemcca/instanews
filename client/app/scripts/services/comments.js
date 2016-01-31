@@ -180,6 +180,7 @@ app.service('Comments', [
         coms.add(com);
         cb(coms);
       }, function (err) {
+        console.log(err);
         cb();
       });
     };

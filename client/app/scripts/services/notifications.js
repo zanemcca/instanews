@@ -12,6 +12,7 @@ app.service('Notifications', [
   'DownVote',
   'Journalist',
   'list',
+  'Navigate',
   'Notif',
   'Platform',
   'Subarticles',
@@ -25,6 +26,7 @@ app.service('Notifications', [
     DownVote,
     Journalist,
     list,
+    Navigate,
     Notif,
     Platform,
     Subarticles,
@@ -126,35 +128,6 @@ app.service('Notifications', [
 
       setExternalBadge();
     });
-
-      /*
-    var iosPushHandler = function(notification) {
-      if(notification.alert) {
-        notification.message = notification.alert;
-      }
-      notifications.push(notification);
-      notifyObservers();
-
-      Platform.showAlert(notification.message, 'Notification');
-    };
-
-    var androidPushHandler = function(notification) {
-      if( notification.event === 'registered' ) {
-        Platform.setDeviceToken(notification.regid);
-        User.install();
-      }
-      else if (notification.event === 'message') {
-        //Save the notification
-        notifications.push(notification);
-        notifyObservers();
-
-        Platform.showAlert(notification.message, 'Notification');
-      }
-      else {
-        console.log('Un-handled notification!');
-      }
-    };
-   */
 
     var focus = function (data) {
       data = data || this;
