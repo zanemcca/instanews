@@ -19,9 +19,18 @@ function ListFactory (Platform) {
       }
     };
 
+    // The default sorting algorithm moves items with the enableFocus flag to the top
     // Sorts the items in the list
     var sortingFunction = function(a,b) {
-      return b.rating - a.rating;
+      if(a.enableFocus && b.enableFocus) {
+        return 0;
+      } else if(a.enableFocus) {
+        return -1;
+      } else if(b.enableFocus) {
+        return 1;
+      } else {
+        return b.rating - a.rating;
+      }
     };
 
     // Add or update items in the list
@@ -35,6 +44,11 @@ function ListFactory (Platform) {
       if(newItems.length) {
 
         newItems.forEach(function (newItem) {
+          // Enable the flag if any items are flagged with 'enableFocus'
+          if(newItem.enableFocus) {
+            that.enableFocus = true;
+          }
+
           var update = false;
           for(var i = spec.items.length - 1; i >= 0; i--) {
             if(spec.items[i].id === newItem.id) {
@@ -74,7 +88,7 @@ function ListFactory (Platform) {
       } else {
         return get();
       }
-    };
+    }; 
 
     // Load more items using the given Find function
     var load = function (cb) {
@@ -177,6 +191,17 @@ function ListFactory (Platform) {
       });
     };
 
+    var unfocusAll = function () {
+      spec.items.forEach(function(item) {
+        delete item.enableFocus;
+      });
+      spec.items.sort(spec.sortingFunction);
+      that.enableFocus = false;
+
+      console.log('Unfocusing all elements');
+      console.log(spec.items);
+    };
+
     // Register and notify observers of the list
     var registerObserver = function(cb) {
       spec.observerCallbacks.push(cb);
@@ -237,6 +262,7 @@ function ListFactory (Platform) {
 
     // New
     spec.items = [];
+    spec.enableFocus = false;
     spec.observerCallbacks = [];
     spec.itemsAvailable = true;
 
@@ -248,6 +274,8 @@ function ListFactory (Platform) {
       getTop: getTop, 
       findById: findById,
       focusById: focusById,
+      unfocusAll: unfocusAll,
+      enableFocus: spec.enableFocus, 
       load: load, 
       add: add,
       remove: remove,

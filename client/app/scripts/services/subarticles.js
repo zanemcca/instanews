@@ -111,12 +111,10 @@ app.service('Subarticles', [
       var focus = function () {
         var sub = this;
         Navigate.go('app.article', { id: sub.parentId });
-        setTimeout(function () {
-          sub.rating = 1;
-          subarticles.add(sub, function() {
-            console.log('Focusing on subarticle: ' + sub.id);
-          });
-        }, 200);
+        sub.enableFocus = true;
+        subarticles.add(sub, function() {
+          console.log('Focusing on subarticle: ' + sub.id);
+        });
       };
 
       var filter = {

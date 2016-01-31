@@ -83,6 +83,8 @@ app.directive('invotes', [
             else {
               $scope.votable.showComments = false;
             }
+
+            //TODO Consider removing this as it does not animate/look good
             if(Scroll) {
               Scroll.toggleAnchorScroll($scope.votable.id);
             }
