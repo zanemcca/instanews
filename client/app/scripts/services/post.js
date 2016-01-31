@@ -61,7 +61,9 @@ app.factory('Post', [
         if(completed === total) {
           posting = false;
           Subarticles.findOrCreate(parentId).reload();
+          //TODO Remove this message as the reload and notifications takes care of it
           var message = 'Your content has finished uploading and should be available soon';
+
           if(failed) {
             message = 'Uh-Oh! Some of your content failed to upload!';
           }
