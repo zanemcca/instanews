@@ -234,7 +234,7 @@ console.log('Cannot load notifications because user is not set yet');
       if(user) {
         console.log('Loading notifications!');
         spec.options.filter.skip = 0;
-        spec.options.filter.limit = 30;
+        spec.options.filter.limit = Math.max(notifications.get().length, 30);
         spec.options.id = user.userId;
         notifications.load();
       } else {
@@ -311,6 +311,7 @@ console.log('Cannot load notifications because user is not set yet');
     var spec = {};
     spec.save = save;
     spec.focus = focus;
+    spec.reload = reload;
     spec.sortingFunction = sortingFunction;
 
     spec.find = Journalist.prototype$__get__notifications;
@@ -362,8 +363,6 @@ console.log('Cannot load notifications because user is not set yet');
     notifications.getBadge = function () {
       return badge;
     };
-
-    notifications.reload = reload;
 
     var user;
 
