@@ -190,7 +190,7 @@ function ListFactory (Platform) {
 
     var reload = function (cb) {
       spec.options.filter.skip = 0;
-      spec.options.filter.limit = Math.max(get().length, 5);
+      spec.options.filter.limit = Math.max(get().length + 1, 5);
       load(cb);
     };
 

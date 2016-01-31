@@ -234,7 +234,7 @@ console.log('Cannot load notifications because user is not set yet');
       if(user) {
         console.log('Loading notifications!');
         spec.options.filter.skip = 0;
-        spec.options.filter.limit = Math.max(notifications.get().length, 30);
+        spec.options.filter.limit = Math.max(notifications.get().length + 1, 30);
         spec.options.id = user.userId;
         notifications.load();
       } else {
