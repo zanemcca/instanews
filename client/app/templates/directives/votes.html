@@ -17,7 +17,7 @@
 </button>
 <button ng-if="votable.commentableType !== 'comment'"
   class="item button button-clear button-small"
-  ng-class="votable.showComments ? ' ion-arrow-down-b button-positive': 'ion-arrow-right-b button-stable'"
+  ng-class="(votable.showComments || Comments.enableFocus) ? ' ion-arrow-down-b button-positive': 'ion-arrow-right-b button-stable'"
   ng-style="{'font-weight': votable.showComments ? 'bold' : 'normal'}"
   style="float: right;border:0;margin:0;"
   id="{{votable.id}}"
