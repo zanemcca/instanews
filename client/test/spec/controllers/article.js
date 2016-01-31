@@ -92,8 +92,39 @@ describe('Article controller: ', function(){
                   }
                 };
               },
+              unfocusAll: function () {},
               load: function () {
               }
+            };
+          },
+          getSpec: function () {},
+          deleteAll: function() {},
+          get: function(id) {
+            return [1,2,3];
+          }
+        };
+      });
+
+      $provide.service('Comments', function() {
+        return {
+          load: function(id, cb) {
+            cb();
+          },
+          registerObserver: function(cb) {
+            cb();
+          },
+          unregisterObserver: function() {},
+          findOrCreate: function () {
+            return {
+              getSpec: function () {
+                return { 
+                  options: {
+                    filter: {}
+                  }
+                };
+              },
+              load: function () {},
+              unfocusAll: function () {}
             };
           },
           getSpec: function () {},
@@ -165,6 +196,7 @@ describe('Article controller: ', function(){
     $ionicModal,
     Article,
     Articles,
+    Comments,
     Subarticles,
     Post,
     Platform,
@@ -177,6 +209,7 @@ describe('Article controller: ', function(){
     article = Article;
     maps = Maps;
     subarticles = Subarticles;
+    comments = Comments;
     articles = Articles;
     uploads = Uploads;
     ctrl = $controller;
@@ -190,6 +223,7 @@ describe('Article controller: ', function(){
       $ionicModal: ionicModal,
       Article: article,
       Articles: articles,
+      Comments: comments,
       Subarticles: subarticles,
       Uploads: uploads,
       Maps: maps,
