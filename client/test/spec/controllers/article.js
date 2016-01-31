@@ -92,6 +92,7 @@ describe('Article controller: ', function(){
                   }
                 };
               },
+              reload: function () {},
               unfocusAll: function () {},
               load: function () {
               }

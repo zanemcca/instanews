@@ -90,6 +90,38 @@ describe('Post service', function() {
         };
       });
 
+      $provide.service('Subarticles', function() {
+        return {
+          load: function(id, cb) {
+            cb();
+          },
+          registerObserver: function(cb) {
+            cb();
+          },
+          unregisterObserver: function() {},
+          findOrCreate: function () {
+            return {
+              getSpec: function () {
+                return { 
+                  options: {
+                    filter: {}
+                  }
+                };
+              },
+              reload: function () {},
+              unfocusAll: function () {},
+              load: function () {
+              }
+            };
+          },
+          getSpec: function () {},
+          deleteAll: function() {},
+          get: function(id) {
+            return [1,2,3];
+          }
+        };
+      });
+
       $provide.service('LocalStorage', function() {
         return {
           readFiles: function(dir, cb) {
@@ -223,12 +255,14 @@ describe('Post service', function() {
     ENV,
     FileTransfer,
     User,
+    Subarticles,
     Platform,
     rfc4122
   ) {
     post = Post;
     article = Article;
     camera = Camera;
+    subarticles = Subarticles;
     localStorage = LocalStorage;
     fileTransfer = FileTransfer;
     env = ENV;
