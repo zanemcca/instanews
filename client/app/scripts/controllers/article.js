@@ -8,6 +8,7 @@ app.controller('ArticleCtrl', [
   '$stateParams',
   'Article',
   'Articles',
+  'Comments',
   'Subarticles',
   'Maps',
   'Navigate',
@@ -20,6 +21,7 @@ app.controller('ArticleCtrl', [
     $stateParams,
     Article,
     Articles,
+    Comments,
     Subarticles,
     Maps,
     Navigate,
@@ -53,6 +55,8 @@ app.controller('ArticleCtrl', [
         console.log('Failed to set the marker');
       }
     };
+
+    var articleComments = Comments.findOrCreate('article',$stateParams.id);
 
     var afterLoaded = function () {
       var map = Maps.getArticleMap();
@@ -110,6 +114,8 @@ app.controller('ArticleCtrl', [
     $scope.$on('$ionicView.afterLeave', function() {
       marker = Maps.deleteMarker(marker);
       uploadObserver.unregister();
+      articleComments.unfocusAll();
+      $scope.Subarticles.unfocusAll();
     });
 
     //TODO Remove this and the template that goes with it

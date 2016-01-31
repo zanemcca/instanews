@@ -70,6 +70,7 @@ app.directive('inList', [
 app.directive('inListItem', [
   '$state',
   '$timeout',
+  'Comments',
   'TextInput',
   'Position',
   'Navigate',
@@ -78,6 +79,7 @@ app.directive('inListItem', [
   function (
     $state,
     $timeout,
+    Comments,
     TextInput,
     Position,
     Navigate,
@@ -143,6 +145,16 @@ app.directive('inListItem', [
           }
         };
 
+        var comments = Comments.findOrCreate($scope.item.modelName, $scope.item.id);
+        if(comments && comments.enableFocus) { 
+          $scope.item.showComments = true;
+          $scope.$watch('item.showComments', function(newVal, oldVal) {
+            if(!newVal && oldVal) {
+              comments.unfocusAll();
+            }
+          });
+        }
+
         var textInput;
         var newText = '';
         if($scope.item.modelName === 'article') {
@@ -204,6 +216,7 @@ app.directive('inListItem', [
                 }
               };
             }
+
         } else if ($scope.item.modelName === 'comment') {
             newText = '';
             $scope.edit = function () {
