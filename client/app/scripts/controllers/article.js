@@ -76,9 +76,6 @@ app.controller('ArticleCtrl', [
         Platform.showToast('404: The article you were looking for is missing!');
       }
       $scope.article = article;
-      if(articleComments.enableFocus) {
-        $scope.article.showComments = true;
-      }
       afterLoaded();
     });
 
@@ -112,10 +109,6 @@ app.controller('ArticleCtrl', [
           }
         }
       });
-
-      if(articleComments.enableFocus) {
-        $scope.article.showComments = true;
-      }
     });
 
     $scope.$on('$ionicView.afterLeave', function() {

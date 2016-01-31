@@ -4,9 +4,7 @@ var app = angular.module('instanews.directive.votes', ['ionic', 'ngResource']);
 
 app.directive('invotes', [
   '$timeout',
-  'Comment',
-  'Article',
-  'Subarticle',
+  'Comments',
   'UpVote',
   'DownVote',
   'Votes',
@@ -15,9 +13,7 @@ app.directive('invotes', [
   'Position',
   function (
     $timeout,
-    Comment,
-    Article,
-    Subarticle,
+    Comments,
     UpVote,
     DownVote,
     Votes,
@@ -33,6 +29,7 @@ app.directive('invotes', [
         controller: function($scope, $location) {
 
           $scope.Platform = Platform;
+          $scope.Comments = Comments.findOrCreate($scope.votable.modelName, $scope.votable.id) || {};
 
           var update = function () {
             $timeout(function () {
@@ -47,14 +44,7 @@ app.directive('invotes', [
                 $scope.votable.downVoted = true;
                 $scope.votable.upVoted = false;
               }
-
-              $scope.score.value = Math.round($scope.votable.rating*10000)/100;
             });
-          };
-
-          //TODO Remove
-          $scope.score = {
-            value: 0
           };
 
           update();
@@ -77,11 +67,16 @@ app.directive('invotes', [
           } // else comments: Do not zoom in on subcomments
 
           $scope.toggleComments = function() {
-            if(!$scope.votable.showComments) {
-              $scope.votable.showComments = true;
-            }
-            else {
+            if($scope.Comments.enableFocus) {
               $scope.votable.showComments = false;
+              $scope.Comments.unfocusAll();
+            } else {
+              if(!$scope.votable.showComments) {
+                $scope.votable.showComments = true;
+              }
+              else {
+                $scope.votable.showComments = false;
+              }
             }
 
             //TODO Consider removing this as it does not animate/look good
@@ -91,6 +86,7 @@ app.directive('invotes', [
           };
 
           $scope.upvote = function () {
+            //TODO Move this into the Votes service
             Navigate.ensureLogin( function () {
               if($scope.votable.upVoted) {
                 //TODO Delete the vote if it already exists
