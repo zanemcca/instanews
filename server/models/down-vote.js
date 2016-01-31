@@ -22,7 +22,7 @@ module.exports = function(DownVote) {
       //disable journalist REST endpoint
       '__get__journalist',
       //disable clickable relation finding
-      '__get__clickable',
+//      '__get__clickable',
       //disable view relation finding
       '__get__view'
    ];
