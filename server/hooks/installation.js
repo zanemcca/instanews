@@ -35,6 +35,7 @@ module.exports = function(app) {
                      */
                   Installation.upsert(res[0], function(err, res) {
                      if (err) {
+                       console.error(err.stack);
                        next(err);
                      } else {
                        console.log('Installation update was successful');

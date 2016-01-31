@@ -167,7 +167,7 @@ exports.notify = function (Model, inst) {
           message: message,
           notifiableId: inst.id,
           notifiableType: inst.modelName,
-          messageFrom: inst.username,
+          messageFrom: someone,
           username: parent.username
         }, report);
       }

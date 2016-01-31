@@ -29,6 +29,13 @@
       "principalType": "ROLE",
       "principalId": "$authenticated",
       "permission": "ALLOW",
+      "property": "__get__clickable"
+    },
+    {
+      "accessType": "EXECUTE",
+      "principalType": "ROLE",
+      "principalId": "$authenticated",
+      "permission": "ALLOW",
       "property": "create"
     }
   ],

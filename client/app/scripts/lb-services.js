@@ -1803,6 +1803,41 @@ module.factory(
 
         /**
          * @ngdoc method
+         * @name lbServices.Comment#findById
+         * @methodOf lbServices.Comment
+         *
+         * @description
+         *
+         * Find a model instance by id from the data source.
+         *
+         * @param {Object=} parameters Request parameters.
+         *
+         *  - `id` – `{*}` - Model id
+         *
+         *  - `filter` – `{object=}` - Filter defining fields and include
+         *
+         * @param {function(Object,Object)=} successCb
+         *   Success callback with two arguments: `value`, `responseHeaders`.
+         *
+         * @param {function(Object)=} errorCb Error callback with one argument:
+         *   `httpResponse`.
+         *
+         * @returns {Object} An empty reference that will be
+         *   populated with the actual data once the response is returned
+         *   from the server.
+         *
+         * <em>
+         * (The remote method definition does not provide any description.
+         * This usually means the response is a `Comment` object.)
+         * </em>
+         */
+        "findById": {
+          url: urlBase + "/comments/:id",
+          method: "GET"
+        },
+
+        /**
+         * @ngdoc method
          * @name lbServices.Comment#deleteById
          * @methodOf lbServices.Comment
          *
@@ -2193,6 +2228,41 @@ module.factory(
 
         /**
          * @ngdoc method
+         * @name lbServices.UpVote#prototype$__get__clickable
+         * @methodOf lbServices.UpVote
+         *
+         * @description
+         *
+         * Fetches belongsTo relation clickable.
+         *
+         * @param {Object=} parameters Request parameters.
+         *
+         *  - `id` – `{*}` - click id
+         *
+         *  - `refresh` – `{boolean=}` - 
+         *
+         * @param {function(Object,Object)=} successCb
+         *   Success callback with two arguments: `value`, `responseHeaders`.
+         *
+         * @param {function(Object)=} errorCb Error callback with one argument:
+         *   `httpResponse`.
+         *
+         * @returns {Object} An empty reference that will be
+         *   populated with the actual data once the response is returned
+         *   from the server.
+         *
+         * <em>
+         * (The remote method definition does not provide any description.
+         * This usually means the response is a `UpVote` object.)
+         * </em>
+         */
+        "prototype$__get__clickable": {
+          url: urlBase + "/upVotes/:id/clickable",
+          method: "GET"
+        },
+
+        /**
+         * @ngdoc method
          * @name lbServices.UpVote#create
          * @methodOf lbServices.UpVote
          *
@@ -2318,6 +2388,41 @@ module.factory(
       urlBase + "/downVotes/:id",
       { 'id': '@id' },
       {
+
+        /**
+         * @ngdoc method
+         * @name lbServices.DownVote#prototype$__get__clickable
+         * @methodOf lbServices.DownVote
+         *
+         * @description
+         *
+         * Fetches belongsTo relation clickable.
+         *
+         * @param {Object=} parameters Request parameters.
+         *
+         *  - `id` – `{*}` - click id
+         *
+         *  - `refresh` – `{boolean=}` - 
+         *
+         * @param {function(Object,Object)=} successCb
+         *   Success callback with two arguments: `value`, `responseHeaders`.
+         *
+         * @param {function(Object)=} errorCb Error callback with one argument:
+         *   `httpResponse`.
+         *
+         * @returns {Object} An empty reference that will be
+         *   populated with the actual data once the response is returned
+         *   from the server.
+         *
+         * <em>
+         * (The remote method definition does not provide any description.
+         * This usually means the response is a `DownVote` object.)
+         * </em>
+         */
+        "prototype$__get__clickable": {
+          url: urlBase + "/downVotes/:id/clickable",
+          method: "GET"
+        },
 
         /**
          * @ngdoc method
