@@ -99,7 +99,7 @@ app.factory('Platform', [
           buttonName = 'Ok';
           cb = title;
           if(!cb) {
-            title = 'Alert'
+            title = 'Alert';
 
             cb = function () {
               console.log('Dialog was confirmed');

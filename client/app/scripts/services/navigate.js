@@ -80,7 +80,6 @@ app.service('Navigate', [
         if(!user) {
           redirect.next = state;
           redirect.nextParams = params;
-          var current = $ionicHistory.currentView();
           redirect.prev = current.stateId; 
           $state.go('app.login');
         } else {

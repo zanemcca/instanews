@@ -1,4 +1,5 @@
 
+// jshint camelcase: false
 'use strict';
 var app = angular.module('instanews.service.notifications', ['ionic', 'ngResource','ngCordova']);
 
@@ -11,12 +12,12 @@ app.service('Notifications', [
   'DownVote',
   'Journalist',
   'list',
+  'Navigate',
   'Notif',
   'Platform',
   'Subarticles',
   'User',
   'UpVote',
-  '$filter',
   function(
     $rootScope,
     $cordovaPush,
@@ -25,12 +26,12 @@ app.service('Notifications', [
     DownVote,
     Journalist,
     list,
+    Navigate,
     Notif,
     Platform,
     Subarticles,
     User,
-    UpVote,
-    $filter
+    UpVote
   ){
     var setExternalBadge = function () {};
 
@@ -128,36 +129,8 @@ app.service('Notifications', [
       setExternalBadge();
     });
 
-      /*
-    var iosPushHandler = function(notification) {
-      if(notification.alert) {
-        notification.message = notification.alert;
-      }
-      notifications.push(notification);
-      notifyObservers();
-
-      Platform.showAlert(notification.message, 'Notification');
-    };
-
-    var androidPushHandler = function(notification) {
-      if( notification.event === 'registered' ) {
-        Platform.setDeviceToken(notification.regid);
-        User.install();
-      }
-      else if (notification.event === 'message') {
-        //Save the notification
-        notifications.push(notification);
-        notifyObservers();
-
-        Platform.showAlert(notification.message, 'Notification');
-      }
-      else {
-        console.log('Un-handled notification!');
-      }
-    };
-   */
-
     var focus = function (data) {
+      data = data || this;
       var handleVotable = function(item) { 
         console.log('votable');
         console.log(item);
@@ -177,7 +150,6 @@ app.service('Notifications', [
         }
       };
 
-      var data = data || this;
       switch(data.notifiableType) {
         case 'subarticle':
           Subarticles.focusById(data.notifiableId);
@@ -216,7 +188,7 @@ app.service('Notifications', [
       if(user) {
         console.log('Loading notifications!');
         spec.options.filter.skip = 0;
-        spec.options.filter.limit = 30;
+        spec.options.filter.limit = Math.max(notifications.get().length + 1, 30);
         spec.options.id = user.userId;
         notifications.load();
       } else {
@@ -225,7 +197,7 @@ app.service('Notifications', [
     };
 
     var setSeen = function (data) {
-      var data = data || this;
+      data = data || this;
 
       var finish = function () {
         reload();
@@ -293,6 +265,7 @@ app.service('Notifications', [
     var spec = {};
     spec.save = save;
     spec.focus = focus;
+    spec.reload = reload;
     spec.sortingFunction = sortingFunction;
 
     spec.find = Journalist.prototype$__get__notifications;
@@ -330,7 +303,7 @@ app.service('Notifications', [
       },
       toString: function () {
         if(!this.number || this.number < 0) {
-          return "0";
+          return '0';
         } else if( this.number >= 1000000) {
           return (Math.floor(this.number/1000000).toString()) + 'M';
         } else if( this.number >= 1000) {
@@ -344,8 +317,6 @@ app.service('Notifications', [
     notifications.getBadge = function () {
       return badge;
     };
-
-    notifications.reload = reload;
 
     var user;
 
