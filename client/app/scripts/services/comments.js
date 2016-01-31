@@ -6,13 +6,19 @@ var app = angular.module('instanews.service.comments', ['ionic', 'ngResource']);
 app.service('Comments', [
   'Article',
   'Subarticle',
+  'Subarticles',
   'Comment',
   'list',
+  'Navigate',
+  'Platform',
   function(
     Article,
     Subarticle,
+    Subarticles,
     Comment,
-    list
+    list,
+    Navigate,
+    Platform
   ){
     var cache ={
       article: [],
@@ -106,6 +112,26 @@ app.service('Comments', [
         });
       };
 
+      var focus = function () {
+        var com = this;
+        com.enableFocus = true;
+        comments.add(com, function() {
+          console.log('Focusing on comment: ' + com.id);
+        });
+
+        switch(com.commentableType) {
+          case 'comment':
+            focusById(com.commentableId);
+            break;
+          case 'subarticle':
+            Subarticles.focusById(com.commentableId);
+            break;
+          case 'article':
+            Navigate.go('app.article', { id: com.commentableId });
+            break;
+        }
+      };
+
       var filter = {
         skip: 0,
         limit: 5,
@@ -124,6 +150,7 @@ app.service('Comments', [
 
       spec.update = spec.update || update;
       spec.save = spec.save || save;
+      spec.focus = spec.focus || focus;
       spec.destroy = spec.destroy || destroy;
 
       spec.options.filter = spec.options.filter || filter;
@@ -145,7 +172,35 @@ app.service('Comments', [
       return comments;
     };
 
+    var findById = function (id, cb) {
+      Comment.findById({ id: id })
+      .$promise
+      .then(function(com) {
+        var coms =  findOrCreate(com.commentableType, com.commentableId);
+        coms.add(com);
+        cb(coms);
+      }, function (err) {
+        cb();
+      });
+    };
+
+    var focusById = function (id, cb) {
+      cb = cb || function () {};
+
+      Platform.loading.show();
+      findById(id, function(coms) {
+        if(coms) {
+          coms.focusById(id);
+        } else { 
+          Platform.loading.hide();
+          Platform.showToast('Sorry! That content seems to be missing');
+        }
+      });
+    };
+
     return {
+      findById: findById,
+      focusById: focusById,
       findOrCreate: findOrCreate 
     };
   }
