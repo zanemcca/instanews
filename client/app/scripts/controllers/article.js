@@ -8,6 +8,7 @@ app.controller('ArticleCtrl', [
   '$stateParams',
   'Article',
   'Articles',
+  'Comments',
   'Subarticles',
   'Maps',
   'Navigate',
@@ -20,6 +21,7 @@ app.controller('ArticleCtrl', [
     $stateParams,
     Article,
     Articles,
+    Comments,
     Subarticles,
     Maps,
     Navigate,
@@ -54,6 +56,8 @@ app.controller('ArticleCtrl', [
       }
     };
 
+    var articleComments = Comments.findOrCreate('article',$stateParams.id);
+
     var afterLoaded = function () {
       var map = Maps.getArticleMap();
       /* istanbul ignore else */
@@ -72,6 +76,9 @@ app.controller('ArticleCtrl', [
         Platform.showToast('404: The article you were looking for is missing!');
       }
       $scope.article = article;
+      if(articleComments.enableFocus) {
+        $scope.article.showComments = true;
+      }
       afterLoaded();
     });
 
@@ -105,11 +112,17 @@ app.controller('ArticleCtrl', [
           }
         }
       });
+
+      if(articleComments.enableFocus) {
+        $scope.article.showComments = true;
+      }
     });
 
     $scope.$on('$ionicView.afterLeave', function() {
       marker = Maps.deleteMarker(marker);
       uploadObserver.unregister();
+      articleComments.unfocusAll();
+      $scope.Subarticles.unfocusAll();
     });
 
     //TODO Remove this and the template that goes with it
