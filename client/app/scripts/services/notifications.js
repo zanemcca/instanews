@@ -8,85 +8,33 @@ app.service('Notifications', [
   '$cordovaPush',
   'Articles',
   'Comments',
+  'DownVote',
   'Journalist',
   'list',
   'Notif',
   'Platform',
   'Subarticles',
   'User',
+  'UpVote',
   '$filter',
   function(
     $rootScope,
     $cordovaPush,
     Articles,
     Comments,
+    DownVote,
     Journalist,
     list,
     Notif,
     Platform,
     Subarticles,
     User,
+    UpVote,
     $filter
   ){
-    console.log('Setting up notifications!!!!');
-    //NOTIFICATION STUFF FROM APP.JS
-    /*
-       $scope.notifications = [];
-
-       var updateNotifications = function() {
-       $scope.notifications = Notifications.get();
-       }; 
-
-    //Notifications.registerObserver(updateNotifications);
-    */
-    /*
-       $scope.handleNotification = function(note) {
-       if(note.notifiableType === 'article') {
-       $state.go('app.article',{ id: note.notifiableId});
-       }
-       else {
-       $state.go('app.notif', { id: note.id});
-       }
-       Navigate.toggleMenu();
-       note.seen = true;
-
-       Journalist.notifications.updateById({
-id: $scope.user.username,
-fk: note.id,
-},note ).$promise
-.then(function(res) {
-console.log('Notification updated: ' + res);
-});
-};
-*/
-
-    /*
-       var loadNotifications = function() {
-       if( $scope.user && $scope.user.username ){
-       var filter = {
-limit: 25,
-skip: 0,
-order: 'date DESC',
-};
-
-Journalist.prototype$__get__notifications({
-id: $scope.user.username,
-filter: filter
-}).$promise
-.then( function(res) {
-Notifications.set(res);
-});
-}
-else {
-console.log('Cannot load notifications because user is not set yet');
-}
-};
-*/
-
     var setExternalBadge = function () {};
 
     Platform.ready.then( function () {
-      console.log('Setting up notifications!');
       var config = {};
 
       var device = Platform.getDevice();
@@ -133,7 +81,6 @@ console.log('Cannot load notifications because user is not set yet');
       });
 
       push.on('notification', function(data) {
-        console.log(data);
         console.log(data.additionalData);
         badge.increment();
         if(data.additionalData) {
@@ -211,19 +158,54 @@ console.log('Cannot load notifications because user is not set yet');
    */
 
     var focus = function (data) {
+      var handleVotable = function(item) { 
+        console.log('votable');
+        console.log(item);
+        switch(item.modelName) {
+          case 'subarticle':
+            Subarticles.focusById(item.id);
+            break;
+          case 'comment':
+            Comments.focusById(item.id);
+            break;
+          case 'article':
+            Navigate.go('app.article', { id: item.id });
+            break;
+          default:
+            console.log('Unknown votable type!');
+            break;
+        }
+      };
+
       var data = data || this;
       switch(data.notifiableType) {
         case 'subarticle':
           Subarticles.focusById(data.notifiableId);
           break;
-        case 'article':
-          Articles.focusById(data.notifiableId);
+        case 'upVote':
+          UpVote.prototype$__get__clickable({ id: data.notifiableId })
+          .$promise
+          .then(function (res) {
+            handleVotable(res);
+          }, function (err) {
+            console.log(err);
+          });
+          break;
+        case 'downVote':
+          DownVote.prototype$__get__clickable({ id: data.notifiableId })
+          .$promise
+          .then(function (res) {
+            handleVotable(res);
+          }, function (err) {
+            console.log(err);
+          });
           break;
         case 'comment':
           Comments.focusById(data.notifiableId);
           break;
         default:
           console.log('Unknown notification type!');
+          console.log(data);
           break;
       }
 
