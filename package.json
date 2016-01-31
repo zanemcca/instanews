@@ -22,6 +22,7 @@
     "errorhandler": "^1.1.1",
     "express-brute": "^0.5.3",
     "express-brute-mongo": "^0.1.0",
+    "google-oauth-jwt": "^0.2.0",
     "helmet": "^0.14.0",
     "loopback": "git+https://github.com/zanemcca/loopback.git#passwordResetToken",
     "loopback-boot": "^2.4.0",
