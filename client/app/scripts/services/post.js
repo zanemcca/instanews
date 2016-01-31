@@ -10,6 +10,7 @@ app.factory('Post', [
   'Maps',
   'observable',
   'Platform',
+  'Subarticles',
   'Uploads',
   function(
     Article,
@@ -17,6 +18,7 @@ app.factory('Post', [
     Maps,
     observable,
     Platform,
+    Subarticles,
     Uploads
   ) {
 
@@ -58,6 +60,7 @@ app.factory('Post', [
         completed++;
         if(completed === total) {
           posting = false;
+          Subarticles.findOrCreate(parentId).reload();
           var message = 'Your content has finished uploading and should be available soon';
           if(failed) {
             message = 'Uh-Oh! Some of your content failed to upload!';
