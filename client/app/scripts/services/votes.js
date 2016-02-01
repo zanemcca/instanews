@@ -101,6 +101,7 @@ app.service('Votes', [
       find: findVotes.bind(findVotes, upVotes),
       registerObserver: upVotes.registerObserver,
       add: upVotes.add,
+      reload: upVotes.reload,
       remove: remove.bind(remove, upVotes)
     };
 
@@ -108,6 +109,7 @@ app.service('Votes', [
       find: findVotes.bind(findVotes, downVotes),
       registerObserver: downVotes.registerObserver,
       add: downVotes.add,
+      reload: downVotes.reload,
       remove: remove.bind(remove, downVotes)
     };
 

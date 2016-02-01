@@ -134,7 +134,8 @@ exports.run = function () {
                 };
 
                 Next = function (err) {
-                  expect(err).to.equal('route');
+                  expect(err).to.exist;
+                  expect(err.status).to.equal(200);
                   done();
                 };
 

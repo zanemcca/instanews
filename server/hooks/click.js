@@ -51,12 +51,12 @@ module.exports = function(app) {
       switch(name) {
         case 'upVote':
           Model = UpVote;
-        OppositeModel = DownVote;
-        break;
+          OppositeModel = DownVote;
+          break;
         case 'downVote':
           Model = DownVote;
-        OppositeModel = UpVote;
-        break;
+          OppositeModel = UpVote;
+          break;
         default:
           return next();
       }
@@ -86,7 +86,25 @@ module.exports = function(app) {
           });
         }
         else {
-          next();
+          Model.findOne(filter, function(err, res) {
+            if(err) {
+              console.error('Error: Failed to complete preVoteChecker');
+              next(err);
+            } else if(res) {
+              console.log('Destroying the vote instead of creating one');
+              res.destroy(function (err) {
+                if(err) {
+                  console.error('Error: Failed to destroy the vote');
+                } else {
+                  err = new Error('Destroying existing vote instead of creating another one');
+                  err.status = 204;
+                }
+                next(err);
+              });
+            } else {
+              next();
+            }
+          });
         }
       });
     }
