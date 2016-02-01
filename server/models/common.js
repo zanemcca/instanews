@@ -91,10 +91,10 @@ exports.notify = function (Model, inst) {
     };
 
     if(inst._file) {
-      if(inst._file.type.indexOf('video')) {
+      if(inst._file.type.indexOf('video') > -1) {
         action = 'added a video to';
         message = 'you posted a video';
-      } else if(inst._file.type.indexOf('image')) {
+      } else if(inst._file.type.indexOf('image') > -1) {
         action = 'added a photo to';
         message = 'you posted a photo';
       }
@@ -137,9 +137,9 @@ exports.notify = function (Model, inst) {
     //Figure out what was acted upon
     if(parent.modelName === 'subarticle') {
       if(parent._file) {
-        if(parent._file.type.indexOf('video')) {
+        if(parent._file.type.indexOf('video') > -1) {
           type = 'video';
-        } else if(parent._file.type.indexOf('image')) {
+        } else if(parent._file.type.indexOf('image') > -1) {
           type = 'photo';
         }
       } else {
