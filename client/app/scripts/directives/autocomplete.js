@@ -48,7 +48,7 @@ app.directive('inautocomplete', [
         };
 
         // Localize the map on the users position
-        $scope.place.localize = function() {
+        $scope.place.localize = function (zoom) {
           $scope.done = true;
           $scope.input.value = '';
           $scope.input.placeholder = defaultPlaceholder;
@@ -66,7 +66,7 @@ app.directive('inautocomplete', [
                 $timeout(function () {
                   map = $scope.place.getMap();
                   if(map) {
-                    Maps.localize(map, cb);
+                    Maps.localize(map, zoom, cb);
                   } else {
                     localizeMap(time - delay);
                   }
