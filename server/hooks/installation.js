@@ -39,7 +39,7 @@ module.exports = function(app) {
                        next(err);
                      } else {
                        console.log('Installation update was successful');
-                       var err = new Error('Installation already exists. Updating instead');
+                       err = new Error('Installation already exists. Updating instead');
                        err.status = 200;
                        next(err);
                      }

@@ -16,9 +16,9 @@ var Articles = app.models.Article;
 exports.run = function() {
   describe('DownVote', function() {
     on.article().plus.downVote().describe('downVote again by the same user', function () {
-      it('should return an error', function(done) {
+      it('should return a 204', function(done) {
         DownVote.create(function(err, vote) {
-          expect(err).to.exist;
+          expect(err).to.not.exist;
           done();
         });
       });
