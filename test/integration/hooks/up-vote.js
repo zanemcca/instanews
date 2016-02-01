@@ -124,9 +124,9 @@ exports.run = function() {
     });
 
     on.article().plus.upVote().describe('upVote again by the same user', function () {
-      it('should return an error', function(done) {
+      it('should return a 204', function(done) {
         UpVote.create(function(err, vote) {
-          expect(err).to.exist;
+          expect(err).to.not.exist;
           done();
         });
       });
