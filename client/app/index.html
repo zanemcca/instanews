@@ -99,13 +99,18 @@
     <script src="scripts/directives/speedDial.js"></script>
     <script src="scripts/directives/sidemenu.js"></script>
     <script src="scripts/lb-services.js"></script>
-    <script src="scripts/app.js"></script>
     <script src="scripts/configuration.js"></script>
     <script src="scripts/app.js"></script>
     <!-- endbuild -->
 
 
-    <script src="https://maps.googleapis.com/maps/api/js?libraries=places,visualization&key=AIzaSyCLYNTmynkgm6Pg8_efYqZUuTnjqGcwYkA"></script>
+    <!--(if target dev)><!-->
+    <script src="https://maps.googleapis.com/maps/api/js?libraries=places,visualization&key=AIzaSyCOqAQ9h_lxoqXzjqpWXc_a7O_9rARJwl8"></script>
+    <!--<!(endif)-->
+    <!--(if target prod)><!-->
+    <script src="https://maps.googleapis.com/maps/api/js?libraries=places,visualization&key=AIzaSyADDWKQMRBbS9sAslLflFcXGhPsewRt-cg"></script>
+    <!--<!(endif)-->
+
   </head>
   <body ng-app="instanews">
     <!--
