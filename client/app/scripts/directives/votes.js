@@ -128,6 +128,8 @@ app.directive('invotes', [
                     Votes.up.add(res);
                   }
                   console.log('Successfully upvoted');
+                  Votes.up.reload();
+                  Votes.down.reload();
                 }, 
                 // istanbul ignore  next 
                 function(err) {
@@ -178,6 +180,8 @@ app.directive('invotes', [
                   if(res && !destroying) {
                     Votes.down.add(res);
                   }
+                  Votes.up.reload();
+                  Votes.down.reload();
                   console.log('Successfully downVoted');
                 },
                 // istanbul ignore next 
