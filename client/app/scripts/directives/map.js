@@ -32,19 +32,10 @@ app.directive('inmap', [
       ) {
 
         var element = elem[0].querySelector('#map');
+        var map;
 
         //Initialize the map
         var initializeMap = function() {
-
-          var position = Position.getPosition();
-          var mPosition = {};
-
-          // istanbul ignore else
-          if(position && position.coords) {
-            mPosition = Position.posToLatLng(position);
-          }
-
-
           var instanewsMapType = new google.maps.StyledMapType([
             {
               stylers: [
@@ -68,9 +59,11 @@ app.directive('inmap', [
           });
           var instanewsMapTypeId = 'instanews_style';
 
+          //Defaults to a view of Canada
           var mapOptions = {
-            center: mPosition,
-            zoom: 12,
+            mapTypeId: google.maps.MapTypeId.HYBRID,
+            center: Position.posToLatLng({ coords: { latitude: 54.708031, longitude: -95.871324}}),
+            zoom: 3,
             minZoom: 3,
             disableDefaultUI: true, 
           };
@@ -79,18 +72,18 @@ app.directive('inmap', [
           // loaded in the element before initializing
           // istanbul ignore else
           if ( element && element.textContent.indexOf('Map') === -1) {
-            var map;
             switch(scope.map.id) {
               case 'feedMap': {
+                // istanbul ignore else
+                if(navigator.splashscreen) {
+                  navigator.splashscreen.hide();
+                }
+
                 mapOptions.maxZoom = 17;
                 map = new google.maps.Map(element, mapOptions);
                 map.mapTypes.set(instanewsMapTypeId, instanewsMapType);
                 map.setMapTypeId(instanewsMapTypeId);
 
-                // istanbul ignore else
-                if(navigator.splashscreen) {
-                  navigator.splashscreen.hide();
-                }
                 //Listener on bounds changing on the map
                 google.maps.event.addListener(map, 'bounds_changed', _.debounce(function() {
                   console.log('Updating bounds');
@@ -101,13 +94,23 @@ app.directive('inmap', [
                 //map.controls[google.maps.ControlPosition.TOP_CENTER].push(TEMPLATE);
 
                 Maps.setFeedMap(map);
+                Maps.localize(map);
+
                 break;
               }
               case 'postMap': {
-                mapOptions.zoom = 18;
+                //mapOptions.zoom = 18;
                 mapOptions.maxZoom = 18;
-                mapOptions.minZoom = 9;
-                mapOptions.mapTypeId = google.maps.MapTypeId.HYBRID;
+                //mapOptions.minZoom = 9;
+
+                var feedMap = Maps.getFeedMap();
+                if(feedMap) {
+                  mapOptions.center = feedMap.getCenter();
+                  mapOptions.zoom = Math.max(feedMap.getZoom(), mapOptions.minZoom);
+                } else {
+                  console.log('No Feed map present!');
+                }
+
                 mapOptions.styles = [
                   {
                     featureType: 'poi',
@@ -117,8 +120,9 @@ app.directive('inmap', [
                 ];
 
                 map = new google.maps.Map(element, mapOptions);
+
                 map.mapTypes.set(instanewsMapTypeId, instanewsMapType);
-                map.setTilt(45);
+                map.setMapTypeId(instanewsMapTypeId);
 
                 google.maps.event.addDomListener(map, 'zoom_changed', function () {
                   var zoom = map.getZoom();
@@ -133,12 +137,12 @@ app.directive('inmap', [
                   Maps.setMarker(Maps.getPostMap(), event.latLng);
                 });
 
+                //map.setTilt(45);
                 Maps.setPostMap(map);
-                Maps.setMarker(map, mPosition);
+                Maps.setMarker(map, mapOptions.center);
                 break;
               }
               case 'articleMap': {
-
                 // istanbul ignore else
                 if ( $stateParams.id) {
                   scope.article = {};
@@ -211,9 +215,7 @@ app.directive('inmap', [
           }
         };
 
-        Position.ready.then(function () {
-          initializeMap();
-        });
+        initializeMap();
       },
       templateUrl: 'templates/directives/map.html'
     };
