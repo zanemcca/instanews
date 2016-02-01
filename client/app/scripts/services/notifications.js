@@ -37,104 +37,104 @@ app.service('Notifications', [
   ){
     var setExternalBadge = function () {};
 
-    Platform.ready.then( function () {
-      var config = {};
+    var setupPush = function () {
+      Platform.ready.then( function () {
+        var config = {};
 
-      var device = Platform.getDevice();
+        var device = Platform.getDevice();
 
-
-      if(Platform.isAndroid()) {
-        config = {
-          android: {
-            sound: true,
-            vibrate: true,
-            forceShow: true,
-            icon: 'notif',
-            iconColor: '#023E4F',
-            //senderID: '1081316781214'
-            senderID: '373574168056'
-          }
-        };
-
-        if(ENV.production) {
-          config.android.senderID = '132830452741';
-        }
-        device.type = 'android';
-      }
-      else if(Platform.isIOS()) {
-        config = {
-          ios: {
-            badge: true,
-            sound: true,
-            alert: true
-          }
-        };
-        device.type = 'ios';
-      }
-      else {
-        console.log('Cannot register! Unknown device!');
-        return;
-      }
-
-      // jshint undef: false 
-      //TODO Defer this until the first time a user logs in to avoid asking for permission right after download
-      console.log('Attempting to register device for push notifications');
-      var push = PushNotification.init(config);
-
-      push.on('registration', function(data) {
-        console.log('Registered: ' + data.registrationId);
-        device.token = data.registrationId;
-        Platform.setDevice(device);
-        User.install();
-      });
-
-      push.on('notification', function(data) {
-        console.log(data.additionalData);
-        badge.increment();
-        if(data.additionalData) {
-          if(!data.additionalData.save) {
-            data.additionalData.id = data.additionalData.id || data.additionalData.myId;
-            notifications.add(data.additionalData);
-          }
-
-          if(data.additionalData.foreground) {
-            if(Platform.isIOS()) {
-              var note = data.additionalData;
-              Platform.showConfirm(note.message, 'Notification', ['Ok', 'View'], function (button) {
-                if(button === 2) {
-                  console.log('View was pressed');
-                  focus(note);
-                }
-              });
+        if(Platform.isAndroid()) {
+          config = {
+            android: {
+              sound: true,
+              vibrate: true,
+              forceShow: true,
+              icon: 'notif',
+              iconColor: '#023E4F',
+              //senderID: '1081316781214'
+              senderID: '373574168056'
             }
-          } else {
-            focus(data.additionalData);
+          };
+
+          if(ENV.production) {
+            config.android.senderID = '132830452741';
           }
+          device.type = 'android';
         }
+        else if(Platform.isIOS()) {
+          config = {
+            ios: {
+              badge: true,
+              sound: true,
+              alert: true
+            }
+          };
+          device.type = 'ios';
+        }
+        else {
+          console.log('Cannot register! Unknown device!');
+          return;
+        }
+
+        // jshint undef: false 
+        console.log('Attempting to register device for push notifications');
+        var push = PushNotification.init(config);
+
+        push.on('registration', function(data) {
+          console.log('Registered: ' + data.registrationId);
+          device.token = data.registrationId;
+          Platform.setDevice(device);
+          User.install();
+        });
+
+        push.on('notification', function(data) {
+          console.log(data.additionalData);
+          badge.increment();
+          if(data.additionalData) {
+            if(!data.additionalData.save) {
+              data.additionalData.id = data.additionalData.id || data.additionalData.myId;
+              notifications.add(data.additionalData);
+            }
+
+            if(data.additionalData.foreground) {
+              if(Platform.isIOS()) {
+                var note = data.additionalData;
+                Platform.showConfirm(note.message, 'Notification', ['Ok', 'View'], function (button) {
+                  if(button === 2) {
+                    console.log('View was pressed');
+                    focus(note);
+                  }
+                });
+              }
+            } else {
+              focus(data.additionalData);
+            }
+          }
+        });
+
+        setExternalBadge = function () {
+          if(Platform.isIOS()) {
+            var succ = function () {
+              console.log('Successfully set the badge number');
+            };
+
+            var fail = function (err) {
+              console.log('Failed to set badge number');
+              console.log(err);
+            };
+
+            var num = 0;
+            if(badge.number > 0) {
+              num = badge.number;
+            }
+
+            push.setApplicationIconBadgeNumber(succ, fail, num);
+          }
+        };
+
+        setExternalBadge();
       });
-
-      setExternalBadge = function () {
-        if(Platform.isIOS()) {
-          var succ = function () {
-            console.log('Successfully set the badge number');
-          };
-
-          var fail = function (err) {
-            console.log('Failed to set badge number');
-            console.log(err);
-          };
-
-          var num = 0;
-          if(badge.number > 0) {
-            num = badge.number;
-          }
-
-          push.setApplicationIconBadgeNumber(succ, fail, num);
-        }
-      };
-
-      setExternalBadge();
-    });
+    };
 
     var focus = function (data) {
       data = data || this;
@@ -326,6 +326,7 @@ app.service('Notifications', [
     };
 
     var user;
+    var firstUser = true;
 
     var userWatch = function () {
       user = User.get();
@@ -333,6 +334,10 @@ app.service('Notifications', [
         if(user.user) {
           console.log(user.user);
           badge.set(user.user.badge);
+        }
+        if(firstUser) {
+          firstUser = false;
+          setupPush();
         }
         reload();
       } else {
