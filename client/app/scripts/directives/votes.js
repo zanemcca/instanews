@@ -88,8 +88,13 @@ app.directive('invotes', [
           $scope.upvote = function () {
             //TODO Move this into the Votes service
             Navigate.ensureLogin( function () {
+              var destroying = false;
               if($scope.votable.upVoted) {
-                //TODO Delete the vote if it already exists
+                //UpVote.create will toggle the vote if it already exists
+                Votes.up.remove($scope.votable);
+                $scope.votable.upVoteCount--;
+                $scope.votable.upVoted = false;
+                destroying = true;
               } else {
                 $scope.votable.upVoteCount++;
                 $scope.votable.upVoted = true;
@@ -119,8 +124,12 @@ app.directive('invotes', [
               .$promise
               .then(
                 function(res) {
-                  Votes.up.add(res);
+                  if(res && !destroying) {
+                    Votes.up.add(res);
+                  }
                   console.log('Successfully upvoted');
+                  Votes.up.reload();
+                  Votes.down.reload();
                 }, 
                 // istanbul ignore  next 
                 function(err) {
@@ -132,8 +141,13 @@ app.directive('invotes', [
 
           $scope.downvote = function () {
             Navigate.ensureLogin( function () {
+              var destroying = false;
               if($scope.votable.downVoted) {
-                //TODO Delete the vote if it already exists
+                //DownVote.create will toggle the vote if it already exists
+                Votes.down.remove($scope.votable);
+                $scope.votable.downVoteCount--;
+                $scope.votable.downVoted = false;
+                destroying = true;
               } else {
                 $scope.votable.downVoteCount++;
                 $scope.votable.downVoted = true;
@@ -163,7 +177,11 @@ app.directive('invotes', [
               .$promise
               .then(
                 function(res) {
-                  Votes.down.add(res);
+                  if(res && !destroying) {
+                    Votes.down.add(res);
+                  }
+                  Votes.up.reload();
+                  Votes.down.reload();
                   console.log('Successfully downVoted');
                 },
                 // istanbul ignore next 
