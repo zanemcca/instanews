@@ -10,6 +10,7 @@ app.service('Notifications', [
   'Articles',
   'Comments',
   'DownVote',
+  'ENV',
   'Journalist',
   'list',
   'Navigate',
@@ -24,6 +25,7 @@ app.service('Notifications', [
     Articles,
     Comments,
     DownVote,
+    ENV,
     Journalist,
     list,
     Navigate,
@@ -49,9 +51,14 @@ app.service('Notifications', [
             forceShow: true,
             icon: 'notif',
             iconColor: '#023E4F',
-            senderID: '1081316781214'
+            //senderID: '1081316781214'
+            senderID: '373574168056'
           }
         };
+
+        if(ENV.production) {
+          config.android.senderID = '132830452741';
+        }
         device.type = 'android';
       }
       else if(Platform.isIOS()) {

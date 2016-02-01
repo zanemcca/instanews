@@ -14,12 +14,13 @@ module.exports = function (app) {
       process.env.NODE_ENV === 'staging' ) 
     {
       var cred = require('./conf/credentials');
-      var google = require('google-oauth-jwt');
 
       var apnsCertData = cred.get('apnsCert');
       var apnsKeyData = cred.get('apnsKey');
 
+      /*
       var googleCred = cred.get('google');
+      var google = require('google-oauth-jwt');
 
       var googleOptions = {
         email: googleCred.client_email,
@@ -28,30 +29,6 @@ module.exports = function (app) {
         ],
         key: googleCred.private_key
       }; 
-
-      var gcm = {
-        serverApiKey: null,
-      };
-
-      var apns = {
-        certData: apnsCertData,
-        keyData: apnsKeyData,
-        pushOptions: {
-          //Could add aditional options in here
-        },
-        feedbackOptions: {
-          batchFeedback: true,
-          interval: 300
-        }
-      };
-
-      var registrationOptions = {
-        description: 'Local Citizen Journalism',
-        pushSettings: {
-          apns: apns,
-          gcm: gcm
-        }
-      };
 
       var refreshTokens = function () {
         google.authenticate(googleOptions, function (err, token) {
@@ -76,6 +53,41 @@ module.exports = function (app) {
         setInterval(function () {
           refreshTokens();
         }, 1000*60*55);
+      };
+      */
+
+      var gcm = {
+        serverApiKey: cred.get('gcmServerApiKey')
+      };
+
+      var apns = {
+        certData: apnsCertData,
+        keyData: apnsKeyData,
+        pushOptions: {
+          //Could add aditional options in here
+        },
+        feedbackOptions: {
+          batchFeedback: true,
+          interval: 300
+        }
+      };
+
+      var registrationOptions = {
+        description: 'Local Citizen Journalism',
+        pushSettings: {
+          apns: apns,
+          gcm: gcm
+        }
+      };
+
+      var startPushServer = function () {
+        updateOrCreateApp(function(err) {
+          if(err) {
+            console.error(err.stack);
+          } else {
+            console.log('Successfully updated the application');
+          }
+        });
       };
 
       var registerApp = function(cb) {
