@@ -32,9 +32,7 @@ app.directive('incomments', [
 
         $scope.$watch('owner.showComments', function (newVal, oldVal) {
           if( newVal && !oldVal) {
-            spec.options.filter.skip = 0;
-            spec.options.filter.limit = 5;
-            $scope.Comments.load();
+            $scope.Comments.reload();
           }
         });
 
