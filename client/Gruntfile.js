@@ -139,6 +139,19 @@ module.exports = function (grunt) {
       }
     },
 
+    targethtml: {
+      dev: {
+        files: {
+          '<%= yeoman.dist %>/index.html' : '<%= yeoman.dist %>/index.html'
+        }
+      }, 
+      prod: {
+        files: {
+          '<%= yeoman.dist %>/index.html' : '<%= yeoman.dist %>/index.html'
+        }
+      }
+    },
+
     // Watches files for changes and runs tasks based on the changed files
     watch: {
       bower: {
@@ -252,7 +265,6 @@ module.exports = function (grunt) {
       }
     },
 
-    
     // Compiles Sass to CSS and generates necessary files if requested
     compass: {
       options: {
@@ -282,7 +294,6 @@ module.exports = function (grunt) {
       }
     },
     
-
     // Reads HTML for usemin blocks to enable smart builds that automatically
     // concat, minify and revision files. Creates configurations in memory so
     // additional tasks can operate on them
@@ -472,7 +483,7 @@ module.exports = function (grunt) {
           '<%= yeoman.app %>/bower_components/videogular-buffering/vg-buffering.js',
           '<%= yeoman.app %>/bower_components/videogular-poster/vg-poster.js',
           '<%= yeoman.app %>/bower_components/videogular-overlay-play/vg-overlay-play.js',
-          'https://maps.googleapis.com/maps/api/js?libraries=places,visualization&key=AIzaSyCLYNTmynkgm6Pg8_efYqZUuTnjqGcwYkA',
+          'https://maps.googleapis.com/maps/api/js?libraries=places,visualization&key=AIzaSyCOqAQ9h_lxoqXzjqpWXc_a7O_9rARJwl8',
           '<%= yeoman.app %>/<%= yeoman.scripts %>/**/*.js',
           '<%= yeoman.test %>/mock/**/*.js',
           '<%= yeoman.test %>/spec/**/*.js'
@@ -523,6 +534,10 @@ module.exports = function (grunt) {
 
   // Register tasks for all Cordova commands
   _.functions(cordovaCli).forEach(function (name) {
+    if(name === 'clean') {
+      name = 'cordovaclean';
+    }
+
     grunt.registerTask(name, function () {
       this.args.unshift(name.replace('cordova:', ''));
       // Handle URL's being split up by Grunt because of `:` characters
@@ -552,7 +567,7 @@ module.exports = function (grunt) {
   // over to <%= yeoman.dist %>/. Last step is running cordova prepare so we can refresh the ripple
   // browser tab to see the changes. Technically ripple runs `cordova prepare` on browser
   // refreshes, but at this time you would need to re-run the emulator to see changes.
-  grunt.registerTask('ripple', ['wiredep', 'newer:copy:app', 'ripple-emulator']);
+  grunt.registerTask('ripple', ['wiredep', 'newer:copy:app', 'targethtml:dev', 'ripple-emulator']);
   grunt.registerTask('ripple-emulator', function () {
     grunt.config.set('watch', {
       all: {
@@ -605,6 +620,7 @@ module.exports = function (grunt) {
     'clean',
     'concurrent:test',
     'postcss',
+    'targethtml:dev',
     'karma:unit:start',
     'watch:karma'
   ]);
@@ -649,7 +665,8 @@ module.exports = function (grunt) {
     'concurrent:server',
     'postcss',
     'newer:copy:app',
-    'newer:copy:tmp'
+    'newer:copy:tmp',
+    'targethtml:dev'
   ]);
 
   grunt.registerTask('init:production', [
@@ -659,7 +676,8 @@ module.exports = function (grunt) {
     'concurrent:dist',
     'postcss',
     'newer:copy:app',
-    'newer:copy:tmp'
+    'newer:copy:tmp',
+    'targethtml:prod'
   ]);
 
   grunt.registerTask('init:staging', [
@@ -669,7 +687,8 @@ module.exports = function (grunt) {
     'concurrent:dist',
     'postcss',
     'newer:copy:app',
-    'newer:copy:tmp'
+    'newer:copy:tmp',
+    'targethtml:prod'
   ]);
 
   grunt.registerTask('compress', [
@@ -685,6 +704,7 @@ module.exports = function (grunt) {
     'cssmin',
     'uglify',
     'usemin',
+    'targethtml:prod',
     'htmlmin'
   ]);
 
