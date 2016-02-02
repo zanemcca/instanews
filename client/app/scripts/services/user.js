@@ -169,7 +169,21 @@ app.service('User', [
         console.log('Resuming app!');
         reload();
       }, false);
+
+      if(!Platform.isBrowser()) {
+        registerObserver(updateSupport);
+        updateSupport();
+      }
     });
+
+    var updateSupport = function () {
+      if(user && user.user) {
+        Platform.support.setEmail(user.user.email);
+        Platform.support.setName(user.userId);
+      } else {
+        Platform.support.clearUser();
+      }
+    };
 
     return {
       clearData: clearData,

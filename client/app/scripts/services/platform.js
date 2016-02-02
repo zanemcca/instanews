@@ -319,6 +319,21 @@ app.factory('Platform', [
         if(window.Mobihelp) {
           window.Mobihelp.showSupport();
         }
+      },
+      setEmail: function (email) {
+        if(window.Mobihelp) {
+          window.Mobihelp.setUserEmail(email);
+        }
+      },
+      setName: function (name) {
+        if(window.Mobihelp) {
+          window.Mobihelp.setUserFullName(name);
+        }
+      },
+      clearUser: function () {
+        if(window.Mobihelp) {
+          window.Mobihelp.clearUserData();
+        }
       }
     };
 
