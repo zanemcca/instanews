@@ -3,6 +3,18 @@
   padding: 0px !important;
 }
 
+.no-border {
+  border: 0px !important;
+}
+
+.no-border:before {
+  border: 0 !important;
+}
+
+.no-border:after {
+  border: 0 !important;
+}
+
 .no-margin {
   margin: 0px !important;
 }

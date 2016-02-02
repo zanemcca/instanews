@@ -40,6 +40,9 @@ describe('Position service', function() {
 
       $provide.service('Platform', function() {
         return {
+          isIOS: function () {
+            return false;
+          },
           ready: {
             then: function (cb) {
               cb();
@@ -69,8 +72,11 @@ describe('Position service', function() {
   }));
 
   describe('successful watch', function () {
-    beforeEach(function () {
-      watchPos();
+    beforeEach(function (done) {
+      position.getPermission(function () {
+        watchPos();
+        done();
+      });
     })
 
     it('should use the location given by navigator.geolocation.watchPostion', function () {
@@ -262,17 +268,16 @@ describe('Position service', function() {
         clock.restore();
       });
 
-      it('should set the position to Montreal when no position is returned', function () {
-        value = null;
+      it('should read the position from memory', function (done) {
+        value = location;
 
-        clock.tick(1000);
+        position.getPermission(function () {
+          clock.tick(1000);
 
-        var pos = position.getPosition();
-        expect(pos).to.deep.equal({
-          coords: { 
-            latitude: 45.5017 ,
-            longitude: -73.5673
-          }
+          var pos = position.getPosition();
+          console.log(pos);
+          expect(pos).to.deep.equal(location);
+          done();
         });
       });
     });

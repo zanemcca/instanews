@@ -50,6 +50,7 @@ app.factory('TextInput', [
 
     $ionicModal.fromTemplateUrl('templates/modals/textInput.html', {
       scope: $rootScope,
+      focusFirstInput: true,
       animation: 'slide-in-up'
     }).then( function (textModal) {
       modal.modal = textModal;
