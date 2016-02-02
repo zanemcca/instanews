@@ -68,6 +68,7 @@ module.exports = function (grunt) {
           action: 'add',
           plugins: [
             'com.hiddentao.cordova.filepath',
+            'https://github.com/freshdesk/mobihelp-phonegap.git',
             'com.ionic.keyboard',
        //     'com.phonegap.plugins.PushPlugin',
             'cordova-plugin-crosswalk-webview',

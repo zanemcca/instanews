@@ -296,7 +296,31 @@ app.factory('Platform', [
         // org.apache.cordova.statusbar required
         StatusBar.styleDefault();
       }
+
+      if (window.Mobihelp) {
+        var options = {
+          domain: 'instanews.freshdesk.com'
+        };
+
+        if(isIOS()) {
+          //TODO Get iOS credentials
+          options.appKey = 'instanews-2-fca5122354a07cf1c41c7e08e38cd988';
+          options.appSecret = '093fc47da209e872dba380fb4f2c9cf226cc5193';
+        } else if(isAndroid()) {
+          options.appKey = 'instanews-1-66224bdfe44137a2d5272cc8976fbb73';
+          options.appSecret = 'f5259266e2fb7076eaca67caecbcf2acf2259866';
+        }
+        window.Mobihelp.init(options);
+      }
     });
+
+    var support = {
+      show: function () {
+        if(window.Mobihelp) {
+          window.Mobihelp.showSupport();
+        }
+      }
+    };
 
     var getAppNameLogo = function () {
      //return '<img src="images/favicon.ico"/>stanews'; 
@@ -313,6 +337,7 @@ app.factory('Platform', [
     };
 
     return {
+      support: support,
       keyboard: keyboard,
       getAppNameLogo: getAppNameLogo,
       loading: loading,
