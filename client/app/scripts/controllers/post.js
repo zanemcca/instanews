@@ -72,7 +72,7 @@ app.controller('PostCtrl', [
     $scope.$on('$ionicView.afterEnter', function() {
       if(!pendingPost) {
         pendingPost = true;
-        $scope.place.localize();
+        $scope.place.localize(18);
       }
     });
 

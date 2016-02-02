@@ -138,8 +138,18 @@ app.service('Comments', [
         order: 'rating DESC'
       };
 
+      var sortingFunction = function (a, b) {
+        //Date descending
+        a = new Date(a.created);
+        b = new Date(b.created);
+        var res = b - a;
+
+        return res;
+      };
+
       if (commentableType === 'comment') {
         filter.order = 'date DESC';
+        spec.sortingFunction = sortingFunction;
       }
 
       if(!spec || !spec.options || !spec.options.id) {

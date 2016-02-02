@@ -265,26 +265,56 @@ return gradient;
       }
     };
 
-    var localize = function(map, cb) {
-      var position = Position.getPosition(); 
+    var localize = function(map, zoom, cb) {
+      var position; 
+      if(!zoom || typeof zoom === 'function') {
+        if(zoom && !cb) {
+          cb = zoom;
+        }
+        zoom = 15;
+      }
 
-      if(setCenter(map, position)) {
-        map.setZoom(15);
-        if(cb) {
-          cb(null, position);
+      var finish = function () {
+        if (setCenter(map, position)) {
+          map.setZoom(zoom);
+          if(zoom >= 18) {
+            map.setTilt(45);
+          }
+          if(cb) {
+            cb(null, position);
+          }
+          else {
+            console.log('Successful localization!');
+          }
         }
         else {
-          console.log('Successful localization!');
-        }
-      }
-      else {
+          if(cb) {
+            cb('Failed localization!');
+          }
+          else {
+            console.log('FAILED localization!');
+          }
+        } 
+      };
+
+      Position.getPermission( function() {
+        Position.ready.then(function () {
+          position = Position.getPosition(); 
+          finish();
+        });
+      }, function () {
+        /*
+        position = feedMap.getCenter();
+        zoom = feedMap.getZoom();
+        finish();
+       */
+        var message = 'Permission denied!';
         if(cb) {
-          cb('Failed localization!',null);
+          cb(message);
+        } else {
+          console.log(message);
         }
-        else {
-          console.log('FAILED localization!');
-        }
-      }
+      }); 
     };
 
     var setCenter = function(map, pos) {

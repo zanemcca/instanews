@@ -87,6 +87,14 @@ app.controller('LoginCtrl', [
         $scope.reset.forgotModal = modal;
       });
 
+      // Cleanup modals
+      $scope.$on('$destroy', function () {
+        $scope.reset.forgotModal.remove();
+        $scope.reset.Modal.remove();
+        $scope.verifyModal.remove();
+        $scope.loginModal.remove();
+      });
+
       $scope.validEmail = function() { 
         var re = /^([\w-]+(?:\.[\w-]+)*)@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$/i;
         var valid = re.test($scope.newUser.email);
