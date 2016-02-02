@@ -320,6 +320,39 @@ app.factory('Platform', [
           window.Mobihelp.showSupport();
         }
       },
+      addData: function (key, data, isSensitive) {
+        isSensitive = isSensitive || false;
+        if(window.Mobihelp) {
+          console.log('Adding support data');
+          var addOne = function (key, val) {
+            window.Mobihelp.addCustomData(function (succ, err) {
+              if(succ) {
+                if(!isSensitive) {
+              //    console.log(key + ': ' + val);
+                }
+              } else {
+                console.log('Failed to write custom data to support');
+                console.log(err);
+              }
+            }, key, val, isSensitive);
+          };
+
+          var add =  function(key, obj, parents) {
+            if(parents.length < 3) {
+              parents.push(key);
+              if(typeof obj === 'number' || typeof obj === 'string') {
+                addOne(parents.join('.'), obj, isSensitive);
+              } else if (typeof obj === 'object') {
+                Object.getOwnPropertyNames(obj).forEach(function (val) {
+                  add(val, obj[val], parents.slice());
+                });
+              }
+            }
+          };
+
+          add(key, data, []);
+        }
+      },
       setEmail: function (email) {
         if(window.Mobihelp) {
           window.Mobihelp.setUserEmail(email);
@@ -330,10 +363,26 @@ app.factory('Platform', [
           window.Mobihelp.setUserFullName(name);
         }
       },
+      clearData: function () {
+        if(window.Mobihelp) {
+          window.Mobihelp.clearCustomData(function (succ, err) {
+            if(!succ || err) {
+              console.log('Failed to clear custom support data!')
+              console.log(err);
+            } else {
+              console.log('Cleared custom support data');
+            }
+          });
+        }
+      },
       clearUser: function () {
         if(window.Mobihelp) {
           window.Mobihelp.clearUserData();
         }
+      },
+      clear: function () {
+        support.clearData();
+        support.clearUser();
       }
     };
 
