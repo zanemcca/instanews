@@ -35,6 +35,14 @@
          </div>
          <div class="sidemenu-item" 
            nav-clear menu-close
+           ng-show="Platform.support.unreadCount"
+           ng-click="Platform.support.showConversations();">
+          <i class="icon ion-person"></i>
+            Support
+            <span class="badge badge-assertive spanposition">{{Platform.support.unreadCount}}</span>
+         </div>
+         <div class="sidemenu-item" 
+           nav-clear menu-close
            ng-show="Uploads.getPending().length"
            ng-click="pendingModal.show();">
           <i class="icon"
