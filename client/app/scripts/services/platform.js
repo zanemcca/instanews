@@ -311,13 +311,29 @@ app.factory('Platform', [
           options.appSecret = 'f5259266e2fb7076eaca67caecbcf2acf2259866';
         }
         window.Mobihelp.init(options);
+
+        var getUnreadCount = function () {
+          support.getUnreadCount(function (count) {
+            support.unreadCount = count;
+          })
+        };
+
+        //Refresh the count every 5 minutes
+        setInterval(getUnreadCount, 5*60*1000);
+        getUnreadCount();
       }
     });
 
     var support = {
+      unreadCount: 0,
       show: function () {
         if(window.Mobihelp) {
           window.Mobihelp.showSupport();
+        }
+      },
+      showConversations: function () {
+        if(window.Mobihelp) {
+          window.Mobihelp.showConversations();
         }
       },
       addData: function (key, data, isSensitive) {
@@ -363,11 +379,22 @@ app.factory('Platform', [
           window.Mobihelp.setUserFullName(name);
         }
       },
+      getUnreadCount: function (cb) {
+        if(window.Mobihelp) {
+          window.Mobihelp.getUnreadCountAsync(function (succ, count) {
+            if(!succ) {
+              console.log('Failed to get the unread count');
+              count = 0;
+            }
+            cb(count);
+          });
+        }
+      },
       clearData: function () {
         if(window.Mobihelp) {
           window.Mobihelp.clearCustomData(function (succ, err) {
             if(!succ || err) {
-              console.log('Failed to clear custom support data!')
+              console.log('Failed to clear custom support data!');
               console.log(err);
             } else {
               console.log('Cleared custom support data');
@@ -378,6 +405,7 @@ app.factory('Platform', [
       clearUser: function () {
         if(window.Mobihelp) {
           window.Mobihelp.clearUserData();
+          support.unreadCount = 0;
         }
       },
       clear: function () {
@@ -386,6 +414,7 @@ app.factory('Platform', [
       }
     };
 
+    
     var getAppNameLogo = function () {
      //return '<img src="images/favicon.ico"/>stanews'; 
      return 'InstaNews'; 
