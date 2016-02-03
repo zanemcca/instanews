@@ -23,6 +23,11 @@ describe('instanews.service.user', function() {
 
       $provide.service('Platform', function() {
         return {
+          support: {
+            clearUser: function () {},
+            setEmail: function () {},
+            setName: function () {}
+          },
           getDevice: function() {
             return {
               type: 'ios',

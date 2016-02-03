@@ -10,8 +10,7 @@
     }
   },
   "hidden": [
-    "verificationToken",
-    "email"
+    "verificationToken"
   ],
   "properties": {
     "firstName": {

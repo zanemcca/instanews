@@ -173,8 +173,13 @@ module.exports = function(app) {
 
     if(instance) {
       var userId;
+      var includeEmail = false;
 
-      var checkAdminStatus = function () {
+      var check = function () {
+        if(userId === instance.username) {
+          includeEmail = true;
+        }
+
         //Only admins can see who else is an admin
         Role.isInRole('admin', {
           principalType: RoleMapping.USER,
@@ -188,12 +193,19 @@ module.exports = function(app) {
               if(exists) {
                 instance.isAdmin = true;
               }
-              next();
+              done();
             });
           } else {
-            next();
+            done();
           }
         });
+      };
+
+      var done = function () {
+        if(!includeEmail) {
+          instance.unsetAttribute('email');
+        }
+        next();
       };
 
       var context = loopback.getCurrentContext();
@@ -203,12 +215,12 @@ module.exports = function(app) {
         if(token) {
           userId = token.userId;
           if(userId) {
-            return checkAdminStatus();
+            return check();
           }
         }
       }
 
-      next();
+      done();
     } else {
       next();
     }

@@ -296,8 +296,125 @@ app.factory('Platform', [
         // org.apache.cordova.statusbar required
         StatusBar.styleDefault();
       }
+
+      if (window.Mobihelp) {
+        var options = {
+          domain: 'instanews.freshdesk.com'
+        };
+
+        if(isIOS()) {
+          //TODO Get iOS credentials
+          options.appKey = 'instanews-2-fca5122354a07cf1c41c7e08e38cd988';
+          options.appSecret = '093fc47da209e872dba380fb4f2c9cf226cc5193';
+        } else if(isAndroid()) {
+          options.appKey = 'instanews-1-66224bdfe44137a2d5272cc8976fbb73';
+          options.appSecret = 'f5259266e2fb7076eaca67caecbcf2acf2259866';
+        }
+        window.Mobihelp.init(options);
+
+        var getUnreadCount = function () {
+          support.getUnreadCount(function (count) {
+            support.unreadCount = count;
+          })
+        };
+
+        //Refresh the count every 5 minutes
+        setInterval(getUnreadCount, 5*60*1000);
+        getUnreadCount();
+      }
     });
 
+    var support = {
+      unreadCount: 0,
+      show: function () {
+        if(window.Mobihelp) {
+          window.Mobihelp.showSupport();
+        }
+      },
+      showConversations: function () {
+        if(window.Mobihelp) {
+          window.Mobihelp.showConversations();
+        }
+      },
+      addData: function (key, data, isSensitive) {
+        isSensitive = isSensitive || false;
+        if(window.Mobihelp) {
+          console.log('Adding support data');
+          var addOne = function (key, val) {
+            window.Mobihelp.addCustomData(function (succ, err) {
+              if(succ) {
+                if(!isSensitive) {
+              //    console.log(key + ': ' + val);
+                }
+              } else {
+                console.log('Failed to write custom data to support');
+                console.log(err);
+              }
+            }, key, val, isSensitive);
+          };
+
+          var add =  function(key, obj, parents) {
+            if(parents.length < 3) {
+              parents.push(key);
+              if(typeof obj === 'number' || typeof obj === 'string') {
+                addOne(parents.join('.'), obj, isSensitive);
+              } else if (typeof obj === 'object') {
+                Object.getOwnPropertyNames(obj).forEach(function (val) {
+                  add(val, obj[val], parents.slice());
+                });
+              }
+            }
+          };
+
+          add(key, data, []);
+        }
+      },
+      setEmail: function (email) {
+        if(window.Mobihelp) {
+          window.Mobihelp.setUserEmail(email);
+        }
+      },
+      setName: function (name) {
+        if(window.Mobihelp) {
+          window.Mobihelp.setUserFullName(name);
+        }
+      },
+      getUnreadCount: function (cb) {
+        if(window.Mobihelp) {
+          window.Mobihelp.getUnreadCountAsync(function (succ, count) {
+            if(!succ) {
+              console.log('Failed to get the unread count');
+              count = 0;
+            }
+            cb(count);
+          });
+        }
+      },
+      clearData: function () {
+        if(window.Mobihelp) {
+          window.Mobihelp.clearCustomData(function (succ, err) {
+            if(!succ || err) {
+              console.log('Failed to clear custom support data!');
+              console.log(err);
+            } else {
+              console.log('Cleared custom support data');
+            }
+          });
+        }
+      },
+      clearUser: function () {
+        if(window.Mobihelp) {
+          window.Mobihelp.clearUserData();
+          support.unreadCount = 0;
+        }
+      },
+      clear: function () {
+        support.clearData();
+        support.clearUser();
+      }
+    };
+
+    
     var getAppNameLogo = function () {
      //return '<img src="images/favicon.ico"/>stanews'; 
      return 'InstaNews'; 
@@ -313,6 +430,7 @@ app.factory('Platform', [
     };
 
     return {
+      support: support,
       keyboard: keyboard,
       getAppNameLogo: getAppNameLogo,
       loading: loading,
