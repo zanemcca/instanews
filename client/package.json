@@ -71,7 +71,11 @@
     "org.apache.cordova.geolocation",
     "org.apache.cordova.media-capture",
     "org.apache.cordova.splashscreen",
-    "org.apache.cordova.statusbar"
+    "org.apache.cordova.statusbar",
+    {
+      "locator": "https://github.com/freshdesk/mobihelp-phonegap.git",
+      "id": "cordova-plugin-freshdesk-mobihelp"
+    }
   ],
   "cordovaPlatforms": [
     "ios",

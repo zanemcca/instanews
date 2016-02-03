@@ -2,7 +2,7 @@
 'use strict';
 var app = angular.module('instanews.service.list', ['ionic', 'ngCordova']);
 
-function ListFactory (Platform) {
+function ListFactory (Platform, User) {
   //var list = function (spec, my) {
   var list = function (spec) {
     var that;
@@ -70,6 +70,36 @@ function ListFactory (Platform) {
                   return true;
                 }
               });
+            };
+
+            newItem.showOptions = function() {
+              var options = {
+                buttons: [
+                  { text: '<i class="icon ion-ios-information-outline positive"></i> Report an issue'}
+                ],
+                titleText: 'What would you like to do?',
+                cancelText: 'Cancel',
+                buttonClicked: function (idx) {
+                  if(idx === 0) {
+                    Platform.support.clearData();
+                    Platform.support.addData('inst', newItem);
+                    Platform.support.show();
+                  } else {
+                    console.log('Unknown button index: ' + idx);
+                  }
+                  return true;
+                }
+              };
+
+              if(User.isMine(newItem) || User.isAdmin()) {
+                options.destructiveText = '<i class="icon ion-trash-b assertive"></i> Delete this item';
+                options.destructiveButtonClicked = function() {
+                  newItem.destroy();
+                  return true;
+                };
+              }
+
+              Platform.showSheet(options);
             };
             spec.items.push(newItem);
           }
@@ -301,5 +331,6 @@ function ListFactory (Platform) {
 
 app.factory('list', [
   'Platform',
+  'User',
   ListFactory
 ]);
