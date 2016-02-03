@@ -37,9 +37,6 @@ module.exports = function(app) {
       if(!user) {
         return cb(null, false);
       }
-
-      console.log('Admin Verified: ' + user.username);
-      console.log(user);
       cb(null, true); // true = is a team member
     });
   });
