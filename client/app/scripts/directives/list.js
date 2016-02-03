@@ -25,12 +25,12 @@ app.directive('inList', [
             var itm = items[0];
             if(itm.modelName !== 'comment' && itm.modelName !== 'notif') {
               classes.push('dynamic-box');
-            }
-            if(itm.modelName !== 'notif') {
-              classes.push('item');
               if($scope.isCard || $scope.isTablet()) {
                 classes.push('card');
               }
+            }
+            if(itm.modelName !== 'notif') {
+              classes.push('item');
             }
 
             if(Platform.getWidth() < 768 && $scope.isTablet()) {
