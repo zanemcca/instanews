@@ -20,9 +20,9 @@ module.exports = function(Article) {
         res.updateAttributes({
           $unset: {
             pending: ''
-          }
+           }
         }, function (err, res) {
-          if(err) {
+           if(err) {
             console.error('Failed to find clear pending flag for article ' + id);
             console.error(err);
             return next(err);
@@ -30,13 +30,13 @@ module.exports = function(Article) {
             console.log('Successfully cleared the pending flag on the article');
             next();
           }
-        });
-      }
+         });
+      } 
       // istanbul ignore else
       else {
         console.log('The pending flag on the article has already been cleared');
         next();
-      }
+      } 
     });
   };
 
@@ -58,6 +58,9 @@ module.exports = function(Article) {
           geoWithin: {
             $box: box
           }
+        },
+        pending: {
+          exists: false
         }
       },
       order: 'rating DESC'

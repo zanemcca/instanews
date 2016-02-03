@@ -61,6 +61,9 @@ exports.run = function () {
                 geoWithin: {
                   $box: box
                 }
+              },
+              pending: {
+                exists: false
               }
             },
             order: 'rating DESC'
