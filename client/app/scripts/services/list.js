@@ -83,7 +83,7 @@ function ListFactory (Platform, User) {
                   if(idx === 0) {
                     Platform.support.clearData();
                     Platform.support.addData('inst', newItem);
-                    Platform.support.show();
+                    Platform.support.showConversations();
                   } else {
                     console.log('Unknown button index: ' + idx);
                   }
