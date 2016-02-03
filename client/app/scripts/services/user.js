@@ -124,6 +124,28 @@ app.service('User', [
       }
     };
 
+    var reload = function () {
+      if(user) {
+        Journalist.findById({
+          id: user.userId 
+        }, function (usr) {
+          user.user = usr;
+          set(user);
+        }, function (err) {
+          console.log(err);
+         });
+      }
+    };
+
+    var updateSupport = function () {
+      if(user && user.user) {
+        Platform.support.setEmail(user.user.email);
+        Platform.support.setName(user.userId);
+      } else {
+        Platform.support.clearUser();
+      }
+    };
+
     // If a user is logged in already then request a new token
      // istanbul ignore else 
     if(LoopBackAuth.accessTokenId && LoopBackAuth.currentUserId) {
@@ -150,19 +172,6 @@ app.service('User', [
       });
     }
 
-    var reload = function () {
-      if(user) {
-        Journalist.findById({
-          id: user.userId 
-        }, function (usr) {
-          user.user = usr;
-          set(user);
-        }, function (err) {
-          console.log(err);
-         });
-      }
-    };
-
     Platform.ready
     .then(function () {
       document.addEventListener('resume', function () {
@@ -175,15 +184,6 @@ app.service('User', [
         updateSupport();
       }
     });
-
-    var updateSupport = function () {
-      if(user && user.user) {
-        Platform.support.setEmail(user.user.email);
-        Platform.support.setName(user.userId);
-      } else {
-        Platform.support.clearUser();
-      }
-    };
 
     return {
       clearData: clearData,
