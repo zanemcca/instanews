@@ -93,6 +93,7 @@ app.service('Notifications', [
           if(data.additionalData) {
             if(!data.additionalData.save) {
               data.additionalData.id = data.additionalData.id || data.additionalData.myId;
+              data.additionalData.created = data.additionalData.created || new Date();
               notifications.add(data.additionalData);
             }
 
@@ -225,8 +226,9 @@ app.service('Notifications', [
 
     // Triggered when an item in the list wants to be updated
     var update = function (newValue, oldValue) {
-      if( newValue.modified >= oldValue.modified ) {
+      if(!oldValue.modified || newValue.modified >= oldValue.modified ) {
         oldValue.seen = newValue.seen;
+        oldValue.created = newValue.created;
       }
     };
 
