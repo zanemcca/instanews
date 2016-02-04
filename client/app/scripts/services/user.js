@@ -76,12 +76,13 @@ app.service('User', [
              status: 'Active'
            };
 
-           Installation.create(appConfig, function (result, header) {
-             console.log('Created a new device installation : ' , header);
+           Installation.create(appConfig, function () {
+             console.log('Created a new device installation');
            },
            // istanbul ignore next
            function(err) {
-             console.log('Error trying to install device', JSON.stringify(err));
+             console.log('Error trying to install device');
+             console.log(err);
            });
          }
     };

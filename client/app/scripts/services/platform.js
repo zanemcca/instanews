@@ -393,7 +393,7 @@ app.factory('Platform', [
       clearData: function () {
         if(window.Mobihelp) {
           window.Mobihelp.clearCustomData(function (succ, err) {
-            if(!succ || err) {
+            if(!succ) {
               console.log('Failed to clear custom support data!');
               console.log(err);
             } else {
@@ -414,7 +414,6 @@ app.factory('Platform', [
       }
     };
 
-    
     var getAppNameLogo = function () {
      //return '<img src="images/favicon.ico"/>stanews'; 
      return 'InstaNews'; 
