@@ -31,10 +31,16 @@
 
 <div class="item"
   style="padding-top:1px;padding-bottom:1px;border:0;"> 
-  <div style="float: right;font-size:small;">
-    <b>{{item.topSub.username}}</b> &bull; 
-    {{location.name}} &bull; 
-    <span am-time-ago="item.created"></span>
+  <div class="item-text-wrap" style="text-align:right;font-size:small;">
+    <span class="no-wrap">
+      <b>{{item.topSub.username}}</b>
+    </span> 
+    <span class="no-wrap">
+      &bull; {{location.name}}
+    </span> 
+    <span class="no-wrap">
+      &bull; <span am-time-ago="item.created"></span>
+    </span>
   </div>
 </div>
 <div class="item" style="border:0px;padding-top:0px;padding-bottom:0px">
