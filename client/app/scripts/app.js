@@ -142,6 +142,16 @@ angular.module('instanews', [
       return User.login();
     };
 
+    $scope.showConversations = function () {
+      Platform.support.clearData();
+      Platform.support.showConversations();
+    };
+
+    $scope.showFAQ = function () {
+      Platform.support.clearData();
+      Platform.support.show();
+    };
+
     $scope.logout = User.logout;
 
     $scope.Navigate = Navigate;
