@@ -315,7 +315,7 @@ app.factory('Platform', [
         var getUnreadCount = function () {
           support.getUnreadCount(function (count) {
             support.unreadCount = count;
-          })
+          });
         };
 
         //Refresh the count every 5 minutes
