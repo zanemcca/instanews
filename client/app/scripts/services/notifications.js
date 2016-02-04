@@ -51,12 +51,11 @@ app.service('Notifications', [
               forceShow: true,
               icon: 'notif',
               iconColor: '#023E4F',
-              //senderID: '1081316781214'
               senderID: '373574168056'
             }
           };
 
-          if(ENV.production) {
+          if(ENV.name === 'production') {
             config.android.senderID = '132830452741';
           }
           device.type = 'android';
@@ -88,6 +87,7 @@ app.service('Notifications', [
         });
 
         push.on('notification', function(data) {
+          console.log('Notification recieved: ');
           console.log(data.additionalData);
           badge.increment();
           if(data.additionalData) {
@@ -334,7 +334,6 @@ app.service('Notifications', [
       user = User.get();
       if(user) {
         if(user.user) {
-          console.log(user.user);
           badge.set(user.user.badge);
         }
         if(firstUser) {
