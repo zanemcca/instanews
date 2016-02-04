@@ -72,6 +72,10 @@ module.exports = function (app) {
         }
       };
 
+      if (process.env.NODE_ENV === 'production') {
+        apns.production = true;
+      }
+
       var registrationOptions = {
         description: 'Local Citizen Journalism',
         pushSettings: {
