@@ -227,9 +227,6 @@ function ListFactory (Platform, User) {
       });
       spec.items.sort(spec.sortingFunction);
       that.enableFocus = false;
-
-      console.log('Unfocusing all elements');
-      console.log(spec.items);
     };
 
     // Register and notify observers of the list

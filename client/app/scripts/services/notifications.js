@@ -87,6 +87,7 @@ app.service('Notifications', [
         });
 
         push.on('notification', function(data) {
+          console.log('Notification recieved: ');
           console.log(data.additionalData);
           badge.increment();
           if(data.additionalData) {
@@ -333,7 +334,6 @@ app.service('Notifications', [
       user = User.get();
       if(user) {
         if(user.user) {
-          console.log(user.user);
           badge.set(user.user.badge);
         }
         if(firstUser) {
