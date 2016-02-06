@@ -18,7 +18,12 @@ describe('Login: ', function(){
 
       $provide.service('Platform', function() {
         return {
+          loading: {
+            show: function () {},
+            hide: function () {}
+          },
           showToast: function() {},
+          showAlert: function() {},
           getDevice: function() {}
         };
       });
