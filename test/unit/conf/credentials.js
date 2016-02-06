@@ -46,11 +46,11 @@ exports.run = function () {
       testKeys(tests);
     } else if(process.env.NODE_ENV === 'staging') {
       tests = [{
-        key: 'mongoEast',
+        key: 'mongo',
         value : {
           'username' : 'owner',
-          'url': '@candidate.54.mongolayer.com:10021,candidate.53.mongolayer.com:10272/',
-          'replicaSet' : 'set-560ef40b82a2b3b5a5001386',
+          'url': '@aws-us-east-1-portal.7.dblayer.com:10698,aws-us-east-1-portal.10.dblayer.com:10304/',
+          'ssl': true,
           'password' : 'couchesareabit2fly4me'
         }
       }];

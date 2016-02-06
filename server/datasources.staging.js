@@ -2,7 +2,9 @@
 var cred = require('./conf/credentials');
 
 var sendgrid = cred.get('sendgrid');
-var mongo = cred.get('mongoEast');
+//var mongo = cred.get('mongoEast');
+var mongo = cred.get('mongo');
+var mongoCA = cred.get('mongoCA');
 var aws = cred.get('aws');
 
 if( !mongo ) {
@@ -15,11 +17,22 @@ if( mongo.username && mongo.password) {
   ':' + mongo.password;
 }
 
+
 mongodb  += mongo.url;
 
 var options = '?connectTimeoutMS=30000';
 if(mongo.replicaSet) {
   options += '&replicaSet=' + mongo.replicaSet;
+}
+
+var mongos;
+
+if(mongo.ssl && mongoCA) {
+  mongos = {
+    ssl: true,
+    sslValidate: true,
+    sslCA: [mongoCA],
+  };
 }
 
 var maxFileSize = 1024*1024*1024; //1Gb
@@ -34,6 +47,7 @@ module.exports = {
     database: 'installations',
     name: 'Installations',
     connector: 'mongodb',
+    mongos: mongos,
     debug: true
   },
   Interactions: {
@@ -41,6 +55,7 @@ module.exports = {
     database: 'interactions',
     name: 'Interactions',
     connector: 'mongodb',
+    mongos: mongos,
     debug: true
   },
   /*
@@ -57,6 +72,7 @@ module.exports = {
     database: 'articles',
     name: 'Articles',
     connector: 'mongodb',
+    mongos: mongos,
     debug: true
   },
   Admins: {
@@ -64,12 +80,14 @@ module.exports = {
     database: 'admins',
     name: 'Admins',
     connector: 'mongodb',
+    mongos: mongos,
     debug: false
   },
   Users: {
     url: mongodb + 'users' + options,
     database: 'users',
     name: 'Users',
+    mongos: mongos,
     connector: 'mongodb'
   },
   push: {
