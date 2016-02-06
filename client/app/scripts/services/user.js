@@ -76,8 +76,15 @@ app.service('User', [
              status: 'Active'
            };
 
+           if(device.oldToken) {
+             appConfig.oldDeviceToken = device.oldToken;
+           }
+
            Installation.create(appConfig, function () {
              console.log('Created a new device installation');
+             delete device.oldToken;
+             Platform.setDevice(device);
+             LocalStorage.secureWrite('deviceToken', device.token);
            },
            // istanbul ignore next
            function(err) {
