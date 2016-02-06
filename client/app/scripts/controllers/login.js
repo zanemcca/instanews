@@ -185,14 +185,20 @@ app.controller('LoginCtrl', [
 
         var failedLogin = function (err) {
           /* istanbul ignore else */
-          if(err) {
-            console.log(err);
-          }
           $scope.invalidLogin = true;
           $scope.cred.password = '';
 
           Platform.loading.hide();
-          Platform.showAlert('There was an error logging in. Please try again');
+          if(err) {
+            console.log(err);
+            if(err.data && err.data.error && err.data.error.status === 401) {
+              Platform.showAlert('Please try again!', 'Invalid credentials');
+            } else {
+              Platform.showAlert('There was an error logging in. Please try again');
+            }
+          } else {
+            Platform.showAlert('There was an error logging in. Please try again');
+          }
         };
 
         var credentials;
