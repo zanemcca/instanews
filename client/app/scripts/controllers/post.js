@@ -33,6 +33,9 @@ app.controller('PostCtrl', [
 
     $scope.Uploads = Uploads.findOrCreate();
 
+    $scope.newArticle = Post.getNewArticle();
+    $scope.place = Post.getPlace(); 
+
     var updateUser = function() {
       $scope.user = User.get();
     };
@@ -48,30 +51,10 @@ app.controller('PostCtrl', [
       }
     });
 
-    $scope.place = {
-      getMap: Maps.getPostMap,
-      ignore: ['country', 'administrative_area_level_1'],
-      localizeCallback: function (err, pos) {
-        if(err) {
-          console.log('Error: ' + err);
-        }
-        else {
-          Maps.setMarker(Maps.getPostMap(), pos);
-        }
-      },
-      localize: function () {}    // localize is filled in by the autocomplete directive
-    };
-
-    $scope.newArticle = {
-      title: ''
-    };
-
-    var pendingPost = false;
-
     //Refresh the map everytime we enter the view
     $scope.$on('$ionicView.afterEnter', function() {
-      if(!pendingPost) {
-        pendingPost = true;
+      if($scope.newArticle.title === '' && $scope.Uploads.get().length === 0) {
+        console.log('New post!');
         $scope.place.localize(18);
       }
     });
@@ -134,43 +117,44 @@ app.controller('PostCtrl', [
       });
     };
 
+
     var exit = function() {
       if( Post.isPosting() ) {
         Platform.showToast('We\'ll let you know when your content is uploaded');
       }
-
-      $scope.newArticle = {
-        title: ''
-      };
 
       Navigate.goBack();
     };
 
     $scope.post = function () {
       if($scope.Uploads.get().length) {
-          var marker = Maps.getMarker();
-          if(marker && $scope.newArticle.title) {
-            var position = {
-              lat: marker.getPosition().lat(),
-              lng: marker.getPosition().lng()
-            };
+        var marker = Maps.getMarker();
+        if(marker && $scope.newArticle.title) {
+          Platform.loading.show();
 
-            var article = {
-              isPrivate: false,
-              location: position,
-              title: $scope.newArticle.title
-            };
+          var position = {
+            lat: marker.getPosition().lat(),
+            lng: marker.getPosition().lng()
+          };
 
-            Post.post($scope.Uploads, article, function (err) {
-              if(!err) {
-                pendingPost = false;
-                exit();
-              }
-            });
-          }
-          else {
-            console.log('Error: Cannot post article without both position and title');
-          }
+          var article = {
+            isPrivate: false,
+            location: position,
+            title: $scope.newArticle.title
+          };
+
+          Post.post($scope.Uploads, article, function (err) {
+            Platform.loading.hide();
+            if(!err) {
+              exit();
+            } else {
+              Platform.showAlert('Something went wrong while posting your content. Please try again');
+            }
+          });
+        }
+        else {
+          console.log('Error: Cannot post article without both position and title');
+        }
       } else {
         console.log('Cannot post without subarticles');
       }

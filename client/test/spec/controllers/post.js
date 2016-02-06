@@ -2,10 +2,21 @@
 describe('Post: ', function(){
 
   var deferred;
+  var article;
+  var place;
   var picture, video, media;
 
   //Load the module and create mocks for all dependencies
   beforeEach( function() {
+    article = {
+      title: ''
+    };
+
+    place = {
+      getMap: function () {}, 
+      localize: function () {}    // localize is filled in by the autocomplete directive
+    };
+
     video = 'video';
     picture = 'picture';
     media = {
@@ -62,6 +73,12 @@ describe('Post: ', function(){
 
       $provide.service('Post', function() {
         return {
+          getNewArticle: function () {
+            return article;
+          },
+          getPlace: function () {
+            return place;
+          },
           saveParentId: function(id, tempId) {
             return {
               tempId: 'uuid',
