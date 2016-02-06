@@ -154,6 +154,7 @@ app.controller('LoginCtrl', [
         Platform.loading.show();
 
         var successLogin = function(res) {
+          //TODO I think we can get rid of this one since we are doing a find before login
           Journalist.findOne({ filter: query}, function (user) {
             res.user = user;
             User.set(res);
@@ -164,21 +165,6 @@ app.controller('LoginCtrl', [
               email: '',
               remember: true
             };
-          /*
-             if($scope.cred.remember) {
-
-             var device = Platform.getDevice();
-             if(res && device.type) {
-             var session = {
-user: res
-}; 
-LocalStorage.secureWrite('session', session);
-}
-else {
-console.log('Error: Cannot save user!');
-}
-}
-*/
 
             $scope.invalidLogin = false;
 
@@ -216,12 +202,14 @@ console.log('Error: Cannot save user!');
 
         if ( $scope.cred.username.indexOf('@') > -1 ) {
           credentials = {
+            ttl: 6*7*24*60*60, 
             email: $scope.cred.username.toLowerCase(),
             password: $scope.cred.password,
           };
           query.where.email = credentials.email;
         } else {
           credentials = {
+            ttl: 6*7*24*60*60, 
             username: $scope.cred.username.toLowerCase(),
             password: $scope.cred.password,
           };

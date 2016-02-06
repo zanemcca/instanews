@@ -157,11 +157,11 @@ app.service('User', [
     // If a user is logged in already then request a new token
      // istanbul ignore else 
     if(LoopBackAuth.accessTokenId && LoopBackAuth.currentUserId) {
-      //Request a new token that expires in 2 weeks
+      //Request a new token that expires in 6 weeks
       //Journalist.accessTokens.create({
       Journalist.prototype$__create__accessTokens({
         id: LoopBackAuth.currentUserId,
-        ttl: 1209600
+        ttl: 6*7*24*60*60 
       }, null, function(user) {
         Journalist.findById({
           id: LoopBackAuth.currentUserId
