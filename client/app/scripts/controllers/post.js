@@ -33,9 +33,6 @@ app.controller('PostCtrl', [
 
     $scope.Uploads = Uploads.findOrCreate();
 
-    $scope.newArticle = Post.getNewArticle();
-    $scope.place = Post.getPlace(); 
-
     var updateUser = function() {
       $scope.user = User.get();
     };
@@ -53,6 +50,8 @@ app.controller('PostCtrl', [
 
     //Refresh the map everytime we enter the view
     $scope.$on('$ionicView.afterEnter', function() {
+      $scope.newArticle = Post.getNewArticle();
+      $scope.place = Post.getPlace(); 
       if($scope.newArticle.title === '' && $scope.Uploads.get().length === 0) {
         console.log('New post!');
         $scope.place.localize(18);
