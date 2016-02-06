@@ -102,7 +102,7 @@ module.exports = function(grunt) {
           check: {
             statements: 79,
             branches: 71,
-            functions: 82,
+            functions: 81,
             lines: 79,
           }
         }
