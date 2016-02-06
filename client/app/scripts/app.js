@@ -194,6 +194,8 @@ angular.module('instanews', [
   $mdGestureProvider
 ) {
 
+  $ionicConfigProvider.views.forwardCache(true);
+
   // Fix ionic ng-click from firing twice when using ngMaterial
   $mdGestureProvider.skipClickHijack();
 
@@ -302,6 +304,7 @@ angular.module('instanews', [
     }
   })
 
+  //TODO Remove this dead code
   .state('app.subarticlePost', {
     cache: false,
     url: '/post/article/{id}',

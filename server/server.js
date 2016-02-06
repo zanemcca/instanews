@@ -158,7 +158,6 @@ if(cluster.isMaster && numCPUs > 1 && process.env.NODE_ENV === 'production') {
   var setupBrute = function () {
     var store = new MongoStore(function (ready) {
       var mongo = cred.get('mongo');
-      var mongoCA = cred.get('mongoCA');
       // istanbul ignore if
       if(!mongo) {
         console.error(new Error('No database found!'));
@@ -180,12 +179,18 @@ if(cluster.isMaster && numCPUs > 1 && process.env.NODE_ENV === 'production') {
 
         var options = {};
 
-        if(mongo.ssl && mongoCA) {
-          options.mongos = {
-            ssl: true,
-            sslValidate: true,
-            sslCA: [mongoCA],
-          };
+        if(mongo.ssl) {
+          var mongoCA = cred.get('mongoCA');
+          if(mongoCA) {
+            options.mongos = {
+              ssl: true,
+              sslValidate: true,
+              sslCA: [mongoCA],
+            };
+          } else {
+            console.error(new Error('No database found!'));
+            process.exit(1);
+          }
         }
 
         //console.log('Connecting to ' + mongodb);
