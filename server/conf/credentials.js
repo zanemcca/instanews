@@ -96,7 +96,7 @@ if( process.env.NODE_ENV === 'production' ||
 else {
   //Place any development credentials you need here
   keys = [{
-    key: 'mongoEast',
+    key: 'mongo',
     value: {
       url: 'localhost:27017/'
     }
