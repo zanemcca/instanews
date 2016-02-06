@@ -48,6 +48,9 @@ app.controller('PostCtrl', [
       }
     });
 
+    $scope.place = Post.getPlace(); 
+    $scope.newArticle = Post.getNewArticle();
+
     //Refresh the map everytime we enter the view
     $scope.$on('$ionicView.afterEnter', function() {
       $scope.newArticle = Post.getNewArticle();
