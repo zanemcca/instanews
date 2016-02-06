@@ -157,7 +157,8 @@ if(cluster.isMaster && numCPUs > 1 && process.env.NODE_ENV === 'production') {
 
   var setupBrute = function () {
     var store = new MongoStore(function (ready) {
-      var mongo = cred.get('mongoEast');
+      var mongo = cred.get('mongo');
+      var mongoCA = cred.get('mongoCA');
       // istanbul ignore if
       if(!mongo) {
         console.error(new Error('No database found!'));
@@ -177,9 +178,19 @@ if(cluster.isMaster && numCPUs > 1 && process.env.NODE_ENV === 'production') {
           mongodb += '?replicaSet=' + mongo.replicaSet;
         }
 
+        var options = {};
+
+        if(mongo.ssl && mongoCA) {
+          options.mongos = {
+            ssl: true,
+            sslValidate: true,
+            sslCA: [mongoCA],
+          };
+        }
+
         //console.log('Connecting to ' + mongodb);
 
-        MongoClient.connect(mongodb, function(err, db) {
+        MongoClient.connect(mongodb, options, function(err, db) {
           // istanbul ignore if
           if (err) {
             console.log('Brute has failed to connect to mongo');
