@@ -135,6 +135,11 @@ app.factory('Post', [
             Article.create(article)
             .$promise
             .then( function(res) {
+              //Reset the article
+              newArticle = {
+                title: ''
+              };
+
               Uploads.moveToPending('newArticle',res.id);
               postSubarticles(uploads, res.id);
               cb();
@@ -159,7 +164,33 @@ app.factory('Post', [
       }
     };
 
+    var getPlace = function () {
+      return {
+        getMap: Maps.getPostMap,
+        ignore: ['country', 'administrative_area_level_1'],
+        localizeCallback: function (err, pos) {
+          if(err) {
+            console.log('Error: ' + err);
+          }
+          else {
+            Maps.setMarker(Maps.getPostMap(), pos);
+          }
+        },
+        localize: function () {}    // localize is filled in by the autocomplete directive
+      };
+    };
+
+    var newArticle = {
+      title: ''
+    };
+
+    var getNewArticle = function () {
+      return newArticle;
+    };
+
     return {
+      getPlace: getPlace,
+      getNewArticle: getNewArticle,
       isValidArticle: isValidArticle,
       isValidSubarticle: isValidSubarticle,
       post: post,
