@@ -51,9 +51,10 @@ app.factory('Post', [
       return posting;
     };
 
-    var postSubarticles = function (uploads, parentId) {
+    var postSubarticles = function (Uplds, parentId) {
       var completed = 0;
       var failed = 0;
+      var uploads = Uplds.get();
       var total = uploads.length;
 
       var done = function () {
@@ -61,13 +62,12 @@ app.factory('Post', [
         if(completed === total) {
           posting = false;
           Subarticles.findOrCreate(parentId).reload();
-          //TODO Remove this message as the reload and notifications takes care of it
-          var message = 'Your content has finished uploading and should be available soon';
 
           if(failed) {
-            message = 'Uh-Oh! Some of your content failed to upload!';
+            Platform.showAlert('Uh-Oh! Some of your content failed to upload! Please try again.');
+          } else if(Uplds.hasMediaItems()) {
+            Platform.showToast('Your content has finished uploading and should be available soon');
           }
-          Platform.showToast(message);
         }
       };
 
@@ -79,13 +79,12 @@ app.factory('Post', [
           sub.parentId = parentId;
           sub.id = parentId;
 
-
           Article.subarticles.create(sub)
           .$promise
           .then(function () {
+            done();
             upload.remove();
             upload.isPosting = false;
-            done();
           }, 
           // istanbul ignore next
           function(err) {
@@ -104,15 +103,15 @@ app.factory('Post', [
       });
     };
 
-    var post = function (uploads, article, cb) {
-      uploads = uploads.get();
+    var post = function (Uplds, article, cb) {
+      var uploads = Uplds.get();
       posting = true;
 
       // istanbul ignore else
       if(uploads.length) {
         if(typeof article === 'string') {
           Uploads.moveToPending(article);
-          postSubarticles(uploads, article);
+          postSubarticles(Uplds, article);
           cb();
           // istanbul ignore else 
         } else if(isValidArticle(article)) { 
@@ -141,12 +140,10 @@ app.factory('Post', [
               };
 
               Uploads.moveToPending('newArticle',res.id);
-              postSubarticles(uploads, res.id);
+              postSubarticles(Uplds, res.id);
               cb();
             }, function (err) {
               posting = false;
-              var message = 'Your article failed to upload. Please make sure you included a title and at least one piece of content.';
-              Platform.showToast(message);
               console.log('Failed to create article');
               console.log(err);
               cb(err);
