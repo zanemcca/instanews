@@ -12,12 +12,21 @@ module.exports = function(app) {
       /* istanbul ignore else */
       if( inst && ctx.isNewInstance) {
 
+        var token = inst.deviceToken;
+
         inst.created = new Date();
+
+        if(inst.oldDeviceToken) {
+          console.log('Olde device token was given!');
+          token = inst.oldDeviceToken;
+          inst.unsetAttribute('oldDeviceToken');
+          console.log(token);
+        }
 
          Installation.find({
             where: {
                deviceType: inst.deviceType,
-               deviceToken: inst.deviceToken
+               deviceToken: token 
             }
          }, function(err, res) {
             if( err) {
@@ -28,6 +37,7 @@ module.exports = function(app) {
 
                   res[0].modified = new Date();
                   res[0].userId = inst.userId;
+                  res[0].deviceToken = inst.deviceToken;
                   //Possibly an infinite loop here
                   /*
                   console.log('Installation was found so ' +

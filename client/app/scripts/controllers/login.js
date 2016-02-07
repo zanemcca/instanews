@@ -154,6 +154,7 @@ app.controller('LoginCtrl', [
         Platform.loading.show();
 
         var successLogin = function(res) {
+          //TODO I think we can get rid of this one since we are doing a find before login
           Journalist.findOne({ filter: query}, function (user) {
             res.user = user;
             User.set(res);
@@ -164,21 +165,6 @@ app.controller('LoginCtrl', [
               email: '',
               remember: true
             };
-          /*
-             if($scope.cred.remember) {
-
-             var device = Platform.getDevice();
-             if(res && device.type) {
-             var session = {
-user: res
-}; 
-LocalStorage.secureWrite('session', session);
-}
-else {
-console.log('Error: Cannot save user!');
-}
-}
-*/
 
             $scope.invalidLogin = false;
 
@@ -199,14 +185,20 @@ console.log('Error: Cannot save user!');
 
         var failedLogin = function (err) {
           /* istanbul ignore else */
-          if(err) {
-            console.log(err);
-          }
           $scope.invalidLogin = true;
           $scope.cred.password = '';
 
           Platform.loading.hide();
-          Platform.showAlert('There was an error logging in. Please try again');
+          if(err) {
+            console.log(err);
+            if(err.data && err.data.error && err.data.error.status === 401) {
+              Platform.showAlert('Please try again!', 'Invalid credentials');
+            } else {
+              Platform.showAlert('There was an error logging in. Please try again');
+            }
+          } else {
+            Platform.showAlert('There was an error logging in. Please try again');
+          }
         };
 
         var credentials;
@@ -216,12 +208,14 @@ console.log('Error: Cannot save user!');
 
         if ( $scope.cred.username.indexOf('@') > -1 ) {
           credentials = {
+            ttl: 6*7*24*60*60, 
             email: $scope.cred.username.toLowerCase(),
             password: $scope.cred.password,
           };
           query.where.email = credentials.email;
         } else {
           credentials = {
+            ttl: 6*7*24*60*60, 
             username: $scope.cred.username.toLowerCase(),
             password: $scope.cred.password,
           };
