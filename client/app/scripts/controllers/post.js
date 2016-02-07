@@ -43,7 +43,9 @@ app.controller('PostCtrl', [
       if(newTitle !== oldTitle) {
         if(newTitle && newTitle.length > 0) {
           // jshint undef: false
-          $scope.newArticle.title = Case.title(newTitle);
+          $scope.title = Case.title(newTitle);
+        } else {
+          $scope.title = '';
         }
       }
     });
@@ -54,6 +56,7 @@ app.controller('PostCtrl', [
     //Refresh the map everytime we enter the view
     $scope.$on('$ionicView.afterEnter', function() {
       $scope.newArticle = Post.getNewArticle();
+      $scope.title = Case.title($scope.newArticle.title);
       $scope.place = Post.getPlace(); 
       if($scope.newArticle.title === '' && $scope.Uploads.get().length === 0) {
         console.log('New post!');
@@ -142,7 +145,7 @@ app.controller('PostCtrl', [
           var article = {
             isPrivate: false,
             location: position,
-            title: $scope.newArticle.title
+            title: $scope.title
           };
 
           Post.post($scope.Uploads, article, function (err) {
