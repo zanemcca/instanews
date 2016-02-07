@@ -198,7 +198,7 @@ exports.run = function() {
 
         this.timeout(5000);
 
-        var limit = 10;
+        var limit = 6;
         var attempts = 0;
         var lastDate = null;
         var date;
@@ -232,8 +232,7 @@ exports.run = function() {
                 attemptLogin();
               }
             });
-          } 
-          else {
+          } else {
             done();
           }
         };
