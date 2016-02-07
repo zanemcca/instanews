@@ -16,6 +16,7 @@ app.service('LocalStorage', [
   Platform.ready
   .then( function() {
     if(!Platform.isBrowser()) {
+      //TODO use Platform.getDataDir() instead
       dataDir = cordova.file.dataDirectory;
     }
   });

@@ -62,7 +62,7 @@ module.exports = function(app) {
       done(err);
     };
 
-    var user;
+    var user, e;
     if( ctx && ctx.req && ctx.req.body) {
       user = ctx.req.body;
     }
@@ -70,7 +70,9 @@ module.exports = function(app) {
       user = instance;
     }
     else {
-      next(new Error('Bad user given for creation!'));
+      e = new Error('Bad user given for creation!');
+      e.status = 422;
+      next(e);
     }
 
     function checkPasswordStrength(password) {
@@ -104,6 +106,9 @@ module.exports = function(app) {
     } 
 
     if(user.username) {
+      if(typeof user.username !== 'string') {
+        user.username = user.username.toString();
+      }
       user.username = user.username.toLowerCase();
     }
     if(user.email) {
@@ -115,10 +120,9 @@ module.exports = function(app) {
       return valid.test(username);
     }
 
-    var e;
     if(checkPasswordStrength(user.password) <= 0) {
       e = new Error('Password is too weak!');
-      e.status = 403;
+      e.status = 422;
       next(e);
     }
     else {

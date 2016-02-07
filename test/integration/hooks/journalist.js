@@ -84,7 +84,7 @@ exports.run = function() {
         user.password = 'toshort';
         api.post('/api/journalists')
         .send(user)
-        .expect(403)
+        .expect(422)
         .end( function(err, res) {
 
           expect(err).to.not.exist;
@@ -143,52 +143,103 @@ exports.run = function() {
       });
     });
 
-    it('should limit the login attempts for the user', function(done) {
+    describe('login', function () {
+      var user;
 
-      this.timeout(5000);
+      before( function (done) {
+        user = {
+          username: Math.round(Math.random()*1000000).toString()
+        };
 
-      var limit = 10;
-      var attempts = 0;
-      var lastDate = null;
-      var date;
-      var delay = 0;
-      var delayLast = 0;
+        user.email = user.username + '@instanews.com';
+        user.password = 'password';
 
-      var badUser = journalist;
-      badUser.password = 'akjgnbsaDOFIUJBO34987thg98h3598nberfjgn';
-      var attemptLogin = function() {
-        if(attempts < limit) {
-          attempts++;
-          api.post('/api/journalists/login')
-          .end( function(err, res) {
-            var error = res.body.error;
-            expect(error).to.exist;
-
-            if(res.status === 429) {
-              expect(error.nextValidRequestDate).to.exist;
-              if( lastDate ) {
-                date = new Date(error.nextValidRequestDate);
-                expect(date).to.be.afterTime(lastDate);
-
-                delayLast = delay;
-                delay = date - lastDate;
-                expect(delay).to.be.above(delayLast);
-              }
-              lastDate = new Date(error.nextValidRequestDate);
-              setTimeout( attemptLogin, lastDate - Date.now());
-            }
-            else {
-              attemptLogin();
-            }
-          });
-        }
-        else {
+        api.post('/api/journalists')
+        .send(user)
+        .expect(200)
+        .end(function (err, res) {
+          expect(err).to.not.exist;
+          expect(res.body.error).to.not.exist;
           done();
-        }
-      };
+        });
+      });
 
-      attemptLogin();
+      it('should be able to login with email', function (done) {
+        api.post('/api/journalists/login')
+        .send({
+          email: user.email,
+          password: user.password
+        })
+        .expect(200)
+        .end(function (err, res) {
+          expect(err).to.not.exist;
+          expect(res.body.error).to.not.exist;
+          done();
+        });
+      });
 
+      it('should be able to login with username', function (done) {
+        api.post('/api/journalists/login')
+        .send({
+          email: user.email,
+          password: user.password
+        })
+        .expect(200)
+        .end(function (err, res) {
+          expect(err).to.not.exist;
+          expect(res.body.error).to.not.exist;
+          done();
+        });
+      });
+    });
+
+    describe('brute', function () {
+      it('should limit the login attempts for the user', function(done) {
+
+        this.timeout(5000);
+
+        var limit = 6;
+        var attempts = 0;
+        var lastDate = null;
+        var date;
+        var delay = 0;
+        var delayLast = 0;
+
+        var badUser = journalist;
+        badUser.password = 'akjgnbsaDOFIUJBO34987thg98h3598nberfjgn';
+        var attemptLogin = function() {
+          if(attempts < limit) {
+            attempts++;
+            api.post('/api/journalists/login')
+            .end( function(err, res) {
+              var error = res.body.error;
+              expect(error).to.exist;
+
+              if(res.status === 429) {
+                expect(error.nextValidRequestDate).to.exist;
+                if( lastDate ) {
+                  date = new Date(error.nextValidRequestDate);
+                  expect(date).to.be.afterTime(lastDate);
+
+                  delayLast = delay;
+                  delay = date - lastDate;
+                  expect(delay).to.be.above(delayLast);
+                }
+                lastDate = new Date(error.nextValidRequestDate);
+                setTimeout( attemptLogin, lastDate - Date.now());
+              }
+              else {
+                attemptLogin();
+              }
+            });
+          } else {
+            done();
+          }
+        };
+
+        attemptLogin();
+
+      });
     });
 
     on.article().describe('Using journalist', function () {
