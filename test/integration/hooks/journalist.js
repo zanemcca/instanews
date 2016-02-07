@@ -84,7 +84,7 @@ exports.run = function() {
         user.password = 'toshort';
         api.post('/api/journalists')
         .send(user)
-        .expect(403)
+        .expect(422)
         .end( function(err, res) {
 
           expect(err).to.not.exist;
@@ -181,7 +181,7 @@ exports.run = function() {
               attemptLogin();
             }
           });
-        }
+        } 
         else {
           done();
         }
@@ -189,6 +189,56 @@ exports.run = function() {
 
       attemptLogin();
 
+    });
+
+    describe('login', function () {
+      var user;
+
+      before( function (done) {
+        user = {
+          username: Math.round(Math.random()*1000000).toString()
+        };
+
+        user.email = user.username + '@instanews.com';
+        user.password = 'password';
+
+        api.post('/api/journalists')
+        .send(user)
+        .expect(200)
+        .end(function (err, res) {
+          expect(err).to.not.exist;
+          expect(res.body.error).to.not.exist;
+          done();
+        });
+      });
+
+      it('should be able to login with email', function (done) {
+        api.post('/api/journalists/login')
+        .send({
+          email: user.email,
+          password: user.password
+        })
+        .expect(200)
+        .end(function (err, res) {
+          expect(err).to.not.exist;
+          expect(res.body.error).to.not.exist;
+          done();
+        });
+      });
+
+      it('should be able to login with username', function (done) {
+        api.post('/api/journalists/login')
+        .send({
+          email: user.email,
+          password: user.password
+        })
+        .expect(200)
+        .end(function (err, res) {
+          expect(err).to.not.exist;
+          expect(res.body.error).to.not.exist;
+          done();
+        });
+      });
     });
 
     on.article().describe('Using journalist', function () {
