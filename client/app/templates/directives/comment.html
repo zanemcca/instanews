@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<div class="item item-text-wrap comment">
+<div ng-class="{'focused' : item.enableFocus }"
+  class="item item-text-wrap comment">
   <div class="row no-padding">
     <div class="col col-90 no-padding">
       <b>{{item.username}}</b> &bull; <span am-time-ago="item.created"></span>
@@ -23,6 +24,7 @@
   <p>{{item.content}}</p-->
 
   <inVotes class="item no-padding"
+     ng-class="{'focused' : item.enableFocus }"
      style="border: transparent"
      votable="item">
   </inVotes>

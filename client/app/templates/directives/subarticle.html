@@ -8,6 +8,7 @@
 
 </div-->
 <div class="item item-body"
+  ng-class="{'focused' : item.enableFocus }"
   style="padding-bottom:5px;">
   <div class="row no-padding">
     <div class="col col-90 no-padding">
@@ -30,12 +31,14 @@
 </div>
 
 <div class="item item-body no-padding"
+  ng-class="{'focused' : item.enableFocus }"
   ng-if="item._file"
   style="border-bottom:0;margin-bottom:0;padding-bottom:1px !important;">
   <inMedia edit-caption="caption.edit" is-mine="is.mine" media="item._file" id="item.id"></inMedia>
 </div>
 
-<div class="item" style="border:0px;padding-top:0px;padding-bottom:0px">
+<div ng-class="{'focused' : item.enableFocus }"
+  class="item" style="border:0px;padding-top:0px;padding-bottom:0px">
    <inVotes style="border: transparent"
       votable="item">
    </inVotes>
