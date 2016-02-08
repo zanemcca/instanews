@@ -22,5 +22,10 @@
   style="float: right;border:0;margin:0;"
   id="{{votable.id}}"
   ng-click="toggleComments()">
-  Comments
+  <span ng-if="votable.modelName !== 'comment'">
+    Comments
+  </span>
+  <span ng-if="votable.modelName === 'comment'">
+    Replies
+  </span>
 </button>
