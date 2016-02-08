@@ -149,13 +149,12 @@ module.exports = function(grunt) {
     shell: {
       debug: {
         command: function (file) { 
-          //return 'node-debug --no-preload ' + file;
-          return 'node-debug --ignore "**/node_modules/**" ' + file;
+          return 'node-debug --hidden node_modules/ ' + file;
         }
       },
       debugTest: {
         command: function (file) { 
-          return 'node-debug --ignore "**/node_modules/**" _mocha --no-timeouts ' + file;
+          return 'node-debug --hidden node_modules/ _mocha --no-timeouts ' + file;
         }
       }
     },
