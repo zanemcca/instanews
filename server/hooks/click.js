@@ -302,7 +302,7 @@ module.exports = function(app) {
     var inst = ctx.instance;
     if(inst) {
       inst.clickable(function(err, res) {
-        if(err) {
+        if(err || !res) {
           console.warn('Warning: Failed to fetch clickable');
           return next(err);
         }
@@ -313,29 +313,29 @@ module.exports = function(app) {
         if(ctx.Model.modelName === 'upVote' &&
            res.modelName === 'article' && !res.verified &&
              nearBy(res.location, inst.location)
-          ) {
+        ) {
 
-            if(res.username !== inst.username) {
-              if(!data.$set) {
-                data.$set = {
-                  verified: true
-                };
-              }
-              else {
-                data.$set.verified = true;
-              }
+          if(res.username !== inst.username) {
+            if(!data.$set) {
+              data.$set = {
+                verified: true
+              };
+            }
+            else {
+              data.$set.verified = true;
             }
           }
+        }
 
-          if(inst.type && inst.type.indexOf('create') === 0) {
-            var modelName = inst.type.slice(6);
-            var variable = 'not' + modelName + 'Rating';
-            if(!data.$mul) {
-              data.$mul = {};
-            }
-            data.$mul[variable] = (1 - Stat.getDefaultRating(modelName));
-            //console.log('Click ' + variable + ': ' + data.$mul[variable]);
+        if(inst.type && inst.type.indexOf('create') === 0) {
+          var modelName = inst.type.slice(6);
+          var variable = 'not' + modelName + 'Rating';
+          if(!data.$mul) {
+            data.$mul = {};
           }
+          data.$mul[variable] = (1 - Stat.getDefaultRating(modelName));
+          //console.log('Click ' + variable + ': ' + data.$mul[variable]);
+        }
 
           res.updateAttributes(data, function(err,res) {
             if(err) {

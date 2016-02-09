@@ -42,6 +42,42 @@
   transform: translateX(-50%);
 }
 
+// Focus animation
+@-webkit-keyframes focused {
+  from {
+    background-color: #F3F3FF;
+  }
+  to {
+    background-color: white; 
+  }
+}
+
+@-moz-keyframes focused {
+  from {
+    background-color: #F3F3FF;
+  }
+  to {
+    background-color: white; 
+  }
+}
+
+@keyframes focused {
+  from {
+    background-color: #F3F3FF;
+  }
+  to {
+    background-color: white; 
+  }
+}
+
+.focused {
+  background-color: white;
+  -webkit-animation: focused 3s ease-in 1;
+  -moz-animation: focused 3s ease-in 1;
+  animation: focused 3s ease-in 1;
+}
+
+// Box validations
 @mixin box-invalid {
   box-shadow: inset 1px 1px 3px #FF0000, inset -1px -1px 3px #FF0000 !important;
 }
@@ -151,3 +187,4 @@
 .buttons-right .icon .icon-badge {
   right: 50%;
 }
+

@@ -128,6 +128,7 @@ app.controller('ArticleCtrl', [
 
     $scope.onRefresh = function () {
       console.log('Refresh');
+      $scope.Subarticles.unfocusAll();
       $scope.Subarticles.reload(function() {
         $scope.$broadcast('scroll.refreshComplete');
       });

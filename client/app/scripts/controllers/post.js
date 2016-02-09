@@ -54,8 +54,10 @@ app.controller('PostCtrl', [
     $scope.newArticle = Post.getNewArticle();
 
     //Refresh the map everytime we enter the view
-    $scope.$on('$ionicView.afterEnter', function() {
+    $scope.$on('$ionicView.beforeEnter', function() {
       $scope.newArticle = Post.getNewArticle();
+
+      // jshint undef: false
       $scope.title = Case.title($scope.newArticle.title);
       $scope.place = Post.getPlace(); 
       if($scope.newArticle.title === '' && $scope.Uploads.get().length === 0) {
@@ -124,7 +126,7 @@ app.controller('PostCtrl', [
 
 
     var exit = function() {
-      if( Post.isPosting() ) {
+      if(Post.isPosting() && $scope.Uploads.hasMediaItems()) {
         Platform.showToast('We\'ll let you know when your content is uploaded');
       }
 
