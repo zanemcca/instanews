@@ -13,6 +13,7 @@ module.exports = function(Subarticle) {
 
   Subarticle.clearPending = function(message, next) {
     var Article = Subarticle.app.models.Article;
+    var Storage = Subarticle.app.models.Storage;
 
     Subarticle.findOne({
       where: {
@@ -42,12 +43,26 @@ module.exports = function(Subarticle) {
         var parentId = res.parentId;
         Subarticle.notify(res);
 
-        res.updateAttributes(query, function (err, res) {
+        res.updateAttributes(query, function (err, result) {
           if(err) {
+            console.error('Failed to update attributes!');
             return next(err);
           }
 
-          Article.clearPending(parentId, next);
+          Article.clearPending(parentId, function (err) { 
+            if(err) {
+              console.error('Failed to clear article pending flag!');
+              return next(err);
+            }
+
+            if(res._file.type.indexOf('video') > -1) {
+              var srcs = res._file.sources.slice();
+              srcs.push(res._file.poster);
+              Storage.updateCacheControl('instanews-videos', srcs, next);
+            } else {
+              next();
+            }
+          });
         });
       } else {
         console.log('No Subarticle found with pending: ' + message.jobId);

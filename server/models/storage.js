@@ -2,6 +2,7 @@
 var common = require('./common');
 var cred = require('../conf/credentials');
 var aws = require('aws-sdk');
+var async = require('async');
 var MessageValidator = require('sns-validator');
 
 /* jshint camelcase: false */
@@ -391,6 +392,47 @@ module.exports = function(Storage) {
   if(s3 && s3.getObject) {
     Storage.getObject = s3.getObject.bind(s3);
   }
+
+  Storage.updateCacheControl = function(container, keys, cb) {
+    if(!process.env.NODE_ENV || process.env.NODE_ENV === 'development') {
+      cb();
+    } else {
+      if(container && keys.length) {
+        if(process.env.NODE_ENV !== 'production') {
+          container += '-test';
+        }
+
+        var setCacheControl = function(key, next) {
+          s3.putObject({
+            Bucket: container,
+            CacheControl: 'no-transform,public,max-age=86400',
+            Key: key 
+          }, function(err) {
+            if(err) {
+              console.error('Failed to update cache control');
+              console.error(key);
+              console.error(err.stack);
+            }
+            next(err);
+          });
+        };
+
+        var funcs = [];
+        keys.forEach(function(key) {
+          funcs.push(setCacheControl.bind(this, key));
+        });
+
+        async.parrallel(funcs, function(err) {
+          cb(err);
+        });
+      } else {
+        var e = new Error('A container and keys are required to update cache-control');
+        e.status = 403;
+        console.warn(e.message);
+        cb(e);
+      }
+    }
+  };
 
   Storage.archive = function(instance, cb) {
     if(!process.env.NODE_ENV || process.env.NODE_ENV === 'development') {
