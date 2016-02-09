@@ -21,6 +21,11 @@ function start() {
           clearPending: function (id, next) {
             next();
           }
+        },
+        Storage: {
+          updateCacheControl: function(container,keys, next) {
+            next();
+          }
         }
       }
     },
@@ -88,6 +93,11 @@ exports.run = function () {
 
           sub = {
             parentId: 'id',
+            _file: {
+              type: 'video/mp4',
+              poster: 'hey.png',
+              sources: ['src1.m3u8', 'src2.mp4']
+            },
             updateAttributes: function(attr, cb) {
               update(attr, cb);
             }
