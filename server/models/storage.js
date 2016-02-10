@@ -403,8 +403,10 @@ module.exports = function(Storage) {
         }
 
         var setCacheControl = function(key, next) {
-          s3.putObject({
+          s3.copyObject({
             Bucket: container,
+            CopySource: container + '/' + key,
+            MetadataDirective: 'COPY',
             CacheControl: 'no-transform,public,max-age=86400',
             Key: key 
           }, function(err) {
