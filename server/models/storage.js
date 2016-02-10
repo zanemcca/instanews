@@ -403,19 +403,33 @@ module.exports = function(Storage) {
         }
 
         var setCacheControl = function(key, next) {
-          s3.copyObject({
+          s3.headObject({
             Bucket: container,
-            CopySource: container + '/' + key,
-            MetadataDirective: 'COPY',
-            CacheControl: 'no-transform,public,max-age=86400',
-            Key: key 
-          }, function(err) {
+            Key: key
+          }, function(err, data) {
             if(err) {
-              console.error('Failed to update cache control');
+              console.error('Failed to get object metadata');
               console.error(key);
               console.error(err.stack);
+              next(err);
+            } else {
+              var meta = data.metadata;
+              s3.copyObject({
+                Bucket: container,
+                CopySource: container + '/' + key,
+                MetadataDirective: 'REPLACE',
+                Metadata: meta,
+                CacheControl: 'no-transform,public,max-age=86400',
+                Key: key 
+              }, function(err) {
+                if(err) {
+                  console.error('Failed to update cache control');
+                  console.error(key);
+                  console.error(err.stack);
+                }
+                next(err);
+              });
             }
-            next(err);
           });
         };
 
