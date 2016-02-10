@@ -117,12 +117,14 @@ app.service('Uploads', [
         return;
       }
 
+      var mediaItemsCount = 0;
       var uploadItems = [];
       var uploads = observable(spec); 
 
       var addUpload = function (item) {
         item.remove = function () {
           if(!item.noFile) {
+            mediaItemsCount--;
             Platform.removeFile(item.options.fileName, function(err) {
               if(err) {
                 console.log(err);
@@ -339,6 +341,8 @@ app.service('Uploads', [
         }
         upload.complete = $q.defer();
 
+        mediaItemsCount++;
+
         addUpload(upload);
       } 
 
@@ -372,6 +376,8 @@ app.service('Uploads', [
 
         upload.complete = $q.defer();
 
+        mediaItemsCount++;
+
         addUpload(upload);
       }
 
@@ -392,6 +398,10 @@ app.service('Uploads', [
       // Public functions
       uploads.get = function (){
         return uploadItems;
+      };
+
+      uploads.hasMediaItems = function () {
+        return mediaItemsCount > 0;
       };
 
       //Capture video using the video camera

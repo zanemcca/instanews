@@ -13,6 +13,7 @@ app.service('Notifications', [
   'ENV',
   'Journalist',
   'list',
+  'LocalStorage',
   'Navigate',
   'Notif',
   'Platform',
@@ -28,6 +29,7 @@ app.service('Notifications', [
     ENV,
     Journalist,
     list,
+    LocalStorage,
     Navigate,
     Notif,
     Platform,
@@ -82,8 +84,17 @@ app.service('Notifications', [
         push.on('registration', function(data) {
           console.log('Registered: ' + data.registrationId);
           device.token = data.registrationId;
-          Platform.setDevice(device);
-          User.install();
+          LocalStorage.secureRead('deviceToken', function(err, token) {
+            if(err) {
+              console.log(err);
+            } else if(token) {
+              if(token !== data.registrationId) {
+                device.oldToken = token;
+              }
+            }
+            Platform.setDevice(device);
+            User.install();
+          });
         });
 
         push.on('notification', function(data) {

@@ -151,8 +151,10 @@ app.controller('LoginCtrl', [
       }, true );
 
       $scope.login = function () {
+        Platform.loading.show();
 
         var successLogin = function(res) {
+          //TODO I think we can get rid of this one since we are doing a find before login
           Journalist.findOne({ filter: query}, function (user) {
             res.user = user;
             User.set(res);
@@ -163,21 +165,6 @@ app.controller('LoginCtrl', [
               email: '',
               remember: true
             };
-          /*
-             if($scope.cred.remember) {
-
-             var device = Platform.getDevice();
-             if(res && device.type) {
-             var session = {
-user: res
-}; 
-LocalStorage.secureWrite('session', session);
-}
-else {
-console.log('Error: Cannot save user!');
-}
-}
-*/
 
             $scope.invalidLogin = false;
 
@@ -185,21 +172,33 @@ console.log('Error: Cannot save user!');
               $scope.loginModal.hide();
             }
 
+            Platform.loading.hide();
+
             Navigate.goOrGoBack();
 
           }, function (err) {
+            Platform.loading.hide();
+            Platform.showAlert('There was an error logging in. Please try again');
             console.log(err);
-            Platform.showToast('Unknown error!');
           });
         }; 
 
         var failedLogin = function (err) {
           /* istanbul ignore else */
-          if(err) {
-            console.log(err);
-          }
           $scope.invalidLogin = true;
           $scope.cred.password = '';
+
+          Platform.loading.hide();
+          if(err) {
+            console.log(err);
+            if(err.data && err.data.error && err.data.error.status === 401) {
+              Platform.showAlert('Please try again!', 'Invalid credentials');
+            } else {
+              Platform.showAlert('There was an error logging in. Please try again');
+            }
+          } else {
+            Platform.showAlert('There was an error logging in. Please try again');
+          }
         };
 
         var credentials;
@@ -209,12 +208,14 @@ console.log('Error: Cannot save user!');
 
         if ( $scope.cred.username.indexOf('@') > -1 ) {
           credentials = {
+            ttl: 6*7*24*60*60, 
             email: $scope.cred.username.toLowerCase(),
             password: $scope.cred.password,
           };
           query.where.email = credentials.email;
         } else {
           credentials = {
+            ttl: 6*7*24*60*60, 
             username: $scope.cred.username.toLowerCase(),
             password: $scope.cred.password,
           };
@@ -223,6 +224,7 @@ console.log('Error: Cannot save user!');
 
         Journalist.findOne({ filter: query}, function (res) {
           if(!res.emailVerified) {
+            Platform.loading.hide();
             $scope.verifyModal.show();
           } else {
             Journalist.login({
@@ -234,11 +236,13 @@ console.log('Error: Cannot save user!');
           }
         }, function (err) {
           console.log(err);
-          Platform.showToast('There is no user with the given username');
+          Platform.loading.hide();
+          Platform.showAlert('There is no user with the given username');
         });
       }; 
 
       $scope.verify = function () {
+        Platform.loading.show();
         Journalist.confirm({
           uid: $scope.cred.username.toLowerCase(),
           token: $scope.verify.token
@@ -248,7 +252,8 @@ console.log('Error: Cannot save user!');
         }, function (err) {
           console.log(err);
           $scope.invalid.token = true;
-          Platform.showToast('The token you entered is invalid. Please try again');
+          Platform.loading.hide();
+          Platform.showAlert('The token you entered is invalid. Please try again');
         });
       };
 
@@ -270,13 +275,17 @@ console.log('Error: Cannot save user!');
           console.log('Failed to send the confirmation code');
           return;
         }
+        Platform.loading.show();
+        console.log(usr);
         Journalist.resendConfirmation({
           user: usr
         }, function () {
+          Platform.loading.hide();
           Platform.showToast('We sent you a new confirmation code. It should arrive soon');
         }, function (err) {
           console.log(err);
-          Platform.showToast('Failed to send the confirmation code. Please try again');
+          Platform.loading.hide();
+          Platform.showAlert('Failed to send the confirmation code. Please try again');
         });
       };
 
@@ -291,19 +300,22 @@ console.log('Error: Cannot save user!');
             usr.username = $scope.cred.username;
           }
         } else {
-          Platform.showToast('A username or an email are required to reset a password');
+          Platform.showAlert('A username or an email are required to reset a password');
           return;
         }
 
+        Platform.loading.show();
         Journalist.requestPasswordReset({
           user: usr
         }, function () {
+          Platform.loading.hide();
           Platform.showToast('We sent you a reset code. It should arrive soon');
           $scope.reset.forgotModal.hide();
           $scope.reset.Modal.show();
         }, function (err) {
           console.log(err);
-          Platform.showToast('Failed to send the reset code. Please try again');
+          Platform.loading.hide();
+          Platform.showAlert('Failed to send the reset code. Please try again');
         });
       };
 
@@ -317,29 +329,33 @@ console.log('Error: Cannot save user!');
             usr.username = $scope.cred.username;
           }
         } else {
-          Platform.showToast('A username or an email are required to reset a password');
+          Platform.showAlert('A username or an email are required to reset a password');
           return;
         }
 
         if(!$scope.reset.token || $scope.reset.token.length !== 6) {
-          Platform.showToast('The token given is invalid');
+          Platform.showAlert('The token given is invalid');
         } else if(checkPasswordStrength($scope.reset.password) <= 0) {
-          Platform.showToast('The password given is too weak');
+          Platform.showAlert('You must have at least 8 characters', 'Password to weak');
         } else if ($scope.reset.password !== $scope.reset.confirmPassword) {
-          Platform.showToast('The confirmation password does not match the original');
+          Platform.showAlert('The confirmation password does not match the original');
         } else {
           usr.password = $scope.reset.password;
           usr.token = $scope.reset.token;
           if(typeof(usr.token) === 'number') {
             usr.token = usr.token.toString();
           }
+
+          Platform.loading.show();
           Journalist.passwordReset({ user: usr}, function () {
             $scope.cred.password = usr.password;
             $scope.login();
             $scope.reset.Modal.hide();
+            Platform.loading.hide();
           }, function (err) {
             console.log(err);
-            Platform.showToast('There was an error resetting your password. Please try again');
+            Platform.loading.hide();
+            Platform.showAlert('There was an error resetting your password. Please try again');
           });
         }
       };
@@ -362,11 +378,12 @@ console.log('Error: Cannot save user!');
         };
 
         if( $scope.passwordStrength <= 0) {
-          Platform.showToast('The password you entered is too weak!');
+          Platform.showAlert('You must have at least 8 characters', 'Password to weak');
         } else if(!$scope.validEmail()) {
-          Platform.showToast('The email you entered is not properly formatted!');
           $scope.invalid.email = true;
+          Platform.showAlert('The email you entered is not properly formatted!');
         } else {
+          Platform.loading.show();
           //Verify that the email and username is unique
           Journalist.count({
             where: {
@@ -374,15 +391,17 @@ console.log('Error: Cannot save user!');
             }
           }, function(res) {
             if( res.count > 0) {
+              Platform.loading.hide();
               $scope.invalid.email = true;
-              Platform.showToast('The email you entered is already used!');
+              Platform.showAlert('The email you entered is already used!');
             }
             else {
               /* istanbul ignore else */
               if ( $scope.newUser.username ) {
                 user.username = $scope.newUser.username.toLowerCase();
               } else {
-                Platform.showToast('You must enter a username!');
+                Platform.loading.hide();
+                Platform.showAlert('You must enter a username!');
                 $scope.invalid.username = true;
                 return;
               }
@@ -393,8 +412,9 @@ console.log('Error: Cannot save user!');
                 }
               }, function(res) {
                 if( res.count > 0) {
+                  Platform.loading.hide();
                   $scope.invalid.username = true;
-                  Platform.showToast('The username you entered is already used. Please try again');
+                  Platform.showAlert('The username you entered is already used. Please try another one');
                 }
                 else {
                   Journalist.create(user, function (res) {
@@ -410,18 +430,24 @@ console.log('Error: Cannot save user!');
                   }, 
                   /* istanbul ignore next */
                   function(err) {
+                    Platform.loading.hide();
+                    Platform.showAlert('There was an error signing up. Please try again');
                     console.log(err);
                   });
                 }
               },
               /* istanbul ignore next */
               function(err) {
+                Platform.loading.hide();
+                Platform.showAlert('There was an error signing up. Please try again');
                 console.log(err);
               });
             }
           },
           /* istanbul ignore next */
           function(err) {
+            Platform.loading.hide();
+            Platform.showAlert('There was an error signing up. Please try again');
             console.log(err);
           });
         }
