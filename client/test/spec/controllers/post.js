@@ -2,14 +2,32 @@
 describe('Post: ', function(){
 
   var deferred;
+  var article;
+  var place;
+  var uplds;
   var picture, video, media;
 
   //Load the module and create mocks for all dependencies
   beforeEach( function() {
+    article = {
+      title: ''
+    };
+
+    place = {
+      getMap: function () {}, 
+      localize: function () {}    // localize is filled in by the autocomplete directive
+    };
+
     video = 'video';
     picture = 'picture';
     media = {
       type: 'image'
+    };
+
+    uplds = {
+      hasMediaItems: function () {
+        return false;
+      }
     };
 
     module('instanews.controller.post');
@@ -62,6 +80,12 @@ describe('Post: ', function(){
 
       $provide.service('Post', function() {
         return {
+          getNewArticle: function () {
+            return article;
+          },
+          getPlace: function () {
+            return place;
+          },
           saveParentId: function(id, tempId) {
             return {
               tempId: 'uuid',
@@ -185,7 +209,7 @@ describe('Post: ', function(){
           findOrCreate: function(id) {
             return {
               get: function() {
-                return uploads;
+                return uplds;
               }
             };
           }
@@ -389,9 +413,9 @@ describe('Post: ', function(){
       expect(maps.getMarker.calledOnce).to.be.true;
     });
 
-    it('should localize on ionicView.afterEnter', function() {
+    it('should localize on ionicView.beforeEnter', function() {
       sinon.stub(scope, '$on', function(text, cb) {
-        expect(text).to.equal('$ionicView.afterEnter');
+        expect(text).to.equal('$ionicView.beforeEnter');
         cb();
       });
 

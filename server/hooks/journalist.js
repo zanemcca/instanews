@@ -62,7 +62,7 @@ module.exports = function(app) {
       done(err);
     };
 
-    var user;
+    var user, e;
     if( ctx && ctx.req && ctx.req.body) {
       user = ctx.req.body;
     }
@@ -70,7 +70,9 @@ module.exports = function(app) {
       user = instance;
     }
     else {
-      next(new Error('Bad user given for creation!'));
+      e = new Error('Bad user given for creation!');
+      e.status = 422;
+      next(e);
     }
 
     function checkPasswordStrength(password) {
@@ -104,6 +106,9 @@ module.exports = function(app) {
     } 
 
     if(user.username) {
+      if(typeof user.username !== 'string') {
+        user.username = user.username.toString();
+      }
       user.username = user.username.toLowerCase();
     }
     if(user.email) {
@@ -115,10 +120,9 @@ module.exports = function(app) {
       return valid.test(username);
     }
 
-    var e;
     if(checkPasswordStrength(user.password) <= 0) {
       e = new Error('Password is too weak!');
-      e.status = 403;
+      e.status = 422;
       next(e);
     }
     else {
@@ -166,61 +170,93 @@ module.exports = function(app) {
     next();
   });
 
-  Journalist.observe('loaded', function(ctx, next) {
-    debug('observe loaded', ctx, next);
+  var checkLoadedUser = function (instance, next) {
+    var userId;
+    var includeEmail = false;
 
-    var instance = ctx.instance;
-
-    if(instance) {
-      var userId;
-      var includeEmail = false;
-
-      var check = function () {
-        if(userId === instance.username) {
-          includeEmail = true;
-        }
-
-        //Only admins can see who else is an admin
-        Role.isInRole('admin', {
-          principalType: RoleMapping.USER,
-          principalId: userId 
-        }, function(err, exists) {
-          if(exists) {
-            Role.isInRole('admin', {
-              principalType: RoleMapping.USER,
-              principalId: instance.username
-            }, function(err, exists) {
-              if(exists) {
-                instance.isAdmin = true;
-              }
-              done();
-            });
-          } else {
-            done();
-          }
-        });
-      };
-
-      var done = function () {
-        if(!includeEmail) {
-          instance.unsetAttribute('email');
-        }
-        next();
-      };
-
-      var context = loopback.getCurrentContext();
-
-      if(context) {
-        var token = context.get('accessToken');
-        if(token) {
-          userId = token.userId;
-          if(userId) {
-            return check();
-          }
-        }
+    var check = function () {
+      if(userId === instance.username) {
+        includeEmail = true;
       }
 
-      done();
+      //Only admins can see who else is an admin
+      Role.isInRole('admin', {
+        principalType: RoleMapping.USER,
+        principalId: userId 
+      }, function(err, exists) {
+        if(exists) {
+          Role.isInRole('admin', {
+            principalType: RoleMapping.USER,
+            principalId: instance.username
+          }, function(err, exists) {
+            if(exists) {
+              instance.isAdmin = true;
+            }
+            done();
+          });
+        } else {
+          done();
+        }
+      });
+    };
+
+    var done = function () {
+      if(!includeEmail) {
+        instance.unsetAttribute('email');
+      }
+      next();
+    };
+
+    var context = loopback.getCurrentContext();
+
+    if(context) {
+      var token = context.get('accessToken');
+      if(token) {
+        userId = token.userId;
+        if(userId) {
+          return check();
+        }
+      }
+    }
+
+    done();
+  };
+
+  Journalist.afterRemote('findById', function(ctx, instance, next) {
+    debug('afterRemote findById', instance, next);
+    console.log('Checking!');
+
+    if(instance) {
+      checkLoadedUser(instance, next);
+    } else {
+      next();
+    }
+  });
+
+  Journalist.afterRemote('findOne', function(ctx, instance, next) {
+    debug('afterRemote findOne', instance, next);
+    console.log('Checking! findOne');
+
+    if(instance) {
+      checkLoadedUser(instance, next);
+    } else {
+      next();
+    }
+  });
+
+  //TODO Test this and use it if we ever open up Journalist.find
+  Journalist.afterRemote('find', function(ctx, instances, next) {
+    debug('afterRemote find', instance, next);
+    console.log('Checking! find');
+
+    if(instances.length) {
+      var funcs = [];
+      instances.forEach( function (instance) {
+        funcs.push(checkLoadedUser.bind(this, instance));
+      });
+      async.parallel(funcs, function(err) {
+        next(err);
+      });
     } else {
       next();
     }

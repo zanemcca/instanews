@@ -1,5 +1,5 @@
       
-"use strict";
+"use Strict";
 
 describe('instanews.service.user', function() {
 
@@ -17,6 +17,7 @@ describe('instanews.service.user', function() {
     module(function($provide) {
       $provide.service('LocalStorage', function() {
         return {
+          secureWrite: function() {},
           secureDelete: function(key) {}
         };
       });
@@ -34,6 +35,7 @@ describe('instanews.service.user', function() {
               token: 'adfasdf54df654asd65f14sad65f3s5'
             };
           },
+          setDevice: function() {},
           ready: {
             then: function (cb) {
               cb();

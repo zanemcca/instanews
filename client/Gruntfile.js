@@ -474,6 +474,7 @@ module.exports = function (grunt) {
           '<%= yeoman.app %>/bower_components/angular-animate/angular-animate.js',
           '<%= yeoman.app %>/bower_components/angular-sanitize/angular-sanitize.js',
           '<%= yeoman.app %>/bower_components/angular-ui-router/release/angular-ui-router.js',
+          '<%= yeoman.app %>/bower_components/Case/dist/Case.js',
           '<%= yeoman.app %>/bower_components/ionic/release/js/ionic.js',
           '<%= yeoman.app %>/bower_components/ionic/release/js/ionic-angular.js',
           '<%= yeoman.app %>/bower_components/angular-resource/angular-resource.js',

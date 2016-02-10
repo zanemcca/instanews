@@ -100,10 +100,10 @@ module.exports = function(grunt) {
         options: {
           coverageFolder: 'coverage*', // will check both coverage folders and merge the coverage results
           check: {
-            statements: 79,
-            branches: 71,
-            functions: 82,
-            lines: 79,
+            statements: 78,
+            branches: 70,
+            functions: 80,
+            lines: 78,
           }
         }
       },
@@ -149,13 +149,12 @@ module.exports = function(grunt) {
     shell: {
       debug: {
         command: function (file) { 
-          //return 'node-debug --no-preload ' + file;
-          return 'node-debug --ignore "**/node_modules/**" ' + file;
+          return 'node-debug --hidden node_modules/ ' + file;
         }
       },
       debugTest: {
         command: function (file) { 
-          return 'node-debug --ignore "**/node_modules/**" _mocha --no-timeouts ' + file;
+          return 'node-debug --hidden node_modules/ _mocha --no-timeouts ' + file;
         }
       }
     },
