@@ -422,7 +422,7 @@ module.exports = function(Storage) {
           funcs.push(setCacheControl.bind(this, key));
         });
 
-        async.parrallel(funcs, function(err) {
+        async.parallel(funcs, function(err) {
           cb(err);
         });
       } else {
