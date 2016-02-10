@@ -4,6 +4,7 @@ describe('Post: ', function(){
   var deferred;
   var article;
   var place;
+  var uplds;
   var picture, video, media;
 
   //Load the module and create mocks for all dependencies
@@ -21,6 +22,12 @@ describe('Post: ', function(){
     picture = 'picture';
     media = {
       type: 'image'
+    };
+
+    uplds = {
+      hasMediaItems: function () {
+        return false;
+      }
     };
 
     module('instanews.controller.post');
@@ -202,7 +209,7 @@ describe('Post: ', function(){
           findOrCreate: function(id) {
             return {
               get: function() {
-                return uploads;
+                return uplds;
               }
             };
           }
@@ -406,9 +413,9 @@ describe('Post: ', function(){
       expect(maps.getMarker.calledOnce).to.be.true;
     });
 
-    it('should localize on ionicView.afterEnter', function() {
+    it('should localize on ionicView.beforeEnter', function() {
       sinon.stub(scope, '$on', function(text, cb) {
-        expect(text).to.equal('$ionicView.afterEnter');
+        expect(text).to.equal('$ionicView.beforeEnter');
         cb();
       });
 
