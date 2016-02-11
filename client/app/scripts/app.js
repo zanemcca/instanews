@@ -7,6 +7,25 @@
 // the 2nd parameter is an array of 'requires'
 // 'starter.services' is found in services.js
 // 'starter.controllers' is found in controllers.js
+
+document.onclick = function(e) {
+  e = e || window.event;
+  var element = e.target || e.srcElement;
+
+  if(element.tagName ==='A') {
+    console.log('Opening ' + element.href + ' in in-app-browser');
+    window.open(element.href, '_blank', 'location=no');
+    return false;
+  } else if(element.tagName === 'IMG' && element.src.indexOf('maps') > -1) {
+    var grandparent = element.parentElement.parentElement;
+    if(grandparent.tagName === 'A') {
+      console.log('Opening ' + grandparent.href + ' in in-app-browser');
+      window.open(grandparent.href, '_blank', 'location=no');
+      return false;
+    }
+  }
+};
+
 angular.module('instanews', [
   'ionic',
   'config',
