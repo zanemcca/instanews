@@ -55,8 +55,10 @@ app.controller('PostCtrl', [
 
     //Refresh the map everytime we enter the view
     $scope.$on('$ionicView.beforeEnter', function() {
-      //TODO This should not have to be here
       $scope.newArticle = Post.getNewArticle();
+      if(!$scope.newArticle.title) {
+        $scope.newArticle.title = '';
+      }
 
       // jshint undef: false
       $scope.title = Case.title($scope.newArticle.title);
