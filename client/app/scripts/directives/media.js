@@ -148,6 +148,7 @@ app.directive(
         restrict: 'E',
         scope: {
           isMine: '=',
+          enableFocus: '=',
           editCaption: '=',
           media: '='
         },
