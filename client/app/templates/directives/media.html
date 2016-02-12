@@ -44,6 +44,7 @@
 
 <div class="item" 
   style="border-top: 0px;"
+  ng-class="{'focused' : enableFocus }"
   ng-if="media.caption">
   <p class="no-margin">{{media.caption}} <button class="no-margin button button-small button-clear icon ion-edit"
       ng-if="isMine()"
@@ -53,6 +54,7 @@
 </div>
 <div class="item"
   style="border-top: 0px;"
+  ng-class="{'focused' : enableFocus }"
   ng-if="!media.caption && isMine()">
   <button class="no-margin positive button button-small button-clear icon ion-edit"
     ng-click="editCaption()">
