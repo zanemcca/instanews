@@ -428,7 +428,55 @@ return gradient;
       });
     };
 
+    //Returns a place object that is used by the autocomplete directive
+    var getNewPlace = function () {
+      var place = {
+        getMap: getPostMap,
+        ignore: ['country', 'administrative_area_level_1'],
+        onLocalize: function () {}, //Ovverriden in autocomplete directive
+        localize: function (zoom) {
+          place.onLocalize();
+          // istanbul ignore else 
+          if(place.getMap instanceof Function) {
+            var map;
+            var delay = 16; //ms
+            var timeout = 5000; // 5s
+
+            var localizeMap = function (time) {
+              // istanbul ignore else 
+              if(time > 0) {
+                setTimeout(function () {
+                  map = place.getMap();
+                  if(map) {
+                    localize(map, zoom, function (err, pos) {
+                      if(err) {
+                        console.log('Error: ' + err);
+                      }
+                      else {
+                        setMarker(place.getMap(), pos);
+                      }
+                    });
+                  } else {
+                    localizeMap(time - delay);
+                  }
+                } , delay);
+              } else {
+                console.log('No Map found in ' + timeout + ' ms');
+              }
+            };
+
+            localizeMap(timeout);
+          }
+          else {
+            console.log('Map not valid! Cannot localize!');
+          }
+        }
+      };
+      return place;
+    };
+
     var geocoder = new google.maps.Geocoder();
+    //Returna geocoded location (aka Google place)
     var getPlace = function (location, cb) {
       geocoder.geocode({
         location: location
@@ -582,6 +630,7 @@ markers.push(new google.maps.Marker(tempMarker));
     that.getArticleMap = getArticleMap;
     that.updateHeatmap = updateHeatmap;
     that.setArticleMap = setArticleMap;
+    that.getNewPlace = getNewPlace; //TODO Rename this as it is ambiguous
     
     return that;
   }

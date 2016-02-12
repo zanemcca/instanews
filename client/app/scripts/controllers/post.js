@@ -50,16 +50,16 @@ app.controller('PostCtrl', [
       }
     });
 
-    $scope.place = Post.getPlace(); 
+    $scope.place = Maps.getNewPlace(); 
     $scope.newArticle = Post.getNewArticle();
 
     //Refresh the map everytime we enter the view
     $scope.$on('$ionicView.beforeEnter', function() {
+      //TODO This should not have to be here
       $scope.newArticle = Post.getNewArticle();
 
       // jshint undef: false
       $scope.title = Case.title($scope.newArticle.title);
-      $scope.place = Post.getPlace(); 
       if($scope.newArticle.title === '' && $scope.Uploads.get().length === 0) {
         console.log('New post!');
         $scope.place.localize(18);
@@ -71,6 +71,7 @@ app.controller('PostCtrl', [
       if(map) {
         google.maps.event.trigger(map, 'resize');
       }
+
     });
 
     $scope.map = {
