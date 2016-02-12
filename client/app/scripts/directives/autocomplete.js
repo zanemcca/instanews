@@ -3,11 +3,9 @@
 var app = angular.module('instanews.directive.autocomplete', ['ionic', 'ngResource']);
 
 app.directive('inautocomplete', [
-  '$timeout',
   'Platform',
   'Maps',
   function (
-    $timeout,
     Platform,
     Maps
   ) {
@@ -18,8 +16,7 @@ app.directive('inautocomplete', [
         place: '='
       },
       controller: function(
-        $scope,
-        $timeout
+        $scope
       ) {
 
         // istanbul ignore next
@@ -48,6 +45,7 @@ app.directive('inautocomplete', [
         };
 
         // Localize the map on the users position
+        /*
         $scope.place.localize = function (zoom) {
           $scope.done = true;
           $scope.input.value = '';
@@ -81,6 +79,13 @@ app.directive('inautocomplete', [
           else {
             console.log('Map not valid! Cannot localize!');
           }
+        };
+       */
+
+        $scope.place.onLocalize = function () {
+          $scope.done = true;
+          $scope.input.value = '';
+          $scope.input.placeholder = defaultPlaceholder;
         };
 
         $scope.set = function (prediction) {
