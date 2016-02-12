@@ -308,7 +308,7 @@ module.exports = function(Journalist) {
               err.status = 401;
               next(err);
             } else {
-              res.updateAttribute('password', user.password, function (err, res) {
+              res.updateAttribute('password', Journalist.hashPassword(user.password), function (err, res) {
                 next(err);
               });
             }
