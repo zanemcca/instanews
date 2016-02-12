@@ -89,6 +89,10 @@ app.controller('ArticleCtrl', [
     //Refresh the map everytime we enter the view
     $scope.$on('$ionicView.afterEnter', function() {
       afterLoaded();
+      var map = Maps.getArticleMap();
+      if(map) {
+        google.maps.event.trigger(map, 'resize');
+      }
       $scope.Subarticles.reload();
 
       uploadObserver = $scope.Uploads.registerObserver(function () {

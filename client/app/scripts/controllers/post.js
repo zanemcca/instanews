@@ -66,6 +66,13 @@ app.controller('PostCtrl', [
       }
     });
 
+    $scope.$on('$ionicView.afterEnter', function() {
+      var map = Maps.getPostMap();
+      if(map) {
+        google.maps.event.trigger(map, 'resize');
+      }
+    });
+
     $scope.map = {
       id: 'postMap'
     };
