@@ -89,7 +89,9 @@ app.service('Position', [
           }
         };
 
-        LocalStorage.secureWrite('position', pos);
+        if(Platform.isIOS()) {
+          LocalStorage.secureWrite('position', pos);
+        }
 
         ready.resolve();
         notifyObservers();
@@ -152,24 +154,26 @@ app.service('Position', [
               enableHighAccuracy: true   //GPS & Network based location
             });
 
-            //If the users location is not found in one second then try and read the last known position
-            setTimeout(function () {
-              // istanbul ignore else
-              if( !mPosition || !mPosition.coords) {
-                LocalStorage.secureRead('position', function(err, res) {
-                  // istanbul ignore else
-                  if (err || !(res && res.coords)) {
-                    console.log('Failed to find an old location');
-                  } else {
+            if(Platform.isIOS()) {
+              //If the users location is not found in one second then try and read the last known position
+              setTimeout(function () {
+                // istanbul ignore else
+                if( !mPosition || !mPosition.coords) {
+                  LocalStorage.secureRead('position', function(err, res) {
                     // istanbul ignore else
-                    if(!mPosition) {
-                      console.log('Using stored position');
-                      set(res);
+                    if (err || !(res && res.coords)) {
+                      console.log('Failed to find an old location');
+                    } else {
+                      // istanbul ignore else
+                      if(!mPosition) {
+                        console.log('Using stored position');
+                        set(res);
+                      }
                     }
-                  }
-                });
-              }
-            },1000);
+                  });
+                }
+               },1000);
+            }
         });
       }
     };
@@ -211,6 +215,30 @@ app.service('Position', [
               cb();
             }
           });
+        } else if (Platform.isAndroid6()) {
+          Platform.isLocationAuthorized(function (authorized) {
+            if(authorized) {
+              setupGeolocation();
+              cb();
+            } else {
+              Platform.requestLocationAuthorization(function (authorized) {
+                if(authorized) {
+                  setupGeolocation();
+                  cb();
+                } else {
+                  rejected();
+                }
+              }, function(err) {
+                console.log('Failed to request geolocationPermission');
+                console.log(err);
+                rejected();
+              });
+            }
+          }, function (err) {
+            console.log('Failed to read geolocationPermission');
+            console.log(err);
+            rejected();
+          }); 
         } else {
           setupGeolocation();
           cb();

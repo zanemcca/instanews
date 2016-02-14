@@ -434,7 +434,33 @@ app.factory('Platform', [
       }, cb);
     };
 
+    var isLocationAuthorized = function (succ, error) {
+      if(!isBrowser()) {
+        cordova.plugins.diagnostic.isLocationAuthorized(succ, error);
+      } else {
+        console.log('Cannot check permission from browser');
+        succ(true);
+      }
+    };
+
+    var requestLocationAuthorization = function (succ, error) {
+      if(!isBrowser()) {
+        cordova.plugins.diagnostic.requestLocationAuthorization(function (status) {
+          if(status === cordova.plugins.diagnostic.runtimePermissionStatus.GRANTED) {
+            succ(true);
+          } else {
+            succ(false);
+          }
+        }, error);
+      } else {
+        console.log('Cannot request permission from browser');
+        succ(true);
+      }
+    };
+
     return {
+      isLocationAuthorized: isLocationAuthorized,
+      requestLocationAuthorization: requestLocationAuthorization,
       support: support,
       keyboard: keyboard,
       getAppNameLogo: getAppNameLogo,
