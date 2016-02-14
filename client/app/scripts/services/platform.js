@@ -54,6 +54,12 @@ app.factory('Platform', [
       return ionic.Platform.isAndroid();
     };
 
+    var isAndroid6 = function() {
+      var version = ionic.Platform.version();
+      console.log(version);
+      return (isAndroid() && ionic.Platform.version() >= 6);
+    };
+
     var isBrowser = function() {
       var ip = ionic.Platform;
       if(ip && window.cordova) {
@@ -444,6 +450,7 @@ app.factory('Platform', [
       initBackButton: initBackButton,
       isIOS: isIOS,
       isAndroid: isAndroid,
+      isAndroid6: isAndroid6,
       isBrowser: isBrowser,
       isCameraPresent: isCameraPresent,
       isVideoPresent: isVideoPresent,
