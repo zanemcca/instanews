@@ -84,7 +84,9 @@ app.service('User', [
              console.log('Created a new device installation');
              delete device.oldToken;
              Platform.setDevice(device);
-             LocalStorage.secureWrite('deviceToken', device.token);
+             if(Platform.isIOS()) {
+               LocalStorage.secureWrite('deviceToken', device.token);
+             }
            },
            // istanbul ignore next
            function(err) {
