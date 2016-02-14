@@ -14,15 +14,20 @@ app.service('Maps', [
     Platform
   ){
 
-    var feedMap, postMap, articleMap;
+    var feedMap, postMap;
+    var articleMaps = {};
 
-    var getArticleMap = function() {
-      return articleMap;
+    var setArticleMap = function(map, id) {
+      articleMaps[id] = map;
+      that.notifyObservers();
     };
 
-    var setArticleMap = function(map) {
-      articleMap = map;
-      that.notifyObservers();
+    var getArticleMap = function(id) {
+      return articleMaps[id];
+    };
+
+    var deleteArticleMap = function (id) {
+      delete articleMaps[id];
     };
 
     var getPostMap = function() {
@@ -628,6 +633,7 @@ markers.push(new google.maps.Marker(tempMarker));
     that.setFeedMap = setFeedMap;
     that.getFeedMap = getFeedMap;
     that.getArticleMap = getArticleMap;
+    that.deleteArticleMap = deleteArticleMap;
     that.updateHeatmap = updateHeatmap;
     that.setArticleMap = setArticleMap;
     that.getNewPlace = getNewPlace; //TODO Rename this as it is ambiguous

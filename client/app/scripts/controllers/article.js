@@ -59,7 +59,7 @@ app.controller('ArticleCtrl', [
     var articleComments = Comments.findOrCreate('article',$stateParams.id);
 
     var afterLoaded = function () {
-      var map = Maps.getArticleMap();
+      var map = Maps.getArticleMap($stateParams.id);
       /* istanbul ignore else */
       if(map && $scope.article.location) { 
         setMarker(map, $scope.article.location);
@@ -86,10 +86,16 @@ app.controller('ArticleCtrl', [
     var marker;
     var uploadObserver;
 
+
+    $scope.$on('$ionicView.unloaded', function () {
+      console.log('Destroying article view!');
+      Maps.deleteArticleMap($stateParams.id);
+    });
+
     //Refresh the map everytime we enter the view
     $scope.$on('$ionicView.afterEnter', function() {
       afterLoaded();
-      var map = Maps.getArticleMap();
+      var map = Maps.getArticleMap($stateParams.id);
       if(map) {
         google.maps.event.trigger(map, 'resize');
       }

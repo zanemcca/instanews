@@ -201,7 +201,7 @@ app.directive('inmap', [
                   }
                 }, 50));
 
-                Maps.setArticleMap(map);
+                Maps.setArticleMap(map, $stateParams.id);
 
                 break;
               }
