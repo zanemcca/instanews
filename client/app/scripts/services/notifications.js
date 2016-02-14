@@ -110,6 +110,7 @@ app.service('Notifications', [
             if(!data.additionalData.save) {
               data.additionalData.id = data.additionalData.id || data.additionalData.myId;
               data.additionalData.created = data.additionalData.created || new Date();
+              data.additionalData.message = data.additionalData.message || data.message;
               notifications.add(data.additionalData);
             }
 
