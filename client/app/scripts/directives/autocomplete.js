@@ -88,6 +88,18 @@ app.directive('inautocomplete', [
           $scope.input.placeholder = defaultPlaceholder;
         };
 
+        $scope.localize = function () {
+          if($scope.place.post) {
+            $scope.place.localize(18, function(pos) {
+              if(pos) {
+                Maps.setMarker($scope.place.getMap(), pos);
+              }
+            });
+          } else {
+            $scope.place.localize();
+          }
+        };
+
         $scope.set = function (prediction) {
           $scope.done = true;
           console.log(prediction);

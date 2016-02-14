@@ -51,6 +51,7 @@ app.controller('PostCtrl', [
     });
 
     $scope.place = Maps.getNewPlace(); 
+    $scope.place.post = true;
     $scope.newArticle = Post.getNewArticle();
 
     //Refresh the map everytime we enter the view
@@ -64,7 +65,11 @@ app.controller('PostCtrl', [
       $scope.title = Case.title($scope.newArticle.title);
       if($scope.newArticle.title === '' && $scope.Uploads.get().length === 0) {
         console.log('New post!');
-        $scope.place.localize(18);
+        $scope.place.localize(18, function (pos) {
+          if(pos) {
+            Maps.setMarker($scope.place.getMap(), pos);
+          }
+        });
       }
     });
 
@@ -74,6 +79,11 @@ app.controller('PostCtrl', [
         google.maps.event.trigger(map, 'resize');
       }
 
+    });
+
+    $scope.$on('$ionicView.unloaded', function() {
+      console.log('Deleting the post map');
+      Maps.deletePostMap();
     });
 
     $scope.map = {

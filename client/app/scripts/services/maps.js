@@ -28,6 +28,7 @@ app.service('Maps', [
 
     var deleteArticleMap = function (id) {
       delete articleMaps[id];
+      that.notifyObservers();
     };
 
     var getPostMap = function() {
@@ -36,6 +37,11 @@ app.service('Maps', [
 
     var setPostMap = function(map) {
       postMap = map;
+      that.notifyObservers();
+    };
+
+    var deletePostMap = function () {
+      postMap = null;
       that.notifyObservers();
     };
 
@@ -439,7 +445,8 @@ return gradient;
         getMap: getPostMap,
         ignore: ['country', 'administrative_area_level_1'],
         onLocalize: function () {}, //Ovverriden in autocomplete directive
-        localize: function (zoom) {
+        localize: function (zoom, cb) {
+          cb = cb || function () {};
           place.onLocalize();
           // istanbul ignore else 
           if(place.getMap instanceof Function) {
@@ -456,9 +463,10 @@ return gradient;
                     localize(map, zoom, function (err, pos) {
                       if(err) {
                         console.log('Error: ' + err);
+                        cb();
                       }
                       else {
-                        setMarker(place.getMap(), pos);
+                        cb(pos);
                       }
                     });
                   } else {
@@ -467,6 +475,7 @@ return gradient;
                 } , delay);
               } else {
                 console.log('No Map found in ' + timeout + ' ms');
+                cb();
               }
             };
 
@@ -474,6 +483,7 @@ return gradient;
           }
           else {
             console.log('Map not valid! Cannot localize!');
+            cb();
           }
         }
       };
@@ -630,6 +640,7 @@ markers.push(new google.maps.Marker(tempMarker));
     that.fitBounds = fitBounds;
     that.setPostMap = setPostMap;
     that.getPostMap = getPostMap;
+    that.deletePostMap = deletePostMap;
     that.setFeedMap = setFeedMap;
     that.getFeedMap = getFeedMap;
     that.getArticleMap = getArticleMap;
