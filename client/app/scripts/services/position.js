@@ -181,7 +181,7 @@ app.service('Position', [
 
       Platform.ready
       .then( function() {
-        if(Platform.isIOS() ||  Platform.isAndroid6()) {
+        if(Platform.isIOS()) {
           LocalStorage.secureRead('geolocationPermission', function(err, res) {
             if(err || !res || !res.hasPermission) {
               if(err) {
