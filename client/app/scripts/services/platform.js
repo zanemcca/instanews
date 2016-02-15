@@ -540,8 +540,12 @@ app.factory('Platform', [
             succ(true);
           }
         }
-      },
-      storage: {
+      }
+    };
+
+
+    if(isAndroid6()) {
+      permissions.storage = {
         isAuthorized: isAuthorized.bind(this, [
           cordova.plugins.diagnostic.runtimePermission.READ_EXTERNAL_STORAGE,
           cordova.plugins.diagnostic.runtimePermission.WRITE_EXTERNAL_STORAGE
@@ -550,8 +554,17 @@ app.factory('Platform', [
           cordova.plugins.diagnostic.runtimePermission.READ_EXTERNAL_STORAGE,
           cordova.plugins.diagnostic.runtimePermission.WRITE_EXTERNAL_STORAGE
         ]) 
-      }
-    };
+      };
+    } else {
+      permissions.storage = {
+        isAuthorized: function (succ) {
+          succ(true);
+        },
+        requestAuthorization: function (succ) {
+          succ(true);
+        }
+      };
+    }
 
     return {
       permissions: permissions,
