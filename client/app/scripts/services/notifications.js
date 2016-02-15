@@ -84,17 +84,22 @@ app.service('Notifications', [
         push.on('registration', function(data) {
           console.log('Registered: ' + data.registrationId);
           device.token = data.registrationId;
-          LocalStorage.secureRead('deviceToken', function(err, token) {
-            if(err) {
-              console.log(err);
-            } else if(token) {
-              if(token !== data.registrationId) {
-                device.oldToken = token;
+          if(Platform.isIOS()) {
+            LocalStorage.secureRead('deviceToken', function(err, token) {
+              if(err) {
+                console.log(err);
+              } else if(token) {
+                if(token !== data.registrationId) {
+                  device.oldToken = token;
+                }
               }
-            }
+              Platform.setDevice(device);
+              User.install();
+            });
+          } else {
             Platform.setDevice(device);
             User.install();
-          });
+          }
         });
 
         push.on('notification', function(data) {
@@ -105,6 +110,7 @@ app.service('Notifications', [
             if(!data.additionalData.save) {
               data.additionalData.id = data.additionalData.id || data.additionalData.myId;
               data.additionalData.created = data.additionalData.created || new Date();
+              data.additionalData.message = data.additionalData.message || data.message;
               notifications.add(data.additionalData);
             }
 

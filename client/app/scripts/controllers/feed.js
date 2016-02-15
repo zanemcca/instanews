@@ -37,10 +37,16 @@ app.controller('FeedCtrl', [
     };
 
     // Prepare our autocompletion by linking it to out feedmap
+    /*
     $scope.place = {
       //types: ['(regions)'],
       getMap: Maps.getFeedMap
     };
+    */
+
+    $scope.place = Maps.getNewPlace();
+    $scope.place.ignore = null;
+    $scope.place.getMap =  Maps.getFeedMap;
 
     // Prepare our map by initializing its id
     $scope.map = {

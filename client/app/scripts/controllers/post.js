@@ -50,20 +50,40 @@ app.controller('PostCtrl', [
       }
     });
 
-    $scope.place = Post.getPlace(); 
+    $scope.place = Maps.getNewPlace(); 
+    $scope.place.post = true;
     $scope.newArticle = Post.getNewArticle();
 
     //Refresh the map everytime we enter the view
     $scope.$on('$ionicView.beforeEnter', function() {
       $scope.newArticle = Post.getNewArticle();
+      if(!$scope.newArticle.title) {
+        $scope.newArticle.title = '';
+      }
 
       // jshint undef: false
       $scope.title = Case.title($scope.newArticle.title);
-      $scope.place = Post.getPlace(); 
       if($scope.newArticle.title === '' && $scope.Uploads.get().length === 0) {
         console.log('New post!');
-        $scope.place.localize(18);
+        $scope.place.localize(18, function (pos) {
+          if(pos) {
+            Maps.setMarker($scope.place.getMap(), pos);
+          }
+        });
       }
+    });
+
+    $scope.$on('$ionicView.afterEnter', function() {
+      var map = Maps.getPostMap();
+      if(map) {
+        google.maps.event.trigger(map, 'resize');
+      }
+
+    });
+
+    $scope.$on('$ionicView.unloaded', function() {
+      console.log('Deleting the post map');
+      Maps.deletePostMap();
     });
 
     $scope.map = {

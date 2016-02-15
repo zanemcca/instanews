@@ -14,14 +14,20 @@ app.service('Maps', [
     Platform
   ){
 
-    var feedMap, postMap, articleMap;
+    var feedMap, postMap;
+    var articleMaps = {};
 
-    var getArticleMap = function() {
-      return articleMap;
+    var setArticleMap = function(map, id) {
+      articleMaps[id] = map;
+      that.notifyObservers();
     };
 
-    var setArticleMap = function(map) {
-      articleMap = map;
+    var getArticleMap = function(id) {
+      return articleMaps[id];
+    };
+
+    var deleteArticleMap = function (id) {
+      delete articleMaps[id];
       that.notifyObservers();
     };
 
@@ -31,6 +37,11 @@ app.service('Maps', [
 
     var setPostMap = function(map) {
       postMap = map;
+      that.notifyObservers();
+    };
+
+    var deletePostMap = function () {
+      postMap = null;
       that.notifyObservers();
     };
 
@@ -428,7 +439,59 @@ return gradient;
       });
     };
 
+    //Returns a place object that is used by the autocomplete directive
+    var getNewPlace = function () {
+      var place = {
+        getMap: getPostMap,
+        ignore: ['country', 'administrative_area_level_1'],
+        onLocalize: function () {}, //Ovverriden in autocomplete directive
+        localize: function (zoom, cb) {
+          cb = cb || function () {};
+          place.onLocalize();
+          // istanbul ignore else 
+          if(place.getMap instanceof Function) {
+            var map;
+            var delay = 16; //ms
+            var timeout = 5000; // 5s
+
+            var localizeMap = function (time) {
+              // istanbul ignore else 
+              if(time > 0) {
+                setTimeout(function () {
+                  map = place.getMap();
+                  if(map) {
+                    localize(map, zoom, function (err, pos) {
+                      if(err) {
+                        console.log('Error: ' + err);
+                        cb();
+                      }
+                      else {
+                        cb(pos);
+                      }
+                    });
+                  } else {
+                    localizeMap(time - delay);
+                  }
+                } , delay);
+              } else {
+                console.log('No Map found in ' + timeout + ' ms');
+                cb();
+              }
+            };
+
+            localizeMap(timeout);
+          }
+          else {
+            console.log('Map not valid! Cannot localize!');
+            cb();
+          }
+        }
+      };
+      return place;
+    };
+
     var geocoder = new google.maps.Geocoder();
+    //Returna geocoded location (aka Google place)
     var getPlace = function (location, cb) {
       geocoder.geocode({
         location: location
@@ -577,11 +640,14 @@ markers.push(new google.maps.Marker(tempMarker));
     that.fitBounds = fitBounds;
     that.setPostMap = setPostMap;
     that.getPostMap = getPostMap;
+    that.deletePostMap = deletePostMap;
     that.setFeedMap = setFeedMap;
     that.getFeedMap = getFeedMap;
     that.getArticleMap = getArticleMap;
+    that.deleteArticleMap = deleteArticleMap;
     that.updateHeatmap = updateHeatmap;
     that.setArticleMap = setArticleMap;
+    that.getNewPlace = getNewPlace; //TODO Rename this as it is ambiguous
     
     return that;
   }

@@ -20,15 +20,15 @@
       "type": "belongsTo",
       "polymorphic": true
     },
-    "from": {
-      "type": "belongsTo",
-      "model": "journalist",
-      "foreignKey": "messageFrom"
-    },
     "to": {
       "type": "belongsTo",
       "model": "journalist",
       "foreignKey": "username"
+    },
+    "from": {
+      "type": "belongsTo",
+      "model": "journalist",
+      "foreignKey": "messageFrom"
     }
   },
   "acls": [

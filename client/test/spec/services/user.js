@@ -41,6 +41,9 @@ describe('instanews.service.user', function() {
               cb();
             }
           },
+          isIOS: function () {
+            return false;
+          },
           isBrowser: function() {
             return false;
           },
