@@ -216,29 +216,18 @@ app.service('Position', [
             }
           });
         } else if (Platform.isAndroid6()) {
-          Platform.isLocationAuthorized(function (authorized) {
+          Platform.permissions.location.requestAuthorization(function (authorized) {
             if(authorized) {
               setupGeolocation();
               cb();
             } else {
-              Platform.requestLocationAuthorization(function (authorized) {
-                if(authorized) {
-                  setupGeolocation();
-                  cb();
-                } else {
-                  rejected();
-                }
-              }, function(err) {
-                console.log('Failed to request geolocationPermission');
-                console.log(err);
-                rejected();
-              });
+              rejected();
             }
-          }, function (err) {
-            console.log('Failed to read geolocationPermission');
+          }, function(err) {
+            console.log('Failed to request geolocationPermission');
             console.log(err);
             rejected();
-          }); 
+          });
         } else {
           setupGeolocation();
           cb();
