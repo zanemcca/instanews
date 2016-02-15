@@ -268,8 +268,12 @@ describe('Post: ', function(){
       $provide.service('Maps', function() {
         return {
           getMarker: function() {},
+          getNewPlace: function() {
+            return {};
+          },
           setMarker: function() {},
           getPostMap: function() {},
+          deletePostMap: function() {},
           localize: function() {
           }
         };
@@ -413,15 +417,18 @@ describe('Post: ', function(){
       expect(maps.getMarker.calledOnce).to.be.true;
     });
 
-    it('should localize on ionicView.beforeEnter', function() {
+    it('should call ionicView.afterEnter, ionicView.beforeEnter, $ionicView.unloaded', function() {
       sinon.stub(scope, '$on', function(text, cb) {
-        expect(text).to.equal('$ionicView.beforeEnter');
+        var acceptable = ['$ionicView.beforeEnter','$ionicView.afterEnter', '$ionicView.unloaded'];
+        console.log(text);
+        console.log(acceptable.indexOf(text));
+        expect(acceptable.indexOf(text) > -1).to.be.true;
         cb();
       });
 
       initController();
 
-      expect(scope.$on.calledOnce).to.be.true;
+      expect(scope.$on.callCount).to.equal(3);
     });
 
     // The local article was removed
