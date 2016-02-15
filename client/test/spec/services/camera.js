@@ -20,6 +20,13 @@ describe('instanews.service.camera', function() {
 
       $provide.service('Platform', function() {
         return {
+          permissions: {
+            storage: {
+              requestAuthorization: function (succ, err) {
+                succ(true);
+              }
+            }
+          },
           getDataDir: function() {
             return 'file://a/fake/uri/';
           },

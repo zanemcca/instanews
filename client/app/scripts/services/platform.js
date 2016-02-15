@@ -54,6 +54,12 @@ app.factory('Platform', [
       return ionic.Platform.isAndroid();
     };
 
+    var isAndroid6 = function() {
+      var version = ionic.Platform.version();
+      console.log(version);
+      return (isAndroid() && ionic.Platform.version() >= 6);
+    };
+
     var isBrowser = function() {
       var ip = ionic.Platform;
       if(ip && window.cordova) {
@@ -428,7 +434,140 @@ app.factory('Platform', [
       }, cb);
     };
 
+    var isAuthorized = function(runtime, succ, err) {
+      var runtimes = [];
+      if(Array.isArray(runtime)) {
+        runtimes = runtime;
+      } else {
+        runtimes.push(runtime);
+      }
+
+      if(isAndroid6()) {
+        cordova.plugins.diagnostic.getPermissionsAuthorizationStatus( function(statuses) {
+          var res = true;
+          for(var runtime in statuses) {
+            res = res && (statuses[runtime] === cordova.plugins.diagnostic.runtimePermissionStatus.GRANTED);
+          }
+
+          succ(res);
+        }, err, runtimes);
+      } else {
+        console.log('Cannot check permission from browser');
+        succ(true);
+      }
+    };
+
+    var requestAuthorization = function (runtime, succ, error) {
+      var runtimes = [];
+      if(Array.isArray(runtime)) {
+        runtimes = runtime;
+      } else {
+        runtimes.push(runtime);
+      }
+
+      if(isAndroid6()) {
+        isAuthorized(runtimes, function (authorized) {
+          if(authorized) {
+            succ(true);
+          } else {
+            cordova.plugins.diagnostic.requestRuntimePermissions(function (statuses) {
+              var res = true;
+              var deniedAlways = false;
+              for(var runtime in statuses) {
+                res = res && (statuses[runtime] === cordova.plugins.diagnostic.runtimePermissionStatus.GRANTED);
+                deniedAlways = deniedAlways || (statuses[runtime] === cordova.plugins.diagnostic.runtimePermissionStatus.DENIED_ALWAYS);
+              }
+
+              if(deniedAlways) {
+                showConfirm('We need your help changing your permissions', 'Go to Settings', function (idx) {
+                  if(idx === 1) {
+                    cordova.plugins.diagnostic.switchToSettings( function() {
+                      isAuthorized(runtimes, succ, error);
+                    }, error);
+                  } else {
+                    succ(false);
+                  }
+                });
+              } else {
+                succ(res);
+              }
+            }, error, runtimes);
+          }
+        }, error); 
+      } else {
+        console.log('Cannot request permission from browser');
+        succ(true);
+      }
+    };
+
+    var permissions = {
+      location: {
+        isAuthorized: function (succ, error) {
+          if(!isBrowser()) {
+            cordova.plugins.diagnostic.isLocationAuthorized(succ, error);
+          } else {
+            console.log('Cannot check permission from browser');
+            succ(true);
+          }
+        },
+        requestAuthorization: function (succ, error) {
+          if(!isBrowser()) {
+            permissions.location.isAuthorized(function (authorized) {
+              if(authorized) {
+                succ(true);
+              } else {
+                cordova.plugins.diagnostic.requestLocationAuthorization(function (status) {
+                  if(status === cordova.plugins.diagnostic.runtimePermissionStatus.GRANTED) {
+                    succ(true);
+                  } else if(status === cordova.plugins.diagnostic.runtimePermissionStatus.DENIED_ALWAYS) {
+                    showConfirm('We need your help changing your location permissions', 'Go to Settings', function (idx) {
+                      if(idx === 1) {
+                        cordova.plugins.diagnostic.switchToSettings( function() {
+                          permissions.location.isAuthorization(succ, error);
+                        }, error);
+                      } else {
+                        succ(false);
+                      }
+                    });
+                  } else {
+                    succ(false);
+                  }
+                }, error);
+              }
+            }, error); 
+          } else {
+            console.log('Cannot request permission from browser');
+            succ(true);
+          }
+        }
+      }
+    };
+
+
+    if(isAndroid6()) {
+      permissions.storage = {
+        isAuthorized: isAuthorized.bind(this, [
+          cordova.plugins.diagnostic.runtimePermission.READ_EXTERNAL_STORAGE,
+          cordova.plugins.diagnostic.runtimePermission.WRITE_EXTERNAL_STORAGE
+        ]),
+        requestAuthorization: requestAuthorization.bind(this, [
+          cordova.plugins.diagnostic.runtimePermission.READ_EXTERNAL_STORAGE,
+          cordova.plugins.diagnostic.runtimePermission.WRITE_EXTERNAL_STORAGE
+        ]) 
+      };
+    } else {
+      permissions.storage = {
+        isAuthorized: function (succ) {
+          succ(true);
+        },
+        requestAuthorization: function (succ) {
+          succ(true);
+        }
+      };
+    }
+
     return {
+      permissions: permissions,
       support: support,
       keyboard: keyboard,
       getAppNameLogo: getAppNameLogo,
@@ -444,6 +583,7 @@ app.factory('Platform', [
       initBackButton: initBackButton,
       isIOS: isIOS,
       isAndroid: isAndroid,
+      isAndroid6: isAndroid6,
       isBrowser: isBrowser,
       isCameraPresent: isCameraPresent,
       isVideoPresent: isVideoPresent,

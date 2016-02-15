@@ -12,21 +12,12 @@ app.service('LocalStorage', [
     $cordovaFile
   ){
 
-  var dataDir;
-  Platform.ready
-  .then( function() {
-    if(!Platform.isBrowser()) {
-      //TODO use Platform.getDataDir() instead
-      dataDir = cordova.file.dataDirectory;
-    }
-  });
-
   var writeFile = function(dir ,filename, data) {
     if(Platform.isBrowser()) {
       console.log('Cannot write files in the browser');
     } else {
       var write = function() {
-        var path = dataDir;
+        var path = Platform.getDataDir();
         if(dir.length > 0) {
           path += dir + '/';
         }
@@ -34,20 +25,20 @@ app.service('LocalStorage', [
         .then( function() {
           //console.log('Successful write of ' + filename);
         }, function(err) {
-          console.log('Error: Failed to write ' + dataDir + dir + '/' + filename + ': ' + JSON.stringify(err));
+          console.log('Error: Failed to write ' + Platform.getDataDir() + dir + '/' + filename + ': ' + JSON.stringify(err));
         });
       };
 
-      $cordovaFile.checkDir(dataDir, dir)
+      $cordovaFile.checkDir(Platform.getDataDir(), dir)
       .then( write(), function(err) {
         if(err.code === 1) {
-          $cordovaFile.createDir(dataDir,dir,true)
+          $cordovaFile.createDir(Platform.getDataDir(),dir,true)
           .then( write(), function(err) {
-            console.log('Error: Failed to create directory ' + dataDir + dir + ': ' + JSON.stringify(err));
+            console.log('Error: Failed to create directory ' + Platform.getDataDir() + dir + ': ' + JSON.stringify(err));
           });
         }
         else {
-          console.log('Error: There was an error checking the directory ' + dataDir + dir + ': ' + JSON.stringify(err));
+          console.log('Error: There was an error checking the directory ' + Platform.getDataDir() + dir + ': ' + JSON.stringify(err));
         }
       });
     }
@@ -57,7 +48,7 @@ app.service('LocalStorage', [
     if(Platform.isBrowser()) {
       console.log('Cannot read files in the browser');
     } else {
-      var path = dataDir;
+      var path = Platform.getDataDir();
       if(dir.length > 0) {
         path += dir + '/';
       }
@@ -96,7 +87,7 @@ app.service('LocalStorage', [
     if(Platform.isBrowser()) {
       console.log('Cannot read files in the browser');
     } else {
-      var path = dataDir;
+      var path = Platform.getDataDir();
       if(dir.length > 0) {
         path += dir + '/';
       }
@@ -176,7 +167,7 @@ app.service('LocalStorage', [
       var file = getFileName(CryptoJS.SHA256(key));
       //console.log('Trying to delete ' + file);
 
-      $cordovaFile.removeFile(dataDir, file)
+      $cordovaFile.removeFile(Platform.getDataDir(), file)
       .then( function (success) {
          console.log('Successfully deleted file!'+ JSON.stringify(success.fileRemoved.name));
       }, function (err) {
@@ -189,7 +180,7 @@ app.service('LocalStorage', [
     if(Platform.isBrowser()) {
       console.log('Cannot delete files in the browser');
     } else {
-      $cordovaFile.removeFile(dataDir + dir, file)
+      $cordovaFile.removeFile(Platform.getDataDir() + dir, file)
       .then( function (success) {
          console.log('Successfully deleted file!'+ JSON.stringify(success.fileRemoved.name));
       }, function (err) {

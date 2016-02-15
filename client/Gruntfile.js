@@ -72,6 +72,7 @@ module.exports = function (grunt) {
             'com.ionic.keyboard',
        //     'com.phonegap.plugins.PushPlugin',
             'cordova-plugin-crosswalk-webview',
+            'cordova-plugin-inappbrowser',
             'cordova-plugin-network-information',
             'cordova-plugin-whitelist',
             'cordova-plugin-x-toast',
@@ -92,7 +93,7 @@ module.exports = function (grunt) {
         options: {
           command: 'platform',
           action: 'add',
-          platforms: ['ios', 'android']
+          platforms: ['ios', 'android@5.0.0']
         }
       }
     },

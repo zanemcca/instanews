@@ -284,7 +284,7 @@ describe('Article controller: ', function(){
     it('should call Maps.getArticleMap', function() {
       sinon.spy(maps, 'getArticleMap');
       scope.$broadcast('$ionicView.afterEnter');
-      expect(maps.getArticleMap.calledOnce).to.be.true;
+      expect(maps.getArticleMap.calledTwice).to.be.true;
     });
 
     it('should call Maps.setMarker', function() {

@@ -32,6 +32,9 @@ describe('Feed: ', function(){
           getFeedMap: function() {
             return {};
           },
+          getNewPlace: function() {
+            return {};
+          },
           updateHeatmap: function(articles) {},
           localize: function() {
           }

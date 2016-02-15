@@ -31,46 +31,56 @@ app.factory('Camera', [
           limit: 1 
         };
 
-        $cordovaCapture.captureVideo(options)
-          .then(function (videoData) {
 
-            var finished = 0;
-            var files = [];
+        Platform.permissions.storage.requestAuthorization( function (succ) {
+          if(succ) {
+            $cordovaCapture.captureVideo(options)
+              .then(function (videoData) {
 
-            var afterCopy = function(fileEntry) {
+                var finished = 0;
+                var files = [];
 
-              console.log('After copy of video');
-              console.log(fileEntry);
+                var afterCopy = function(fileEntry) {
 
-              fileEntry.type = videoData[0].type;
+                  console.log('After copy of video');
+                  console.log(fileEntry);
 
-              files.push(fileEntry);
-              finished++;
-              if(finished === videoData.length) { 
-                if(files.length) {
-                  if(files.length > 1) {
-                    console.log('More than one video was grabbed');
+                  fileEntry.type = videoData[0].type;
+
+                  files.push(fileEntry);
+                  finished++;
+                  if(finished === videoData.length) { 
+                    if(files.length) {
+                      if(files.length > 1) {
+                        console.log('More than one video was grabbed');
+                      }
+                      q.resolve(files[0]);
+                    } else {
+                      q.resolve();
+                    }
                   }
-                  q.resolve(files[0]);
-                } else {
-                  q.resolve();
-                }
-              }
-            };
+                };
 
-            //Copy all of the videos into the app directory and create a thumbnail for each
-            for(var  i = 0; i < videoData.length; i++) {
-              if(Platform.isAndroid()) {
-                //Android video is compressed later so copying would be redundunt.
-                //Also android videos are too large to copy sometimes
-                FileTransfer.resolve(videoData[i].fullPath, afterCopy);
-              } else {
-                copyFile(videoData[i].fullPath, afterCopy);
-              }
-            }
-          }, function (err) {
-            q.reject(err);
-          }, options);
+                //Copy all of the videos into the app directory and create a thumbnail for each
+                for(var  i = 0; i < videoData.length; i++) {
+                  if(Platform.isAndroid()) {
+                    //Android video is compressed later so copying would be redundunt.
+                    //Also android videos are too large to copy sometimes
+                    FileTransfer.resolve(videoData[i].fullPath, afterCopy);
+                  } else {
+                    copyFile(videoData[i].fullPath, afterCopy);
+                  }
+                }
+              },
+              function (err) {
+                q.reject(err);
+              }, options);
+          } else {
+            q.reject();
+          }
+        }, function (err) {
+          q.reject(err);
+        });
 
         return q.promise;
       };
@@ -103,23 +113,31 @@ app.factory('Camera', [
         var q = $q.defer();
 
         if (Platform.isCameraPresent()) {
-          navigator.camera.getPicture(function(uri) {
-            var copy = copyFile;
-            if(Platform.isAndroid() && uri.indexOf('video') > -1) {
-              //Android videos tend to be larger and they are compressed later 
-              // therefore copying would be redundent.
-              copy = FileTransfer.resolve;
-            }
+          Platform.permissions.storage.requestAuthorization( function (succ) {
+            if(succ) {
+              navigator.camera.getPicture(function(uri) {
+                var copy = copyFile;
+                if(Platform.isAndroid() && uri.indexOf('video') > -1) {
+                  //Android videos tend to be larger and they are compressed later 
+                  // therefore copying would be redundent.
+                  copy = FileTransfer.resolve;
+                }
 
-            copy(uri, function(fileEntry) {
-              fileEntry.type = getType(fileEntry.name);
-              q.resolve(fileEntry);
-            }, function (err) {
-              q.reject(err);
-            });
+                copy(uri, function(fileEntry) {
+                  fileEntry.type = getType(fileEntry.name);
+                  q.resolve(fileEntry);
+                }, function (err) {
+                  q.reject(err);
+                });
+              }, function(err) {
+                q.reject(err);
+              }, options);
+            } else {
+              q.reject();
+            }
           }, function(err) {
             q.reject(err);
-          }, options);
+          });
 
           return q.promise;
         } else {
