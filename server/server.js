@@ -31,10 +31,10 @@ var setupMonitoring = function () {
     var dd = require('node-dogstatsd').StatsD;
     var datadogHost = 'localhost';
     for(var i in process.env) {
-      if(i.match(/^DATADOG_\d_ENV_TUTUM_NODE_HOSTNAME$/)) {
-        if(process.env[i] === process.env.TUTUM_NODE_HOSTNAME) {
+      if(i.match(/^DATADOG_\d_ENV_DOCKERCLOUD_NODE_HOSTNAME$/)) {
+        if(process.env[i] === process.env.DOCKERCLOUD_NODE_HOSTNAME) {
           var num = i[8];
-          var env = 'DATADOG_' + num + '_ENV_TUTUM_CONTAINER_HOSTNAME';
+          var env = 'DATADOG_' + num + '_ENV_DOCKERCLOUD_CONTAINER_HOSTNAME';
           env  = process.env[env];
 
           if(env) {
