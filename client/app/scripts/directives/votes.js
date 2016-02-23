@@ -39,9 +39,11 @@ app.directive('invotes', [
               if($scope.votable.upVotes.length) {
                 $scope.votable.upVoted = true;
                 $scope.votable.downVoted = false;
-              }
-              else if($scope.votable.downVotes.length) {
+              } else if($scope.votable.downVotes.length) {
                 $scope.votable.downVoted = true;
+                $scope.votable.upVoted = false;
+              } else {
+                $scope.votable.downVoted = false;
                 $scope.votable.upVoted = false;
               }
             });

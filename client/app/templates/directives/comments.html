@@ -9,7 +9,8 @@
     style="float: left;"
     ng-show="Comments.areItemsAvailable()"
     ng-click="Comments.load()">
-    Load more
+    <i ng-if="owner.modelName !== 'comment'">Show more</i>
+    <i ng-if="owner.modelName === 'comment'">Show older</i>
   </button>
   <button 
     ng-disabled="Platform.isBrowser()"
