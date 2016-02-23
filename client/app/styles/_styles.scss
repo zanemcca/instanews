@@ -188,3 +188,17 @@
   right: 50%;
 }
 
+//Hack to fix squashed title on iOS
+// ionic issue #4661
+.platform-ios,
+.platform-browser {
+  .title.title-center.header-item {
+    right: 26px!important;
+  }
+}
+
+.platform-android {
+  .title.title-left.header-item {
+    right: 36px!important;
+  }
+}
