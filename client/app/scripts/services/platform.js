@@ -232,7 +232,7 @@ app.factory('Platform', [
       ionic.Platform.ready( function( device ) {
         /* jshint undef:false */
         if(navigator.connection && navigator.connection.type === Connection.NONE) {
-          Platform.showAlert('Instanews is unavailable offline. Please try again later', 'Sorry', function () {
+          showAlert('Instanews is unavailable offline. Please try again later', 'Sorry', function () {
             if(navigator.app) {
               navigator.app.exitApp();
             }
