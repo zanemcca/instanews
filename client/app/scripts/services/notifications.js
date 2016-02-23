@@ -171,6 +171,7 @@ app.service('Notifications', [
             break;
           default:
             console.log('Unknown votable type!');
+            Platform.showToast('Sorry but that vote was removed');
             break;
         }
       };
@@ -186,6 +187,7 @@ app.service('Notifications', [
             handleVotable(res);
           }, function (err) {
             console.log(err);
+            Platform.showToast('Sorry but that vote was removed');
           });
           break;
         case 'downVote':
@@ -195,6 +197,7 @@ app.service('Notifications', [
             handleVotable(res);
           }, function (err) {
             console.log(err);
+            Platform.showToast('Sorry but that vote was removed');
           });
           break;
         case 'comment':
@@ -326,19 +329,10 @@ app.service('Notifications', [
         this.number = 0;
         setExternalBadge();
         User.clearBadge();
-      },
-      toString: function () {
-        if(!this.number || this.number < 0) {
-          return '0';
-        } else if( this.number >= 1000000) {
-          return (Math.floor(this.number/1000000).toString()) + 'M';
-        } else if( this.number >= 1000) {
-          return (Math.floor(this.number/1000).toString()) + 'k';
-        } else {
-          return this.number.toString();
-        }
       }
     };
+
+    badge.toString = Platform.numToString.bind(badge); 
 
     notifications.getBadge = function () {
       return badge;
