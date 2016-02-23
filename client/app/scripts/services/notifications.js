@@ -326,19 +326,10 @@ app.service('Notifications', [
         this.number = 0;
         setExternalBadge();
         User.clearBadge();
-      },
-      toString: function () {
-        if(!this.number || this.number < 0) {
-          return '0';
-        } else if( this.number >= 1000000) {
-          return (Math.floor(this.number/1000000).toString()) + 'M';
-        } else if( this.number >= 1000) {
-          return (Math.floor(this.number/1000).toString()) + 'k';
-        } else {
-          return this.number.toString();
-        }
       }
     };
+
+    badge.toString = Platform.numToString.bind(badge); 
 
     notifications.getBadge = function () {
       return badge;
