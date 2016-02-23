@@ -425,6 +425,19 @@ app.factory('Platform', [
      return 'InstaNews'; 
     };
 
+    var numToString = function(num) {
+      num = num || this.number;
+      if(!num || num < 0) {
+        return '0';
+      } else if( num >= 1000000) {
+        return (Math.floor(num/1000000).toString()) + 'M';
+      } else if( num >= 1000) {
+        return (Math.floor(num/1000).toString()) + 'k';
+      } else {
+        return num.toString();
+      }
+    };
+
     //TODO Move to FileTransfer
     var removeFile = function (name, cb) {
       //TODO Add a directory option
@@ -594,6 +607,7 @@ app.factory('Platform', [
       setDevice: setDevice,
       setDeviceToken: setDeviceToken,
       getSizeClassPrefix: getSizeClassPrefix,
+      numToString: numToString,
       ready: ready.promise
     };
   }
