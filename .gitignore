@@ -11,8 +11,10 @@ client/platforms/
 client/engine/
 client/plugins/
 client/hooks/
-client/resources/android
-client/resources/ios
+client/resources/android/icon
+client/resources/android/splash
+client/resources/ios/icon
+client/resources/ios/splash
 client/www/
 
 client/coverage
