@@ -28,6 +28,14 @@
       <inAutocomplete place="place"></inAutocomplete>
       <inMap map="map"></inMap>
     </in-list>
+    <div ng-if="!Articles.areItemsAvailable()" class="list-end">
+      <i class="icon ion-alert-circled"></i>
+      <span ng-if="Articles.get().length" > No more stories.</span>
+      <span ng-if="!Articles.get().length" > No stories found here.</span>
+      <div>
+        Use the map to find more news
+      </div>
+    </div>
   </ion-content>
   <in-text-footer>
   </in-text-footer>
