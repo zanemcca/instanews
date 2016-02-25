@@ -282,7 +282,7 @@ return gradient;
         if(zoom && !cb) {
           cb = zoom;
         }
-        zoom = 15;
+        zoom = 10;
       }
 
       var finish = function () {
