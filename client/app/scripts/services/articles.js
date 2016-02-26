@@ -27,6 +27,8 @@ app.service('Articles', [
         oldValue.modified = newValue.modified;
         oldValue.downVoteCount = newValue.downVoteCount;
         oldValue.upVoteCount = newValue.upVoteCount;
+        oldValue.createCommentCount = newValue.createCommentCount;
+        oldValue.createSubarticleCount = newValue.createSubarticleCount;
         oldValue.verified = newValue.verified;
         oldValue.version = newValue.version;
         //TODO Remove once the vote service is completed
