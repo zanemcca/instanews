@@ -75,6 +75,7 @@ app.service('Comments', [
           oldValue.modified = newValue.modified;
           oldValue.downVoteCount = newValue.downVoteCount;
           oldValue.upVoteCount = newValue.upVoteCount;
+          oldValue.createCommentCount = newValue.createCommentCount;
           oldValue.upVotes = newValue.upVotes;
           oldValue.version = newValue.version;
           oldValue.content = newValue.content;
