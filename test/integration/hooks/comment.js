@@ -24,9 +24,11 @@ exports.run = function () {
           expect(res).to.exist;
           expect(res.modelName).to.equal('comment');
           done(err);
-        });
+         });
       });
-    });
+    }); 
+
+    //TODO Write a test to check if createCommentCount is decremented after deletion
 
     /*
      * TODO Re-enable these once notifications are finished
