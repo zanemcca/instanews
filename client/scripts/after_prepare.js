@@ -11,16 +11,30 @@ module.exports = function(ctx) {
   var path = ctx.requireCordovaModule('path');
   var deferral = ctx.requireCordovaModule('q').defer();
 
-  var inputFolder = path.join(ctx.opts.projectRoot, '/resources/notification/');
+  var inputFolder = path.join(ctx.opts.projectRoot, '/resources/android/notification/');
   var outputFolder = path.join(ctx.opts.projectRoot, '/platforms/android/res/');
 
   ncp(inputFolder, outputFolder, function (err) {
     if(err) {
       console.error(err.stack);
       deferral.reject(err);
+      console.log('------------------------------------------------------------------------------------------');
     } else {
       console.log('Successfully copied notification icons');
-      deferral.resolve();
+      inputFolder = path.join(ctx.opts.projectRoot, '/resources/android/signing/');
+      outputFolder = path.join(ctx.opts.projectRoot, '/platforms/android/');
+
+      ncp(inputFolder, outputFolder, function (err) {
+        if(err) {
+          console.error(err.stack);
+          deferral.reject(err);
+          console.log('------------------------------------------------------------------------------------------');
+        } else {
+          console.log('Successfully copied signing info');
+          console.log('------------------------------------------------------------------------------------------');
+          deferral.resolve();
+        }
+      });
     }
   });
   
