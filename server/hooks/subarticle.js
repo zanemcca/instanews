@@ -256,6 +256,9 @@ module.exports = function(app) {
                   var data = {
                     $mul: {
                       'notSubarticleRating': 1/(1 - inst.rating)
+                    },
+                    $inc: {
+                      'createSubarticleCount': -1
                     }
                   };
 

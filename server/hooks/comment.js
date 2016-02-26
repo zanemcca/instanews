@@ -95,6 +95,9 @@ next();
                   var data = {
                     $mul: {
                       'notCommentRating': 1/(1 - inst.rating)
+                    },
+                    $inc: {
+                      'createCommentCount': -1
                     }
                   };
 
