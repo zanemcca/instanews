@@ -42,7 +42,6 @@ app.service('Comments', [
 
       items.forEach(function(item) {
         if(item.spec.options.id === commentableId) {
-          console.log('Found cached copy of comments');
           parent = item;
         }
        });
