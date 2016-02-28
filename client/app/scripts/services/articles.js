@@ -19,10 +19,13 @@ app.service('Articles', [
     Position
   ){
 
+    var updateRating = false;
     // Triggered when an item in the list wants to be updated
     var update = function (newValue, oldValue) {
       if( newValue.modified >= oldValue.modified ) {
-        oldValue.rating = newValue.rating;
+        if(updateRating) {
+          oldValue.rating = newValue.rating;
+        }
         oldValue.title = newValue.title;
         oldValue.modified = newValue.modified;
         oldValue.downVoteCount = newValue.downVoteCount;
@@ -195,8 +198,10 @@ app.service('Articles', [
 
       Platform.loading.show();
 
+      updateRating = true;
       articles.load(function () {
         //TODO Lets rethink this potentially unnecessary reorganize
+        updateRating = false;
         reorganize();
         Platform.loading.hide();
       });

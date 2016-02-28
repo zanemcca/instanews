@@ -159,7 +159,6 @@ function ListFactory (Platform, User) {
 
         if(!modified) {
           if(cb) {
-            console.log('Calling callback!');
             cb(get());
           } else {
             return get();
