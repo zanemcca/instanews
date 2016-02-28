@@ -17,7 +17,8 @@ app.directive('inScrollTop', [
         scrollHandle: '@'
       },
       controller: function(
-        $scope
+        $scope,
+        _
       ) {
         $scope.swipeDownObj = {};
 
@@ -40,18 +41,16 @@ app.directive('inScrollTop', [
           return $scope.scroll.showScrollToTop;
         };
 
-        var onSwipeDown = function () {
+        var onSwipeDown = _.debounce(function () {
           if(!$scope.scroll.showScrollToTop) {
-            console.log('Setting showScrollToTop');
             $scope.$apply(function () {
               $scope.scroll.showScrollToTop = true;
               $timeout(function() {
-                console.log('Clearing showScrollToTop');
                 $scope.scroll.showScrollToTop = false;
               }, 2000);
             });
           }
-        };
+        }, 3000, true);
 
         var element = angular.element(document.getElementById($scope.scrollHandle));
         $ionicGesture.on('swipedown', onSwipeDown, element, $scope.swipeDownObj);
