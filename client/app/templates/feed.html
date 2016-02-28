@@ -21,8 +21,10 @@
       </span>
     </button>
   </ion-nav-buttons>
-
-  <ion-content delegate-handle="feed" overflow-scroll="true" class="gpu">
+  <in-scroll-top scroll-handle="feed" 
+  scroll="scroll">
+  </in-scroll-top>
+  <ion-content id="feed" delegate-handle="feed" overflow-scroll="true" class="gpu">
     <in-list list="Articles"
       is-card="true"> 
       <inAutocomplete place="place"></inAutocomplete>
