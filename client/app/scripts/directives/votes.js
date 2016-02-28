@@ -53,6 +53,7 @@ app.directive('invotes', [
           Votes.up.registerObserver(update);
           Votes.down.registerObserver(update);
 
+          /*
           var Scroll;
           var spec = {
             scrollHandle: '',
@@ -68,6 +69,7 @@ app.directive('invotes', [
             spec.scrollHandle = 'feed';
             Scroll = Navigate.scroll(spec);
           } // else comments: Do not zoom in on subcomments
+         */
 
           $scope.toggleComments = function() {
             if($scope.Comments.enableFocus) {
@@ -83,9 +85,11 @@ app.directive('invotes', [
             }
 
             //TODO Consider removing this as it does not animate/look good
+            /*
             if(Scroll) {
               Scroll.toggleAnchorScroll($scope.votable.id);
             }
+           */
           };
 
           $scope.upvote = function () {
