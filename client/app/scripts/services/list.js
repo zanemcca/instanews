@@ -300,7 +300,7 @@ function ListFactory (Platform, User) {
     spec.items = [];
     spec.enableFocus = false;
     spec.observerCallbacks = [];
-    spec.itemsAvailable = true;
+    spec.itemsAvailable = false;
 
     // That is the object to be constructed
     // it has privlidged access to my, and spec

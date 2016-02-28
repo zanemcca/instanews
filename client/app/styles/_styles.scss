@@ -223,3 +223,13 @@
 .scroll-to-top.ng-hide {
   top: 0px;
 }
+
+.ng-hide-add,
+.ng-hide-remove {
+  display: none !important;
+}
+
+// ng-cloak stuff
+[ng\:cloak], [ng-cloak], [data-ng-cloak], [x-ng-cloak], .ng-cloak, .x-ng-cloak {
+    display: none !important;
+}
