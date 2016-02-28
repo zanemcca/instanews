@@ -54,13 +54,13 @@ app.directive('inList', [
           }
         };
 
-        $scope.load = _.throttle(function() {
+        $scope.load = _.debounce(function() {
           $scope.list.load( function() {
             $scope.safeApply(function(){
               $scope.$broadcast('scroll.infiniteScrollComplete');
             });
           });
-        }, 1000);
+        }, 1000, true);
       },
       templateUrl: 'templates/directives/list.html'
     };
