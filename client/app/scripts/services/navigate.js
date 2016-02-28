@@ -161,12 +161,9 @@ app.service('Navigate', [
 
     var scroll = function(spec) {
       spec = spec || {};
+      spec.$timeout = spec.$timeout || setTimeout;
       if(!spec.scrollHandle) { 
         console.log('Warning: Spec.scrollHandle is needed to avoid controlling all scrolls');
-      }
-      if(!spec.$location) {
-        console.log('Info: Since Spec.$location is not set it is up to the user to call $location.hash' +
-                    'on the anchors before calling Navigate.anchorScroll(anchor)');
       }
 
       var scrollTop = function() {
@@ -174,7 +171,9 @@ app.service('Navigate', [
         if(spec.scrollHandle) {
           delegate = delegate.$getByHandle(spec.scrollHandle);
         }
-        delegate.scrollTop(true);
+        spec.$timeout(function () {
+          delegate.scrollTop(true);
+        });
       };
 
       var resize = function () {
@@ -182,7 +181,9 @@ app.service('Navigate', [
         if(spec.scrollHandle) {
           delegate = delegate.$getByHandle(spec.scrollHandle);
         }
-        delegate.resize();
+        spec.$timeout(function () {
+          delegate.resize();
+        });
       };
 
       var getScrollDelegate = function () {
@@ -194,12 +195,17 @@ app.service('Navigate', [
       };
 
       var anchorScroll = function (anchor) {
-        document.getElementById(anchor).scrollIntoView();
+        spec.$timeout(function () {
+          document.getElementById(anchor).scrollIntoView();
+        });
         /*
          * TODO Find source of scrolling from top bug
          * then use animated ionic scrolling
          if(spec.$location) {
          spec.$location.hash(anchor);
+         } else {
+           console.log('Warning: Since Spec.$location is not set it is up to the user to call $location.hash' +
+                      'on the anchors before calling Navigate.anchorScroll(anchor)');
          }
 
          getScrollDelegate().anchorScroll(animate);
@@ -213,14 +219,17 @@ app.service('Navigate', [
           // or if they clicked the toggle back very rapidly 
           var curr = getScrollDelegate().getScrollPosition();
           if(!scroll.currentPosition || Math.abs(scroll.currentPosition.top - curr.top) <= 30) {
-            getScrollDelegate().scrollTo(0, scroll.oldPosition.top, animate);
+            var top = scroll.oldPosition.top;
+            spec.$timeout(function () {
+              getScrollDelegate().scrollTo(0, top, animate);
+            });
           }
           scroll.oldPosition = null;
         } else {
           scroll.oldPosition = getScrollDelegate().getScrollPosition();
           anchorScroll(anchor);
           scroll.currentPosition = null;
-          setTimeout(function () {
+          spec.$timeout(function () {
             scroll.currentPosition = getScrollDelegate().getScrollPosition();
           }, 1000);
         }
@@ -269,4 +278,5 @@ console.log('Scroll top on ? ' + $scope.scroll.buttonOn);
       ensureLogin: ensureLogin,
       disableNextBack: disableNextBack
     };
-  }]);
+  }
+]);

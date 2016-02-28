@@ -209,3 +209,17 @@
   text-align: center;
   color: $dark
 }
+
+// Animations
+.scroll-to-top {
+  margin-top: 0px;
+  left: 50%;
+  transform: translateX(-50%);
+  transition: .3s ease all;
+  position: absolute;
+  z-index: 2;
+  top: 50px;
+}
+.scroll-to-top.ng-hide {
+  top: 0px;
+}

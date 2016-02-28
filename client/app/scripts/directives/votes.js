@@ -26,7 +26,7 @@ app.directive('invotes', [
         scope: {
           votable: '='
         },
-        controller: function($scope, $location) {
+        controller: function($scope, $location, $timeout) {
 
           $scope.Platform = Platform;
           $scope.Comments = Comments.findOrCreate($scope.votable.modelName, $scope.votable.id) || {};
@@ -56,6 +56,7 @@ app.directive('invotes', [
           var Scroll;
           var spec = {
             scrollHandle: '',
+            $timeout: $timeout,
             $location: $location
           };
 
