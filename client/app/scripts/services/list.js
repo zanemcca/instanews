@@ -141,8 +141,11 @@ function ListFactory (Platform, User) {
               if(items.length < spec.options.filter.limit) {
                 spec.itemsAvailable = false;
               }
+              spec.options.filter.limit = 10; 
+              /*
               spec.options.filter.limit *= 2;  
               spec.options.filter.limit = Math.min(spec.options.filter.limit, 100);
+             */
               modified = true;
               add(items, cb);
             }
