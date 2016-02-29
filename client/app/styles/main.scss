@@ -1,5 +1,10 @@
 /* Empty. Add your own CSS if you like */
 
+// ng-cloak stuff
+[ng\:cloak], [ng-cloak], [data-ng-cloak], [x-ng-cloak], .ng-cloak, .x-ng-cloak {
+    display: none !important;
+}
+
 @import "_variables";
 
 @import "../bower_components/ionic/scss/ionic.scss";
