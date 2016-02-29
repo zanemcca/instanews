@@ -345,6 +345,9 @@ app.controller('LoginCtrl', [
           if(typeof(usr.token) === 'number') {
             usr.token = usr.token.toString();
           }
+          if(typeof(usr.password) === 'number') {
+            usr.password = usr.password.toString();
+          }
 
           Platform.loading.show();
           Journalist.passwordReset({ user: usr}, function () {

@@ -63,6 +63,7 @@ app.directive('incomments', [
                   console.log(err);
                 }
                 else {
+                  $scope.owner.createCommentCount++;
                   $scope.Comments.reload();
                 }
               });

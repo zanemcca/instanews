@@ -4,6 +4,7 @@ var app = angular.module('instanews.controller.post', ['ionic', 'ngResource', 'u
 app.controller('PostCtrl', [
   '$stateParams',
   '$scope',
+  '$timeout',
   '$ionicModal',
   'Navigate',
   'Article',
@@ -16,6 +17,7 @@ app.controller('PostCtrl', [
   function(
     $stateParams,
     $scope,
+    $timeout,
     $ionicModal,
     Navigate,
     Article,
@@ -151,9 +153,15 @@ app.controller('PostCtrl', [
       }
 
       Navigate.goBack();
+      $timeout(function () {
+        $scope.alreadyPosting = false;
+      }, 1000);
     };
 
+    $scope.alreadyPosting = false;
+
     $scope.post = function () {
+      $scope.alreadyPosting = true;
       if($scope.Uploads.get().length) {
         var marker = Maps.getMarker();
         if(marker && $scope.newArticle.title) {
@@ -175,14 +183,17 @@ app.controller('PostCtrl', [
             if(!err) {
               exit();
             } else {
+              $scope.alreadyPosting = false;
               Platform.showAlert('Something went wrong while posting your content. Please try again');
             }
           });
         }
         else {
+          $scope.alreadyPosting = false;
           console.log('Error: Cannot post article without both position and title');
         }
       } else {
+        $scope.alreadyPosting = false;
         console.log('Cannot post without subarticles');
       }
     };

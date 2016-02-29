@@ -141,8 +141,11 @@ function ListFactory (Platform, User) {
               if(items.length < spec.options.filter.limit) {
                 spec.itemsAvailable = false;
               }
+              spec.options.filter.limit = 10; 
+              /*
               spec.options.filter.limit *= 2;  
               spec.options.filter.limit = Math.min(spec.options.filter.limit, 100);
+             */
               modified = true;
               add(items, cb);
             }
@@ -156,7 +159,6 @@ function ListFactory (Platform, User) {
 
         if(!modified) {
           if(cb) {
-            console.log('Calling callback!');
             cb(get());
           } else {
             return get();
@@ -298,7 +300,7 @@ function ListFactory (Platform, User) {
     spec.items = [];
     spec.enableFocus = false;
     spec.observerCallbacks = [];
-    spec.itemsAvailable = true;
+    spec.itemsAvailable = false;
 
     // That is the object to be constructed
     // it has privlidged access to my, and spec

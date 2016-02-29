@@ -105,6 +105,10 @@ module.exports = function(app) {
       return strength;
     } 
 
+    if(typeof(user.password) === 'number') {
+      user.password = user.password.toString();
+    }
+
     if(user.username) {
       if(typeof user.username !== 'string') {
         user.username = user.username.toString();
