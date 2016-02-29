@@ -45,9 +45,13 @@ describe('instanews.service.navigate', function() {
     ionicHistory = $ionicHistory;
   }));
 
-  var spec;
+  var spec, scroll;
   beforeEach(function () {
-    spec = {};
+    spec = {
+      $timeout: function (cb) {
+        cb();
+      }
+    };
     scroll = navigate.scroll(spec);
   });
 
