@@ -193,13 +193,13 @@
 .platform-ios,
 .platform-browser {
   .title.title-center.header-item {
-    right: 26px!important;
+    right: 64px!important;
   }
 }
 
 .platform-android {
   .title.title-left.header-item {
-    right: 36px!important;
+    right: 68px!important;
   }
 }
 
@@ -209,6 +209,8 @@
   text-align: center;
   color: $dark
 }
+
+
 
 // Scroll-to-top 
 .scroll-to-top {
