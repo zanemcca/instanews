@@ -176,6 +176,14 @@ app.service('Navigate', [
         });
       };
 
+      var getPosition = function() {
+        var delegate = $ionicScrollDelegate;
+        if(spec.scrollHandle) {
+          delegate = delegate.$getByHandle(spec.scrollHandle);
+        }
+        return delegate.getScrollPosition();
+      };
+
       var resize = function () {
         var delegate = $ionicScrollDelegate;
         if(spec.scrollHandle) {
@@ -259,6 +267,7 @@ console.log('Scroll top on ? ' + $scope.scroll.buttonOn);
 
       return {
         scrollTop: scrollTop,
+        getPosition: getPosition,
         resize: resize,
         anchorScroll: anchorScroll,
         toggleAnchorScroll: toggleAnchorScroll,
