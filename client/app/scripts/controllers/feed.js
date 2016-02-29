@@ -101,6 +101,7 @@ app.controller('FeedCtrl', [
         google.maps.event.trigger(map, 'resize');
       }
       Articles.reorganize();
+      Platform.analytics.trackView('Feed View');
 
       User.reload();
     });
