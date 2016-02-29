@@ -3,7 +3,7 @@
   style="background: #F0F0F0">
   <ion-nav-title>{{article.title}}</ion-nav-title>
   <ion-nav-buttons side="secondary">
-    <div ng-if="!Platform.isBrowser()">
+    <div ng-if="!Platform.isBrowser()" style="width:34px;">
       <div ng-show="uploads.length > 0">
         <button  ng-click="uploadModal.show();"
           class="button button-clear icon ion-plus">
