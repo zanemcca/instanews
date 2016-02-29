@@ -26,7 +26,7 @@ app.directive('invotes', [
         scope: {
           votable: '='
         },
-        controller: function($scope, $location) {
+        controller: function($scope, $location, $timeout) {
 
           $scope.Platform = Platform;
           $scope.Comments = Comments.findOrCreate($scope.votable.modelName, $scope.votable.id) || {};
@@ -53,9 +53,11 @@ app.directive('invotes', [
           Votes.up.registerObserver(update);
           Votes.down.registerObserver(update);
 
+          /*
           var Scroll;
           var spec = {
             scrollHandle: '',
+            $timeout: $timeout,
             $location: $location
           };
 
@@ -67,6 +69,7 @@ app.directive('invotes', [
             spec.scrollHandle = 'feed';
             Scroll = Navigate.scroll(spec);
           } // else comments: Do not zoom in on subcomments
+         */
 
           $scope.toggleComments = function() {
             if($scope.Comments.enableFocus) {
@@ -82,9 +85,11 @@ app.directive('invotes', [
             }
 
             //TODO Consider removing this as it does not animate/look good
+            /*
             if(Scroll) {
               Scroll.toggleAnchorScroll($scope.votable.id);
             }
+           */
           };
 
           $scope.upvote = function () {

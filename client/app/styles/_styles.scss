@@ -209,3 +209,39 @@
   text-align: center;
   color: $dark
 }
+
+// Scroll-to-top 
+.scroll-to-top {
+  margin-top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  position: absolute;
+  z-index: 2;
+  top: $bar-height; 
+}
+
+.scroll-to-top.ng-leave,
+.scroll-to-top.ng-enter.ng-enter-active {
+  top: $bar-height; 
+}
+
+.platform-ios.platform-cordova {
+  &:not(.fullscreen) {
+    .scroll-to-top {
+      top: $bar-height + $ios-statusbar-height; 
+    }
+    .scroll-to-top.ng-leave,
+    .scroll-to-top.ng-enter.ng-enter-active {
+      top: $bar-height + $ios-statusbar-height; 
+    }
+  }
+}
+
+.scroll-to-top.ng-enter, .scroll-to-top.ng-leave {
+  transition: all cubic-bezier(.06,.6,.53,1.18) 0.3s;
+}
+
+.scroll-to-top.ng-enter,
+.scroll-to-top.ng-leave.ng-leave-active {
+  top: -55px;
+}

@@ -271,6 +271,10 @@ module.exports = function(Journalist) {
       where: {}
     };
 
+    if(typeof(user.password) === 'number') {
+      user.password = user.password.toString();
+    }
+
     if(!user ||
        !(user.email || user.username) ||
        !(user.token) ||
@@ -317,7 +321,6 @@ module.exports = function(Journalist) {
       }
     });
   };
-
 
   Journalist.remoteMethod(
     'clearBadge',
