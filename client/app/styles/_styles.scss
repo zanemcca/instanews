@@ -215,21 +215,21 @@
   margin-top: 0px;
   left: 50%;
   transform: translateX(-50%);
-  transition: .3s ease all;
   position: absolute;
   z-index: 2;
   top: 50px;
 }
-.scroll-to-top.ng-hide {
-  top: 0px;
+
+.scroll-to-top.ng-enter, .scroll-to-top.ng-leave {
+  transition: all cubic-bezier(.06,.6,.53,1.18) 0.3s;
 }
 
-.ng-hide-add,
-.ng-hide-remove {
-  display: none !important;
+.scroll-to-top.ng-enter,
+.scroll-to-top.ng-leave.ng-leave-active {
+  top: -20px;
 }
 
-// ng-cloak stuff
-[ng\:cloak], [ng-cloak], [data-ng-cloak], [x-ng-cloak], .ng-cloak, .x-ng-cloak {
-    display: none !important;
+.scroll-to-top.ng-leave,
+.scroll-to-top.ng-enter.ng-enter-active {
+  top: 50px;
 }
