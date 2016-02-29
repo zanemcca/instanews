@@ -43,12 +43,15 @@ app.directive('inScrollTop', [
 
         var onSwipeDown = _.debounce(function () {
           if(!$scope.scroll.showScrollToTop) {
-            $scope.$apply(function () {
-              $scope.scroll.showScrollToTop = true;
-              $timeout(function() {
-                $scope.scroll.showScrollToTop = false;
-              }, 2000);
-            });
+            //Only display scroll to top if we are scrolled down far enough
+            if($scope.scroll.getPosition().top > 2000) {
+              $scope.$apply(function () {
+                $scope.scroll.showScrollToTop = true;
+                $timeout(function() {
+                  $scope.scroll.showScrollToTop = false;
+                }, 2000);
+              });
+            }
           }
         }, 3000, true);
 
