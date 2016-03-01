@@ -4,6 +4,7 @@ var LIMIT = 10;
 module.exports = function(app) {
 
   var loopback = require('loopback');
+  var uuid = require('node-uuid');
 
   var Journalist = app.models.journalist;
 
@@ -143,6 +144,7 @@ module.exports = function(app) {
             next(err);
           }
           else if(count === 0) {
+            user.uniqueId = uuid.v4();
             next();
           }
           else {
@@ -176,11 +178,11 @@ module.exports = function(app) {
 
   var checkLoadedUser = function (instance, next) {
     var userId;
-    var includeEmail = false;
+    var includeSecrets = false;
 
     var check = function () {
       if(userId === instance.username) {
-        includeEmail = true;
+        includeSecrets = true;
       }
 
       //Only admins can see who else is an admin
@@ -205,8 +207,22 @@ module.exports = function(app) {
     };
 
     var done = function () {
-      if(!includeEmail) {
+      if(!includeSecrets) {
         instance.unsetAttribute('email');
+        instance.unsetAttribute('uniqueId');
+      } else {
+        //TODO This Read-Modify-Write operation is not Atomic
+        // Adds a uniqueId to the user if they are missing it
+        if(!instance.uniqueId) {
+          instance.setAttribute('uniqueId', uuid.v4());
+          return instance.save(function (err) {
+            if( err) {
+              console.error('Failed to create a uniqueId!');
+              console.error(err.stack);
+            }
+            next(err);
+          });
+        }
       }
       next();
     };
