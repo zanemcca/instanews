@@ -283,6 +283,100 @@ app.factory('Platform', [
       }
     };
 
+    var analytics = {
+      init: function () {
+        if(window.analytics) {
+          if(isAndroid()) {
+            window.analytics.startTrackerWithId('UA-74478035-1');
+          } else if(isIOS()) {
+            //TODO Get iOS Google analytics key
+            window.analytics.startTrackerWithId('UA-74478035-3');
+          } else {
+            return console.log('Error: Failed to start analytics!');
+          }
+
+          window.analytics.enableUncaughtExceptionReporting(true, function () {
+            console.log('Successfully set up analytics uncaughtExceptionReporting!');
+          }, function (err) {
+            console.log(err.stack);
+          });
+
+        } else {
+          //Browser version
+          var ga;
+          (function(i,s,o,g,r,a,m){
+            i.GoogleAnalyticsObject = r;
+            i[r] = i[r] || function(){
+              (i[r].q = i[r].q || []).push(arguments);
+            };
+            i[r].l = 1*new Date();
+            a = s.createElement(o);
+            m = s.getElementsByTagName(o)[0];
+            a.async = 1;
+            a.src = g;
+            m.parentNode.insertBefore(a,m);
+          })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+          ga('create', 'UA-74478035-2', 'auto');
+          ga('send', 'pageview');
+          analytics.ga = ga;
+        }
+      },
+      setUser: function (userId) {
+        if(window.analytics) {
+          window.analytics.setUserId(userId, function () {
+            console.log('Successfully set the analytics user to: ' + userId);
+          }, function(err) {
+            console.log(err.stack);
+          });
+        } else {
+          analytics.ga('set', 'userId', userId);
+        }
+      },
+      trackView: function(name) {
+        if(window.analytics) {
+          window.analytics.trackView(name, function () {
+            console.log('Tracking: ' + name);
+          }, function(err) {
+            console.log(err.stack);
+          });
+        } else {
+          //TODO
+        }
+      },
+      trackException: function(description, isFatal) {
+        if(window.analytics) {
+          window.analytics.trackException(description, isFatal, function () {}, function(err) {
+            console.log(err.stack);
+          });
+        } else {
+          //TODO
+        }
+      },
+      trackTiming: function(category, interval, variable, label) {
+        if(window.analytics) {
+          window.analytics.trackTiming(category, interval, variable, label, function () {
+            console.log('Tracking: ' + category + '-' + interval);
+          }, function(err) {
+            console.log(err.stack);
+          });
+        } else {
+          //TODO
+        }
+      },
+      trackEvent: function(category, action, label, value) {
+        if(window.analytics) {
+          window.analytics.trackEvent(category, action, label, value, function () {
+            console.log('Tracking: ' + category + '-' + action);
+          }, function(err) {
+            console.log(err.stack);
+          });
+        } else {
+          //TODO
+        }
+      }
+    };
+
     // Initialize the platform
     ready.promise
       .then(function() {
@@ -328,7 +422,10 @@ app.factory('Platform', [
         setInterval(getUnreadCount, 5*60*1000);
         getUnreadCount();
       }
+
+      analytics.init();
     });
+
 
     var support = {
       unreadCount: 0,
@@ -582,6 +679,7 @@ app.factory('Platform', [
     return {
       permissions: permissions,
       support: support,
+      analytics: analytics,
       keyboard: keyboard,
       getAppNameLogo: getAppNameLogo,
       loading: loading,

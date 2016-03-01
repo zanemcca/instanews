@@ -81,6 +81,7 @@ app.controller('PostCtrl', [
         google.maps.event.trigger(map, 'resize');
       }
 
+      Platform.analytics.trackView('Post View');
     });
 
     $scope.$on('$ionicView.unloaded', function() {

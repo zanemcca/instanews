@@ -64,6 +64,10 @@ describe('Feed: ', function(){
       $provide.service('Platform', function() {
         return {
           showSheet: function(sheet) {},
+          analytics: {
+            trackView: function () {},
+            trackEvent: function () {},
+          },
           getAppNameLogo: function () {
             return 'logoname';
           },

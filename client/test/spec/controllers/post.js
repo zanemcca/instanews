@@ -158,6 +158,10 @@ describe('Post: ', function(){
 
       $provide.service('Platform', function() {
         return {
+          analytics: {
+            trackView: function () {},
+            trackEvent: function () {},
+          },
           showSheet: function(sheet) {},
           showToast: function(message) {}
         }

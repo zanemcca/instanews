@@ -120,6 +120,8 @@ app.controller('ArticleCtrl', [
           }
         }
       });
+
+      Platform.analytics.trackView('Article View');
     });
 
     $scope.$on('$ionicView.afterLeave', function() {
