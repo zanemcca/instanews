@@ -181,9 +181,15 @@ module.exports = function(app) {
     var includeSecrets = false;
 
     var check = function () {
-      if(userId === instance.username) {
-        includeSecrets = true;
-      }
+       if(userId === instance.username) {
+         includeSecrets = true;
+       } else {
+         //find by query can be used to discover the user behind a uniqueId or email
+         if (!instance.findById) {
+           instance.unsetAttribute('username');
+           instance.setAttribute('used', true);
+         }
+       }
 
       //Only admins can see who else is an admin
       Role.isInRole('admin', {
@@ -239,6 +245,11 @@ module.exports = function(app) {
       }
     }
 
+    if (!instance.findById) {
+      instance.unsetAttribute('username');
+      instance.setAttribute('used', true);
+    }
+
     done();
   };
 
@@ -247,6 +258,7 @@ module.exports = function(app) {
     console.log('Checking!');
 
     if(instance) {
+      instance.findById = true;
       checkLoadedUser(instance, next);
     } else {
       next();
