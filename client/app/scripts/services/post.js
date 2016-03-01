@@ -52,6 +52,7 @@ app.factory('Post', [
     };
 
     var postSubarticles = function (Uplds, parentId) {
+      Platform.analytics.trackEvent('Post Subarticles', 'start');
       var completed = 0;
       var failed = 0;
       var uploads = Uplds.get();
@@ -64,8 +65,10 @@ app.factory('Post', [
           Subarticles.findOrCreate(parentId).reload();
 
           if(failed) {
+            Platform.analytics.trackEvent('Post Subarticles', 'failed');
             Platform.showAlert('Uh-Oh! Some of your content failed to upload! Please try again.');
           } else if(Uplds.hasMediaItems()) {
+            Platform.analytics.trackEvent('Post Subarticles', 'success');
             Platform.showToast('Your content has finished uploading and should be available soon');
           }
         }
@@ -85,11 +88,13 @@ app.factory('Post', [
             done();
             upload.remove();
             upload.isPosting = false;
+            Platform.analytics.trackEvent('Post Subarticles', 'createSubarticle');
           }, 
           // istanbul ignore next
           function(err) {
             failed++;
             console.log('Failed to upload subarticle');
+            Platform.analytics.trackEvent('Post Subarticles', 'createSubarticle', 'error', err.toString());
             console.log(err);
             done();
           });
@@ -97,6 +102,7 @@ app.factory('Post', [
         // istanbul ignore next
         function (err) {
           failed++;
+          Platform.analytics.trackEvent('Post Subarticles', 'upload', 'error', err.toString());
           console.log(err);
           done();
         });
