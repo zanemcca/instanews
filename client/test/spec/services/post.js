@@ -173,6 +173,9 @@ describe('Post service', function() {
               cb();
             }
           },
+          analytics: {
+            trackEvent: function () {}
+          },
           showToast: function(message) {}
         };
       });
