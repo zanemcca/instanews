@@ -159,7 +159,8 @@ app.controller('LoginCtrl', [
         Platform.loading.show();
 
         var successLogin = function(res) {
-          //TODO I think we can get rid of this one since we are doing a find before login
+          //Journalist.findOne only returns user information if it is that user requesting it. 
+          //Therefore the first findOne does not get the user and this one is required
           Journalist.findOne({ filter: query}, function (user) {
             res.user = user;
             User.set(res);
