@@ -324,35 +324,53 @@ app.factory('Platform', [
       },
       setUser: function (userId) {
         if(window.analytics) {
-          window.analytics.setUserId(userId);
+          window.analytics.setUserId(userId, function () {
+            console.log('Successfully set the analytics user to: ' + userId);
+          }, function(err) {
+            console.log(err.stack);
+          });
         } else {
           analytics.ga('set', 'userId', userId);
         }
       },
       trackView: function(name) {
         if(window.analytics) {
-          window.analytics.trackView(name);
+          window.analytics.trackView(name, function () {
+            console.log('Tracking: ' + name);
+          }, function(err) {
+            console.log(err.stack);
+          });
         } else {
           //TODO
         }
       },
       trackException: function(description, isFatal) {
         if(window.analytics) {
-          window.analytics.trackException(description, isFatal);
+          window.analytics.trackException(description, isFatal, function () {}, function(err) {
+            console.log(err.stack);
+          });
         } else {
           //TODO
         }
       },
       trackTiming: function(category, interval, variable, label) {
         if(window.analytics) {
-          window.analytics.trackTiming(category, interval, variable, label);
+          window.analytics.trackTiming(category, interval, variable, label, function () {
+            console.log('Tracking: ' + category + '-' + interval);
+          }, function(err) {
+            console.log(err.stack);
+          });
         } else {
           //TODO
         }
       },
       trackEvent: function(category, action, label, value) {
         if(window.analytics) {
-          window.analytics.trackView(category, action, label, value);
+          window.analytics.trackEvent(category, action, label, value, function () {
+            console.log('Tracking: ' + category + '-' + action);
+          }, function(err) {
+            console.log(err.stack);
+          });
         } else {
           //TODO
         }
