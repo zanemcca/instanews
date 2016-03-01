@@ -147,12 +147,18 @@ app.service('User', [
       }
     };
 
+    //TODO Create Support and Analytics services respectively
     var updateSupport = function () {
       if(user && user.user) {
         Platform.support.setEmail(user.user.email);
         Platform.support.setName(user.userId);
       } else {
         Platform.support.clearUser();
+      }
+    };
+    var updateAnalytics = function () {
+      if(user && user.user) {
+        Platform.analytics.setUser(user.user.uniqueId);
       }
     };
 
@@ -190,8 +196,11 @@ app.service('User', [
       }, false);
 
       if(!Platform.isBrowser()) {
+        //TODO These should be added in support, and analytics services respectively
         registerObserver(updateSupport);
+        registerObserver(updateAnalytics);
         updateSupport();
+        updateAnalytics();
       }
     });
 

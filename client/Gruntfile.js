@@ -72,6 +72,7 @@ module.exports = function (grunt) {
             'com.ionic.keyboard',
        //     'com.phonegap.plugins.PushPlugin',
             'cordova-plugin-crosswalk-webview',
+            'cordova-plugin-google-analytics',
             'cordova-plugin-inappbrowser',
             'cordova-plugin-network-information',
             'cordova-plugin-whitelist',

@@ -100,10 +100,10 @@ module.exports = function(grunt) {
         options: {
           coverageFolder: 'coverage*', // will check both coverage folders and merge the coverage results
           check: {
-            statements: 78,
-            branches: 70,
+            statements: 77,
+            branches: 69,
             functions: 80,
-            lines: 78,
+            lines: 77,
           }
         }
       },
@@ -214,7 +214,6 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-watch');
   grunt.loadNpmTasks('grunt-contrib-jshint');
   grunt.loadNpmTasks('grunt-shell');
-
 
   /**
    * Grunt Task definitions

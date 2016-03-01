@@ -213,7 +213,6 @@ angular.module('instanews', [
   $ionicConfigProvider,
   $mdGestureProvider
 ) {
-
   $ionicConfigProvider.views.forwardCache(true);
 
   // Fix ionic ng-click from firing twice when using ngMaterial
