@@ -22,6 +22,10 @@ describe('Login: ', function(){
             show: function () {},
             hide: function () {}
           },
+          analytics: {
+            trackView: function () {},
+            trackEvent: function () {},
+          },
           showToast: function() {},
           showAlert: function() {},
           getDevice: function() {}
