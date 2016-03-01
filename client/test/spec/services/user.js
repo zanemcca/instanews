@@ -29,6 +29,11 @@ describe('instanews.service.user', function() {
             setEmail: function () {},
             setName: function () {}
           },
+          analytics: {
+            setUser: function () {},
+            trackView: function () {},
+            trackEvent: function () {}
+          },
           getDevice: function() {
             return {
               type: 'ios',
