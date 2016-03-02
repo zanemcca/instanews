@@ -250,7 +250,7 @@ function ListFactory (Platform, User) {
           spec.items = [];
         }
 
-        if(items.length) {
+        if(items && items.length) {
           add(items, cb);
         } else {
           notifyObservers();
