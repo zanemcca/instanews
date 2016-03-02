@@ -147,7 +147,7 @@ function ListFactory (Platform, User) {
               spec.options.filter.limit = Math.min(spec.options.filter.limit, 100);
              */
               modified = true;
-              add(items, cb);
+              cb(items);
             }
           }, function (err) {
             console.log('Failed to load more items!');
@@ -245,7 +245,20 @@ function ListFactory (Platform, User) {
     var reload = function (cb) {
       spec.options.filter.skip = 0;
       spec.options.filter.limit = Math.max(get().length + 1, defaultLimit);
-      load(cb);
+      load(function (items) {
+        if(spec.items.length) {
+          spec.items = [];
+        }
+
+        if(items.length) {
+          add(items, cb);
+        } else {
+          notifyObservers();
+          if(cb) {
+            cb();
+          }
+        }
+      });
     };
 
     var areItemsAvailable = function () {
@@ -313,7 +326,11 @@ function ListFactory (Platform, User) {
       focusById: focusById,
       unfocusAll: unfocusAll,
       enableFocus: spec.enableFocus, 
-      load: load, 
+      load: function (cb) {
+        load( function(items) {
+          add(items, cb);
+        });
+      },
       reload: reload,
       add: add,
       remove: remove,
