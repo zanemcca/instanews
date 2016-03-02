@@ -244,7 +244,7 @@ function ListFactory (Platform, User) {
 
     var reload = function (cb) {
       spec.options.filter.skip = 0;
-      spec.options.filter.limit = Math.max(get().length + 1, 5);
+      spec.options.filter.limit = Math.max(get().length + 1, defaultLimit);
       load(cb);
     };
 
@@ -290,7 +290,8 @@ function ListFactory (Platform, User) {
     spec.options.filter = spec.options.filter || {};
     spec.options.filter.order = spec.options.filter.order || 'rating DESC';
     spec.options.filter.skip = spec.options.filter.skip || 0;
-    spec.options.filter.limit = spec.options.filter.limit || 5;
+    var defaultLimit =  spec.options.filter.limit || 5;
+    spec.options.filter.limit = defaultLimit;
 
     for(var i in spec.options.filter) {
       ogFilter[i] = spec.options.filter[i];
