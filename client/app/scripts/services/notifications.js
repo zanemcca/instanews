@@ -212,17 +212,6 @@ app.service('Notifications', [
       setSeen(data);
     };
 
-    var reload = function () {
-      if(user) {
-        console.log('Loading notifications!');
-        spec.options.filter.skip = 0;
-        spec.options.filter.limit = Math.max(notifications.get().length + 1, 30);
-        spec.options.id = user.userId;
-        notifications.load();
-      } else {
-        console.log('Cannot load notifications without a user');
-      }
-    };
 
     var setSeen = function (data) {
       data = data || this;
@@ -294,7 +283,6 @@ app.service('Notifications', [
     var spec = {};
     spec.save = save;
     spec.focus = focus;
-    spec.reload = reload;
     spec.sortingFunction = sortingFunction;
 
     spec.find = Journalist.prototype$__get__notifications;
@@ -361,6 +349,24 @@ app.service('Notifications', [
     User.registerObserver(userWatch);
 
     userWatch();
+
+    var previousReload = notifications.reload;
+
+    var reload = function (cb) {
+      if(user) {
+        console.log('Loading notifications!');
+        spec.options.id = user.userId;
+        previousReload(cb);
+      } else {
+        notifications.clear();
+        console.log('Cannot load notifications without a user');
+        if(cb) {
+          cb();
+        }
+      }
+    };
+
+    notifications.reload = reload;
 
     return notifications;
   }
