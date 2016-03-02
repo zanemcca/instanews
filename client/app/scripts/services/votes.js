@@ -14,7 +14,7 @@ app.service('Votes', [
   ){
 
     var filter = {
-      limit: 1000,
+      limit: 1000000,
       order: 'id DESC'
     };
 
@@ -69,10 +69,6 @@ app.service('Votes', [
         upVotes.reload();
       }
     };
-
-    //TODO Deal with usecase of more than 1000 votes in the last 2 weeks
-    // 1000 is the max that will be returned by mongodb
-    // spec.itemsAvailable
 
     var findVotes = function (Votes, votable) {
       var votes = Votes.get();
