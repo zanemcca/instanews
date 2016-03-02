@@ -159,9 +159,9 @@ function ListFactory (Platform, User) {
 
         if(!modified) {
           if(cb) {
-            cb(get());
+            cb();
           } else {
-            return get();
+            return;
           }
         }
       });
@@ -328,7 +328,13 @@ function ListFactory (Platform, User) {
       enableFocus: spec.enableFocus, 
       load: function (cb) {
         load( function(items) {
-          add(items, cb);
+          if(items && items.length) {
+            add(items, cb);
+          } else if(cb) {
+            cb(get());
+          } else {
+            return get();
+          }
         });
       },
       reload: reload,
