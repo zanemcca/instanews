@@ -122,10 +122,12 @@ function ListFactory (Platform, User) {
 
     // Load more items using the given Find function
     var load = function (cb) {
+      /*
       if(!spec.options.filter.skip) {
         spec.itemsAvailable = true;
         //spec.options.filter.limit = ogFilter.limit;
       }
+      */
 
       Platform.ready
       .then( function () {
@@ -140,6 +142,8 @@ function ListFactory (Platform, User) {
             } else {
               if(items.length < spec.options.filter.limit) {
                 spec.itemsAvailable = false;
+              } else {
+                spec.itemsAvailable = true;
               }
               spec.options.filter.limit = 10; 
               /*
