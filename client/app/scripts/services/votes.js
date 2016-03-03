@@ -14,7 +14,7 @@ app.service('Votes', [
   ){
 
     var filter = {
-      limit: 1000,
+      limit: 1000000,
       order: 'id DESC'
     };
 
@@ -49,15 +49,24 @@ app.service('Votes', [
     var upVotes = list(upSpec);
     var downVotes = list(downSpec);
 
+    var user = User.get();
+
     var updateVotes = function () {
-      downVotes.clear();
-      upVotes.clear();
-      var user = User.get();
-      if(user) {
-        upSpec.options.id = user.userId; 
-        downSpec.options.id = user.userId; 
-        downVotes.load();
-        upVotes.load();
+      var usr = User.get();
+      // If the user changes in any way then we explicitely clear the votes
+      if((!user || !usr || usr.userId !== user.userId)) {
+        upVotes.clear();
+        downVotes.clear();
+        user = usr;
+      }
+
+      // Only reload if we have a user
+      if(usr) {
+        upSpec.options.id = usr.userId;
+        downSpec.options.id = usr.userId;
+
+        downVotes.reload();
+        upVotes.reload();
       }
     };
 
