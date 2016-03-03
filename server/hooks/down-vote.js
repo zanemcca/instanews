@@ -13,6 +13,8 @@ module.exports = function(app) {
    
   DownVote.observe('after delete', function(ctx, next) {
     debug('after delete', ctx, next);
+    //TODO Check the deletion count to make sure an item was deleted before decrementing downVoteCount
+
     //The click after save should have added an incrementation parameter
     if(ctx.inc && typeof(ctx.inc) === 'object') {
       ctx.inc.downVoteCount = -1;

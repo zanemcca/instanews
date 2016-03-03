@@ -396,9 +396,9 @@ exports.run = function () {
         });
       });
 
-      describe('before delete', function() {
+      describe('after delete', function() {
         beforeEach(function () {
-          hookName = 'before delete';
+          hookName = 'after delete';
         });
 
         afterEach(function() {
