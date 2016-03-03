@@ -11,6 +11,7 @@ app.directive('invotes', [
   'Navigate',
   'Platform',
   'Position',
+  '_',
   function (
     $timeout,
     Comments,
@@ -19,7 +20,9 @@ app.directive('invotes', [
     Votes,
     Navigate,
     Platform,
-    Position) {
+    Position,
+    _
+  ) {
 
       return {
         restrict: 'E',
