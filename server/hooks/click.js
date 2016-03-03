@@ -223,8 +223,8 @@ module.exports = function(app) {
     }
   });
 
-  Click.observe('before delete', function(ctx, next) {
-    debug('observe - before delete', ctx);
+  Click.observe('after delete', function(ctx, next) {
+    debug('observe - after delete', ctx);
     //Delegate the count updating to the inherited model 
 
     /* istanbul ignore next */
