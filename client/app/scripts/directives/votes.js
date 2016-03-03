@@ -11,6 +11,7 @@ app.directive('invotes', [
   'Navigate',
   'Platform',
   'Position',
+  '_',
   function (
     $timeout,
     Comments,
@@ -19,7 +20,9 @@ app.directive('invotes', [
     Votes,
     Navigate,
     Platform,
-    Position) {
+    Position,
+    _
+  ) {
 
       return {
         restrict: 'E',
@@ -71,7 +74,7 @@ app.directive('invotes', [
           } // else comments: Do not zoom in on subcomments
          */
 
-          $scope.toggleComments = function() {
+          $scope.toggleComments = _.debounce(function() {
             if($scope.Comments.enableFocus) {
               $scope.votable.showComments = false;
               $scope.Comments.unfocusAll();
@@ -90,9 +93,9 @@ app.directive('invotes', [
               Scroll.toggleAnchorScroll($scope.votable.id);
             }
            */
-          };
+          }, 500, true);
 
-          $scope.upvote = function () {
+          $scope.upvote = _.debounce(function () {
             //TODO Move this into the Votes service
             Navigate.ensureLogin( function () {
               var destroying = false;
@@ -144,9 +147,9 @@ app.directive('invotes', [
                   console.log(err);
                 });
             });
-          };
+          }, 500, true);
 
-          $scope.downvote = function () {
+          $scope.downvote = _.debounce(function () {
             Navigate.ensureLogin( function () {
               var destroying = false;
               if($scope.votable.downVoted) {
@@ -197,7 +200,7 @@ app.directive('invotes', [
                   console.log(err);
                 });
             });
-          };
+          }, 500, true);
         },
         templateUrl: 'templates/directives/votes.html'
       };

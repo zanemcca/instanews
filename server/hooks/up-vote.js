@@ -17,6 +17,7 @@ module.exports = function(app) {
   UpVote.observe('after delete', function(ctx, next) {
     debug('after delete', ctx, next);
 
+    //TODO Check the deletion count to make sure an item was deleted before decrementing upVoteCount
     if(ctx.inc && typeof(ctx.inc) === 'object') {
       ctx.inc.upVoteCount = -1;
     } else {
