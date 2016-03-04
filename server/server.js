@@ -217,7 +217,7 @@ if(cluster.isMaster && numCPUs > 1 && process.env.NODE_ENV === 'production') {
          var loggerFmt = 'method: :method,,' +
          'url: :url,,' +
          'status: :status,,' +
-         'responseTime :response-time ms,,'+
+         'responseTime: :response-time ms,,'+
          'length: :res[content-length],,' +
          'remoteAddr: :remote-addr,,' +
          'referrer: :referrer,,' +
