@@ -38,9 +38,6 @@ app.controller('ArticleCtrl', [
     $scope.uploads = [];
 
     var spec = $scope.Subarticles.getSpec();
-    spec.options.filter.limit = 5;
-    spec.options.filter.skip = 0;
-    $scope.Subarticles.load();
 
     $scope.article = {
       modelName: 'article',
@@ -99,7 +96,10 @@ app.controller('ArticleCtrl', [
       if(map) {
         google.maps.event.trigger(map, 'resize');
       }
-      $scope.Subarticles.reload();
+
+      spec.options.filter.limit = Math.max($scope.Subarticles.get(), 5);
+      spec.options.filter.skip = 0;
+      $scope.Subarticles.load();
 
       uploadObserver = $scope.Uploads.registerObserver(function () {
         var uploads = $scope.Uploads.get();
@@ -141,7 +141,9 @@ app.controller('ArticleCtrl', [
     $scope.onRefresh = function () {
       console.log('Refresh');
       $scope.Subarticles.unfocusAll();
-      $scope.Subarticles.reload(function() {
+      spec.options.filter.limit = Math.max($scope.Subarticles.get(), 5);
+      spec.options.filter.skip = 0;
+      $scope.Subarticles.load(function() {
         $scope.$broadcast('scroll.refreshComplete');
       });
     };
