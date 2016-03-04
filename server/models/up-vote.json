@@ -15,6 +15,7 @@
     }
   },
   "properties": {},
+  "strictDelete": true,
   "validations": [],
   "relations": {},
   "acls": [
