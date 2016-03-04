@@ -214,7 +214,7 @@ exports.run = function () {
                     viewableId: ctx.instance.clickableId,
                     viewableType: ctx.instance.clickableType
                   },
-                  order: 'created DESC'
+                  order: 'id DESC'
                 });
 
                 cb();
