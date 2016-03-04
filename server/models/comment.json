@@ -3,6 +3,10 @@
   "base": "base",
   "idInjection": true,
   "indexes": {
+    "parent_index": {
+      "commentableId": 1,
+      "commentableType": 1
+    },
     "commentable_index": {
       "commentableId": 1
     }

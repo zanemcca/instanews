@@ -73,26 +73,23 @@ module.exports = function(app) {
         if(err) {
           console.error('Error: Failed to complete preVoteChecker');
           next(err);
-        }
-        else if(res) {
+        } else if(res) {
           res.destroy(function(err) {
             if(err) {
               console.error('Error: Failed to complete preVoteChecker');
               next(err);
-            }
-            else {
+            } else {
               next();
             }
           });
-        }
-        else {
+        } else {
           Model.findOne(filter, function(err, res) {
             if(err) {
               console.error('Error: Failed to complete preVoteChecker');
               next(err);
             } else if(res) {
               console.log('Destroying the vote instead of creating one');
-              res.destroy(function (err) {
+              res.destroy(function (err, count) {
                 if(err) {
                   console.error('Error: Failed to destroy the vote');
                 } else {
@@ -107,8 +104,7 @@ module.exports = function(app) {
           });
         }
       });
-    }
-    else {
+    } else {
       console.warn('Warning: PreVoteChecker should only be called on new votes');
       next();
     }
@@ -179,7 +175,7 @@ module.exports = function(app) {
 
       View.findOne({
         where: where, 
-        order: 'created DESC'
+        order: 'id DESC'
       }, function(err, res) {
         if(err) {
           console.warn('Warning: Failed to find a view for Type: ' +
@@ -377,5 +373,4 @@ module.exports = function(app) {
       next(error);
     }
   };
-
 };
