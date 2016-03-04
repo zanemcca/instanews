@@ -75,29 +75,6 @@ app.controller(
       Platform
     ) {
 
-      //TODO Come up with a more clear solution for 
-      //the quality mapping
-      var prefixs = ['XS', 'S', 'M', 'L'];
-      var done = false;
-      var max = -1;
-      for(var j in prefixs) {
-        var idx = prefixs.length - 1 - j;
-        var p = prefixs[idx];
-        for(var i in $scope.media.sources) {
-          var source = $scope.media.sources[i];
-          if(source.prefix === p) {
-            max = idx;
-            done = true;
-            break;
-          }
-        }
-        if(done) {
-          break;
-        }
-      }
-
-      var prefix = Platform.getSizeClassPrefix(max);
-
       var urlBase = ENV.photoEndpoint;
 
       var getUrl = function(container, fileName) {
@@ -108,33 +85,70 @@ app.controller(
         return url;
       };
 
-      var src = prefix + '-' + $scope.media.name;
-
       var isVideo = false;
       $scope.isVideo = function () {
         return isVideo;
       };
 
-      // If this is a video then it will
-      // have a poster which should be used
-      // instead of other sources
-      if($scope.media.poster) {
-        urlBase = ENV.videoEndpoint;
-        src = $scope.media.poster;
-        isVideo = true;
-      } else if($scope.media.source) {
-        // Local source
-        src = $scope.media.source;
-      }
+      var getPrefix = function(sources) {
+        //TODO Come up with a more clear solution for 
+        //the quality mapping
+        var prefixs = ['XS', 'S', 'M', 'L'];
+        var done = false;
+        var max = -1;
+        for(var j in prefixs) {
+          var idx = prefixs.length - 1 - j;
+          var p = prefixs[idx];
+          for(var i in sources) {
+            var source = sources[i];
+            if(source.prefix === p) {
+              max = idx;
+              done = true;
+              break;
+            }
+          }
+          if(done) {
+            break;
+          }
+        }
 
-      // istanbul ignore else 
-      if(src) {
-        $scope.source = getUrl($scope.container, src);
-      } else {
-        //TODO Create some kind of image that lets users know the photo is broken
-        console.error('There is no valid photo source given!');
-        console.log($scope.media);
-      }
+        return  Platform.getSizeClassPrefix(max);
+      };
+
+      var findSource = function () {
+        var prefix = getPrefix($scope.media.sources);
+        var src = prefix + '-' + $scope.media.name;
+
+        isVideo = false;
+        // If this is a video then it will
+        // have a poster which should be used
+        // instead of other sources
+        if($scope.media.poster) {
+          urlBase = ENV.videoEndpoint;
+          src = $scope.media.poster;
+          isVideo = true;
+        } else if($scope.media.source) {
+          // Local source
+          src = $scope.media.source;
+        }
+
+        // istanbul ignore else 
+        if(src) {
+          $scope.source = getUrl($scope.container, src);
+        } else {
+          //TODO Create some kind of image that lets users know the photo is broken
+          console.error('There is no valid photo source given!');
+          console.log($scope.media);
+        }
+      };
+
+      findSource();
+
+      $scope.$watch('media', function(oldMedia, newMedia) {
+        if(oldMedia.name !== newMedia.name) {
+          findSource();
+        }
+      });
     }]
 );
 
