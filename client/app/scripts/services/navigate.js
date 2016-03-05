@@ -242,29 +242,7 @@ app.service('Navigate', [
           }, 1000);
         }
       };
-
-      /*
-         var onScroll = function() {
-         if($ionicScrollDelegate.getScrollPosition().top > 0) {
-         return true;
-         }
-         else {
-         return false;
-         }
-         };
-
-      //TODO Rewrite this use ionic on-swipe-down gesture
-      $scope.scroll = {
-buttonOn: false
-};
-
-//TODO get the scroll to top button disabling appropriately
-$scope.onScroll = function() {
-$scope.scroll.buttonOn = Navigate.onScroll();
-console.log('Scroll top on ? ' + $scope.scroll.buttonOn);
-};
-*/
-
+      
       return {
         scrollTop: scrollTop,
         getPosition: getPosition,

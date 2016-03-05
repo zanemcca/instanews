@@ -58,6 +58,7 @@ angular.module('instanews', [
   'instanews.service.observable',
   'instanews.service.platform',
   'instanews.service.position',
+  'instanews.service.preload',
   'instanews.service.post',
   'instanews.service.subarticles',
   'instanews.service.textInput',
