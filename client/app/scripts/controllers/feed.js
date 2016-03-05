@@ -9,6 +9,7 @@ app.controller('FeedCtrl', [
   'Maps',
   'Position',
   'Platform',
+  'preload',
   'Articles',
   'Navigate',
   'Notifications',
@@ -20,6 +21,7 @@ app.controller('FeedCtrl', [
     Maps,
     Position,
     Platform,
+    preload,
     Articles,
     Navigate,
     Notifications,
@@ -51,6 +53,17 @@ app.controller('FeedCtrl', [
     // Prepare our map by initializing its id
     $scope.map = {
       id: 'feedMap'
+    };
+
+    var Preload = preload({
+      scrollHandle: 'feed',
+      list: Articles
+    });
+
+    $scope.predictor = {
+      predict: function () {
+        return Preload.predictScroll(1000);
+      }
     };
 
     $scope.badge = Notifications.getBadge();
