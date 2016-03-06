@@ -210,6 +210,9 @@ app.service('Articles', [
     Position.registerBoundsObserver(updateBounds);
 
     articles.reorganize = reorganize;
+    articles.getSpec = function () {
+      return spec;
+    };
 
     return articles;
   }
