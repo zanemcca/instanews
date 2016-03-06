@@ -5,6 +5,7 @@ var app = angular.module('instanews.controller.feed', ['ionic', 'ngResource', 'm
 app.controller('FeedCtrl', [
   '$scope',
   '$location',
+  '$timeout',
   'Article',
   'Maps',
   'Position',
@@ -17,6 +18,7 @@ app.controller('FeedCtrl', [
   function(
     $scope,
     $location,
+    $timeout,
     Article,
     Maps,
     Position,
@@ -57,14 +59,12 @@ app.controller('FeedCtrl', [
 
     var Preload = preload({
       scrollHandle: 'feed',
+      $timeout: $timeout,
       list: Articles
     });
 
-    $scope.predictor = {
-      predict: function () {
-        return Preload.predictScroll(1000);
-      }
-    };
+    Preload.start();
+    $scope.plot = Preload.plot;
 
     $scope.badge = Notifications.getBadge();
 
