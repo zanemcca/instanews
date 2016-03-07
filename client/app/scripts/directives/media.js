@@ -76,7 +76,6 @@ app.controller(
     ) {
 
       var urlBase = ENV.photoEndpoint;
-
       var getUrl = function(container, fileName) {
         var url = fileName;
         if(fileName.indexOf('file://') !== 0) {

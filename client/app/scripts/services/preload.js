@@ -135,7 +135,7 @@ function PreloadFactory(Navigate, Platform) {
           max = pred;
           maxUpdate(max, pos);
         }
-        plotCallback(pred,pos);
+       // plotCallback(pred,pos);
       };
 
       predictor = averageScrollPredict(after, true);
