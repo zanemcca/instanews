@@ -5,12 +5,16 @@ var app = angular.module('instanews.service.subarticles', ['ionic', 'ngResource'
 
 app.service('Subarticles', [
   'Article',
+  'ENV',
+  'ImageCache',
   'Navigate',
   'Subarticle',
   'Platform',
   'list',
   function(
     Article,
+    ENV,
+    ImageCache,
     Navigate,
     Subarticle,
     Platform,
@@ -186,13 +190,86 @@ app.service('Subarticles', [
       if(!sub.preloaded) {
         sub.preloaded = true;
         console.log('Preloading subarticle content!');
+
         if(sub._file) {
-          //TODO Get the image that we are using (look at media)
-          //TODO Preload the image with the image cache
+
+
+          var urlBase = ENV.photoEndpoint;
+          var getUrl = function(fileName) {
+            var url = fileName;
+            if(fileName.indexOf('file://') !== 0) {
+              url = urlBase + '/' + url;
+            }
+            return url;
+          };
+
+          var findImageSource = function (file) {
+            var prefix = getImagePrefix(file.sources);
+            var src = prefix + '-' + file.name;
+
+            // If this is a video then it will
+            // have a poster which should be used
+            // instead of other sources
+            if(file.poster) {
+              urlBase = ENV.videoEndpoint;
+              src = file.poster;
+            } else if(file.source) {
+              // Local source
+              src = file.source;
+            }
+
+            // istanbul ignore else 
+            if(src) {
+              return getUrl(src);
+            } else {
+              //TODO Create some kind of image that lets users know the photo is broken
+              console.error('There is no valid photo source given!');
+              console.log(file);
+              //TODO Get the image that we are using (look at media)
+            }
+          };
+
+          var getImagePrefix = function(sources) {
+
+            //TODO Come up with a more clear solution for 
+            //the quality mapping
+            
+            // Gets the max image size available
+            var prefixs = ['XS', 'S', 'M', 'L'];
+            var done = false;
+            var max = -1;
+            for(var j in prefixs) {
+              var idx = prefixs.length - 1 - j;
+              var p = prefixs[idx];
+              for(var i in sources) {
+                var source = sources[i];
+                if(source.prefix === p) {
+                  max = idx;
+                  done = true;
+                  break;
+                }
+              }
+              if(done) {
+                break;
+              }
+            }
+
+            //Get the recommended size with that max value
+            return  Platform.getSizeClassPrefix(max);
+          };
+
+          ImageCache.Cache(findImageSource(sub._file))
+          .then( function() {
+            console.log('Preloaded the image!');
+            cb(sub);
+          }, function(err) {
+            console.log('Failed to cache the image!');
+            console.log(err);
+            cb(sub);
+          });
+        } else {
+          cb(sub);
         }
-        cb(sub);
-      } else {
-        cb(sub);
       }
     }; 
 
@@ -203,3 +280,5 @@ app.service('Subarticles', [
     };
   }
 ]);
+
+
