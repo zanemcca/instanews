@@ -84,39 +84,41 @@ app.service('Articles', [
     };
 
     var preLoad = function (article, cb) {
-      //TODO This should be within a $scope.$apply in order to be rendered
-      var update = function () {
-        //console.log('Trying to get topSubarticle');
+      if(!article.preloaded) {
+        article.preloaded = true;
 
-        //If all the subarticles have been removed then remove the article
-        if(article.Subarticles.get().length === 0) {
-          //Attempt to load more subarticles
-          article.Subarticles.load(function (subs) {
-            if(subs.length === 0) {
-              articles.remove(function (art) {
-                return (art.id === article.id);
-              });
+        //TODO This should be within a $scope.$apply in order to be rendered
+        var update = function () {
+          //console.log('Trying to get topSubarticle');
+
+          //If all the subarticles have been removed then remove the article
+          if(article.Subarticles.get().length === 0) {
+            //Attempt to load more subarticles
+            article.Subarticles.load(function (subs) {
+              if(subs.length === 0) {
+                articles.remove(function (art) {
+                  return (art.id === article.id);
+                });
+              }
+            });
+          } else {
+            var subarticle = article.Subarticles.getTop();
+            if(subarticle) {
+              article.topSub = subarticle;
             }
-          });
-        } else {
-          var subarticle = article.Subarticles.getTop();
-          if(subarticle) {
-            article.topSub = subarticle;
           }
+        };
+
+        if(!article.Subarticles) {
+          article.Subarticles = Subarticles.findOrCreate(article.id);
+          article.Subarticles.registerObserver(update);
         }
-      };
 
-      if(!article.Subarticles) {
-        article.Subarticles = Subarticles.findOrCreate(article.id);
-        article.Subarticles.registerObserver(update);
+        var spec = article.Subarticles.getSpec();
+        spec.options.filter.skip = 0;
+        spec.options.filter.limit = 1;
+        article.Subarticles.load();
       }
-
-
-      var spec = article.Subarticles.getSpec();
-      spec.options.filter.skip = 0;
-      spec.options.filter.limit = 1;
-      article.Subarticles.load();
-
       cb(article);
     }; 
 
@@ -192,7 +194,7 @@ app.service('Articles', [
       }
 
       spec.options.filter.skip = 0;
-      spec.options.filter.limit = 5;
+      spec.options.filter.limit = 100;
 
       console.log('UpateBounds');
 

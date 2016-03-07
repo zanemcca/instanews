@@ -273,6 +273,63 @@ function ListFactory (Platform, User) {
       spec.preLoad(item, cb);
     };
 
+    //TODO Use pendingLoad to avoid multiple load requests
+    var pendingLoad = false;
+
+    var getLoader = function () {
+      var lSpec = {
+        items: []
+      };
+
+      var more = function (rate, cb) {
+        if(lSpec.items.length + rate <= get().length) {
+          lSpec.items = getSegment(lSpec.items.length + rate);
+          cb(loader.get());
+        } else if(pendingLoad) {
+          //TODO register an observer for the the completion of the load
+          cb(loader.get());
+        } else if(areItemsAvailable()) {
+          spec.options.filter.limit = Math.max(rate, 50);
+          console.log('Loading ' + spec.options.filter.limit + ' more!');
+          spec.options.filter.skip = lSpec.items.length;
+          that.load(function() {
+            lSpec.items = getSegment(lSpec.items.length + rate);
+            cb(loader.get());
+          });
+        } else {
+          cb(loader.get());
+        }
+       };
+
+      var getSegment = function (size) {
+        var items = get();
+        if(items.length > size) { 
+          return items.slice(0, size);
+        } else {
+          return items.slice();
+        }
+      };
+
+      var loader = {
+        get: function () {
+          return lSpec.items;
+        },
+        areItemsAvailable: function () {
+          return (areItemsAvailable() || lSpec.items.length < get().length);
+        },
+        preLoad: preLoad,
+        more: more
+      };
+
+      //TODO Clear observer
+      registerObserver(function () {
+        //TODO This could be customized for different loaders potentially
+        lSpec.items = getSegment(Math.max(10, lSpec.items.length));
+      });
+
+      return loader;
+    };
+
     spec.addFilter = spec.addFilter || function (input) { return input;};
 
     spec.preLoad = spec.preLoad || function(item, cb) {
@@ -323,6 +380,7 @@ function ListFactory (Platform, User) {
     // That is the object to be constructed
     // it has privlidged access to my, and spec
     that = {
+      getLoader: getLoader,
       get: get, 
       clear: clear,
       getTop: getTop, 
