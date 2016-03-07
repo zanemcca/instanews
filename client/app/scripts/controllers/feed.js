@@ -29,9 +29,7 @@ app.controller('FeedCtrl', [
     Notifications,
     User
   ) {
-
-    // Local reference to articles service
-    $scope.Articles = Articles;
+    $scope.Articles = Articles.getLoader();
 
     $scope.toggleMenu = function () {
       if(Navigate.toggleMenu()) {
@@ -118,84 +116,5 @@ app.controller('FeedCtrl', [
 
       User.reload();
     });
-
-    /*
-       $scope.scrollTop = Navigate.scrollTop;
-
-       $scope.scrollTopVisible = false;
-
-       $scope.onSwipeDown = function () {
-       $scope.scrollTopVisible = true;
-       setTimeout(function () {
-       $scope.$apply(function () {
-       $scope.scrollTopVisible = false;
-       });
-       }, 2000);
-       };
-       */
-    /*
-    // Refresh the articles completely
-    $scope.onRefresh = function () {
-    console.log('Refresh');
-
-//Reset all necessary values
-//Articles.deleteAll();
-
-//Load the initial articles
-Articles.load( function() {
-$scope.$broadcast('scroll.refreshComplete');
-});
-};
-*/
-    /*istanbul ignore next */
-/*
-   $scope.safeApply = function(fn) {
-   var phase = this.$root.$$phase;
-   if(phase === '$apply' || phase === '$digest') {
-   if(fn && (typeof(fn) === 'function')) {
-   fn();
-   }
-   } else {
-   this.$apply(fn);
-   }
-   };
-
-   var items = {
-available: function () {
-return false;
-}
-}; 
-
-$scope.itemsAvailable = function () { 
-return items.available();
-};
-
-Position.boundsReady
-.then(function () {
-items.available = Articles.areItemsAvailable;
-});
-*/
-    // This is called when the bottom of the feed is reached
-/*
-   $scope.loadMore = function() {
-   console.log('Loading more articles');
-   Articles.load( function() {
-   $scope.safeApply(function(){
-   $scope.$broadcast('scroll.infiniteScrollComplete');
-   });
-   });
-   };
-
-*/
-    //Update our local articles
-    //var first = true;
-/*
-   var updateArticles = function() {
-   $scope.articles = Articles.get();
-   };
-
-//Update the map if the articles are updated
-Articles.registerObserver(updateArticles);
-*/
   }
 ]);
