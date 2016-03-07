@@ -18,6 +18,8 @@ app.service('Subarticles', [
   ){
     var articles = [];
 
+    //TODO Create a preload function that will preload images
+
     var findOrCreate = function (parentId) {
       var parent;
       articles.forEach(function(article) {
