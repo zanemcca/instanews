@@ -50,6 +50,7 @@ angular.module('instanews', [
   'instanews.service.camera',
   'instanews.service.comments',
   'instanews.service.fileTransfer',
+  'instanews.service.imageCache',
   'instanews.service.list',
   'instanews.service.localStorage',
   'instanews.service.maps',
