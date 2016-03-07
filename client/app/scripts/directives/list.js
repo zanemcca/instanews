@@ -54,13 +54,45 @@ app.directive('inList', [
           }
         };
 
-        $scope.load = _.debounce(function() {
-          $scope.list.load( function() {
+        //TODO Debounce leaves infinite scroll hanging sometimes
+        //Throttle calls all queued requests so it still punches the server to hard
+        var load = _.debounce(function() {
+          var cb = function() {
             $scope.safeApply(function(){
               $scope.$broadcast('scroll.infiniteScrollComplete');
             });
-          });
+          };
+          console.log('Loading more!');
+          if($scope.list.more) {
+            $scope.list.more(10,cb);
+          } else if ($scope.list.load) {
+            $scope.list.load(cb);
+          } else {
+            console.log('No loading function on the list!');
+            cb();
+          }
         }, 1000, true);
+
+        $scope.load = function () {
+          load();
+        };
+/*
+        debounce = function(func, wait, immediate) {
+          var timeout;
+          return function() {
+            var context = this, args = arguments;
+            var later = function() {
+              timeout = null;
+              if (!immediate) func.apply(context, args);
+            };
+
+            var callNow = immediate && !timeout;
+            clearTimeout(timeout);
+            timeout = setTimeout(later, wait);
+            if (callNow) func.apply(context, args);
+          };
+        };
+*/
       },
       templateUrl: 'templates/directives/list.html'
     };
