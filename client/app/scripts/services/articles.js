@@ -9,7 +9,7 @@ app.service('Articles', [
   'list',
   'Subarticles',
   'Platform',
-'Position',
+  'Position',
   function(
     $filter,
     Article,
@@ -104,22 +104,35 @@ app.service('Articles', [
           } else {
             var subarticle = article.Subarticles.getTop();
             if(subarticle) {
-              article.topSub = subarticle;
+              article.Subarticles.preLoad(subarticle, function (sub) {
+                article.topSub = sub;
+              });
             }
           }
         };
 
         if(!article.Subarticles) {
           article.Subarticles = Subarticles.findOrCreate(article.id);
+
+          //TODO This should be removed on destroy event
           article.Subarticles.registerObserver(update);
         }
 
         var spec = article.Subarticles.getSpec();
         spec.options.filter.skip = 0;
         spec.options.filter.limit = 1;
-        article.Subarticles.load();
+        article.Subarticles.load(function () {
+          var top = article.Subarticles.getTop();
+          if(top) {
+            article.Subarticles.preLoad(top, function () {
+              cb(article);
+            });
+          }
+          cb(article);
+        });
+      } else {
+        cb(article);
       }
-      cb(article);
     }; 
 
     var spec = {};

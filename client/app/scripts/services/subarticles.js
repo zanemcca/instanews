@@ -149,6 +149,8 @@ app.service('Subarticles', [
       spec.save = spec.save || save;
       spec.destroy = spec.destroy || destroy;
 
+      spec.preLoad = preLoad;
+
       // Create a list for articles within view
       var subarticles = list(spec);
 
@@ -179,6 +181,20 @@ app.service('Subarticles', [
         }
       });
     };
+
+    var preLoad = function (sub, cb) {
+      if(!sub.preloaded) {
+        sub.preloaded = true;
+        console.log('Preloading subarticle content!');
+        if(sub._file) {
+          //TODO Get the image that we are using (look at media)
+          //TODO Preload the image with the image cache
+        }
+        cb(sub);
+      } else {
+        cb(sub);
+      }
+    }; 
 
     return {
       findById: findById,
