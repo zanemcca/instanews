@@ -2,7 +2,95 @@
 //jshint undef: false
 var app = angular.module('instanews.service.preload', ['chart.js']);
 
-function PreloadFactory(Navigate, Platform) {
+function PreloadQueueFactory($q) {
+  if(!this.that) {
+    var queue = [];
+
+    var avgQueueTime = 0;
+    var avgLoadTime = 0;
+    var totalProcessed = 0;
+
+    var queueEntryFactory = function(item) {
+      var deferred = $q.defer();
+
+      var started = Date.now();
+
+      var entry = {
+        item: item,
+        resolve: function () {
+          //Track queueing time
+          var resolving = Date.now();
+          entry.queueTime = resolving - started;
+          avgQueueTime *= totalProcessed;
+          avgQueueTime += entry.queueTime;
+          avgQueueTime /= (totalProcessed + 1);
+
+          item.preLoad(function(item) {
+            //Track loading time
+            entry.loadTime = Date.now() - resolving;
+            avgLoadTime *= totalProcessed;
+            avgLoadTime += entry.queueTime;
+            totalProcessed++;
+            avgLoadTime /= totalProcessed;
+
+            var res = queue.shift();
+            if(item.id && res.item.id !== item.id) {
+              console.log(item);
+              console.log(res);
+              console.log('Error: Queue did not remove the write item!');
+            }
+
+            deferred.resolve(item);
+          });
+        },
+        promise: deferred.promise
+      };
+
+      queue.push(entry);
+
+      if(queue.length === 1) {
+        entry.resolve();
+      } else {
+        //Wait for the previous queue to be flushed
+        queue[queue.length - 2].promise.then(function () {
+          entry.resolve();
+        }, function (err) {
+          console.log('Previous preload failed in the queue!');
+          console.log(err);
+          entry.resolve();
+        });
+      }
+
+      return deferred.promise;
+    };
+
+    var add = function (items) {
+      if(!Array.isArray(items)) { 
+        return queueEntryFactory(items);
+      } else {
+        var promises = [];
+        for(var i in items) {
+          promises.push(queueEntryFactory(items[i]));
+        }
+
+        return $q.all(promises);
+      }
+    };
+
+    this.that = {
+      add: add,
+      stats: {
+        queueDelay: avgQueueTime,
+        loadDelay: avgLoadTime,
+        queueLength: queue.length,
+        totalProcessed: totalProcessed
+      }
+    };
+  }
+  return this.that;
+}
+
+function PreloadFactory(Navigate, Platform, PreloadQueue) {
   var preload = function (spec) {
     var that;
     if(!spec || !spec.list || !spec.scrollHandle) {
@@ -106,22 +194,48 @@ function PreloadFactory(Navigate, Platform) {
       } 
     };
 
-    var options = spec.list.getSpec().options;
-
-    var maxUpdate = function (pred, pos) {
-      //TODO Use variable load from list service
-      //TODO Use the number of rendered articles and the total view height 
-      //    The current implementation causes a positive feedback loop
+    var update = function (pred) {
       var length = spec.list.get().length;
-      var needed = Math.round((pred - pos) * (length / pos));
 
+      /*
+      var body = document.body;
+      var html = document.documentElement;
+      var height = Math.max(body.scrollHeight, body.offsetHeight, html.clientHeight, html.scrollHeight, html.offsetHeight );
+      console.log(height);
+      var avgHeight = height/length;
+      */
+      
+      //TODO Calculate this from the items directives after they have loaded
+      var avgHeight = 500;
+
+      var needed = Math.round(pred/avgHeight) - length;
       if(needed > 0 && spec.list.areItemsAvailable()) {
-        //TODO Increase this limit once the view is restricted
-        options.filter.limit = Math.min(needed, 10);
-        options.filter.skip = length;
+        if(needed + length > max) {
+          var limit = Math.min(needed, 50);
+          max = length + limit;
 
-        console.log('Have: ' + length + '\tLoading:' + options.filter.limit + '\tWanted: ' + needed);
-        spec.list.load();
+          console.log('Have: ' + length + '\tLoading:' + limit + '\tWanted: ' + needed + '\tAvgHeight: ' + avgHeight);
+          spec.list.more(limit, function (items) {
+            var done = function (item) {
+              /*console.log('QueueAvg: ' + PreloadQueue.stats.queueDelay +
+                          '\tLoadAvg: ' + PreloadQueue.stats.loadDelay +
+                          '\tQueueLength: ' + PreloadQueue.stats.queueLength);
+                         */
+              spec.list.add(item);
+            };
+
+            var error = function (err) {
+              console.log('Failed to preload the item!');
+              console.log(err);
+            };
+            for(var i in items) {
+              if(!items[i].preloaded) {
+                items[i].preLoad = spec.list.preLoad.bind(this, items[i]);
+                PreloadQueue.add(items[i]).then(done, error);
+              }
+            }
+          }, true);
+        }
       }
     };
 
@@ -131,10 +245,7 @@ function PreloadFactory(Navigate, Platform) {
 
     var startMonitor = function () {
       var after = function (pred, pos) {
-        if(pred > max) {
-          max = pred;
-          maxUpdate(max, pos);
-        }
+        update(pred, pos);
        // plotCallback(pred,pos);
       };
 
@@ -147,7 +258,6 @@ function PreloadFactory(Navigate, Platform) {
         predictor = null;
       }
     };
-
 
      //Plotting data - Depends on angular-chart.js
     Platform.ready.then(function () {
@@ -222,8 +332,14 @@ function PreloadFactory(Navigate, Platform) {
   return preload;
 }
 
+app.factory('PreloadQueue', [
+  '$q',
+  PreloadQueueFactory
+]);
+
 app.factory('preload', [
   'Navigate',
   'Platform',
+  'PreloadQueue',
   PreloadFactory
 ]);

@@ -58,8 +58,10 @@ function ListFactory (Platform, User) {
             }
           }
           if(!update) {
+            //TODO Change to one style to keep a consistent format 
             newItem.focus = spec.focus.bind(newItem);
             newItem.save = spec.save.bind(newItem);
+            newItem.preLoad = spec.preLoad.bind(this, newItem);
             newItem.destroy = function() {
               Platform.showSheet({
                 destructiveText: '<i class="icon ion-trash-b assertive"></i> Delete',
@@ -129,9 +131,10 @@ function ListFactory (Platform, User) {
       }
       */
 
+     cb = cb || function () {};
+
       Platform.ready
       .then( function () {
-        var modified = false;
         if(spec.find instanceof Function) {
           /* TODO Take into account fringe cases where content crosses pages.
            * Only dealing with duplicates for the moment
@@ -139,6 +142,7 @@ function ListFactory (Platform, User) {
           spec.find(spec.options).$promise.then(function (items) {
             if(!items || !items.length) {
               spec.itemsAvailable = false;
+              cb();
             } else {
               if(items.length < spec.options.filter.limit) {
                 spec.itemsAvailable = false;
@@ -150,23 +154,16 @@ function ListFactory (Platform, User) {
               spec.options.filter.limit *= 2;  
               spec.options.filter.limit = Math.min(spec.options.filter.limit, 100);
              */
-              modified = true;
               cb(items);
             }
           }, function (err) {
             console.log('Failed to load more items!');
             console.log(err);
+            cb();
           });
         } else {
           console.log('Invalid find function!');
-        }
-
-        if(!modified) {
-          if(cb) {
-            cb();
-          } else {
-            return;
-          }
+          cb();
         }
       });
     };
@@ -281,10 +278,13 @@ function ListFactory (Platform, User) {
         items: []
       };
 
-      var more = function (rate, cb) {
+      var more = function (rate, cb, doNotUpdate) {
         if(lSpec.items.length + rate <= get().length) {
-          lSpec.items = getSegment(lSpec.items.length + rate);
-          cb(loader.get());
+          var items = getSegment(lSpec.items.length + rate);
+          if(!doNotUpdate) {
+            lSpec.items = items;
+          }
+          cb(items);
         } else if(pendingLoad) {
           //TODO register an observer for the the completion of the load
           cb(loader.get());
@@ -293,13 +293,16 @@ function ListFactory (Platform, User) {
           console.log('Loading ' + spec.options.filter.limit + ' more!');
           spec.options.filter.skip = lSpec.items.length;
           that.load(function() {
-            lSpec.items = getSegment(lSpec.items.length + rate);
-            cb(loader.get());
+            var items = getSegment(lSpec.items.length + rate);
+            if(!doNotUpdate) {
+              lSpec.items = items;
+            }
+            cb(items);
           });
         } else {
           cb(loader.get());
         }
-       };
+      };
 
       var getSegment = function (size) {
         var items = get();
@@ -311,6 +314,10 @@ function ListFactory (Platform, User) {
       };
 
       var loader = {
+        add: function (item) {
+          //TODO We get duplicates added toward the bottom of the list
+          lSpec.items.push(item);
+        },
         get: function () {
           return lSpec.items;
         },
