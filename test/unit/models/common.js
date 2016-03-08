@@ -95,14 +95,14 @@ exports.run = function () {
             run();
           });
 
-          it('should return a cb of 1' , function (done) {
+          it('should return a list of the update data' , function (done) {
             models = [{
               id: 5,
               version: 0
             }];
 
             cb = function(err,res) {
-              expect(res).to.equal(1);
+              expect(res).to.deep.equal(models);
               done(err);
             };
             run();
