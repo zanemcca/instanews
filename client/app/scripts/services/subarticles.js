@@ -256,7 +256,6 @@ app.service('Subarticles', [
 
           ImageCache.Cache(findImageSource(sub._file))
           .then( function() {
-            console.log('Preloaded the image!');
             cb(sub);
           }, function(err) {
             console.log('Failed to cache the image!');
