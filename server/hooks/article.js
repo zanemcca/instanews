@@ -169,10 +169,12 @@ module.exports = function(app) {
  */
 
   Article.triggerRating = function(where, modify, cb) {
+    var timer = app.Timer('Article.triggerRating');
     debug('triggerRating', where, modify);
     if(where && where.id) {
       //Update the article
       Stat.updateRating(where, Article.modelName, modify, function(err, res) {
+        timer.elapsed();
         if(err) {
           console.warn('Warning: Failed to update an article');
           return cb(err);

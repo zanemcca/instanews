@@ -16,9 +16,8 @@ module.exports = function(app) {
   };
   */
 
-  //var Timer = require('../timer.js');
   Stat.updateRating = function(where, type, modify, cb) {
-    //var timer = Timer('Stat.updateRating');
+    var timer = app.Timer('Stat.updateRating');
     debug('updateRating', where, type, modify, cb);
     var err;
     if(!where || !type) {
@@ -77,9 +76,9 @@ module.exports = function(app) {
       };
     };
 
-    console.log(query);
+    //console.log(query);
     Model.readModifyWrite(query, rate(modify), function(err, res) {
-      //timer.lap('readModifyWrite');
+      timer.lap('Stat.updateRating.readModifyWrite');
       //delete where.ratingModified;
 
       if(err && (!err.status || err.status !== 409)) {
@@ -182,7 +181,7 @@ module.exports = function(app) {
             Base.updateStats(stat.parentId, stat.parentType, {
               '$mul': mul
             }, function(err) {
-              //timer.elapsed('Updated Base Stats');
+              timer.elapsed('Stat.updateRating.updateBaseStats.total');
               /* istanbul ignore if */
               if(err) {
                 console.warn('Failed to update stat ' +stat.deltaRating +
@@ -195,6 +194,7 @@ module.exports = function(app) {
           }
         });
 
+        timer.elapsed('Stat.updateRating.return.total');
         //No need to wait around for all that to finish
         cb(null, finalResult);
       }
