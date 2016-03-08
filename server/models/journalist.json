@@ -5,8 +5,13 @@
   "idInjection": false,
   "indexes": {
     "unique_index": {
-      "username": 1,
-      "email": 1
+      "keys": {
+        "username": 1,
+        "email": 1
+      },
+      "options": {
+        "background": true
+      }
     }
   },
   "hidden": [

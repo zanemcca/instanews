@@ -80,10 +80,12 @@ module.exports = function(app) {
   });
 
   View.updateViewableAttributes = function(ctx, data, next) {
+    var timer = app.Timer('View.updateViewableAttributes.time');
     debug('updateViewableAttributes', ctx, data, next);
     var inst = ctx.instance;
     if(inst) {
       inst.viewable(function(err, res) {
+        timer.lap('View.updateViewableAttributes.findViewable');
         if(err) {
           console.warn('Warning: Failed to fetch viewable');
           return next(err);
@@ -92,6 +94,7 @@ module.exports = function(app) {
         // istanbul ignore else
         if(res) {
           res.updateAttributes(data, function(err,res) {
+            timer.lap('View.updateViewableAttributes.updateViewable');
             if(err) {
               console.warn('Warning: Failed to save viewable');
               next(err);
@@ -102,6 +105,8 @@ module.exports = function(app) {
               inst.viewableType,
               null,
               function(err, res) {
+                timer.lap('View.updateViewableAttributes.triggerRating');
+                timer.elapsed('View.updateViewableAttributes.total');
                 if(err) { 
                   //Conflicts are ok because it means that 
                   //someone else has just triggered the rating.
