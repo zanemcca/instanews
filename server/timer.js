@@ -1,8 +1,10 @@
-function Timer(message) {
+function Timer(app, message) {
   var start = Date.now();
   var time = start;
 
-  console.log(message);
+  if(process.env.NODE_ENV !== 'production') {
+    console.log(message);
+  }
 
   var report = function(val, msg) {
     if(!msg) {
@@ -16,9 +18,17 @@ function Timer(message) {
     val = val || time;
 
     if(msg) {
-      console.log(val + ': ' + msg);
+      if(process.env.NODE_ENV === 'production') {
+        app.dd.timing(message, val);
+      } else {
+        console.log(val + ': ' + msg);
+      }
     } else {
-      console.log(val);
+      if(process.env.NODE_ENV === 'production') {
+        app.dd.timing('unknown_timer', val);
+      } else {
+        console.log(val);
+      }
     }
   };
 

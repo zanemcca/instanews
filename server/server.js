@@ -2,6 +2,7 @@
 var cluster = require('cluster');
 var numCPUs = require('os').cpus().length;
 var loopback = require('loopback');
+var Timer = require('./timer.js');
 var http,
 datadog;
 
@@ -70,6 +71,7 @@ var setupMonitoring = function () {
 
 var app = loopback();
 setupMonitoring();
+app.Timer = Timer.bind(this, app);
 
 app.utils = {
   objectIdWithTimestamp: objectIdWithTimestamp
