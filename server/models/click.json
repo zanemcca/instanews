@@ -4,8 +4,13 @@
   "idInjection": true,
   "indexes": {
     "parent_index": {
-      "clickableId": 1,
-      "clickableType": 1
+      "keys": {
+        "clickableId": 1,
+        "clickableType": 1
+      },
+      "options": {
+        "background": true
+      }
     }
   },
   "options": {

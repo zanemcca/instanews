@@ -33,7 +33,7 @@ exports.run = function() {
             }
           }, modify,function(err, res) {
 
-            expect(res).to.equal(1);
+            expect(res.length).to.equal(1);
             expect(err).to.be.null;
             Article.find({
               where: {
@@ -74,7 +74,7 @@ exports.run = function() {
             expect(err).to.exist;
             expect(err.message).to.
               equal('Transaction failed to update too many times.likely due to version number');
-            expect(res).to.equal(0);
+            expect(res.length).to.equal(0);
             done();
           }, 5);
       });

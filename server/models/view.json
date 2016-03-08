@@ -3,14 +3,15 @@
   "base": "PersistedModel",
   "idInjection": true,
   "indexes": {
-    "parent_index": {
-      "viewableId": 1,
-      "viewableType": 1
-    },
     "user_index": {
-      "username": 1,
-      "viewableId": 1,
-      "viewableType": 1
+      "keys": {
+        "username": 1,
+        "viewableId": 1,
+        "viewableType": 1
+      },
+      "options": {
+        "background": true
+      }
     }
   },
   "options": {
