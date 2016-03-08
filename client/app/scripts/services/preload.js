@@ -6,9 +6,12 @@ function PreloadQueueFactory($q) {
   if(!this.that) {
     var queue = [];
 
-    var avgQueueTime = 0;
-    var avgLoadTime = 0;
-    var totalProcessed = 0;
+    var stats = {
+      queueDelay: 0,
+      loadDelay: 0,
+      getLength: function () { return queue.length; },
+      totalProcessed: 0 
+    };
 
     var queueEntryFactory = function(item) {
       var deferred = $q.defer();
@@ -20,18 +23,13 @@ function PreloadQueueFactory($q) {
         resolve: function () {
           //Track queueing time
           var resolving = Date.now();
-          entry.queueTime = resolving - started;
-          avgQueueTime *= totalProcessed;
-          avgQueueTime += entry.queueTime;
-          avgQueueTime /= (totalProcessed + 1);
+          entry.queueDelay = resolving - started;
+          stats.queueDelay = entry.queueDelay*0.3 + stats.queueDelay*0.7;
 
           item.preLoad(function(item) {
             //Track loading time
-            entry.loadTime = Date.now() - resolving;
-            avgLoadTime *= totalProcessed;
-            avgLoadTime += entry.queueTime;
-            totalProcessed++;
-            avgLoadTime /= totalProcessed;
+            entry.loadDelay = Date.now() - resolving;
+            stats.loadDelay = entry.loadDelay*0.3 + stats.loadDelay*0.7;
 
             var res = queue.shift();
             if(item.id && res.item.id !== item.id) {
@@ -79,12 +77,7 @@ function PreloadQueueFactory($q) {
 
     this.that = {
       add: add,
-      stats: {
-        queueDelay: avgQueueTime,
-        loadDelay: avgLoadTime,
-        queueLength: queue.length,
-        totalProcessed: totalProcessed
-      }
+      stats: stats
     };
   }
   return this.that;
@@ -214,13 +207,15 @@ function PreloadFactory(Navigate, Platform, PreloadQueue) {
           var limit = Math.min(needed, 50);
           max = length + limit;
 
-          console.log('Have: ' + length + '\tLoading:' + limit + '\tWanted: ' + needed + '\tAvgHeight: ' + avgHeight);
+          console.log('Have: ' + length + '\tLoading:' + limit + '\tWanted: ' + needed);
           spec.list.more(limit, function (items) {
             var done = function (item) {
-              /*console.log('QueueAvg: ' + PreloadQueue.stats.queueDelay +
-                          '\tLoadAvg: ' + PreloadQueue.stats.loadDelay +
-                          '\tQueueLength: ' + PreloadQueue.stats.queueLength);
+              /*
+              console.log('QueueAvg: ' + Math.round(PreloadQueue.stats.queueDelay) +
+                          '\tLoadAvg: ' + Math.round(PreloadQueue.stats.loadDelay) +
+                          '\tQueueLength: ' + PreloadQueue.stats.getLength());
                          */
+                         
               spec.list.add(item);
             };
 

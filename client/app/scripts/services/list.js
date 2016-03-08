@@ -34,7 +34,7 @@ function ListFactory (Platform, User) {
     };
 
     // Add or update items in the list
-    var add = function (newItems, cb) {
+    var add = function (items, newItems, cb) {
       if(!Array.isArray(newItems)) {
         newItems = [newItems];
       }
@@ -50,9 +50,9 @@ function ListFactory (Platform, User) {
           }
 
           var update = false;
-          for(var i = spec.items.length - 1; i >= 0; i--) {
-            if(spec.items[i].id === newItem.id) {
-              spec.update(newItem, spec.items[i]);
+          for(var i = items.length - 1; i >= 0; i--) {
+            if(items[i].id === newItem.id) {
+              spec.update(newItem, items[i]);
               update = true;
               break;
             }
@@ -103,14 +103,15 @@ function ListFactory (Platform, User) {
 
               Platform.showSheet(options);
             };
-            spec.items.push(newItem);
+            items.push(newItem);
           }
         });
-        spec.items.sort(spec.sortingFunction);
 
-        spec.options.filter.skip = spec.items.length;
-
-        notifyObservers();
+        if(items === spec.items) {
+          spec.items.sort(spec.sortingFunction);
+          spec.options.filter.skip = spec.items.length;
+          notifyObservers();
+        }
       } else {
         console.log('No items pased to list.add');
       }
@@ -252,7 +253,7 @@ function ListFactory (Platform, User) {
         }
 
         if(items && items.length) {
-          add(items, cb);
+          that.add(items, cb);
         } else {
           notifyObservers();
           if(cb) {
@@ -313,11 +314,27 @@ function ListFactory (Platform, User) {
         }
       };
 
-      var loader = {
-        add: function (item) {
+      /*
+          function (item) {
           //TODO We get duplicates added toward the bottom of the list
+          for(var i in lSpec.items) {
+            if(lSpec.items[i].id === item.id) {
+              spec.update(item, lSpec.items[i]);
+            }
+          }
           lSpec.items.push(item);
         },
+       */
+
+      var loader = {
+        add: function(newItems, cb) {
+          /*
+          lSpec.items.push(newItems);
+          cb = cb || function () {};
+          cb(lSpec.items);
+          */
+          add(lSpec.items, newItems, cb);
+        }, 
         get: function () {
           return lSpec.items;
         },
@@ -398,7 +415,7 @@ function ListFactory (Platform, User) {
       load: function (cb) {
         load( function(items) {
           if(items && items.length) {
-            add(items, cb);
+            that.add(items, cb);
           } else if(cb) {
             cb(get());
           } else {
@@ -407,7 +424,7 @@ function ListFactory (Platform, User) {
         });
       },
       reload: reload,
-      add: add,
+      add: add.bind(this, spec.items),
       remove: remove,
       preLoad: preLoad,
       registerObserver: registerObserver,
