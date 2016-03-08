@@ -127,8 +127,10 @@ app.service('Articles', [
             article.Subarticles.preLoad(top, function () {
               cb(article);
             });
+          } else {
+            console.log('Failed to find a top subarticle!');
+            cb(article);
           }
-          cb(article);
         });
       } else {
         cb(article);
