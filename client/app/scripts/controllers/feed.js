@@ -58,11 +58,10 @@ app.controller('FeedCtrl', [
     var Preload = preload({
       scrollHandle: 'feed',
       $timeout: $timeout,
-      list: Articles
+      list: $scope.Articles
     });
 
-    Preload.start();
-    $scope.plot = Preload.plot;
+    //$scope.plot = Preload.plot;
 
     $scope.badge = Notifications.getBadge();
 
@@ -106,6 +105,7 @@ app.controller('FeedCtrl', [
 
     //Refresh the map everytime we enter the view
     $scope.$on('$ionicView.afterEnter', function() {
+      Preload.start();
       var map = Maps.getFeedMap();
       /* istanbul ignore else */
       if(map) {
@@ -115,6 +115,10 @@ app.controller('FeedCtrl', [
       Platform.analytics.trackView('Feed View');
 
       User.reload();
+    });
+
+    $scope.$on('$ionicView.beforeLeave', function() {
+      Preload.stop();
     });
   }
 ]);
