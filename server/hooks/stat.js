@@ -91,7 +91,7 @@ module.exports = function(app) {
           console.trace('Bad Callback');
         }
 
-        console.log(res);
+        //console.log(res);
 
         var finalResult = [];
 
