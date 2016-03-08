@@ -189,11 +189,7 @@ app.service('Subarticles', [
     var preLoad = function (sub, cb) {
       if(!sub.preloaded) {
         sub.preloaded = true;
-        console.log('Preloading subarticle content!');
-
         if(sub._file) {
-
-
           var urlBase = ENV.photoEndpoint;
           var getUrl = function(fileName) {
             var url = fileName;
@@ -270,6 +266,8 @@ app.service('Subarticles', [
         } else {
           cb(sub);
         }
+      } else {
+        cb(sub);
       }
     }; 
 
