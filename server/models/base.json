@@ -5,7 +5,12 @@
   "idInjection": true,
   "indexes": {
     "rating_index": {
-      "rating": -1
+      "keys": {
+        "rating": -1
+      },
+      "options": {
+        "background": true
+      }
     }
   },
   "hidden": [
