@@ -13,6 +13,8 @@ function PreloadQueueFactory($q) {
       totalProcessed: 0 
     };
 
+    var flushing = false;
+
     var queueEntryFactory = function(item) {
       var deferred = $q.defer();
 
@@ -26,6 +28,7 @@ function PreloadQueueFactory($q) {
           entry.queueDelay = resolving - started;
           stats.queueDelay = entry.queueDelay*0.3 + stats.queueDelay*0.7;
 
+          //TODO Error callback that will propogate
           item.preLoad(function(item) {
             //Track loading time
             entry.loadDelay = Date.now() - resolving;
@@ -35,11 +38,20 @@ function PreloadQueueFactory($q) {
             if(item.id && res.item.id !== item.id) {
               console.log(item);
               console.log(res);
-              console.log('Error: Queue did not remove the write item!');
-            }
+              console.log('Error: Queue did not remove the correct item!');
+            } 
 
             deferred.resolve(item);
           });
+        },
+        reject: function(err) {
+          var res = queue.shift();
+          if(item.id && res.item.id !== item.id) {
+            console.log(item);
+            console.log(res);
+            console.log('Error: Queue did not remove the correct item!');
+          }
+          deferred.reject(err);
         },
         promise: deferred.promise
       };
@@ -51,11 +63,13 @@ function PreloadQueueFactory($q) {
       } else {
         //Wait for the previous queue to be flushed
         queue[queue.length - 2].promise.then(function () {
-          entry.resolve();
+          resolve(entry);
         }, function (err) {
-          console.log('Previous preload failed in the queue!');
-          console.log(err);
-          entry.resolve();
+          if(err !== 'flush') {
+            console.log('Previous preload failed in the queue!');
+            console.log(err);
+          }
+          resolve(entry);
         });
       }
 
@@ -75,8 +89,26 @@ function PreloadQueueFactory($q) {
       }
     };
 
+    var flush = function () {
+      console.log('Flush initiated...');
+      flushing = true;
+    };
+
+    var resolve = function(entry) {
+      if(flushing) {
+        entry.reject('flush');
+        if(queue.length === 0) {
+          flushing = false;
+          console.log('...Flush resolved');
+        }
+      } else {
+        entry.resolve();
+      }
+    };
+
     this.that = {
       add: add,
+      flush: flush,
       stats: stats
     };
   }
@@ -220,9 +252,13 @@ function PreloadFactory(Navigate, Platform, PreloadQueue) {
             };
 
             var error = function (err) {
-              console.log('Failed to preload the item!');
-              console.log(err);
+              max--;
+              if(err !== 'flush') {
+                console.log('Failed to preload the item!');
+                console.log(err);
+              }
             };
+
             for(var i in items) {
               if(!items[i].preloaded) {
                 items[i].preLoad = spec.list.preLoad.bind(this, items[i]);
@@ -250,6 +286,7 @@ function PreloadFactory(Navigate, Platform, PreloadQueue) {
     var stopMonitor = function () {
       if(predictor) {
         predictor.stop();
+        PreloadQueue.flush();
         predictor = null;
       }
     };
