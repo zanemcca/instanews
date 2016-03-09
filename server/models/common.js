@@ -255,6 +255,7 @@ exports.readModifyWrite = function(Model, query, modify, cb, options) {
 
         if(versionName && instance.hasOwnProperty(versionName)) {
           where[versionName] = instance[versionName];
+          instance[versionName]++;
         }
         else {
           var err = new Error('The given versionName is invalid.' +
@@ -283,6 +284,7 @@ exports.readModifyWrite = function(Model, query, modify, cb, options) {
           }
         }
 
+        //console.log(where);
         Model.updateAll(where, instance, function(err, res) {
           if(err) {
             console.warn('Warning: Transaction failed to update: ' +
@@ -320,17 +322,17 @@ exports.readModifyWrite = function(Model, query, modify, cb, options) {
             else if(res.count > 1) {
               console.warn('Warning: More than one instance was updated: ' +
                           res.count);
-              cb(null, res);
+              cb(null, instance);
             }
             else {
-              cb(null, res);
+              cb(null, instance);
             }
           }
         });
       };
 
       var count = 0;
-      var results = 0; 
+      var results = []; 
       var error = null;
 
       var callback = function(err, result) {
@@ -339,7 +341,11 @@ exports.readModifyWrite = function(Model, query, modify, cb, options) {
           error = err; 
         }
         if(result) {
-          results += result.count;
+          if(Array.isArray(result)) {
+            results = results.concat(result);
+          } else {
+            results.push(result);
+          }
         }
 
         if(count === res.length) {
