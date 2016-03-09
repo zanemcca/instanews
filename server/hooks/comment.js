@@ -134,30 +134,33 @@ next();
   /* istanbul ignore next */
 
   Comment.triggerRating = function(where, modify, cb) {
+    var timer = app.Timer('Comment.triggerRating');
     debug('triggerRating', where, modify, cb);
     if(where && Object.getOwnPropertyNames(where).length > 0) {
       Stat.updateRating(where, Comment.modelName, modify, function(err, res) {
+        timer.lap('Comment.triggerRating.updateRating');
         if(err) {
           console.warn('Warning: Failed to update a comment');
           cb(err);
-        }
-        else {
+        } else {
           var query = {
             where: where,
             limit: 1
           };
 
           Comment.find(query, function(err, res) {
+            timer.lap('Comment.triggerRating.find');
             if(err) {
               console.warn('Warning: Failed to find comment');
               cb(err);
-            }
-            else if(res.length > 0) {
+            } else if(res.length > 0) {
               Stat.triggerRating({
                 id: res[0].commentableId
-              }, res[0].commentableType, null, cb);
-            }
-            else {
+              }, res[0].commentableType, null, function(err, res) {
+                timer.lap('Comment.triggerRating.triggerRating');
+                cb(err, res);
+              });
+            } else {
               cb();
             }
           });
