@@ -424,7 +424,9 @@ function ListFactory (Platform, User) {
         });
       },
       reload: reload,
-      add: add.bind(this, spec.items),
+      add: function(newItems, cb) {
+        add(spec.items, newItems, cb);
+      },
       remove: remove,
       preLoad: preLoad,
       registerObserver: registerObserver,
