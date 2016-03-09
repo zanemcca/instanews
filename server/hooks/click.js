@@ -294,10 +294,12 @@ module.exports = function(app) {
   };
 
   Click.updateClickableAttributes = function(ctx, data, next) {
+    var timer = app.Timer('Click.updateClickableAttributes');
     debug('updateClickableAttributes', ctx, data);
     var inst = ctx.instance;
     if(inst) {
       inst.clickable(function(err, res) {
+      timer.lap('Click.updateClickableAttributes.findClickable');
         if(err || !res) {
           console.warn('Warning: Failed to fetch clickable');
           return next(err);
@@ -334,6 +336,7 @@ module.exports = function(app) {
         }
 
         res.updateAttributes(data, function(err,res) {
+        timer.lap('Click.updateClickableAttributes.update');
           if(err) {
             console.warn('Warning: Failed to save clickable');
             next(err);
@@ -345,6 +348,7 @@ module.exports = function(app) {
             inst.clickableType,
             null,
             function(err, res) {
+              timer.lap('Click.updateClickableAttributes.triggerRating');
               if(err) { 
                 //Conflicts are ok because it means that 
                 //someone else has just triggered the rating.
