@@ -333,38 +333,32 @@ module.exports = function(app) {
           //console.log('Click ' + variable + ': ' + data.$mul[variable]);
         }
 
-          res.updateAttributes(data, function(err,res) {
-            if(err) {
-              console.warn('Warning: Failed to save clickable');
-              next(err);
-            }
-            else {
-              Stat.triggerRating({
-                id: inst.clickableId
-              },
-              inst.clickableType,
-              null,
-              function(err, res) {
-                if(err) { 
-                  //Conflicts are ok because it means that 
-                  //someone else has just triggered the rating.
-                  //So we will not throw an error
-                  console.error('Error: Failed to update the rating for ' +
-                                inst.clickableType + ' - ' + inst.clickableId +
-                                ' from click ' + inst.id);
-                  console.error(err.stack);
-                  return next(err);
-                }
-                next();
-              }); 
-            }
-            /*
-          //TODO Remove this.
-          //Age statistics are not needed when we do not use timedecay
-          var age = Date.now() - res.created;
-          Click.addAgeSample(ctx, age, next);
-          */
-            });
+        res.updateAttributes(data, function(err,res) {
+          if(err) {
+            console.warn('Warning: Failed to save clickable');
+            next(err);
+          }
+          else {
+            Stat.triggerRating({
+              id: inst.clickableId
+            },
+            inst.clickableType,
+            null,
+            function(err, res) {
+              if(err) { 
+                //Conflicts are ok because it means that 
+                //someone else has just triggered the rating.
+                //So we will not throw an error
+                console.error('Error: Failed to update the rating for ' +
+                              inst.clickableType + ' - ' + inst.clickableId +
+                              ' from click ' + inst.id);
+                console.error(err.stack);
+                return next(err);
+              }
+              next();
+            }); 
+          }
+        });
       });
     } else {
       var error = new Error('Invalid instance for updateClickableAttributes');
