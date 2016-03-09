@@ -143,7 +143,10 @@ app.controller('ArticleCtrl', [
       $scope.Subarticles.unfocusAll();
       spec.options.filter.limit = Math.max($scope.Subarticles.get(), 5);
       spec.options.filter.skip = 0;
-      $scope.Subarticles.load(function() {
+      $scope.Subarticles.load(function(err) {
+        if(err) { 
+          console.log(err);
+        }
         $scope.$broadcast('scroll.refreshComplete');
       });
     };
