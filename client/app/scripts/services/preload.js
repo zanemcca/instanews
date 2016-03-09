@@ -28,8 +28,13 @@ function PreloadQueueFactory($q) {
           entry.queueDelay = resolving - started;
           stats.queueDelay = entry.queueDelay*0.3 + stats.queueDelay*0.7;
 
-          //TODO Error callback that will propogate
-          item.preLoad(function(item) {
+          item.preLoad(function(err, item) {
+            if(err) {
+              console.log('Failed to preLoad!')
+              console.log(item);
+              return deferred.reject(err);
+            }
+
             //Track loading time
             entry.loadDelay = Date.now() - resolving;
             stats.loadDelay = entry.loadDelay*0.3 + stats.loadDelay*0.7;
@@ -90,8 +95,10 @@ function PreloadQueueFactory($q) {
     };
 
     var flush = function () {
-      console.log('Flush initiated...');
-      flushing = true;
+      if(queue.length > 1) {
+        console.log('Flush initiated...');
+        flushing = true;
+      }
     };
 
     var resolve = function(entry) {
@@ -240,7 +247,14 @@ function PreloadFactory(Navigate, Platform, PreloadQueue) {
           max = length + limit;
 
           console.log('Have: ' + length + '\tLoading:' + limit + '\tWanted: ' + needed);
-          spec.list.more(limit, function (items) {
+          spec.list.more(limit, function (err, items) {
+            if(err) {
+              max = length;
+              console.log('Failed to get more!');
+              console.log(err);
+              return;
+            }
+
             var done = function (item) {
               /*
               console.log('QueueAvg: ' + Math.round(PreloadQueue.stats.queueDelay) +

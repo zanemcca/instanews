@@ -39,6 +39,7 @@ function ListFactory (Platform, User) {
         newItems = [newItems];
       }
 
+      var err;
       newItems = spec.addFilter(newItems);
 
       if(newItems.length) {
@@ -114,12 +115,17 @@ function ListFactory (Platform, User) {
         }
       } else {
         console.log('No items pased to list.add');
+        err = new Error('Empty list being added');
       }
 
       if(cb) {
-        cb(get());
+        cb(err, get());
       } else {
-        return get();
+        if(err) {
+          return err;
+        } else {
+          return get();
+        }
       }
     }; 
 
@@ -155,16 +161,16 @@ function ListFactory (Platform, User) {
               spec.options.filter.limit *= 2;  
               spec.options.filter.limit = Math.min(spec.options.filter.limit, 100);
              */
-              cb(items);
+              cb(null, items);
             }
           }, function (err) {
             console.log('Failed to load more items!');
             console.log(err);
-            cb();
+            cb(err);
           });
         } else {
           console.log('Invalid find function!');
-          cb();
+          cb(new Error('Invalid find function!'));
         }
       });
     };
@@ -247,7 +253,11 @@ function ListFactory (Platform, User) {
     var reload = function (cb) {
       spec.options.filter.skip = 0;
       spec.options.filter.limit = Math.max(get().length + 1, defaultLimit);
-      load(function (items) {
+      load(function (err, items) {
+        if(err) {
+          return console.log(err);
+        }
+
         if(spec.items.length) {
           spec.items = [];
         }
@@ -285,23 +295,28 @@ function ListFactory (Platform, User) {
           if(!doNotUpdate) {
             lSpec.items = items;
           }
-          cb(items);
+          cb(null, items);
         } else if(pendingLoad) {
           //TODO register an observer for the the completion of the load
-          cb(loader.get());
+          cb(null, loader.get());
         } else if(areItemsAvailable()) {
           spec.options.filter.limit = Math.max(rate, 50);
           console.log('Loading ' + spec.options.filter.limit + ' more!');
           spec.options.filter.skip = lSpec.items.length;
-          that.load(function() {
+          that.load(function(err) {
+            if(err) {
+              console.log('Failed to load more!');
+              return cb(err);
+            }
+
             var items = getSegment(lSpec.items.length + rate);
             if(!doNotUpdate) {
               lSpec.items = items;
             }
-            cb(items);
+            cb(null, items);
           });
         } else {
-          cb(loader.get());
+          cb(null, loader.get());
         }
       };
 
@@ -413,13 +428,20 @@ function ListFactory (Platform, User) {
       unfocusAll: unfocusAll,
       enableFocus: spec.enableFocus, 
       load: function (cb) {
-        load( function(items) {
+        load( function(err, items) {
+          if(err) {
+            if(cb) {
+              cb(err);
+            } else {
+              console.log(err);
+            }
+            return;
+          }
+
           if(items && items.length) {
             that.add(items, cb);
           } else if(cb) {
-            cb(get());
-          } else {
-            return get();
+            cb(null, get());
           }
         });
       },

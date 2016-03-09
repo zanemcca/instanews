@@ -256,17 +256,16 @@ app.service('Subarticles', [
 
           ImageCache.Cache(findImageSource(sub._file))
           .then( function() {
-            cb(sub);
+            cb(null, sub);
           }, function(err) {
-            console.log('Failed to cache the image!');
             console.log(err);
-            cb(sub);
+            cb(new Error('Failed to cache the image!'));
           });
         } else {
-          cb(sub);
+          cb(null, sub);
         }
       } else {
-        cb(sub);
+        cb(null, sub);
       }
     }; 
 

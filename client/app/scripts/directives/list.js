@@ -57,7 +57,10 @@ app.directive('inList', [
         //TODO Debounce leaves infinite scroll hanging sometimes
         //Throttle calls all queued requests so it still punches the server to hard
         var load = _.debounce(function() {
-          var cb = function() {
+          var cb = function(err) {
+            if(err) {
+              console.log(err);
+            }
             $scope.safeApply(function(){
               $scope.$broadcast('scroll.infiniteScrollComplete');
             });

@@ -94,8 +94,12 @@ app.service('Articles', [
           //If all the subarticles have been removed then remove the article
           if(article.Subarticles.get().length === 0) {
             //Attempt to load more subarticles
-            article.Subarticles.load(function (subs) {
-              if(subs.length === 0) {
+            article.Subarticles.load(function (err, subs) {
+              if(err || subs.length === 0) {
+                if(err) {
+                  console.log('Failed to load top subarticle');
+                  console.log(err);
+                }
                 articles.remove(function (art) {
                   return (art.id === article.id);
                 });
@@ -104,8 +108,15 @@ app.service('Articles', [
           } else {
             var subarticle = article.Subarticles.getTop();
             if(subarticle) {
-              article.Subarticles.preLoad(subarticle, function (sub) {
-                article.topSub = sub;
+              article.Subarticles.preLoad(subarticle, function (err, sub) {
+                if(err) {
+                  console.log(err);
+                  articles.remove(function (art) {
+                    return (art.id === article.id);
+                  });
+                } else {
+                  article.topSub = sub;
+                }
               });
             }
           }
@@ -121,19 +132,23 @@ app.service('Articles', [
         var spec = article.Subarticles.getSpec();
         spec.options.filter.skip = 0;
         spec.options.filter.limit = 1;
-        article.Subarticles.load(function () {
+        article.Subarticles.load(function (err) {
+          if(err) {
+            console.log(err);
+            return cb(new Error('Failed to find top subarticle'), article);
+          }
           var top = article.Subarticles.getTop();
           if(top) {
-            article.Subarticles.preLoad(top, function () {
-              cb(article);
+            article.Subarticles.preLoad(top, function (err) {
+              cb(err, article);
             });
           } else {
             console.log('Failed to find a top subarticle!');
-            cb(article);
+            cb(new Error('Failed to find top subarticle'), article);
           }
         });
       } else {
-        cb(article);
+        cb(null, article);
       }
     }; 
 
@@ -216,11 +231,15 @@ app.service('Articles', [
       Platform.loading.show();
 
       updateRating = true;
-      articles.load(function () {
-        //TODO Lets rethink this potentially unnecessary reorganize
+      articles.load(function (err) {
         updateRating = false;
-        reorganize();
         Platform.loading.hide();
+
+        if(err) {
+          return console.log(err);
+        }
+        //TODO Lets rethink this potentially unnecessary reorganize
+        reorganize();
       });
     };
 
