@@ -319,6 +319,7 @@ viewCount: 270
 
 
     if(rating > 1 || rating < 0 || isNaN(rating)) {
+      Stat.app.dd.increment('Stat.brokenRating');
       console.warn('The returned probability is not unitary!: ' + rating);
       return rateable.rating;
     }
