@@ -15,6 +15,25 @@ function PreloadQueueFactory($q) {
 
     var flushing = false;
 
+    var flush = function () {
+      if(queue.length > 1) {
+        console.log('Flush initiated...');
+        flushing = true;
+      }
+    };
+
+    var resolve = function(entry) {
+      if(flushing) {
+        entry.reject('flush');
+        if(queue.length === 0) {
+          flushing = false;
+          console.log('...Flush resolved');
+        }
+      } else {
+        entry.resolve();
+      }
+    };
+
     var queueEntryFactory = function(item) {
       var deferred = $q.defer();
 
@@ -30,7 +49,7 @@ function PreloadQueueFactory($q) {
 
           item.preLoad(function(err, item) {
             if(err) {
-              console.log('Failed to preLoad!')
+              console.log('Failed to preLoad!');
               console.log(item);
               return deferred.reject(err);
             }
@@ -91,25 +110,6 @@ function PreloadQueueFactory($q) {
         }
 
         return $q.all(promises);
-      }
-    };
-
-    var flush = function () {
-      if(queue.length > 1) {
-        console.log('Flush initiated...');
-        flushing = true;
-      }
-    };
-
-    var resolve = function(entry) {
-      if(flushing) {
-        entry.reject('flush');
-        if(queue.length === 0) {
-          flushing = false;
-          console.log('...Flush resolved');
-        }
-      } else {
-        entry.resolve();
       }
     };
 
