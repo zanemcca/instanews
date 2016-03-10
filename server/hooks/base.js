@@ -67,9 +67,11 @@ module.exports = function(app) {
       ctx.query.limit = LIMIT;
     }
 
+    /*
     ctx.query.where = ctx.query.where || {};
     //Limit the requests to be within the last two weeks
     ctx.query.where.id = ctx.query.where.id || { gt: app.utils.objectIdWithTimestamp(Date.now() - 2 * ONE_WEEK) };
+    */
 
     /*
     if(ctx.query.include) {
