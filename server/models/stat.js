@@ -152,6 +152,7 @@ viewCount: 270
   var criticalValueInfinity = 0.674;
 
   Stat.getRating  = function(rateable) {
+    Stat.app.dd.increment('Stat.getRating');
     var upVoteCount = rateable.upVoteCount || 0;
     var downVoteCount = rateable.downVoteCount || 0;
     var getCommentsCount = rateable.getCommentsCount || 0;
