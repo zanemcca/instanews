@@ -133,169 +133,34 @@ next();
   });
   /* istanbul ignore next */
 
-  /*
-  Comment.observe('after save', function(ctx, next) {
-    debug('ater save', ctx, next);
-    //TODO Rewrite notifications
-    var inst = ctx.instance;
-
-    //List of already notified users
-    var users = [];
-
-    var report = function(err,res) {
-      if (err) console.error(err.stack);
-      else {
-        //console.log('Created a notification!');
-      }
-    };
-
-    var notify = function(message, id, models) {
-      var username;
-      if(models) {
-        if(Array.isArray(models)) {
-          if(models.length ) {
-            for(var i = 0; i < models.length; i++) {
-              if( users.indexOf(models[i].username) === -1) {
-                username = models[i].username;
-                //console.log('Starting push to '+ username +'...');
-
-                Notification.create({
-                  message: message,
-                  notifiableId: id,
-                  notifiableType: 'comment',
-                  messageFrom: inst.username,
-                  username: username
-                }, report );
-
-                users.push(models[i].username);
-              }
-            }
-          }
-        } else {
-          if( users.indexOf(models.username) === -1) {
-            username = models.username;
-            //console.log('Starting push to '+ username +'...');
-
-            Notification.create({
-              message: message,
-              notifiableId: id,
-              notifiableType: 'comment',
-              messageFrom: inst.username,
-              username: username
-            }, report);
-
-            users.push(models.username);
-          }
-        }
-      }
-    };
-
-    if (inst && ctx.isNewInstance) {
-
-      users.push(inst.username);
-
-      var Model = {};
-
-      switch(inst.commentableType) {
-        case 'article':
-          //TODO original poster needs a notification
-        Model = app.models.Subarticle;
-        Model.find({
-          where: {
-            parentId: inst.commentableId
-          }
-        }, function(err, res) {
-          if (err) {
-            console.error(
-              'Error retrieving items for comment notification');
-          }
-          else {
-            var message = inst.username +
-              ' commented on an article you contributed to';
-
-            notify(message, inst.id, res);
-          }
-        });
-        break;
-        case 'subarticle':
-          Model = app.models.Subarticle;
-        Model.findById(inst.commentableId, function(err, res) {
-          if (err) {
-            console.error(
-              'Error retrieving items for comment notification');
-          }
-          else {
-            var message = inst.username +
-              ' commented on your subarticle';
-            notify(message, inst.id, res);
-          }
-        });
-        break;
-        case 'comment':
-          Model = app.models.Comment;
-
-        Model.findById(inst.commentableId, function(err, res) {
-          if (err) {
-            console.error(
-              'Error retrieving items for comment notification');
-          }
-          else {
-            var message = inst.username + ' commented on your comment';
-            notify(message, inst.id, res);
-          }
-        });
-        Model.find({
-          where: {
-            commentableId: inst.commentableId,
-            commentableType: inst.commentableType
-          }
-        }, function(err, res) {
-          if (err) {
-            console.error(
-              'Error retrieving items for comment notification');
-          }
-          else {
-            var message = inst.username +
-              ' commented on a comment stream that you are part of';
-            notify(message, inst.id, res);
-          }
-        });
-        break;
-        default:
-          console.error('Error: bad votableType');
-      }
-
-    }
-    next();
-
-  });
-  */
-
   Comment.triggerRating = function(where, modify, cb) {
+    var timer = app.Timer('Comment.triggerRating');
     debug('triggerRating', where, modify, cb);
     if(where && Object.getOwnPropertyNames(where).length > 0) {
       Stat.updateRating(where, Comment.modelName, modify, function(err, res) {
+        timer.lap('Comment.triggerRating.updateRating');
         if(err) {
           console.warn('Warning: Failed to update a comment');
           cb(err);
-        }
-        else {
+        } else {
           var query = {
             where: where,
             limit: 1
           };
 
           Comment.find(query, function(err, res) {
+            timer.lap('Comment.triggerRating.find');
             if(err) {
               console.warn('Warning: Failed to find comment');
               cb(err);
-            }
-            else if(res.length > 0) {
+            } else if(res.length > 0) {
               Stat.triggerRating({
                 id: res[0].commentableId
-              }, res[0].commentableType, null, cb);
-            }
-            else {
+              }, res[0].commentableType, null, function(err, res) {
+                timer.lap('Comment.triggerRating.triggerRating');
+                cb(err, res);
+              });
+            } else {
               cb();
             }
           });
