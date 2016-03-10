@@ -148,7 +148,6 @@ exports.run = function () {
             expect(where).to.deep.equal({ id:res[0].commentableId });
             expect(type).to.equal(res[0].commentableType);
             expect(mod).to.be.null;
-            expect(cb).to.equal(callback);
             done();
           });
 
