@@ -60,6 +60,7 @@ angular.module('instanews', [
   'instanews.service.platform',
   'instanews.service.position',
   'instanews.service.preload',
+  'instanews.service.preloadQueue',
   'instanews.service.post',
   'instanews.service.subarticles',
   'instanews.service.textInput',
