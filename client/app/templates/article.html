@@ -31,6 +31,12 @@
          <inComments owner="article"></inComments>
       </div>
     </in-list>
+    <div ng-show="Subarticles.areItemsAvaialable()" class="list-end">
+      <ion-spinner></ion-spinner>
+    </div>
+    <div ng-hide="Subrticles.areItemsAvailable()" class="list-end">
+       No more items
+    </div>
   </ion-content>
   <in-text-footer></in-text-footer>
 </ion-view>
