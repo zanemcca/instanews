@@ -43,6 +43,12 @@ app.controller('ArticleCtrl', [
     $scope.Uploads = Uploads.findOrCreate($stateParams.id);
     $scope.uploads = [];
 
+    $scope.preScrollToTop = function (cb) {
+      Preload.stop();
+      cb();
+      Preload.reset();
+    };
+
     var Preload = preload({
       scrollHandle: 'subarticle',
       //$timeout: $timeout,

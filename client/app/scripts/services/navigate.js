@@ -172,7 +172,7 @@ app.service('Navigate', [
           delegate = delegate.$getByHandle(spec.scrollHandle);
         }
         spec.$timeout(function () {
-          delegate.scrollTop(true);
+          delegate.scrollTop(false);
         });
       };
 

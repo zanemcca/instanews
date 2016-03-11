@@ -58,6 +58,12 @@ app.controller('FeedCtrl', [
       id: 'feedMap'
     };
 
+    $scope.preScrollToTop = function (cb) {
+      Preload.stop();
+      cb();
+      Preload.reset();
+    };
+
     var Preload = preload({
       scrollHandle: 'feed',
 //      $timeout: $timeout,
