@@ -29,7 +29,10 @@ app.controller('FeedCtrl', [
     Notifications,
     User
   ) {
-    $scope.Articles = Articles.getLoader();
+    $scope.Articles = Articles.getLoader({
+      preload: true,
+      keepSync: true
+    });
 
     $scope.toggleMenu = function () {
       if(Navigate.toggleMenu()) {
@@ -57,7 +60,7 @@ app.controller('FeedCtrl', [
 
     var Preload = preload({
       scrollHandle: 'feed',
-      $timeout: $timeout,
+//      $timeout: $timeout,
       list: $scope.Articles
     });
 
@@ -111,7 +114,8 @@ app.controller('FeedCtrl', [
       if(map) {
         google.maps.event.trigger(map, 'resize');
       }
-      Articles.reorganize();
+      Articles.reorganize();  //Reorganize the cached list to remove any out of view articles
+
       Platform.analytics.trackView('Feed View');
 
       User.reload();

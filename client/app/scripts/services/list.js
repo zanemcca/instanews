@@ -2,7 +2,7 @@
 'use strict';
 var app = angular.module('instanews.service.list', ['ionic', 'ngCordova']);
 
-function ListFactory (Platform, User) {
+function ListFactory (Platform, PreloadQueue, User) {
   //var list = function (spec, my) {
   var list = function (spec) {
     var that;
@@ -284,18 +284,21 @@ function ListFactory (Platform, User) {
     //TODO Use pendingLoad to avoid multiple load requests
     var pendingLoad = false;
 
-    var getLoader = function () {
-      var lSpec = {
-        items: []
-      };
+    var getLoader = function (lSpec) {
+      lSpec = lSpec || {};
+      lSpec.preload = lSpec.preload || false;
+      lSpec.keepSync = lSpec.keepSync || false;
+      lSpec.items = [];
 
-      var more = function (rate, cb, doNotUpdate) {
+      var more = function (rate, cb) {
         if(lSpec.items.length + rate <= get().length) {
           var items = getSegment(lSpec.items.length + rate);
-          if(!doNotUpdate) {
+          if(lSpec.preload) {
+            preloadItems(items);
+          } else {
             lSpec.items = items;
           }
-          cb(null, items);
+          cb(null, lSpec.items);
         } else if(pendingLoad) {
           //TODO register an observer for the the completion of the load
           cb(null, loader.get());
@@ -310,13 +313,47 @@ function ListFactory (Platform, User) {
             }
 
             var items = getSegment(lSpec.items.length + rate);
-            if(!doNotUpdate) {
+            if(lSpec.preload) {
+              preloadItems(items);
+            } else {
               lSpec.items = items;
             }
-            cb(null, items);
+            cb(null, lSpec.items);
           });
         } else {
           cb(null, loader.get());
+        }
+      };
+
+      var preloadItems = function (items) {
+        var done = function (item) {
+          /*
+          console.log('QueueAvg: ' + Math.round(PreloadQueue.stats.queueDelay) +
+                      '\tLoadAvg: ' + Math.round(PreloadQueue.stats.loadDelay) +
+                      '\tQueueLength: ' + PreloadQueue.stats.getLength());
+                     */
+                     
+          add(lSpec.items, item, function(err) {
+            if(err) {
+              console.log('Failed to add preloaded item');
+            }
+          });
+        };
+
+        var error = function (err) {
+          if(err !== 'flush') {
+            console.log('Failed to preload the item!');
+            console.log(err);
+          }
+        };
+
+        for(var i in items) {
+          if(!items[i].preloaded) {
+            items[i].preLoad = preLoad.bind(this, items[i]);
+            PreloadQueue.add(items[i]).then(done, error);
+          } else {
+            done(items[i]);
+          }
         }
       };
 
@@ -329,27 +366,36 @@ function ListFactory (Platform, User) {
         }
       };
 
-      /*
-          function (item) {
-          //TODO We get duplicates added toward the bottom of the list
-          for(var i in lSpec.items) {
-            if(lSpec.items[i].id === item.id) {
-              spec.update(item, lSpec.items[i]);
-            }
-          }
-          lSpec.items.push(item);
-        },
-       */
-
       var loader = {
         add: function(newItems, cb) {
-          /*
-          lSpec.items.push(newItems);
-          cb = cb || function () {};
-          cb(lSpec.items);
-          */
-          add(lSpec.items, newItems, cb);
+          if(lSpec.preload) {
+            preloadItems(newItems);
+            cb(null, lSpec.items);
+          } else {
+            add(lSpec.items, newItems, cb);
+          }
         }, 
+        reload: function(cb) {
+          reload(function (err) {
+            if(err) {
+              console.log('Failed to reload!');
+              return cb(err);
+            }
+            loader.sync();
+            cb(null, lSpec.items);
+          });
+        },
+        sync: function() {
+          var items = getSegment(Math.max(10, lSpec.items.length));
+          lSpec.items = [];
+
+          if(lSpec.preload) {
+            preloadItems(items);
+          } else {
+            lSpec.items = items;
+          }
+          return lSpec.items;
+        },
         get: function () {
           return lSpec.items;
         },
@@ -360,11 +406,10 @@ function ListFactory (Platform, User) {
         more: more
       };
 
-      //TODO Clear observer
-      registerObserver(function () {
-        //TODO This could be customized for different loaders potentially
-        lSpec.items = getSegment(Math.max(10, lSpec.items.length));
-      });
+      if(lSpec.keepSync) {
+        //TODO Clear observer
+        registerObserver(loader.sync);
+      }
 
       return loader;
     };
@@ -464,6 +509,7 @@ function ListFactory (Platform, User) {
 
 app.factory('list', [
   'Platform',
+  'PreloadQueue',
   'User',
   ListFactory
 ]);

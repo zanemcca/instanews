@@ -36,7 +36,10 @@ app.controller('ArticleCtrl', [
 
     $scope.Platform = Platform;
     var Subs = Subarticles.findOrCreate($stateParams.id);
-    $scope.Subarticles = Subs.getLoader();
+    $scope.Subarticles = Subs.getLoader({
+      preload: true
+    });
+
     $scope.Uploads = Uploads.findOrCreate($stateParams.id);
     $scope.uploads = [];
 
@@ -107,9 +110,15 @@ app.controller('ArticleCtrl', [
         google.maps.event.trigger(map, 'resize');
       }
 
-      spec.options.filter.limit = Math.max(Subs.get(), 5);
+      spec.options.filter.limit = Math.max(Subs.get(), 100);
       spec.options.filter.skip = 0;
-      Subs.load();
+      Subs.load(function (err) {
+        if(err) {
+          console.log(err);
+        } else {
+          $scope.Subarticles.sync();
+        }
+      });
 
       uploadObserver = $scope.Uploads.registerObserver(function () {
         var uploads = $scope.Uploads.get();
@@ -155,13 +164,22 @@ app.controller('ArticleCtrl', [
     $scope.onRefresh = function () {
       console.log('Refresh');
       Subs.unfocusAll();
-      spec.options.filter.limit = Math.max(Subs.get(), 5);
-      spec.options.filter.skip = 0;
-      Subs.load(function(err) {
+      $scope.Subarticles.reload( function (err) {
         if(err) { 
           console.log(err);
         }
         $scope.$broadcast('scroll.refreshComplete');
+      });
+
+      spec.options.filter.limit = Math.max(Subs.get(), 100);
+      spec.options.filter.skip = 0;
+      Subs.load(function (err) {
+        if(err) {
+          console.log(err);
+        } else {
+          $scope.Subarticles.sync();
+          $scope.$broadcast('scroll.refreshComplete');
+        }
       });
     };
 
