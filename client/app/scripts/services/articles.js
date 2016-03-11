@@ -134,15 +134,22 @@ app.service('Articles', [
         spec.options.filter.limit = 1;
         article.Subarticles.load(function (err) {
           if(err) {
+            article.preloaded = false;
             console.log(err);
             return cb(new Error('Failed to find top subarticle'), article);
           }
           var top = article.Subarticles.getTop();
           if(top) {
             article.Subarticles.preLoad(top, function (err) {
-              cb(err, article);
+              if(err) {
+                article.preloaded = false;
+                return cb(err);
+              }
+
+              cb(null, article);
             });
           } else {
+            article.preloaded = false;
             console.log('Failed to find a top subarticle!');
             cb(new Error('Failed to find top subarticle'), article);
           }

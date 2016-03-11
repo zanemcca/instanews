@@ -127,16 +127,18 @@ function PreloadFactory(Navigate, Platform, PreloadQueue) {
           max = length + limit;
 
           console.log('Have: ' + length + '\tLoading:' + limit + '\tWanted: ' + needed);
-          spec.list.more(limit, function (err, items) {
+          spec.list.more(limit, function (err) {
             if(err) {
               max = length;
               console.log('Failed to get more!');
               console.log(err);
               return;
             }
+            /*
             if(items) {
-              console.log('Loaded: ' + items.length - length);
+              console.log('Loaded: ' + (items.length - length));
             }
+            */
           });
         }
       }
