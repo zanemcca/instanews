@@ -259,6 +259,7 @@ app.service('Subarticles', [
             cb(null, sub);
           }, function(err) {
             console.log(err);
+            sub.preloaded = false;
             cb(new Error('Failed to cache the image!'));
           });
         } else {
