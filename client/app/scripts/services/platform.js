@@ -164,6 +164,28 @@ app.factory('Platform', [
 
     var getWidth = function () {
       return window.innerWidth;
+    }; 
+
+    var getMaxImageDimensions = function () {
+      var res = {
+        height: 0,
+        width: 0
+      };
+      res.width = Math.min(getWidth() -20,600);
+
+      var max = Math.max(window.innerWidth, window.innerHeight);
+      if(max < 500) {
+        res.height = 300;
+      } else if(max < 600) {
+        res.height = 500;
+      } else if(max < 700) {
+        res.height = 600;
+      } else if(max < 800) {
+        res.height = 700;
+      } else {
+        res.height = 800;
+      }
+      return res;
     };
 
     var isLandscape = function () {
@@ -701,6 +723,7 @@ app.factory('Platform', [
       isTablet: isTablet,
       isLandscape: isLandscape,
       getWidth: getWidth,
+      getMaxImageDimensions: getMaxImageDimensions,
       getDevice: getDevice,
       setDevice: setDevice,
       setDeviceToken: setDeviceToken,
