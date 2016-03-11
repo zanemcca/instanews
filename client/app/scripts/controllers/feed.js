@@ -64,6 +64,7 @@ app.controller('FeedCtrl', [
       list: $scope.Articles
     });
 
+    Position.registerBoundsObserver(Preload.reset);
     //$scope.plot = Preload.plot;
 
     $scope.badge = Notifications.getBadge();
@@ -108,7 +109,7 @@ app.controller('FeedCtrl', [
 
     //Refresh the map everytime we enter the view
     $scope.$on('$ionicView.afterEnter', function() {
-      Preload.start();
+      Preload.reset();
       var map = Maps.getFeedMap();
       /* istanbul ignore else */
       if(map) {
