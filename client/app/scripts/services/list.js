@@ -292,8 +292,9 @@ function ListFactory (Platform, PreloadQueue, User) {
 
       var more = function (rate, cb) {
         cb = cb || function () {};
+        var items = [];
         if(lSpec.items.length + rate <= get().length) {
-          var items = getSegment(lSpec.items.length + rate);
+          items = getSegment(lSpec.items.length + rate);
           if(lSpec.preload) {
             preloadItems(items);
           } else {
@@ -313,7 +314,7 @@ function ListFactory (Platform, PreloadQueue, User) {
               return cb(err);
             }
 
-            var items = getSegment(lSpec.items.length + rate);
+            items = getSegment(lSpec.items.length + rate);
             if(lSpec.preload) {
               preloadItems(items);
             } else {
@@ -322,7 +323,7 @@ function ListFactory (Platform, PreloadQueue, User) {
             cb(null, lSpec.items);
           });
         } else {
-          var items = getSegment(get().length);
+          items = getSegment(get().length);
           if(lSpec.preload) {
             preloadItems(items);
           } else {
