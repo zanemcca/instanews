@@ -50,6 +50,7 @@ angular.module('instanews', [
   'instanews.service.camera',
   'instanews.service.comments',
   'instanews.service.fileTransfer',
+  'instanews.service.imageCache',
   'instanews.service.list',
   'instanews.service.localStorage',
   'instanews.service.maps',
@@ -58,6 +59,8 @@ angular.module('instanews', [
   'instanews.service.observable',
   'instanews.service.platform',
   'instanews.service.position',
+  'instanews.service.preload',
+  'instanews.service.preloadQueue',
   'instanews.service.post',
   'instanews.service.subarticles',
   'instanews.service.textInput',
@@ -145,7 +148,9 @@ angular.module('instanews', [
     Uploads
   ) {
 
-    $scope.Notifications = Notifications;
+    $scope.Notifications = Notifications.getLoader({
+      keepSync: true
+    });
 
     //Update user function
     var updateUser = function() {

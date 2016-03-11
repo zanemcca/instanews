@@ -27,7 +27,8 @@
     "angular-moment": "~0.10.3",
     "angular-underscore-module": "~1.0.3",
     "angular-material": "~0.11.4",
-    "angular-elastic": "~2.5.1"
+    "angular-elastic": "~2.5.1",
+    "angular-chart.js": "^0.8.8"
   },
   "resolutions": {
     "angular": "1.4.3"

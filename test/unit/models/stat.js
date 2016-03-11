@@ -21,7 +21,7 @@ var Stat = {
       increment: function () {},
       timing: function () {}
     }
-  },
+  }
 };
 common.req('models/stat')(Stat);
 
