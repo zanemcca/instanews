@@ -18,6 +18,17 @@ function start() {
     find: function () {},
     findById: function () {},
     disableRemoteMethod: function () {},
+    app: {
+      utils: {
+        objectIdWithTimestamp: function () {
+          return "id";
+        }
+      },
+      dd: {
+        increment: function () {},
+        timing: function () {}
+      }
+    },
     remoteMethod: function () {}
   };
 
@@ -61,6 +72,9 @@ exports.run = function () {
                 geoWithin: {
                   $box: box
                 }
+              },
+              id: {
+                gt: "id"
               },
               pending: {
                 exists: false

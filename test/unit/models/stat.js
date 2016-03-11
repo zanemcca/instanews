@@ -13,8 +13,13 @@ var app = common.req('server');
 var Stat = {
   on: function (event, cb) {},
   app: {
+    utils: {
+      objectIdWithTimestamp: function () {
+      }
+    },
     dd: {
-      increment: function () {}
+      increment: function () {},
+      timing: function () {}
     }
   }
 };
