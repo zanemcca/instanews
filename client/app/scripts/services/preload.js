@@ -1,6 +1,7 @@
 'use strict';
 //jshint undef: false
-var app = angular.module('instanews.service.preload', ['chart.js']);
+//var app = angular.module('instanews.service.preload', ['chart.js']);
+var app = angular.module('instanews.service.preload', []);
 
 function PreloadFactory(Navigate, Platform, PreloadQueue) {
   var preload = function (spec) {
@@ -165,6 +166,14 @@ function PreloadFactory(Navigate, Platform, PreloadQueue) {
       }
     };
 
+    var resetMonitor = function () {
+      max = 0;
+      if(!predictor) {
+        startMonitor();
+      }
+    };
+
+    /*
      //Plotting data - Depends on angular-chart.js
     Platform.ready.then(function () {
 //    Chart.defaults.global.animation = false;
@@ -223,11 +232,13 @@ function PreloadFactory(Navigate, Platform, PreloadQueue) {
     };
 
     plotInit();
+    */
 
     // That is the object to be constructed
     // it has privlidged access to my, and spec
     that = {
-      plot: plot,
+      //plot: plot,
+      reset: resetMonitor,
       stop: stopMonitor,
       start: startMonitor
     };
