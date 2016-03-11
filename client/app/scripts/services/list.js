@@ -291,6 +291,7 @@ function ListFactory (Platform, PreloadQueue, User) {
       lSpec.items = [];
 
       var more = function (rate, cb) {
+        cb = cb || function () {};
         if(lSpec.items.length + rate <= get().length) {
           var items = getSegment(lSpec.items.length + rate);
           if(lSpec.preload) {
@@ -321,7 +322,13 @@ function ListFactory (Platform, PreloadQueue, User) {
             cb(null, lSpec.items);
           });
         } else {
-          cb(null, loader.get());
+          var items = getSegment(get().length);
+          if(lSpec.preload) {
+            preloadItems(items);
+          } else {
+            lSpec.items = items;
+          }
+          cb(null, lSpec.items);
         }
       };
 
@@ -377,6 +384,7 @@ function ListFactory (Platform, PreloadQueue, User) {
         }, 
         reload: function(cb) {
           reload(function (err) {
+            cb = cb || function () {};
             if(err) {
               console.log('Failed to reload!');
               return cb(err);
