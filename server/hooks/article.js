@@ -1,4 +1,7 @@
 
+var ONE_DAY = 24*60*60*1000; // 1 Day in millisecs
+var ONE_WEEK = 7*ONE_DAY; // 1 Week in millisecs
+var ONE_MONTH = 30*ONE_DAY; // 1 Month in millisecs
 
 var PRELOAD_LIMIT = 1; //WARNING: Changing this could break the ranking algorithm
 
@@ -137,9 +140,27 @@ module.exports = function(app) {
     });
   });
 
+  //TODO This should likely be for the find remote method only
+  Article.beforeRemote('find', function(ctx, unused, next){
+    debug('beforeRemote.find', ctx, next);
+
+    var filter = {};
+    if(ctx.args.filter) { 
+      filter = JSON.parse(ctx.args.filter);
+    }
+
+    filter.where = filter.where || {};
+    filter.where.id = filter.where.id || { gt: app.utils.objectIdWithTimestamp(Date.now() - 2 * ONE_WEEK) };
+    ctx.args.filter = JSON.stringify(filter);
+
+    next();
+  });
+
   /*
   Article.observe('access', function(ctx, next) {
     debug('observe access', ctx);
+
+    /*
     if(ctx.options.rate) {
       var context = loopback.getCurrentContext();
       if(context) {
@@ -166,7 +187,7 @@ module.exports = function(app) {
     }
     next();
   });
- */
+   */
 
   Article.triggerRating = function(where, modify, cb) {
     var timer = app.Timer('Article.triggerRating');
