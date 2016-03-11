@@ -89,6 +89,16 @@ app.controller(
         return isVideo;
       };
 
+      var img = {
+        height: 0,
+        width: 0
+      };
+
+      var rendered = {
+        height: 0,
+        width: 0
+      };
+
       var getPrefix = function(sources) {
         //TODO Come up with a more clear solution for 
         //the quality mapping
@@ -111,12 +121,20 @@ app.controller(
           }
         }
 
-        return  Platform.getSizeClassPrefix(max);
-      };
+        return Platform.getSizeClassPrefix(max);
+      }; 
 
       var findSource = function () {
         var prefix = getPrefix($scope.media.sources);
         var src = prefix + '-' + $scope.media.name;
+
+        for(var i in $scope.media.sources) {
+          if($scope.media.sources[i].prefix === prefix) {
+            img.height = $scope.media.sources[i].height;
+            img.width = $scope.media.sources[i].width;
+            break;
+          }
+        }
 
         isVideo = false;
         // If this is a video then it will
@@ -134,6 +152,25 @@ app.controller(
         // istanbul ignore else 
         if(src) {
           $scope.source = getUrl($scope.container, src);
+          if(img.height && img.width) {
+            rendered = Platform.getMaxImageDimensions();
+
+            if(rendered.width > img.width) {
+              if(rendered.height > img.height) {
+                rendered.width = img.width;
+                rendered.height = img.height;
+              } else {
+                rendered.width = Math.round(rendered.height/img.height*img.width);
+              }
+            } else {
+              var maxH = Math.round(rendered.width/img.width*img.height);
+              if(rendered.height > maxH) {
+                rendered.height = maxH;
+              } else {
+                rendered.width = Math.round(rendered.height/img.height*img.width);
+              }
+            }
+          }
         } else {
           //TODO Create some kind of image that lets users know the photo is broken
           console.error('There is no valid photo source given!');
@@ -142,6 +179,32 @@ app.controller(
       };
 
       findSource();
+
+
+      $scope.imgStyle = function () {
+        if(rendered.height && rendered.width) {
+          return {
+            'height': '100%',
+            'width': '100%'
+          };
+        } else {
+          return {
+            'heighx': 'auto',
+            'width': 'auto'
+           };
+        }
+      };
+
+      $scope.containerStyle = function () {
+        if(rendered.height && rendered.width) {
+          return {
+            'margin': 'auto',
+            'background-color': '#EFEFFF',
+            'height': rendered.height + 'px',
+            'width': rendered.width + 'px'
+          };
+        }
+      };
 
       $scope.$watch('media', function(oldMedia, newMedia) {
         if(oldMedia.name !== newMedia.name) {
