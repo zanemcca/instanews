@@ -90,7 +90,6 @@ app.service('Articles', [
         //TODO This should be within a $scope.$apply in order to be rendered
         var update = function () {
           //console.log('Trying to get topSubarticle');
-
           //If all the subarticles have been removed then remove the article
           if(article.Subarticles.get().length === 0) {
             //Attempt to load more subarticles
@@ -129,31 +128,46 @@ app.service('Articles', [
           article.Subarticles.registerObserver(update);
         }
 
-        var spec = article.Subarticles.getSpec();
-        spec.options.filter.skip = 0;
-        spec.options.filter.limit = 1;
-        article.Subarticles.load(function (err) {
-          if(err) {
-            article.preloaded = false;
-            console.log(err);
-            return cb(new Error('Failed to find top subarticle'), article);
-          }
-          var top = article.Subarticles.getTop();
-          if(top) {
-            article.Subarticles.preLoad(top, function (err) {
-              if(err) {
-                article.preloaded = false;
-                return cb(err);
-              }
+        var top = article.Subarticles.getTop();
 
-              cb(null, article);
-            });
-          } else {
-            article.preloaded = false;
-            console.log('Failed to find a top subarticle!');
-            cb(new Error('Failed to find top subarticle'), article);
-          }
-        });
+        if(top) {
+          article.Subarticles.preLoad(top, function (err, sub) {
+            if(err) {
+              article.preloaded = false;
+              return cb(err);
+            }
+
+            article.topSub = sub;
+            cb(null, article);
+          });
+        } else {
+          var spec = article.Subarticles.getSpec();
+          spec.options.filter.skip = 0;
+          spec.options.filter.limit = 1;
+          article.Subarticles.load(function (err) {
+            if(err) {
+              article.preloaded = false;
+              console.log(err);
+              return cb(new Error('Failed to find top subarticle'), article);
+            }
+            var top = article.Subarticles.getTop();
+            if(top) {
+              article.Subarticles.preLoad(top, function (err, sub) {
+                if(err) {
+                  article.preloaded = false;
+                  return cb(err);
+                }
+
+                article.topSub = sub;
+                cb(null, article);
+              });
+            } else {
+              article.preloaded = false;
+              console.log('Failed to find a top subarticle!');
+              cb(new Error('Failed to find top subarticle'), article);
+            }
+          });
+        }
       } else {
         cb(null, article);
       }
