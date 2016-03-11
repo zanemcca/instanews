@@ -162,6 +162,38 @@ app.factory('Platform', [
       return (navigator.device && navigator.device.capture && navigator.device.capture.captureVideo);
     };
 
+    var scrollBarWidth = -1;
+    var getScrollBarWidth = function() {
+      if(scrollBarWidth < 0) {
+        var inner = document.createElement('p');
+        inner.style.width = '100%';
+        inner.style.height = '200px';
+
+        var outer = document.createElement('div');
+        outer.style.position = 'absolute';
+        outer.style.top = '0px';
+        outer.style.left = '0px';
+        outer.style.visibility = 'hidden';
+        outer.style.width = '200px';
+        outer.style.height = '150px';
+        outer.style.overflow = 'hidden';
+        outer.appendChild (inner);
+
+        document.body.appendChild (outer);
+        var w1 = inner.offsetWidth;
+        outer.style.overflow = 'scroll';
+        var w2 = inner.offsetWidth;
+        if (w1 === w2) {
+          w2 = outer.clientWidth;
+        }
+
+        document.body.removeChild (outer);
+
+        scrollBarWidth = (w1 - w2);
+      }
+      return scrollBarWidth;
+    };
+
     var getWidth = function () {
       return window.innerWidth;
     }; 
@@ -171,7 +203,15 @@ app.factory('Platform', [
         height: 0,
         width: 0
       };
-      res.width = Math.min(getWidth() -20,600);
+
+      var width = getWidth() - getScrollBarWidth();
+      if(width >= 768) {
+        res.width = 600;
+      } else if(isTablet()) {
+        res.width = Math.round(width*0.8);
+      } else {
+        res.width = width - 20;
+      }
 
       var max = Math.max(window.innerWidth, window.innerHeight);
       if(max < 500) {
@@ -202,7 +242,7 @@ app.factory('Platform', [
     var getDeviceType = function () {
       var height = Math.max(window.innerHeight, window.innerWidth);
       var type = 'phone';
-      if( 900 <= height ) {
+      if(height  >= 900) {
         type = 'tablet';
       }
       return type;
