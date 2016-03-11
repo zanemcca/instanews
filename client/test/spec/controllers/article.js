@@ -59,6 +59,16 @@ describe('Article controller: ', function(){
         };
       });
 
+      $provide.service('preload', function() {
+        return function () {
+          return {
+            reset: function () {},
+            start: function () {},
+            stop: function () {}
+          };
+        };
+      });
+
       $provide.service('Uploads', function() {
         return {
           findOrCreate: function(id) {
@@ -94,6 +104,13 @@ describe('Article controller: ', function(){
                   options: {
                     filter: {}
                   }
+                };
+              },
+              getLoader: function (spec) {
+                return {
+                  more: function (num, cb) {
+                    cb() 
+                  } 
                 };
               },
               get: function () {
@@ -208,6 +225,7 @@ describe('Article controller: ', function(){
     Subarticles,
     Post,
     Platform,
+    preload,
     Uploads,
     Maps
   ){
@@ -217,6 +235,7 @@ describe('Article controller: ', function(){
     article = Article;
     maps = Maps;
     subarticles = Subarticles;
+    Preload = preload;
     comments = Comments;
     articles = Articles;
     uploads = Uploads;
@@ -233,6 +252,7 @@ describe('Article controller: ', function(){
       Articles: articles,
       Comments: comments,
       Subarticles: subarticles,
+      preload: Preload,
       Uploads: uploads,
       Maps: maps,
     });
