@@ -9,7 +9,7 @@ app.service('Articles', [
   'list',
   'Subarticles',
   'Platform',
-'Position',
+  'Position',
   function(
     $filter,
     Article,
@@ -84,40 +84,93 @@ app.service('Articles', [
     };
 
     var preLoad = function (article, cb) {
-      //TODO This should be within a $scope.$apply in order to be rendered
-      var update = function () {
-        //console.log('Trying to get topSubarticle');
+      if(!article.preloaded) {
+        article.preloaded = true;
 
-        //If all the subarticles have been removed then remove the article
-        if(article.Subarticles.get().length === 0) {
-          //Attempt to load more subarticles
-          article.Subarticles.load(function (subs) {
-            if(subs.length === 0) {
-              articles.remove(function (art) {
-                return (art.id === article.id);
+        //TODO This should be within a $scope.$apply in order to be rendered
+        var update = function () {
+          //console.log('Trying to get topSubarticle');
+          //If all the subarticles have been removed then remove the article
+          if(article.Subarticles.get().length === 0) {
+            //Attempt to load more subarticles
+            article.Subarticles.load(function (err, subs) {
+              if(err || subs.length === 0) {
+                if(err) {
+                  console.log('Failed to load top subarticle');
+                  console.log(err);
+                }
+                articles.remove(function (art) {
+                  return (art.id === article.id);
+                });
+              }
+            });
+          } else {
+            var subarticle = article.Subarticles.getTop();
+            if(subarticle) {
+              article.Subarticles.preLoad(subarticle, function (err, sub) {
+                if(err) {
+                  console.log(err);
+                  articles.remove(function (art) {
+                    return (art.id === article.id);
+                  });
+                } else {
+                  article.topSub = sub;
+                }
               });
             }
+          }
+        };
+
+        if(!article.Subarticles) {
+          article.Subarticles = Subarticles.findOrCreate(article.id);
+
+          //TODO This should be removed on destroy event
+          article.Subarticles.registerObserver(update);
+        }
+
+        var top = article.Subarticles.getTop();
+
+        if(top) {
+          article.Subarticles.preLoad(top, function (err, sub) {
+            if(err) {
+              article.preloaded = false;
+              return cb(err);
+            }
+
+            article.topSub = sub;
+            cb(null, article);
           });
         } else {
-          var subarticle = article.Subarticles.getTop();
-          if(subarticle) {
-            article.topSub = subarticle;
-          }
+          var spec = article.Subarticles.getSpec();
+          spec.options.filter.skip = 0;
+          spec.options.filter.limit = 1;
+          article.Subarticles.load(function (err) {
+            if(err) {
+              article.preloaded = false;
+              console.log(err);
+              return cb(new Error('Failed to find top subarticle'), article);
+            }
+            var top = article.Subarticles.getTop();
+            if(top) {
+              article.Subarticles.preLoad(top, function (err, sub) {
+                if(err) {
+                  article.preloaded = false;
+                  return cb(err);
+                }
+
+                article.topSub = sub;
+                cb(null, article);
+              });
+            } else {
+              article.preloaded = false;
+              console.log('Failed to find a top subarticle!');
+              cb(new Error('Failed to find top subarticle'), article);
+            }
+          });
         }
-      };
-
-      if(!article.Subarticles) {
-        article.Subarticles = Subarticles.findOrCreate(article.id);
-        article.Subarticles.registerObserver(update);
+      } else {
+        cb(null, article);
       }
-
-
-      var spec = article.Subarticles.getSpec();
-      spec.options.filter.skip = 0;
-      spec.options.filter.limit = 1;
-      article.Subarticles.load();
-
-      cb(article);
     }; 
 
     var spec = {};
@@ -192,24 +245,31 @@ app.service('Articles', [
       }
 
       spec.options.filter.skip = 0;
-      spec.options.filter.limit = 5;
+      spec.options.filter.limit = 100;
 
       console.log('UpateBounds');
 
       Platform.loading.show();
 
       updateRating = true;
-      articles.load(function () {
-        //TODO Lets rethink this potentially unnecessary reorganize
+      articles.load(function (err) {
         updateRating = false;
-        reorganize();
         Platform.loading.hide();
+
+        if(err) {
+          return console.log(err);
+        }
+        //TODO Lets rethink this potentially unnecessary reorganize
+        reorganize();
       });
     };
 
     Position.registerBoundsObserver(updateBounds);
 
     articles.reorganize = reorganize;
+    articles.getSpec = function () {
+      return spec;
+    };
 
     return articles;
   }

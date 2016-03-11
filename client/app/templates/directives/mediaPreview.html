@@ -1,8 +1,10 @@
 <!DOCTYPE html>
 <div ng-controller="imageCtrl"
   ng-class="{ 'black-background': isVideo() }"
+  ng-style="containerStyle()"
   class="item no-padding image-container">
-  <img height="auto" width="auto" alt="Oops! There was a problem loading this image" ng-src="{{source}}">
+  <!--img ng-style="imgStyle()" alt="Oops! There was a problem loading this image" ng-src="{{source}}"-->
+  <img ng-style="imgStyle()" ng-src="{{source}}">
   <div class="icon ion-ios-play icon-center" ng-if="isVideo()"></div>
 </div>
 

@@ -14,10 +14,16 @@
       </div>
     </div>
   </ion-nav-buttons>
-  <ion-content delegate-handle="subarticle" on-swipe-down="onSwipeDown()" overflow-scroll="true" class="gpu">
+
+  <in-scroll-top scroll-handle="subarticle" 
+  preScroll="preScrollToTop">
+  </in-scroll-top>
+
+  <ion-content id="subarticle" delegate-handle="subarticle" on-swipe-down="onSwipeDown()" overflow-scroll="true" class="gpu">
     <ion-refresher pulling-text="Fresh Stuff" on-refresh="onRefresh()">
     </ion-refresher>
     <in-list list="Subarticles"
+      is-not-infinite="true" 
       is-card="true"> 
       <inMap map="map"></inMap>
       <div class="item dynamic-box"
@@ -29,6 +35,12 @@
          <inComments owner="article"></inComments>
       </div>
     </in-list>
+    <div ng-show="Subarticles.areItemsAvaialable()" class="list-end">
+      <ion-spinner></ion-spinner>
+    </div>
+    <div ng-hide="Subrticles.areItemsAvailable()" class="list-end">
+       No more items
+    </div>
   </ion-content>
   <in-text-footer></in-text-footer>
 </ion-view>

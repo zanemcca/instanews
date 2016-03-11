@@ -9,6 +9,7 @@ app.controller('ArticleCtrl', [
   'Article',
   'Articles',
   'Comments',
+  'preload',
   'Subarticles',
   'Maps',
   'Navigate',
@@ -22,6 +23,7 @@ app.controller('ArticleCtrl', [
     Article,
     Articles,
     Comments,
+    preload,
     Subarticles,
     Maps,
     Navigate,
@@ -33,11 +35,27 @@ app.controller('ArticleCtrl', [
     Platform.initBackButton();
 
     $scope.Platform = Platform;
-    $scope.Subarticles = Subarticles.findOrCreate($stateParams.id);
+    var Subs = Subarticles.findOrCreate($stateParams.id);
+    $scope.Subarticles = Subs.getLoader({
+      preload: true
+    });
+
     $scope.Uploads = Uploads.findOrCreate($stateParams.id);
     $scope.uploads = [];
 
-    var spec = $scope.Subarticles.getSpec();
+    $scope.preScrollToTop = function (cb) {
+      Preload.stop();
+      cb();
+      Preload.reset();
+    };
+
+    var Preload = preload({
+      scrollHandle: 'subarticle',
+      //$timeout: $timeout,
+      list: $scope.Subarticles
+    });
+
+    var spec = Subs.getSpec();
 
     $scope.article = {
       modelName: 'article',
@@ -91,15 +109,22 @@ app.controller('ArticleCtrl', [
 
     //Refresh the map everytime we enter the view
     $scope.$on('$ionicView.afterEnter', function() {
+      Preload.start();
       afterLoaded();
       var map = Maps.getArticleMap($stateParams.id);
       if(map) {
         google.maps.event.trigger(map, 'resize');
       }
 
-      spec.options.filter.limit = Math.max($scope.Subarticles.get(), 5);
+      spec.options.filter.limit = Math.max(Subs.get(), 100);
       spec.options.filter.skip = 0;
-      $scope.Subarticles.load();
+      Subs.load(function (err) {
+        if(err) {
+          console.log(err);
+        } else {
+          $scope.Subarticles.sync();
+        }
+      });
 
       uploadObserver = $scope.Uploads.registerObserver(function () {
         var uploads = $scope.Uploads.get();
@@ -124,11 +149,15 @@ app.controller('ArticleCtrl', [
       Platform.analytics.trackView('Article View');
     });
 
+    $scope.$on('$ionicView.beforeLeave', function() {
+      Preload.stop();
+    });
+
     $scope.$on('$ionicView.afterLeave', function() {
       marker = Maps.deleteMarker(marker);
       uploadObserver.unregister();
       articleComments.unfocusAll();
-      $scope.Subarticles.unfocusAll();
+      Subs.unfocusAll();
     });
 
     //TODO Remove this and the template that goes with it
@@ -140,11 +169,23 @@ app.controller('ArticleCtrl', [
 
     $scope.onRefresh = function () {
       console.log('Refresh');
-      $scope.Subarticles.unfocusAll();
-      spec.options.filter.limit = Math.max($scope.Subarticles.get(), 5);
-      spec.options.filter.skip = 0;
-      $scope.Subarticles.load(function() {
+      Subs.unfocusAll();
+      $scope.Subarticles.reload( function (err) {
+        if(err) { 
+          console.log(err);
+        }
         $scope.$broadcast('scroll.refreshComplete');
+      });
+
+      spec.options.filter.limit = Math.max(Subs.get(), 100);
+      spec.options.filter.skip = 0;
+      Subs.load(function (err) {
+        if(err) {
+          console.log(err);
+        } else {
+          $scope.Subarticles.sync();
+          $scope.$broadcast('scroll.refreshComplete');
+        }
       });
     };
 

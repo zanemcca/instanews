@@ -14,7 +14,8 @@ app.directive('inScrollTop', [
     return {
       restrict: 'E',
       scope: {
-        scrollHandle: '@'
+        scrollHandle: '@',
+        preScroll: '='
       },
       controller: function(
         $scope,
@@ -27,6 +28,14 @@ app.directive('inScrollTop', [
           $timeout: $timeout,
         });
         $scope.scroll.showScrollToTop = false;
+
+        $scope.scrollToTop = function () {
+          if($scope.preScroll) {
+            $scope.preScroll($scope.scroll.scrollTop);
+          } else {
+            $scope.scroll.scrollTop();
+          }
+        };
 
         $scope.$on('$ionicView.unloaded', function () {
           $ionicGesture.off($scope.swipeDownObj, 'swipedown', function (err) {

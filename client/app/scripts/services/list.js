@@ -2,7 +2,7 @@
 'use strict';
 var app = angular.module('instanews.service.list', ['ionic', 'ngCordova']);
 
-function ListFactory (Platform, User) {
+function ListFactory (Platform, PreloadQueue, User) {
   //var list = function (spec, my) {
   var list = function (spec) {
     var that;
@@ -34,11 +34,12 @@ function ListFactory (Platform, User) {
     };
 
     // Add or update items in the list
-    var add = function (newItems, cb) {
+    var add = function (items, newItems, cb) {
       if(!Array.isArray(newItems)) {
         newItems = [newItems];
       }
 
+      var err;
       newItems = spec.addFilter(newItems);
 
       if(newItems.length) {
@@ -50,16 +51,18 @@ function ListFactory (Platform, User) {
           }
 
           var update = false;
-          for(var i = spec.items.length - 1; i >= 0; i--) {
-            if(spec.items[i].id === newItem.id) {
-              spec.update(newItem, spec.items[i]);
+          for(var i = items.length - 1; i >= 0; i--) {
+            if(items[i].id === newItem.id) {
+              spec.update(newItem, items[i]);
               update = true;
               break;
             }
           }
           if(!update) {
+            //TODO Change to one style to keep a consistent format 
             newItem.focus = spec.focus.bind(newItem);
             newItem.save = spec.save.bind(newItem);
+            newItem.preLoad = spec.preLoad.bind(this, newItem);
             newItem.destroy = function() {
               Platform.showSheet({
                 destructiveText: '<i class="icon ion-trash-b assertive"></i> Delete',
@@ -101,22 +104,28 @@ function ListFactory (Platform, User) {
 
               Platform.showSheet(options);
             };
-            spec.items.push(newItem);
+            items.push(newItem);
           }
         });
-        spec.items.sort(spec.sortingFunction);
 
-        spec.options.filter.skip = spec.items.length;
-
-        notifyObservers();
+        if(items === spec.items) {
+          spec.items.sort(spec.sortingFunction);
+          spec.options.filter.skip = spec.items.length;
+          notifyObservers();
+        }
       } else {
         console.log('No items pased to list.add');
+        err = new Error('Empty list being added');
       }
 
       if(cb) {
-        cb(get());
+        cb(err, get());
       } else {
-        return get();
+        if(err) {
+          return err;
+        } else {
+          return get();
+        }
       }
     }; 
 
@@ -129,9 +138,10 @@ function ListFactory (Platform, User) {
       }
       */
 
+     cb = cb || function () {};
+
       Platform.ready
       .then( function () {
-        var modified = false;
         if(spec.find instanceof Function) {
           /* TODO Take into account fringe cases where content crosses pages.
            * Only dealing with duplicates for the moment
@@ -139,6 +149,7 @@ function ListFactory (Platform, User) {
           spec.find(spec.options).$promise.then(function (items) {
             if(!items || !items.length) {
               spec.itemsAvailable = false;
+              cb();
             } else {
               if(items.length < spec.options.filter.limit) {
                 spec.itemsAvailable = false;
@@ -150,23 +161,16 @@ function ListFactory (Platform, User) {
               spec.options.filter.limit *= 2;  
               spec.options.filter.limit = Math.min(spec.options.filter.limit, 100);
              */
-              modified = true;
-              cb(items);
+              cb(null, items);
             }
           }, function (err) {
             console.log('Failed to load more items!');
             console.log(err);
+            cb(err);
           });
         } else {
           console.log('Invalid find function!');
-        }
-
-        if(!modified) {
-          if(cb) {
-            cb();
-          } else {
-            return;
-          }
+          cb(new Error('Invalid find function!'));
         }
       });
     };
@@ -249,13 +253,17 @@ function ListFactory (Platform, User) {
     var reload = function (cb) {
       spec.options.filter.skip = 0;
       spec.options.filter.limit = Math.max(get().length + 1, defaultLimit);
-      load(function (items) {
+      load(function (err, items) {
+        if(err) {
+          return console.log(err);
+        }
+
         if(spec.items.length) {
           spec.items = [];
         }
 
         if(items && items.length) {
-          add(items, cb);
+          that.add(items, cb);
         } else {
           notifyObservers();
           if(cb) {
@@ -271,6 +279,148 @@ function ListFactory (Platform, User) {
 
     var preLoad = function (item, cb) {
       spec.preLoad(item, cb);
+    };
+
+    //TODO Use pendingLoad to avoid multiple load requests
+    var pendingLoad = false;
+
+    var getLoader = function (lSpec) {
+      lSpec = lSpec || {};
+      lSpec.preload = lSpec.preload || false;
+      lSpec.keepSync = lSpec.keepSync || false;
+      lSpec.items = [];
+
+      var more = function (rate, cb) {
+        cb = cb || function () {};
+        var items = [];
+        if(lSpec.items.length + rate <= get().length) {
+          items = getSegment(lSpec.items.length + rate);
+          if(lSpec.preload) {
+            preloadItems(items);
+          } else {
+            lSpec.items = items;
+          }
+          cb(null, lSpec.items);
+        } else if(pendingLoad) {
+          //TODO register an observer for the the completion of the load
+          cb(null, loader.get());
+        } else if(areItemsAvailable()) {
+          spec.options.filter.limit = Math.max(rate, 50);
+          console.log('Loading ' + spec.options.filter.limit + ' more!');
+          spec.options.filter.skip = lSpec.items.length;
+          that.load(function(err) {
+            if(err) {
+              console.log('Failed to load more!');
+              return cb(err);
+            }
+
+            items = getSegment(lSpec.items.length + rate);
+            if(lSpec.preload) {
+              preloadItems(items);
+            } else {
+              lSpec.items = items;
+            }
+            cb(null, lSpec.items);
+          });
+        } else {
+          items = getSegment(get().length);
+          if(lSpec.preload) {
+            preloadItems(items);
+          } else {
+            lSpec.items = items;
+          }
+          cb(null, lSpec.items);
+        }
+      };
+
+      var preloadItems = function (items) {
+        var done = function (item) {
+          /*
+          console.log('QueueAvg: ' + Math.round(PreloadQueue.stats.queueDelay) +
+                      '\tLoadAvg: ' + Math.round(PreloadQueue.stats.loadDelay) +
+                      '\tQueueLength: ' + PreloadQueue.stats.getLength());
+                     */
+                     
+          add(lSpec.items, item, function(err) {
+            if(err) {
+              console.log('Failed to add preloaded item');
+            }
+          });
+        };
+
+        var error = function (err) {
+          if(err !== 'flush') {
+            console.log('Failed to preload the item!');
+            console.log(err);
+          }
+        };
+
+        for(var i in items) {
+          if(!items[i].preloaded) {
+            items[i].preLoad = preLoad.bind(this, items[i]);
+            PreloadQueue.add(items[i]).then(done, error);
+          } else {
+            done(items[i]);
+          }
+        }
+      };
+
+      var getSegment = function (size) {
+        var items = get();
+        if(items.length > size) { 
+          return items.slice(0, size);
+        } else {
+          return items.slice();
+        }
+      };
+
+      var loader = {
+        add: function(newItems, cb) {
+          if(lSpec.preload) {
+            preloadItems(newItems);
+            cb(null, lSpec.items);
+          } else {
+            add(lSpec.items, newItems, cb);
+          }
+        }, 
+        reload: function(cb) {
+          reload(function (err) {
+            cb = cb || function () {};
+            if(err) {
+              console.log('Failed to reload!');
+              return cb(err);
+            }
+            loader.sync();
+            cb(null, lSpec.items);
+          });
+        },
+        sync: function() {
+          var items = getSegment(Math.max(10, lSpec.items.length));
+          lSpec.items = [];
+
+          if(lSpec.preload) {
+            preloadItems(items);
+          } else {
+            lSpec.items = items;
+          }
+          return lSpec.items;
+        },
+        get: function () {
+          return lSpec.items;
+        },
+        areItemsAvailable: function () {
+          return (areItemsAvailable() || lSpec.items.length < get().length);
+        },
+        preLoad: preLoad,
+        more: more
+      };
+
+      if(lSpec.keepSync) {
+        //TODO Clear observer
+        registerObserver(loader.sync);
+      }
+
+      return loader;
     };
 
     spec.addFilter = spec.addFilter || function (input) { return input;};
@@ -323,6 +473,7 @@ function ListFactory (Platform, User) {
     // That is the object to be constructed
     // it has privlidged access to my, and spec
     that = {
+      getLoader: getLoader,
       get: get, 
       clear: clear,
       getTop: getTop, 
@@ -331,18 +482,27 @@ function ListFactory (Platform, User) {
       unfocusAll: unfocusAll,
       enableFocus: spec.enableFocus, 
       load: function (cb) {
-        load( function(items) {
+        load( function(err, items) {
+          if(err) {
+            if(cb) {
+              cb(err);
+            } else {
+              console.log(err);
+            }
+            return;
+          }
+
           if(items && items.length) {
-            add(items, cb);
+            that.add(items, cb);
           } else if(cb) {
-            cb(get());
-          } else {
-            return get();
+            cb(null, get());
           }
         });
       },
       reload: reload,
-      add: add,
+      add: function(newItems, cb) {
+        add(spec.items, newItems, cb);
+      },
       remove: remove,
       preLoad: preLoad,
       registerObserver: registerObserver,
@@ -358,6 +518,7 @@ function ListFactory (Platform, User) {
 
 app.factory('list', [
   'Platform',
+  'PreloadQueue',
   'User',
   ListFactory
 ]);

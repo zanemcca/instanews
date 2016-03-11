@@ -22,20 +22,34 @@
     </button>
   </ion-nav-buttons>
   <in-scroll-top scroll-handle="feed" 
-  scroll="scroll">
+  preScroll="preScrollToTop">
   </in-scroll-top>
+  <!--div style="position:absolute;top: 44px; left: 0; height: 35%;width: 100%;z-index:1000;background: white;">
+    <canvas id=line" class="chart chart-line" chart-data="plot.data" chart-labels="plot.labels"
+      chart-series="plot.series" chart-legend="true">
+    </canvas>
+  </div-->
   <ion-content id="feed" delegate-handle="feed" overflow-scroll="true" class="gpu">
     <in-list list="Articles"
+      is-not-infinite="true" 
       is-card="true"> 
       <inAutocomplete place="place"></inAutocomplete>
       <inMap map="map"></inMap>
     </in-list>
-    <div ng-if="!Articles.areItemsAvailable()" class="list-end">
-      <i class="icon ion-alert-circled"></i>
-      <span ng-if="Articles.get().length" > No more stories.</span>
-      <span ng-if="!Articles.get().length" > No stories found here.</span>
-      <div>
-        Use the map to find more news
+    <div class="list-end">
+      <ion-spinner ng-show="Articles.areItemsAvaialable()">
+      </ion-spinner>
+      <div ng-hide="Articles.areItemsAvailable()">
+        <div ng-if="Articles.get().length">
+          No more stories
+        </div>
+        <div ng-if="!Articles.get().length">
+          <i class="icon ion-alert-circled"></i>
+          No stories found here
+        </div>
+        <div>
+          Use the map to find more news
+        </div>
       </div>
     </div>
   </ion-content>
