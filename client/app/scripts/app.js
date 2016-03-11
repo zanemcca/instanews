@@ -148,7 +148,9 @@ angular.module('instanews', [
     Uploads
   ) {
 
-    $scope.Notifications = Notifications;
+    $scope.Notifications = Notifications.getLoader({
+      keepSync: true
+    });
 
     //Update user function
     var updateUser = function() {
