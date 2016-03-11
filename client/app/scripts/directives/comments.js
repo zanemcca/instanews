@@ -27,7 +27,9 @@ app.directive('incomments', [
 
         $scope.Platform = Platform;
 
-        $scope.Comments = Comments.findOrCreate($scope.owner.modelName, $scope.owner.id);
+        $scope.Comments = Comments.findOrCreate($scope.owner.modelName, $scope.owner.id).getLoader({
+          keepSync: true
+        });
 
         $scope.$watch('owner.showComments', function (newVal, oldVal) {
           if( newVal && !oldVal) {
