@@ -28,7 +28,7 @@ function objectIdWithTimestamp(timestamp) {
 // istanbul ignore next 
 var setupMonitoring = function () {
   // Monitoring only necessary when in production
-  if(process.env.NODE_ENV === 'production') {
+  if(process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'staging') {
     var dd = require('node-dogstatsd').StatsD;
     var datadogHost = 'localhost';
     for(var i in process.env) {
