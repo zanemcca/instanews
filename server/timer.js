@@ -18,13 +18,13 @@ function Timer(app, message) {
     val = val || time;
 
     if(msg) {
-      if(process.env.NODE_ENV === 'production') {
+      if(process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'staging') {
         app.dd.timing(message, val);
       } else {
         console.log(val + ': ' + msg);
       }
     } else {
-      if(process.env.NODE_ENV === 'production') {
+      if(process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'staging') {
         app.dd.timing('unknown_timer', val);
       } else {
         console.log(val);
