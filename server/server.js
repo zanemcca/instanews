@@ -156,6 +156,15 @@ if(cluster.isMaster && numCPUs > 1 && process.env.NODE_ENV === 'production') {
   var fs = require('fs');
   var debounce = require('debounce');
   var cred = require('./conf/credentials');
+  var kue = require('kue');
+  app.jobs = kue.createQueue();
+
+  app.jobs.process('updateBase', function (job, done) {
+    //TODO Update the base model and trigger a rating if necessary
+    console.log('Processing ' + job.data.type + ': ' + job.data.id);
+    console.log(job.data);
+    done();
+  });
 
   var setupBrute = function () {
     var store = new MongoStore(function (ready) {
