@@ -24,6 +24,7 @@
     "express-brute-mongo": "^0.1.0",
     "google-oauth-jwt": "^0.2.0",
     "helmet": "^0.14.0",
+    "kue": "^0.10.5",
     "loopback": "git+https://github.com/zanemcca/loopback.git#passwordResetToken",
     "loopback-boot": "^2.4.0",
     "loopback-component-push": "^1.4.4",

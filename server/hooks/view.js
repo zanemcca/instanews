@@ -4,6 +4,7 @@
 module.exports = function(app) {
 
   var View = app.models.view;
+  var Base = app.models.Base;
   var Stat = app.models.stat;
   var loopback = require('loopback');
   var debug = app.debug('hooks:view');
@@ -84,6 +85,8 @@ module.exports = function(app) {
     debug('updateViewableAttributes', ctx, data, next);
     var inst = ctx.instance;
     if(inst) {
+      Base.deferUpdate(inst.viewableId, inst.viewableType, data, next);
+      /*
       inst.viewable(function(err, res) {
         timer.lap('View.updateViewableAttributes.findViewable');
         if(err) {
@@ -127,6 +130,7 @@ module.exports = function(app) {
           next();
         }
       });
+     */
     } else {
       var error = new Error('Invalid instance for updateViewableAttributes');
       error.status = 400;
