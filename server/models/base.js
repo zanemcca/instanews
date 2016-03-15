@@ -9,6 +9,34 @@ module.exports = function(Base) {
     return key;
   };
 
+  var getDeferredUpdateId = function(key) {
+    var res = key.slice(key.lastIndexOf(':') + 1, key.length);
+    console.log(res);
+    return res;
+  };
+
+  var getDeferredUpdateType = function(key) {
+    var shortType = key.split(':')[1];
+    console.log(shortType);
+    var res;
+    switch(shortType) {
+      case 'ar':
+        res = 'article';
+        break;
+      case 'co':
+        res = 'comment';
+        break;
+      case 'su':
+        res = 'subarticle';
+        break;
+      default:
+        console.error('Unknown deferred update type!');
+        break;
+    }
+    console.log(res);
+    return res;
+  };
+
   var createOrUpdateDeferredUpdate = function (id, type, data, cb) {
     if(data.$inc || data.$set) {
       var key = getDeferredUpdateKey(id, type);
@@ -59,10 +87,58 @@ module.exports = function(Base) {
         console.error(err.stack);
         return next(err);
       }
-      var data = res[0];
+      var data = res[0][1];
       console.log(data);
-      //TODO Perform updating here
-      next();
+
+      // createSubarticleCount and createCommentCount are taken care of with a DB read
+      var incrementers = ['viewCount', 'getSubarticlesCount', 'getCommentsCount', 'clickCount']; 
+      var shouldNotBeDeferred = ['upVoteCount', 'createCommentCount', 'downVoteCount'];
+
+      var notSubarticleRating = -1, notCommentRating = -1;
+      var incs = {};
+
+      for(var i = 0; i < data.length - 1; i += 2) {
+        try {
+          if(shouldNotBeDeferred.indexOf(data[i]) > -1) {
+            console.warn('Should not be deferred: ' + data[i] + data[i+1]);
+            console.warn('Not implementing update of invalid values');
+          } else if(incrementers.indexOf(data[i]) > -1) {
+            console.log('Incrementing ' + data[i] + data[i+1]);
+            incs[data[i]] = JSON.parse(data[i+1]);
+          } else if(data[i] === 'comments') {
+            if(JSON.parse(data[i+1])) {
+              console.log('Recalculating comment contribution!');
+              //TODO Read all comments from the database for this model
+            }
+          } else if(data[i] === 'subarticles') {
+            if(JSON.parse(data[i+1])) {
+              console.log('Recalculating subarticle contribution!');
+              //TODO Read all subarticles from the database for this model
+            }
+           }
+        } catch(e) {
+          console.error(e.stack);
+        }
+      }
+
+      console.log(incs);
+
+      Base.app.models.Stat.updateRating({ 
+        id: getDeferredUpdateId(key)
+      },
+      getDeferredUpdateType(key),
+      function(instance) {
+        for(var i in incs) {
+          instance[i] += incs[i];
+        }
+        if(notSubarticleRating >= 0) {
+          instance.notSubarticleRating = notSubarticleRating;
+        }
+        if(notCommentRating >= 0) {
+          instance.notCommentRating = notCommentRating;
+        }
+        return instance;
+      }, next);
     });
   };
 
