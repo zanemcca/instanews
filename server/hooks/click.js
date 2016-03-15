@@ -4,6 +4,7 @@
 module.exports = function(app) {
 
   var Click = app.models.click;
+  var Base = app.models.base;
   var Stat = app.models.stat;
   var View = app.models.view;
   var UpVote = app.models.upVote;
@@ -250,22 +251,27 @@ module.exports = function(app) {
     var inst = ctx.instance;
 
     if(inst && ctx.isNewInstance) {
-      var inc = {};
+      var data = {
+        '$inc': {} 
+      };
 
       if(ctx.instance.type) {
-        inc[ctx.instance.type + 'Count'] = 1;
+        data.$inc[ctx.instance.type + 'Count'] = 1;
+        if(ctx.instance.type.indexOf('create') === 0) {
+          var modelName = inst.type.slice(6).toLowerCase();
+          //Set the `modelName` flag in the deferred update to indicate its portion
+          //of the rating must be updated 
+          data[modelName] = true;
+        }
       }
 
       //Delegate the count updating to the inherited model 
       if(ctx.Model.modelName !== 'click') {
-        ctx.inc = inc;
+        ctx.inc = data.$inc;
         next();
       }
       else {
-        Click.updateClickableAttributes(ctx, {
-          '$inc':  inc
-        },
-        next);
+        Click.updateClickableAttributes(ctx, data, next);
       }
     }
     else {
@@ -298,72 +304,101 @@ module.exports = function(app) {
     debug('updateClickableAttributes', ctx, data);
     var inst = ctx.instance;
     if(inst) {
-      inst.clickable(function(err, res) {
-      timer.lap('Click.updateClickableAttributes.findClickable');
-        if(err || !res) {
-          console.warn('Warning: Failed to fetch clickable');
-          return next(err);
-        }
+      var updateImmediately = ['upVote', 'downVote', 'createComment'];
+      if(updateImmediately.indexOf(ctx.Model.modelName) > -1 || updateImmediately.indexOf(inst.type) > -1) {
+        var dat = {
+          updateRating : true,
+        };
 
-        //Upvotes verfiy articles if they are near by
-        //TODO Move this to upvote without incuring an
-        //extra read
-        if(ctx.Model.modelName === 'upVote' &&
-           res.modelName === 'article' && !res.verified &&
-             nearBy(res.location, inst.location)
-        ) {
-
-          if(res.username !== inst.username) {
-            if(!data.$set) {
-              data.$set = {
-                verified: true
-              };
-            }
-            else {
-              data.$set.verified = true;
-            }
+        if(inst.type) {
+          var modelName = inst.type.slice(6).toLowerCase();
+          if(data[modelName]) {
+            dat[modelName] = true;
           }
         }
 
-        if(inst.type && inst.type.indexOf('create') === 0) {
-          var modelName = inst.type.slice(6);
+          /*
+           * This is covered by the update job processing
           var variable = 'not' + modelName + 'Rating';
           if(!data.$mul) {
             data.$mul = {};
           }
           data.$mul[variable] = (1 - Stat.getDefaultRating(modelName));
           //console.log('Click ' + variable + ': ' + data.$mul[variable]);
-        }
+         */
 
-        res.updateAttributes(data, function(err,res) {
-        timer.lap('Click.updateClickableAttributes.update');
+        Base.deferUpdate(inst.clickableId, inst.clickableType, { updateRating: true }, function (err) { 
           if(err) {
-            console.warn('Warning: Failed to save clickable');
-            next(err);
+            console.err('Failed to defer update');
+            return next(err);
           }
-          else {
-            Stat.triggerRating({
-              id: inst.clickableId
-            },
-            inst.clickableType,
-            null,
-            function(err, res) {
-              timer.lap('Click.updateClickableAttributes.triggerRating');
-              if(err) { 
-                //Conflicts are ok because it means that 
-                //someone else has just triggered the rating.
-                //So we will not throw an error
-                console.error('Error: Failed to update the rating for ' +
-                              inst.clickableType + ' - ' + inst.clickableId +
-                              ' from click ' + inst.id);
-                console.error(err.stack);
-                return next(err);
+
+          console.log('Updating info immediately!');
+          console.log(data);
+          inst.clickable(function(err, res) {
+            timer.lap('Click.updateClickableAttributes.findClickable');
+            if(err || !res) {
+              console.warn('Warning: Failed to fetch clickable');
+              return next(err);
+            }
+
+            //Upvotes verfiy articles if they are near by
+            //TODO Move this to upvote without incuring an
+            //extra read
+            if(ctx.Model.modelName === 'upVote' &&
+               res.modelName === 'article' && !res.verified &&
+                 nearBy(res.location, inst.location)
+            ) {
+
+              if(res.username !== inst.username) {
+                if(!data.$set) {
+                  data.$set = {
+                    verified: true
+                  };
+                }
+                else {
+                  data.$set.verified = true;
+                }
               }
-              next();
-            }); 
-          }
+            }
+
+            res.updateAttributes(data, function(err,res) {
+            timer.lap('Click.updateClickableAttributes.update');
+              if(err) {
+                console.warn('Warning: Failed to save clickable');
+                next(err);
+              }
+              else {
+                next();
+                /*
+                 * The deferred update will trigger the rating
+                Stat.triggerRating({
+                  id: inst.clickableId
+                },
+                inst.clickableType,
+                null,
+                function(err, res) {
+                  timer.lap('Click.updateClickableAttributes.triggerRating');
+                  if(err) { 
+                    //Conflicts are ok because it means that 
+                    //someone else has just triggered the rating.
+                    //So we will not throw an error
+                    console.error('Error: Failed to update the rating for ' +
+                                  inst.clickableType + ' - ' + inst.clickableId +
+                                  ' from click ' + inst.id);
+                    console.error(err.stack);
+                    return next(err);
+                  }
+                  next();
+                }); 
+               */
+              }
+            });
+          });
         });
-      });
+      } else {
+        Base.deferUpdate(inst.clickableId, inst.clickableType, data, next);
+      }
     } else {
       var error = new Error('Invalid instance for updateClickableAttributes');
       error.status = 400;

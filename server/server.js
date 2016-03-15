@@ -184,9 +184,6 @@ if(cluster.isMaster && numCPUs > 1 && process.env.NODE_ENV === 'production') {
 
   //Process the updateBase queue
   app.jobs.process('updateBase', function (job, done) {
-    //TODO Update the base model and trigger a rating if necessary
-    console.log('Processing ' + job.data.type + ': ' + job.data.id);
-    console.log(job.data);
     app.models.Base.processUpdate(job.data.key, done);
   });
 
