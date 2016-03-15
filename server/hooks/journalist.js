@@ -4,6 +4,7 @@ var LIMIT = 10;
 module.exports = function(app) {
 
   var loopback = require('loopback');
+  var async = require('async');
   var uuid = require('node-uuid');
 
   var Journalist = app.models.journalist;
@@ -180,6 +181,27 @@ module.exports = function(app) {
     var userId;
     var includeSecrets = false;
 
+    var done = function () {
+      if(!includeSecrets) {
+        instance.unsetAttribute('email');
+        instance.unsetAttribute('uniqueId');
+      } else {
+        //TODO This Read-Modify-Write operation is not Atomic
+        // Adds a uniqueId to the user if they are missing it
+        if(!instance.uniqueId) {
+          instance.setAttribute('uniqueId', uuid.v4());
+          return instance.save(function (err) {
+            if( err) {
+              console.error('Failed to create a uniqueId!');
+              console.error(err.stack);
+            }
+            next(err);
+          });
+        }
+      }
+      next();
+    };
+
     var check = function () {
        if(userId === instance.username) {
          includeSecrets = true;
@@ -210,27 +232,6 @@ module.exports = function(app) {
           done();
         }
       });
-    };
-
-    var done = function () {
-      if(!includeSecrets) {
-        instance.unsetAttribute('email');
-        instance.unsetAttribute('uniqueId');
-      } else {
-        //TODO This Read-Modify-Write operation is not Atomic
-        // Adds a uniqueId to the user if they are missing it
-        if(!instance.uniqueId) {
-          instance.setAttribute('uniqueId', uuid.v4());
-          return instance.save(function (err) {
-            if( err) {
-              console.error('Failed to create a uniqueId!');
-              console.error(err.stack);
-            }
-            next(err);
-          });
-        }
-      }
-      next();
     };
 
     var context = loopback.getCurrentContext();
@@ -278,7 +279,7 @@ module.exports = function(app) {
 
   //TODO Test this and use it if we ever open up Journalist.find
   Journalist.afterRemote('find', function(ctx, instances, next) {
-    debug('afterRemote find', instance, next);
+    debug('afterRemote find', instances, next);
     console.log('Checking! find');
 
     if(instances.length) {
