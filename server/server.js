@@ -159,53 +159,65 @@ if(cluster.isMaster && numCPUs > 1 && process.env.NODE_ENV === 'production') {
   var Redis = require('ioredis');
   var kue = require('kue');
 
-  //TODO Get redis info from credentials
-  app.redisClient = new Redis({
-    reconnectOnError: function (err) {
-      console.warn('Redis error!');
-      console.warn(err); 
-      var targetError = 'READONLY';
-      if (err.message.slice(0, targetError.length) === targetError) {
-        console.log('Reconnecting Redis!');
-        // Only reconnect when the error starts with "READONLY"
-        return true; // or `return 1;`
+  var setupRedis = function () {
+    var options = {
+      reconnectOnError: function (err) {
+        console.warn('Redis error!');
+        console.warn(err); 
+        var targetError = 'READONLY';
+        if (err.message.slice(0, targetError.length) === targetError) {
+          console.log('Reconnecting Redis!');
+          // Only reconnect when the error starts with "READONLY"
+          return true; // or `return 1;`
+        }
       }
+    };
+
+   if(process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'staging') {
+      var redis = cred.get('redis');
+      options.port = redis.port;
+      options.host = redis.host;
+      options.password = redis.password;
     }
-  });
 
-  kue.redis.createClient = function () {
-    return app.redisClient;
-  };
+    console.log(options);
 
-  //TODO Secure this so we can expose it for debugging production
-  kue.app.listen(5001);
+    app.redisClient = new Redis(options);
 
-  app.jobs = kue.createQueue();
+    kue.redis.createClient = function () {
+      return app.redisClient;
+    };
 
-  //Process the updateBase queue
-  app.jobs.process('updateBase', function (job, done) {
-    app.models.Base.processUpdate(job.data.key, done);
-  });
+    //TODO Secure this so we can expose it for debugging production
+    kue.app.listen(5001);
 
-  //Catch queue errors
-  app.jobs.on('error', function(err) {
-    console.error('Jobs queue error!');
-    console.error(err);
-  });
+    app.jobs = kue.createQueue();
 
-  //Gracefully shutdown the queue
-  process.once('SIGTERM', function (sig) {
-    app.jobs.shutdown( 5000, function (err) {
-      if(err) {
-        console.error('Failed to shutdown the jobs queue!');
-        console.error(err);
-        process.exit(-1);
-      } else {
-        console.log('Shutdown the jobs queue!');
-        process.exit(0);
-      }
+    //Process the updateBase queue
+    app.jobs.process('updateBase', function (job, done) {
+      app.models.Base.processUpdate(job.data.key, done);
     });
-  });
+
+    //Catch queue errors
+    app.jobs.on('error', function(err) {
+      console.error('Jobs queue error!');
+      console.error(err);
+    });
+
+    //Gracefully shutdown the queue
+    process.once('SIGTERM', function (sig) {
+      app.jobs.shutdown( 5000, function (err) {
+        if(err) {
+          console.error('Failed to shutdown the jobs queue!');
+          console.error(err);
+          process.exit(-1);
+        } else {
+          console.log('Shutdown the jobs queue!');
+          process.exit(0);
+        }
+      });
+    });
+  };
 
   var setupBrute = function () {
     var store = new MongoStore(function (ready) {
@@ -322,6 +334,7 @@ if(cluster.isMaster && numCPUs > 1 && process.env.NODE_ENV === 'production') {
   var setupMiddleware = function () {
     // Setup 
   //  setupMonitoring();
+    setupRedis();
     setupBrute();
     setupLogging();
 
