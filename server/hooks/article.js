@@ -140,7 +140,6 @@ module.exports = function(app) {
     });
   });
 
-  //TODO This should likely be for the find remote method only
   Article.beforeRemote('find', function(ctx, unused, next){
     debug('beforeRemote.find', ctx, next);
 
@@ -189,6 +188,8 @@ module.exports = function(app) {
   });
    */
 
+  /*
+   * Unused due to deferred updates
   Article.triggerRating = function(where, modify, cb) {
     var timer = app.Timer('Article.triggerRating');
     debug('triggerRating', where, modify);
@@ -210,4 +211,5 @@ module.exports = function(app) {
       cb(error);
     }
   };
+  */
 };
