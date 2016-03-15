@@ -59,6 +59,8 @@ module.exports = function(app) {
         }
         var rating = Stat.getRating(model);
 
+        //TODO Remove this once we clean up after readModifyWrite
+        //This is no longer neaded with new deferred updates
         if(parentless.indexOf(type) === -1) {
           //TODO Maybe we should have 0 and divide by zero protection
           //on this
@@ -91,6 +93,8 @@ module.exports = function(app) {
         }
 
         //console.log(res);
+        //TODO Remove this shit below and only allow single item updates for now
+        //TODO Call deferUpdate on the parent if it exists
 
         var finalResult = [];
 
@@ -167,6 +171,20 @@ module.exports = function(app) {
 
           /* istanbul ignore else */
           if(whitelist.indexOf(stat.parentType) > -1) {
+            var data = {
+              updateRating: true
+            };
+            data[type.toLowerCase()] = true;
+
+            Base.deferUpdate(stat.parentId, stat.parentType, data, function(err) {
+              if(err) {
+                console.error('Failed to defer an update for ' + stat.parentType + ': ' + stat.parentId);
+                console.error(err);
+              }
+              timer.elapsed('Stat.updateRating.deferUpdate.total');
+            }); 
+
+            /*
             var mul = {};
             if(type === 'comment') {
               mul = {
@@ -182,13 +200,14 @@ module.exports = function(app) {
               '$mul': mul
             }, function(err) {
               timer.elapsed('Stat.updateRating.updateBaseStats.total');
-              /* istanbul ignore if */
+              // istanbul ignore if
               if(err) {
                 console.warn('Failed to update stat ' +stat.deltaRating +
                              ' on ' + stat.parentType + ' ' + stat.parentId);
                 console.warn(err);
               }
             });
+           */
           } else {
             console.warn(stat.parentType + ' is not a valid rateable model');
           }
@@ -204,6 +223,8 @@ module.exports = function(app) {
     });
   };
 
+  /*
+   * Unused because of new deferred updates
   Stat.triggerRating = function(where, modelName, modify, cb) {
     debug('triggerRating', where, modelName, modify, cb);
     var error = new Error('Unrecognized modelName: ' + modelName);
@@ -226,4 +247,5 @@ module.exports = function(app) {
       }
     }
   };
+ */
 };
