@@ -90,12 +90,8 @@ next();
               var id = ctx.where.id || ctx.where._id;
               // Rerank the parent if this element was deleted individually 
               if(JSON.stringify(id) === JSON.stringify(inst.id)) {
-                //TODO Use Base.updateStats
                 inst.commentable(function (err, res) {
                   var data = {
-                    $mul: {
-                      'notCommentRating': 1/(1 - inst.rating)
-                    },
                     $inc: {
                       'createCommentCount': -1
                     }
@@ -106,13 +102,9 @@ next();
                       console.error(err.stack);
                       return next(err);
                     }
-
-                    Stat.triggerRating({
-                      id: res.id
-                    }, 
-                    res.modelName,
-                    null, 
-                    function(err, res) {
+                    Base.deferUpdate(inst.commentableId, inst.commentableType, {
+                      comment: true,
+                    }, function(err) {
                       if(err) {
                         console.log(err.stack);
                       }
@@ -133,6 +125,8 @@ next();
   });
   /* istanbul ignore next */
 
+  /*
+   * Unused due to deferred updates
   Comment.triggerRating = function(where, modify, cb) {
     var timer = app.Timer('Comment.triggerRating');
     debug('triggerRating', where, modify, cb);
@@ -174,4 +168,5 @@ next();
         cb(error);
     }
   };
+ */
 };

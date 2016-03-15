@@ -58,6 +58,8 @@ module.exports = function(app) {
       }
    });
 
+  /*
+   * Unused due to deferred updates
   Subarticle.triggerRating = function(where, modify, cb) {
     debug('triggerRating', where, modify, cb);
     if(where && Object.getOwnPropertyNames(where).length > 0) {
@@ -98,6 +100,7 @@ module.exports = function(app) {
       cb(error);
     }
   };
+ */
 
   Subarticle.observe('after save', function(ctx, next) {
     debug('after save', ctx, next);
@@ -252,6 +255,15 @@ module.exports = function(app) {
               var id = ctx.where.id || ctx.where._id;
               // Rerank the parent if this element was deleted individually 
               if(JSON.stringify(id) === JSON.stringify(inst.id)) {
+                Base.deferUpdate(id, 'article', {
+                  subarticle: true
+                }, function(err) {
+                  if(err) {
+                    console.log(err.stack);
+                  }
+                  next(err);
+                });
+                /*
                 inst.article(function (err, res) {
                   var data = {
                     $mul: {
@@ -278,6 +290,7 @@ module.exports = function(app) {
                     });
                   });
                 });
+                */
               } else {
                 deleteMedia(inst, next);
               }
