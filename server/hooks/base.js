@@ -209,10 +209,7 @@ module.exports = function(app) {
           ctx.data.$inc.version = 1;
         }
 
-        var set = ctx.data.$set;
-        if(!set) {
-          set = {};
-        }
+        var set = ctx.data.$set || {};
 
         var names = Object.getOwnPropertyNames(ctx.data);
         for(var i in names) {
@@ -241,6 +238,8 @@ module.exports = function(app) {
   });
 
   /* istanbul ignore next */
+  /* 
+   * Unused in current implementation
   Base.updateStats = function(id, modelName, data, next) {
     debug('updateStats', id, modelName, data, next);
     if(app.models[modelName]) {
@@ -290,6 +289,7 @@ module.exports = function(app) {
       return next(err);
     }
   };
+  */
 
   /*
      Base.observe('loaded', function(ctx, next) {
