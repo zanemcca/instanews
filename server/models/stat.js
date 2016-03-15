@@ -295,7 +295,7 @@ viewCount: 270
     //rating = Stat.getUnion(Pup, Pclick) - Stat.getIntersection(Pclick, Pdown);
 
     // The rating is the probability of not downvoting and then positively interacting
-    rating = (1 - Pdown)*(Pup + (1 - Pdown - Pup)*Pclick);
+    var rating = (1 - Pdown)*(Pup + (1 - Pdown - Pup)*Pclick);
 
     /*
     // Click Thru

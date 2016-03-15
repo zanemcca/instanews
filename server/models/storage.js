@@ -25,6 +25,7 @@ module.exports = function(Storage) {
 
   var transcoder,
   s3,
+  sns,
   lambda;
 
   var credentials = cred.get('aws');
