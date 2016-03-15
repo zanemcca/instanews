@@ -84,9 +84,11 @@ module.exports = function(Base) {
   };
 
   Base.processUpdate = function(key, next) {
+    var timer = Base.app.Timer('Base.processUpdate');
     var redis = Base.app.redisClient;
     console.log('Processing: ' + key);
     redis.multi().hgetall(key).del(key).exec(function(err, res) {
+      timer.lap('Base.processUpdate.getFromRedis');
       if(err) {
         console.error('Failed to complete the update transaction!');
         console.error(err.stack);
@@ -131,6 +133,7 @@ module.exports = function(Base) {
             notCommentRating *= (1 - res[i].rating);
           }
 
+          timer.lap('Base.processUpdate.addCommentRating');
           cb();
         });
       };
@@ -162,6 +165,7 @@ module.exports = function(Base) {
             }
           }
 
+          timer.lap('Base.processUpdate.addSubarticleRating');
           cb();
          });
       };
@@ -240,6 +244,7 @@ module.exports = function(Base) {
 
             return instance;
           }, function(err) {
+            timer.elapsed('Base.processUpdate.total');
             if(err) {
               console.error('Failed to update the rating!'); 
               console.error(err);
@@ -254,9 +259,14 @@ module.exports = function(Base) {
   };
 
   Base.deferUpdate = function (id, type, data, next) {
+    var timer = Base.app.Timer('Base.deferUpdate');
+    var dd = Base.app.dd;
+
     console.log('Creating an update job for ' + type + ': ' + id);
     console.log(data);
+
     createOrUpdateDeferredUpdate(id, type, data, function(err, newInstance) {
+      timer.lap('Base.deferUpdate.createOrUpdate');
       if(err) {
         console.error(err.stack);
         return next(err);
@@ -266,6 +276,20 @@ module.exports = function(Base) {
         Base.app.jobs.create('updateBase', {
           key: getDeferredUpdateKey(id, type)
         }).delay(30000)
+        .on('promotion', function () {
+          dd.increment('app.deferredUpdate.active');
+        })
+        .on('complete', function () {
+          dd.decrement('app.deferredUpdate.active');
+        })
+        .on('failed', function () {
+          dd.decrement('app.deferredUpdate.active');
+          dd.increment('app.deferredUpdate.failed');
+        })
+        .on('failed attempt', function () {
+          dd.decrement('app.deferredUpdate.active');
+          dd.increment('app.deferredUpdate.failedAttempt');
+        })
         //.attempts(5)
         .removeOnComplete(true)
         .save();
