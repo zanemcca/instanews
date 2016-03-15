@@ -156,14 +156,58 @@ if(cluster.isMaster && numCPUs > 1 && process.env.NODE_ENV === 'production') {
   var fs = require('fs');
   var debounce = require('debounce');
   var cred = require('./conf/credentials');
+  var Redis = require('ioredis');
   var kue = require('kue');
+
+  //TODO Get redis info from credentials
+  app.redisClient = new Redis({
+    reconnectOnError: function (err) {
+      console.warn('Redis error!');
+      console.warn(err); 
+      var targetError = 'READONLY';
+      if (err.message.slice(0, targetError.length) === targetError) {
+        console.log('Reconnecting Redis!');
+        // Only reconnect when the error starts with "READONLY"
+        return true; // or `return 1;`
+      }
+    }
+  });
+
+  kue.redis.createClient = function () {
+    return app.redisClient;
+  };
+
+  //TODO Secure this so we can expose it for debugging production
+  kue.app.listen(5001);
+
   app.jobs = kue.createQueue();
 
+  //Process the updateBase queue
   app.jobs.process('updateBase', function (job, done) {
     //TODO Update the base model and trigger a rating if necessary
     console.log('Processing ' + job.data.type + ': ' + job.data.id);
     console.log(job.data);
-    done();
+    app.models.Base.processUpdate(job.data.key, done);
+  });
+
+  //Catch queue errors
+  app.jobs.on('error', function(err) {
+    console.error('Jobs queue error!');
+    console.error(err);
+  });
+
+  //Gracefully shutdown the queue
+  process.once('SIGTERM', function (sig) {
+    app.jobs.shutdown( 5000, function (err) {
+      if(err) {
+        console.error('Failed to shutdown the jobs queue!');
+        console.error(err);
+        process.exit(-1);
+      } else {
+        console.log('Shutdown the jobs queue!');
+        process.exit(0);
+      }
+    });
   });
 
   var setupBrute = function () {
