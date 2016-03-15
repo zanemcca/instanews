@@ -229,6 +229,14 @@ module.exports = function(app) {
       var inc = {};
       if(ctx.instance.type) {
         inc[ctx.instance.type + 'Count'] = -1;
+
+        //This should never be necessary as we do not delete create clicks
+        if(ctx.instance.type.indexOf('create') === 0) {
+          var modelName = inst.type.slice(6).toLowerCase();
+          //Set the `modelName` flag in the deferred update to indicate its portion
+          //of the rating must be updated 
+          data[modelName] = true;
+        }
       }
 
       if(ctx.Model.modelName !== 'click') {
