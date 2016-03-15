@@ -180,8 +180,6 @@ if(cluster.isMaster && numCPUs > 1 && process.env.NODE_ENV === 'production') {
       options.password = redis.password;
     }
 
-    console.log(options);
-
     app.redisClient = new Redis(options);
 
     kue.redis.createClient = function () {
