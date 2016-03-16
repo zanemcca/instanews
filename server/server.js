@@ -51,6 +51,68 @@ var setupMonitoring = function () {
     console.log('Connecting statsd to ' + datadogHost);
     app.dd = new dd(datadogHost, 8125);
 
+    /*
+     *TODO Get this working
+    app.dd.socket.on('error', function (e) {
+      console.warn('Socket error with Datadog');
+      console.error(e);
+      return;
+    });
+   */
+
+    app.DD = function(modelName, functionName) {
+      if(!modelName || !functionName) {
+        console.warn('modelName and functionName are required to monitor stats!');
+        return;
+      }
+
+      //The calling function becomes a tag on the reported function
+      var tags = ['model:' + modelName, 'function:' + modelName + '.' + functionName];
+
+      var start = Date.now();
+      var time = start;
+
+      var name = function (given) {
+        given = given || modelName + '_' + functionName;
+        return 'app.' + given.replace('.','_');
+      };
+
+      var dd = {};
+      dd.increment = function(key, val) {
+        val = val || 1;
+        app.dd.increment(name(key), val, tags);
+      };
+
+      dd.decrement = function(key, val) {
+        val = val || 1;
+        app.dd.decrement(name(key), val, tags);
+      };
+
+      dd.timing = function(key, val) {
+        app.dd.timing(name(key), val, tags);
+      };
+
+      dd.histogram = function(key, val) {
+        app.dd.histogram(name(key), val, tags);
+      };
+
+      dd.lap = function (key) {
+        var temp = Date.now();
+        var lap = temp - time;
+        time = temp;
+        dd.timing(key, lap);
+        return lap;
+      };
+
+      dd.elapsed =  function (key) {
+        var total = Date.now() - start;
+        dd.timing(key, total);
+        return total;
+      };
+
+      return dd;
+    };
+
     datadog = require('connect-datadog')({ 
       dogstatsd: app.dd,
       response_code: true,
@@ -61,10 +123,16 @@ var setupMonitoring = function () {
     });
   } else {
     app.dd = {
+      lap: function () {},
+      elapsed: function () {},
       histogram: function () {},
       timing: function () {},
       increment: function () {},
       decrement: function () {}
+    };
+
+    app.DD = function () {
+      return app.dd;
     };
   }
 };
@@ -194,8 +262,18 @@ if(cluster.isMaster && numCPUs > 1 && process.env.NODE_ENV === 'production') {
     kue.app.listen(5001);
 
     //Process the updateBase queue
-    app.jobs.process('updateBase', function (job, done) {
-      app.models.Base.processUpdate(job.data.key, done);
+    app.jobs.process('deferredUpdate', function (job, done) {
+      var dd = app.DD('Jobs', 'processDeferredUpdate');
+      app.models.Base.processUpdate(job.data.key, function (err) {
+        if(err) {
+          console.error('Failed to process the job!');
+          console.error(err);
+          return done(err);
+        }
+
+        dd.lap('Base.processUpdate');
+        done();
+      });
     });
 
     //Catch queue errors
