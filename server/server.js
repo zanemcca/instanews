@@ -173,7 +173,7 @@ if(cluster.isMaster && numCPUs > 1 && process.env.NODE_ENV === 'production') {
       }
     };
 
-   if(process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'staging') {
+    if(process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'staging') {
       var redis = cred.get('redis');
       options.port = redis.port;
       options.host = redis.host;
@@ -182,14 +182,16 @@ if(cluster.isMaster && numCPUs > 1 && process.env.NODE_ENV === 'production') {
 
     app.redisClient = new Redis(options);
 
-    kue.redis.createClient = function () {
-      return app.redisClient;
-    };
+    app.jobs = kue.createQueue({
+      redis: {
+        createClientFactory: function () {
+          return new Redis(options);
+        }
+      }
+    });
 
     //TODO Secure this so we can expose it for debugging production
     kue.app.listen(5001);
-
-    app.jobs = kue.createQueue();
 
     //Process the updateBase queue
     app.jobs.process('updateBase', function (job, done) {
