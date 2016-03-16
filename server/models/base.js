@@ -84,11 +84,12 @@ module.exports = function(Base) {
   };
 
   Base.processUpdate = function(key, next) {
-    var timer = Base.app.Timer('Base.processUpdate');
+    var dd = Base.app.DD('Base','processUpdate');
+
     var redis = Base.app.redisClient;
     console.log('Processing: ' + key);
     redis.multi().hgetall(key).del(key).exec(function(err, res) {
-      timer.lap('Base.processUpdate.getFromRedis');
+      dd.lap('Redis.getAndDelete');
       if(err) {
         console.error('Failed to complete the update transaction!');
         console.error(err.stack);
@@ -133,7 +134,7 @@ module.exports = function(Base) {
             notCommentRating *= (1 - res[i].rating);
           }
 
-          timer.lap('Base.processUpdate.addCommentRating');
+          dd.lap('Comment.find');
           cb();
         });
       };
@@ -165,7 +166,7 @@ module.exports = function(Base) {
             }
           }
 
-          timer.lap('Base.processUpdate.addSubarticleRating');
+          dd.lap('Subarticle.find');
           cb();
          });
       };
@@ -244,7 +245,7 @@ module.exports = function(Base) {
 
             return instance;
           }, function(err) {
-            timer.elapsed('Base.processUpdate.total');
+            dd.lap('Stat.updateRating');
             if(err) {
               console.error('Failed to update the rating!'); 
               console.error(err);
@@ -259,36 +260,33 @@ module.exports = function(Base) {
   };
 
   Base.deferUpdate = function (id, type, data, next) {
-    var timer = Base.app.Timer('Base.deferUpdate');
-    var dd = Base.app.dd;
+    var dd = Base.app.DD('Base', 'deferUpdate');
 
     console.log('Creating an update job for ' + type + ': ' + id);
     console.log(data);
 
     createOrUpdateDeferredUpdate(id, type, data, function(err, newInstance) {
-      timer.lap('Base.deferUpdate.createOrUpdate');
+      dd.lap('Redis.createOrUpdate');
       if(err) {
         console.error(err.stack);
         return next(err);
       }
 
       if(newInstance) {
-        Base.app.jobs.create('updateBase', {
+        Base.app.jobs.create('deferredUpdate', {
           key: getDeferredUpdateKey(id, type)
         }).delay(30000)
         .on('promotion', function () {
-          dd.increment('app.deferredUpdate.active');
+          dd.increment('Jobs.promotion');
         })
         .on('complete', function () {
-          dd.decrement('app.deferredUpdate.active');
+          dd.increment('Jobs.complete');
         })
         .on('failed', function () {
-          dd.decrement('app.deferredUpdate.active');
-          dd.increment('app.deferredUpdate.failed');
+          dd.increment('Jobs.failed');
         })
         .on('failed attempt', function () {
-          dd.decrement('app.deferredUpdate.active');
-          dd.increment('app.deferredUpdate.failedAttempt');
+          dd.increment('Jobs.failedAttempt');
         })
         //.attempts(5)
         .removeOnComplete(true)
