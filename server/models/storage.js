@@ -229,6 +229,7 @@ module.exports = function(Storage) {
   };
 
   Storage.triggerTranscoding = function (containerName, file, cb) {
+    var dd = Storage.app.DD('Storage','triggerTranscoding');
     var params = getTranscoderParams(containerName, file);
     var type = getContainerType(containerName);
 
@@ -236,6 +237,7 @@ module.exports = function(Storage) {
       if(type === 'video') {
         if( transcoder) {
           transcoder.createJob(params, function (err, res) {
+            dd.lap('Transcoder.createJob');
             if(err) {
               console.error('Failed to create transcoding job');
               console.error(err.stack);
@@ -273,6 +275,7 @@ module.exports = function(Storage) {
         }
       } else if(type === 'photo') {
         lambda.invoke(params, function(err, data) {
+          dd.lap('Lambda.invoke');
           if (err) {
             console.error('imageTranscoding failed!');
             console.error(err.stack); // an error occurred
@@ -294,6 +297,7 @@ module.exports = function(Storage) {
   };
 
   Storage.transcodingComplete = function (ctx, next) {
+    var dd = Storage.app.DD('Storage','transcodingComplete');
     var Subarticle = Storage.app.models.Subarticle;
     var req = ctx.req;
 
@@ -303,7 +307,7 @@ module.exports = function(Storage) {
     });
 
     req.on('end', function () {
-
+      dd.lap('Storage.transcodingCompleteRequestEnd');
       if(chunks.length > 0) {
         var job;
         try {
@@ -320,6 +324,7 @@ module.exports = function(Storage) {
         console.dir(job, { colors: true });
 
         validator.validate(job, function(err, job) {
+          dd.lap('Validator.validate');
           if(err) {
             console.error(err.stack);
             next(err);
@@ -346,6 +351,8 @@ module.exports = function(Storage) {
                 }
 
                 Subarticle.clearPending(message, function (err) {
+                  dd.lap('Subarticle.clearPending');
+                  dd.elapsed();
                   console.log('Transcoding Job ' + message.jobId + ' has finished!');
                   if(err) {
                     console.error(err);
@@ -360,12 +367,12 @@ module.exports = function(Storage) {
                     Token: job.Token,
                     TopicArn: job.TopicArn
                   }, function(err, data) {
+                    dd.lap('SNS.confirmSubscription');
+                    dd.elapsed();
                     if( err) {
                       console.error(err.stack);
                       next(err);
                     } else {
-                      // TODO Set pending flag
-                      //TODO Clear pending flag from subarticle and article
                       console.dir(data, {colors: true});
                       next();
                     }
@@ -395,6 +402,7 @@ module.exports = function(Storage) {
   }
 
   Storage.updateCacheControl = function(container, keys, cb) {
+    var dd = Storage.app.DD('Storage','udpateCacheControl');
     if(!process.env.NODE_ENV || process.env.NODE_ENV === 'development') {
       cb();
     } else {
@@ -408,6 +416,7 @@ module.exports = function(Storage) {
             Bucket: container,
             Key: key
           }, function(err, data) {
+            dd.elapsed('S3.headObject');
             if(err) {
               console.error('Failed to get object metadata');
               console.error(key);
@@ -423,6 +432,7 @@ module.exports = function(Storage) {
                 CacheControl: 'no-transform,public,max-age=86400',
                 Key: key 
               }, function(err) {
+                dd.elapsed('S3.copyObject');
                 if(err) {
                   console.error('Failed to update cache control');
                   console.error(key);
@@ -452,6 +462,7 @@ module.exports = function(Storage) {
   };
 
   Storage.archive = function(instance, cb) {
+    var dd = Storage.app.DD('Storage','archive');
     if(!process.env.NODE_ENV || process.env.NODE_ENV === 'development') {
       cb();
     } else {
@@ -467,6 +478,7 @@ module.exports = function(Storage) {
           Body: JSON.stringify(instance),
           Key: instance.id + '.json'
         }, function(err) {
+          dd.lap('S3.putObject');
           if(err) {
             console.error('Failed to archive the given instance');
             console.error(instance);
@@ -484,6 +496,7 @@ module.exports = function(Storage) {
   };
 
   Storage.destroy = function(container, name, next) {
+    var dd = Storage.app.DD('Storage','destroy');
     var params = {
       Bucket: container + '-delete',
       CopySource: container + '/' + name,
@@ -491,6 +504,7 @@ module.exports = function(Storage) {
     };
 
     s3.copyObject(params, function(err, data) {
+      dd.lap('S3.copyObject');
       if( err) {
         console.error('Failed to copy the given instance');
         console.log(params);
@@ -503,6 +517,7 @@ module.exports = function(Storage) {
         };
 
         s3.deleteObject(params, function (err, data) {
+          dd.lap('S3.deleteObject');
           if(err) {
             console.error('Failed to delete the given instance');
             console.log(params);
