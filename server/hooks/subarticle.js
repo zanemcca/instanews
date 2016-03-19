@@ -15,7 +15,7 @@ module.exports = function(app) {
   var debug = app.debug('hooks:subarticle');
 
   Subarticle.afterRemote('prototype.__get__comments', function(ctx, inst,next){
-    var dd = app.DD('Article','afterGetComments');
+    var dd = app.DD('Subarticle','afterGetComments');
     ctx.options = {
       clickType: 'getComments'
     };
@@ -33,7 +33,7 @@ module.exports = function(app) {
   });
 
    Subarticle.observe('before save', function(ctx, next) {
-      var dd = app.DD('Article','beforeSave');
+      var dd = app.DD('Subarticle','beforeSave');
       debug('before save', ctx, next);
       var inst = ctx.instance;
       /* istanbul ignore else */
@@ -107,7 +107,7 @@ module.exports = function(app) {
  */
 
   Subarticle.observe('after save', function(ctx, next) {
-    var dd = app.DD('Article','beforeSave');
+    var dd = app.DD('Subarticle','afterSave');
     debug('after save', ctx, next);
     var inst = ctx.instance;
     if(!inst) {
@@ -236,7 +236,7 @@ module.exports = function(app) {
   };
 
   Subarticle.observe('before delete', function(ctx, next) {
-    var dd = app.DD('Article','beforeDelete');
+    var dd = app.DD('Subarticle','beforeDelete');
     debug('before delete', ctx, next);
     Subarticle.find({ where: ctx.where }, function (err, res) {
       dd.lap('Subarticle.find');
