@@ -20,6 +20,7 @@ module.exports = function(app) {
   var debug = app.debug('hooks:base');
 
   Base.createClickAfterRemote = function(ctx, next){
+    var dd = app.DD('Base', 'createClickAfterRemote');
     debug('createClickAfterRemote', ctx);
     if(ctx &&
        ctx.req &&
@@ -38,6 +39,7 @@ module.exports = function(app) {
               clickableId: ctx.req.remotingContext.instance.id
             };
             Click.create(click, function(err, res) {
+              dd.lap('Click.create');
               if(err) {
                 console.error(err.stack);
               }
@@ -123,6 +125,7 @@ module.exports = function(app) {
   });
 
   Base.observe('before save', function(ctx, next) {
+    var dd = app.DD('Base', 'beforeSave');
     debug('observe.before save', ctx);
     var inst = ctx.instance;
     if (!inst) {
@@ -181,6 +184,7 @@ module.exports = function(app) {
         }
 
         var rating = Stat.getRating(inst);
+        dd.lap('Stat.getRating');
         inst.rating = rating;
       }
       else {
