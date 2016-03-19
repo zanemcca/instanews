@@ -31,6 +31,8 @@ exports.initBase = function(Model) {
 };
 
 exports.notify = function (Model, inst) {
+  var modelName = exports.getModelName(Model);
+  var dd = Model.app.DD(modelName, 'notify');
   var Notification = Model.app.models.notif;
 
   var getParent,
@@ -47,6 +49,7 @@ exports.notify = function (Model, inst) {
 
   // Loggin function
   var report = function(err, res) {
+    dd.elapsed('Notification.create');
     if (err) {
       console.error(err.stack);
     } else {
@@ -62,8 +65,11 @@ exports.notify = function (Model, inst) {
     inst.username
   ];
 
+  var getParentName = '';
+
   //Setup who is going to be notified and what type of action was completed to warrant the notification
   if(inst.modelName === 'comment') {
+    getParentName = 'Comment.commentable';
     getParent = inst.commentable;
 
     action = 'commented on';
@@ -81,6 +87,7 @@ exports.notify = function (Model, inst) {
 
     notifyParentOwner = true;
   } else if(inst.modelName === 'subarticle') {
+    getParentName = 'Subarticle.article';
     getParent = inst.article;
 
     notifyCollaborators = true;
@@ -113,6 +120,7 @@ exports.notify = function (Model, inst) {
       username: inst.username
     }, report);
   } else if(inst.modelName === 'upVote' || inst.modelName === 'downVote') {
+    getParentName = 'Click.clickable';
     getParent = inst.clickable;
     action = 'voted on';
     if(inst.modelName === 'downVote') {
@@ -125,7 +133,9 @@ exports.notify = function (Model, inst) {
     return;
   }
 
+
   getParent(function(err, parent) {
+    dd.lap(getParentName);
     if(err) {
       console.error(err.stack);
       return;
@@ -189,6 +199,7 @@ exports.notify = function (Model, inst) {
 
       //Find all comments on the the parent item
       Model.find(query, function(err, res) {
+        dd.lap(modelName + '.find');
         //Error checking
         if(err) {
           console.error(err.stack);
@@ -217,9 +228,18 @@ exports.notify = function (Model, inst) {
   });
 };
 
+exports.getModelName = function(Model) {
+  var modelName = Model.definition.name;
+  modelName = modelName.charAt(0).toUpperCase() + modelName.slice(1);
+  return modelName;
+};
+
 //readModifyWrite
 // with an Optimistic Locking Strategy
 exports.readModifyWrite = function(Model, query, modify, cb, options) {
+  var modelName = exports.getModelName(Model);
+
+  var dd = Model.app.DD(modelName,'readModifyWrite');
   var MAXRETRYS = 20;
   var versionName = 'version';
   var retryCount = MAXRETRYS;
@@ -239,6 +259,7 @@ exports.readModifyWrite = function(Model, query, modify, cb, options) {
   }
 
   Model.find(query, function(err,res) {
+    dd.lap(modelName + '.find');
     if(err) {
       console.warn('Warning: Transaction failed to read: ' +
                   JSON.stringify(err));
@@ -292,6 +313,7 @@ exports.readModifyWrite = function(Model, query, modify, cb, options) {
             cb(err);
           }
           else{
+            dd.lap(modelName + '.updateAll');
             if(res.count === 0) {
               if(retryCount > 0) {
                 var opt = {

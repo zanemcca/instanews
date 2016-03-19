@@ -94,21 +94,21 @@ module.exports = function (app) {
         });
       };
 
+      Push.on('error', function (err) {
+        console.error('Push Notification error: ', err.stack);
+      });
+
+      App.observe('before save', function(ctx, next) {
+        var inst = ctx.instance;
+        if( inst) {
+          inst.id = appName;
+        }
+        next();
+      });
+
       var registerApp = function(cb) {
-        Push.on('error', function (err) {
-          console.error('Push Notification error: ', err.stack);
-        });
-
-        App.observe('before save', function(ctx, next) {
-          var inst = ctx.instance;
-          if( inst) {
-            inst.id = appName;
-          }
-          next();
-        });
-
-
         App.register(username, appName, registrationOptions,function(err, app) {
+          dd.lap('App.register');
           if (err) {
             console.log('Error Registering app: ' , err);
           }
@@ -123,16 +123,22 @@ module.exports = function (app) {
           where: { id: appName }
         },
         function (err, result) {
+          dd.lap('App.findOne');
           if (err) {
             cb(err);
           } else if (result) {
             console.log('Updating application: ' + result.id);
-            result.updateAttributes(registrationOptions, cb);
+            result.updateAttributes(registrationOptions, function(err,res) {
+              dd.lap('App.updateAttributes');
+              cb(err, res);
+            });
           } else {
             return registerApp(cb);
           }
         });
       };
+
+      var dd = app.DD('Push', 'setup');
 
       startPushServer();
     }

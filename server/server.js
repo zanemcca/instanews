@@ -403,9 +403,11 @@ if(cluster.isMaster && numCPUs > 1 && process.env.NODE_ENV === 'production') {
 
     var dataSource;
 
-    for(var name in app.dataSources) {
-      dataSource = app.dataSources[name];
-      dataSource.on('connected', onConnected.bind(onConnected, dataSource)); 
+    if(process.env.AUTOUPDATE_DB) {
+      for(var name in app.dataSources) {
+        dataSource = app.dataSources[name];
+        dataSource.on('connected', onConnected.bind(onConnected, dataSource)); 
+      }
     }
   };
 
@@ -473,6 +475,9 @@ if(cluster.isMaster && numCPUs > 1 && process.env.NODE_ENV === 'production') {
   } else {
     app.use(loopback.static(path.resolve(__dirname, '../client/www/')));
   }
+
+  // Create a healthcheck API
+  app.use('/healthcheck', require('express-healthcheck')());
 
   // Bootstrap the application, config ure models, datasources and middleware.
   // Sub-apps like REST API are mounted via boot scripts.

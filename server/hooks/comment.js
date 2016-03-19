@@ -26,10 +26,12 @@ next();
       clickType: 'getComments'
     };
     debug('aterRemote __get__comments', ctx, instance, next);
+    var dd = app.DD('Comment','afterGetComments');
     Base.createClickAfterRemote(
       ctx,
       // istanbul ignore next
       function (err) {
+        dd.lap('Base.createClickAfterRemote');
         if(err) {
           console.error(err.stack);
         }
@@ -39,6 +41,7 @@ next();
   });
 
   Comment.observe('after save', function(ctx, next) {
+    var dd = app.DD('Comment','afterSave');
     debug('ater save', ctx, next);
     var inst = ctx.instance;
     if(!inst) {
@@ -53,6 +56,7 @@ next();
         clickableType: inst.commentableType,
         clickableId: inst.commentableId
       }, function(err, res) {
+        dd.lap('Click.create');
         if(err) {
           console.error('Error: Failed to create a click for comment creation');
         }
@@ -68,14 +72,17 @@ next();
   });
 
   Comment.observe('before delete', function(ctx, next) {
+    var dd = app.DD('Comment','beforeDelete');
     debug('before delete', ctx, next);
     Comment.find({ where: ctx.where }, function (err, res) {
+      dd.lap('Comment.find');
       if(err) {
         console.error(err.stack);
         next(err);
       } else if(res.length > 0) {
         res.forEach(function(inst) {
           Storage.archive(inst, function(err) {
+            dd.elapsed('Storage.archive');
             if(err) {
               console.error(err.stack);
               return next(err);
@@ -86,18 +93,23 @@ next();
                 console.error(err.stack);
                 return next(err);
               }
+              dd.elapsed('Comment.comments.destroyAll');
 
               var id = ctx.where.id || ctx.where._id;
               // Rerank the parent if this element was deleted individually 
               if(JSON.stringify(id) === JSON.stringify(inst.id)) {
                 inst.commentable(function (err, res) {
+                  dd.elapsed('Comment.commentable');
                   var data = {
                     $inc: {
                       'createCommentCount': -1
                     }
                   };
 
+                  var modelName = inst.commentableType.charAt(0).toUpperCase() + inst.commentableType.slice(1);
+
                   res.updateAttributes(data, function (err, res) {
+                    dd.elapsed(modelName + '.updateAttributes');
                     if(err) {
                       console.error(err.stack);
                       return next(err);
@@ -105,6 +117,7 @@ next();
                     Base.deferUpdate(inst.commentableId, inst.commentableType, {
                       comment: true,
                     }, function(err) {
+                      dd.elapsed('base.deferUpdate');
                       if(err) {
                         console.log(err.stack);
                       }

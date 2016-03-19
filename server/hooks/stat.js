@@ -17,7 +17,7 @@ module.exports = function(app) {
   */
 
   Stat.updateRating = function(where, type, modify, cb) {
-    var timer = app.Timer('Stat.updateRating');
+    var dd = app.DD('Stat', 'updateRating');
     debug('updateRating', where, type, modify, cb);
     var err;
     if(!where || !type) {
@@ -51,6 +51,8 @@ module.exports = function(app) {
       return;
     }
 
+    var modelName = type.charAt(0).toUpperCase() + type.slice(1).toLowerCase();
+
     var stats = [];
     var rate = function(modify) {
       return function(model) {
@@ -80,7 +82,7 @@ module.exports = function(app) {
 
     //console.log(query);
     Model.readModifyWrite(query, rate(modify), function(err, res) {
-      timer.lap('Stat.updateRating.readModifyWrite');
+      dd.lap(modelName + '.readModifyWrite');
       //delete where.ratingModified;
 
       if(err && (!err.status || err.status !== 409)) {
@@ -181,7 +183,7 @@ module.exports = function(app) {
                 console.error('Failed to defer an update for ' + stat.parentType + ': ' + stat.parentId);
                 console.error(err);
               }
-              timer.elapsed('Stat.updateRating.deferUpdate.total');
+              dd.elapsed('Base.deferUpdate');
             }); 
 
             /*
@@ -213,7 +215,6 @@ module.exports = function(app) {
           }
         });
 
-        timer.elapsed('Stat.updateRating.return.total');
         //No need to wait around for all that to finish
         cb(null, finalResult);
       }
