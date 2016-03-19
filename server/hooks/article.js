@@ -20,12 +20,14 @@ module.exports = function(app) {
   var debug = app.debug('hooks:article');
 
   Article.afterRemote('prototype.__get__comments', function(ctx, instance, next){
+    var dd = app.DD('Article','afterGetComments');
     ctx.options = {
       clickType: 'getComments'
     };
     debug('afterRemote prototype.__get__comments', ctx, instance, next);
 
     Base.createClickAfterRemote(ctx, function (err) {
+      dd.lap('Base.createClickAfterRemote');
       /* istanbul ignore next */
       if(err) {
         console.error(err.stack);
@@ -36,6 +38,7 @@ module.exports = function(app) {
   });
 
   Article.afterRemote('prototype.__get__subarticles', function(ctx, inst, next){
+    var dd = app.DD('Article','afterGetSubarticles');
     ctx.options = {
       clickType: 'getSubarticles'
     };
@@ -51,6 +54,7 @@ module.exports = function(app) {
     }
 
     Base.createClickAfterRemote(ctx, function (err) {
+      dd.lap('Base.createClickAfterRemote');
       /* istanbul ignore next */
       if(err) {
         console.error(err.stack);
@@ -75,6 +79,7 @@ module.exports = function(app) {
   });
 
   Article.observe('after save', function(ctx, next) {
+    var dd = app.DD('Article','afterSave');
     debug('observe after save', ctx);
     var inst = ctx.instance;
     if(!inst) {
@@ -87,6 +92,7 @@ module.exports = function(app) {
         viewableType: 'article',
         viewableId: inst.id
       }, function(err, res) {
+        dd.lap('View.create');
         /* istanbul ignore else */
         if(err) {
           console.error(
@@ -104,14 +110,17 @@ module.exports = function(app) {
   });
 
   Article.observe('before delete', function(ctx, next) {
+    var dd = app.DD('Article','beforeDelete');
     debug('before delete', ctx, next);
     Article.find({ where: ctx.where }, function (err, res) {
+      dd.lap('Article.find');
       if(err) {
         console.error(err.stack);
         next(err);
       } else if(res.length > 0) {
         res.forEach(function(inst) {
           Storage.archive(inst, function(err) {
+            dd.elapsed('Storage.archive');
             var error;
             if(err) {
               console.error(err.stack);
@@ -119,12 +128,14 @@ module.exports = function(app) {
             } 
 
             inst.comments.destroyAll(function (err, res) {
+              dd.elapsed('Article.comments.destroyAll');
               if(err) {
                 console.error(err.stack);
                 error = error || err;
               }
 
               inst.subarticles.destroyAll(function (err, res) {
+                dd.elapsed('Article.subarticles.destroyAll');
                 if(err) {
                   console.error(err.stack);
                   error = error || err;
