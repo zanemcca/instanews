@@ -152,7 +152,7 @@ viewCount: 270
   var criticalValueInfinity = 0.674;
 
   Stat.getRating  = function(rateable) {
-    Stat.app.dd.increment('Stat.getRating');
+    var dd = Stat.app.DD('Stat', 'getRating');
     var upVoteCount = rateable.upVoteCount || 0;
     var downVoteCount = rateable.downVoteCount || 0;
     var getCommentsCount = rateable.getCommentsCount || 0;
@@ -319,7 +319,7 @@ viewCount: 270
 
 
     if(rating > 1 || rating < 0 || isNaN(rating)) {
-      Stat.app.dd.increment('Stat.brokenRating');
+      dd.increment('Stat.brokenRating');
       console.warn('The returned probability is not unitary!: ' + rating);
       return rateable.rating;
     }

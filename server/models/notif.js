@@ -3,6 +3,7 @@ var common = require('./common');
 module.exports = function(Notif) {
 
   Notif.setSeen = function (id, next) {
+    var dd = Notif.app.DD('Notification', 'setSeen');
     var query = {
       where: {
         id: id,
@@ -10,6 +11,7 @@ module.exports = function(Notif) {
     };
 
     Notif.findOne(query, function (err, res) {
+      dd.lap('Notification.findOne');
       if(err) {
         return next(err);
       }
@@ -19,10 +21,15 @@ module.exports = function(Notif) {
         return next(err);
       } else if (!res.seen) {
         res.updateAttribute('seen', true, function (err, res) {
+          dd.lap('Notification.updateAttribute');
           if(err) {
             return next(err);
           } else {
-            Notif.app.models.Journalist.decrementBadge(res.username, next);
+            Notif.app.models.Journalist.decrementBadge(res.username, function(err) {
+              dd.lap('Journalist.decrementBadge');
+              dd.elapsed();
+              next(err);
+            });
           }
         });
       } else {

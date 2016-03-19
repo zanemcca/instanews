@@ -15,6 +15,7 @@ module.exports = function(app) {
   var debug = app.debug('hooks:upVote');
    
   UpVote.observe('after delete', function(ctx, next) {
+    var dd = app.DD('UpVote', 'afterDelete');
     debug('after delete', ctx, next);
 
     //TODO Check the deletion count to make sure an item was deleted before decrementing upVoteCount
@@ -25,7 +26,10 @@ module.exports = function(app) {
         upVoteCount: -1
       };
     }
-    Click.updateVoteParent(ctx, next);
+    Click.updateVoteParent(ctx, function(err) {
+      dd.lap('Click.updateVoteParent');
+      next(err);
+    });
 
     /*
     //The click after save should have added an incrementation parameter
@@ -57,6 +61,7 @@ module.exports = function(app) {
   });
 
   UpVote.observe('after save', function(ctx, next) {
+    var dd = app.DD('UpVote', 'afterSave');
     debug('after save', ctx, next);
     var inst = ctx.instance;
 
@@ -65,7 +70,10 @@ module.exports = function(app) {
       //The click after save should have added an incrementation parameter
       if(ctx.inc && typeof(ctx.inc) === 'object') {
         ctx.inc.upVoteCount = 1;
-        Click.updateVoteParent(ctx, next);
+        Click.updateVoteParent(ctx, function(err) {
+          dd.lap('Click.updateVoteParent');
+          next(err);
+        });
       }
       else {
         var error = new Error('Upvote expected there to be ctx.inc!');

@@ -5,9 +5,11 @@ module.exports = function(app) {
   var debug = app.debug('hooks:file');
 
   File.beforeSave = function (inst, next) {
+    var dd = app.DD('File', 'beforeSave');
     debug('before save', inst, next);
     //TODO Check if video is available on S3
     Storage.triggerTranscoding( inst.container, inst.name, function (err, res) {
+      dd.lap('Storage.triggerTranscoding');
       if(err) {
         return next(err);
       }

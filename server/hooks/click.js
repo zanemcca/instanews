@@ -44,17 +44,23 @@ module.exports = function(app) {
   // uniqueness is guaranteed at the database layer
   var preVoteChecker = function(ctx, next) {
     debug('preVoteChecker', ctx);
+    var dd = app.DD('Click', 'preVoteChecker');
     var inst = ctx.instance;
     /* istanbul ignore else */
     if(inst && ctx.isNewInstance) {
       var name = ctx.Model.modelName;
       var Model, OppositeModel;
+      var modelName, oppositeModelName;
       switch(name) {
         case 'upVote':
+          modelName = 'UpVote';
+          oppositeModelName = 'DownVote';
           Model = UpVote;
           OppositeModel = DownVote;
           break;
         case 'downVote':
+          modelName = 'DownVote';
+          oppositeModelName = 'UpVote';
           Model = DownVote;
           OppositeModel = UpVote;
           break;
@@ -71,11 +77,13 @@ module.exports = function(app) {
       };
 
       OppositeModel.findOne(filter, function(err, res) {
+        dd.lap(oppositeModelName + '.findOne');
         if(err) {
           console.error('Error: Failed to complete preVoteChecker');
           next(err);
         } else if(res) {
           res.destroy(function(err) {
+            dd.lap(oppositeModelName + '.destroy');
             if(err) {
               console.error('Error: Failed to complete preVoteChecker');
               next(err);
@@ -85,12 +93,14 @@ module.exports = function(app) {
           });
         } else {
           Model.findOne(filter, function(err, res) {
+            dd.lap(modelName + '.findOne');
             if(err) {
               console.error('Error: Failed to complete preVoteChecker');
               next(err);
             } else if(res) {
               console.log('Destroying the vote instead of creating one');
               res.destroy(function (err, count) {
+                dd.lap(modelName + '.destroy');
                 if(err) {
                   console.error('Error: Failed to destroy the vote');
                 } else {
@@ -112,6 +122,7 @@ module.exports = function(app) {
   };
 
   Click.observe('before save', function(ctx, next) {
+    var dd = app.DD('Click', 'beforeSave');
     debug('observe  - before save', ctx);
     var inst = ctx.instance;
 
@@ -129,7 +140,10 @@ module.exports = function(app) {
         if(token) {
           inst.username = token.userId;
           if(inst.clickableId && inst.clickableType) {
-            preVoteChecker(ctx, next);
+            preVoteChecker(ctx, function(err) {
+              dd.lap('Click.preVoteChecker');
+              next(err);
+            });
           }
           else {
             console.dir(inst);
@@ -153,6 +167,7 @@ module.exports = function(app) {
   });
 
   Click.observe('before save', function(ctx, next) {
+    var dd = app.DD('Click', 'beforeSave');
     debug('observe - before save', ctx);
     var inst = ctx.instance;
     if(inst && ctx.isNewInstance) {
@@ -178,6 +193,7 @@ module.exports = function(app) {
         where: where, 
         order: 'id DESC'
       }, function(err, res) {
+        dd.lap('View.findOne');
         if(err) {
           console.warn('Warning: Failed to find a view for Type: ' +
                        inst.clickableType + '\tTypeId: ' +
@@ -192,6 +208,7 @@ module.exports = function(app) {
         }
         else {
           View.create(where, function (err, res) {
+            dd.lap('View.create');
             if(err || !res) {
               console.warn('Warning: Failed to create a view for Type: ' +
                            inst.clickableType + '\tTypeId: ' +
@@ -222,6 +239,7 @@ module.exports = function(app) {
 
   Click.observe('after delete', function(ctx, next) {
     debug('observe - after delete', ctx);
+    var dd = app.DD('Click', 'afterDelete');
     //Delegate the count updating to the inherited model 
 
     /* istanbul ignore next */
@@ -246,8 +264,10 @@ module.exports = function(app) {
         //TODO This should check the where filter and update the attributes for all parents
         Click.updateClickableAttributes(ctx, {
           '$inc': inc 
-        },
-        next);
+        }, function(err) {
+          dd.lap('Click.updateClickableAttributes');
+          next(err);
+        });
       }
     } else {
       next();
@@ -255,6 +275,7 @@ module.exports = function(app) {
   });
 
   Click.observe('after save', function(ctx, next) {
+    var dd = app.DD('Click', 'afterSave');
     debug('observe - after save', ctx);
     var inst = ctx.instance;
 
@@ -279,7 +300,10 @@ module.exports = function(app) {
         next();
       }
       else {
-        Click.updateClickableAttributes(ctx, data, next);
+        Click.updateClickableAttributes(ctx, data, function(err) {
+          dd.lap('Click.updateClickableAttributes');
+          next(err);
+        });
       }
     }
     else {
@@ -289,6 +313,7 @@ module.exports = function(app) {
   });
 
   Click.updateVoteParent = function(ctx, next) {
+    var dd = app.DD('Click', 'updateVoteParent');
     debug('updateVoteParent', ctx);
     var inst = ctx.instance;
 
@@ -296,6 +321,7 @@ module.exports = function(app) {
       Click.updateClickableAttributes(ctx, { 
         '$inc': ctx.inc 
       }, function(err) {
+        dd.lap('Click.updateClickableAttributes');
         //console.error('Failed to update clickableAttributes');
         next(err);
       });
@@ -308,10 +334,12 @@ module.exports = function(app) {
   };
 
   Click.updateClickableAttributes = function(ctx, data, next) {
-    var timer = app.Timer('Click.updateClickableAttributes');
+    var dd = app.DD('Click', 'updateClickableAttributes');
     debug('updateClickableAttributes', ctx, data);
     var inst = ctx.instance;
     if(inst) {
+      var modelName = inst.clickableType.charAt(0).toUpperCase() + inst.clickableType.slice(1);
+
       var updateImmediately = ['upVote', 'downVote', 'createComment'];
       if(updateImmediately.indexOf(ctx.Model.modelName) > -1 || updateImmediately.indexOf(inst.type) > -1) {
         var dat = {
@@ -319,8 +347,8 @@ module.exports = function(app) {
         };
 
         if(inst.type) {
-          var modelName = inst.type.slice(6).toLowerCase();
-          if(data[modelName]) {
+          var modName = inst.type.slice(6).toLowerCase();
+          if(data[modName]) {
             dat[modelName] = true;
           }
         }
@@ -336,6 +364,7 @@ module.exports = function(app) {
          */
 
         Base.deferUpdate(inst.clickableId, inst.clickableType, { updateRating: true }, function (err) { 
+          dd.lap('Base.deferUpdate');
           if(err) {
             console.err('Failed to defer update');
             return next(err);
@@ -344,7 +373,7 @@ module.exports = function(app) {
           console.log('Updating info immediately!');
           console.log(data);
           inst.clickable(function(err, res) {
-            timer.lap('Click.updateClickableAttributes.findClickable');
+            dd.lap('Click.clickable');
             if(err || !res) {
               console.warn('Warning: Failed to fetch clickable');
               return next(err);
@@ -371,7 +400,7 @@ module.exports = function(app) {
             }
 
             res.updateAttributes(data, function(err,res) {
-            timer.lap('Click.updateClickableAttributes.update');
+              dd.lap(modelName + '.updateAttributes');
               if(err) {
                 console.warn('Warning: Failed to save clickable');
                 next(err);
@@ -405,7 +434,10 @@ module.exports = function(app) {
           });
         });
       } else {
-        Base.deferUpdate(inst.clickableId, inst.clickableType, data, next);
+        Base.deferUpdate(inst.clickableId, inst.clickableType, data, function(err) {
+          dd.lap('Base.deferUpdate');
+          next(err);
+        });
       }
     } else {
       var error = new Error('Invalid instance for updateClickableAttributes');

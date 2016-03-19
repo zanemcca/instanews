@@ -10,12 +10,14 @@ module.exports = function(Article) {
   common.initBase(Article);
 
   Article.clearPending = function (id, next) {
+    var dd = Article.app.DD('Article', 'clearPending');
     //Find the article if it has a pending flag
     Article.findById(id, {
       pending: {
         exists: true
       }
     }, function (err, res) {
+      dd.lap('Article.findById');
       if(err) {
         console.error('Failed to find clear pending flag for article ' + id);
         console.error(err);
@@ -26,6 +28,7 @@ module.exports = function(Article) {
             pending: ''
            }
         }, function (err, res) {
+           dd.lap('Article.updateAttributes');
            if(err) {
             console.error('Failed to find clear pending flag for article ' + id);
             console.error(err);
@@ -49,6 +52,7 @@ module.exports = function(Article) {
   };
 
   Article.getHeatMap = function (box, cb) {
+    var dd = Article.app.DD('Article', 'getHeatMap');
     Article.find({
       limit: 500,
       fields: {
@@ -71,6 +75,8 @@ module.exports = function(Article) {
       },
       order: 'rating DESC'
     }, function (err, res) {
+      dd.lap('Article.find');
+      dd.elapsed();
       // istanbul ignore if
       if(err) {
         console.error('Failed to find articles for the heatmap!');

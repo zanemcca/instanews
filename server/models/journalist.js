@@ -24,6 +24,7 @@ module.exports = function(Journalist) {
   }
 
   Journalist.sendConfirmation = function (user, next) {
+    var dd = Journalist.app.DD('Journalist', 'sendConfirmation');
     var options = {
       type: 'email',
       to: user.email,
@@ -40,6 +41,8 @@ module.exports = function(Journalist) {
     };
 
     user.verify(options, function(err, res) {
+      dd.lap('Journalist.verify');
+      dd.elapsed();
       if( err) {
         console.error('Error: Failed to verify the email ' + user.email);
         console.error(err.stack);
@@ -52,6 +55,7 @@ module.exports = function(Journalist) {
   }; 
 
   Journalist.resendConfirmation = function (user, next) {
+    var dd = Journalist.app.DD('Journalist', 'resendConfirmation');
     var query = {
       where: {}
     };
@@ -68,6 +72,7 @@ module.exports = function(Journalist) {
     }
 
     Journalist.findOne(query, function (err, res) {
+      dd.lap('Journalist.findOne');
       if(err) {
         return next(err);
       }
@@ -81,13 +86,18 @@ module.exports = function(Journalist) {
           err.status = 403;
           return next(err);
         } else {
-          Journalist.sendConfirmation(res, next);
+          Journalist.sendConfirmation(res, function(err) {
+            dd.lap('Journalist.sendConfirmation');
+            dd.elapsed();
+            next(err);
+          });
         }
       }
     });
   };
 
   Journalist.incrementBadge = function (userId, next) {
+    var dd = Journalist.app.DD('Journalist', 'incrementBadge');
     Journalist.updateAll({ 
       username: userId,
     },
@@ -96,12 +106,15 @@ module.exports = function(Journalist) {
         badge: 1
       }
     }, function (err, res) {
+      dd.lap('Journalist.updateAll');
       if(err || res.count !== 1) {
         console.log('Failed to increment the badge number!');
         console.log(err);
         next(err);
       } else {
         Journalist.findById(userId, function (err, res) {
+          dd.lap('Journalist.findById');
+          dd.elapsed();
           if( err) {
             console.log('Failed to increment the badge number!');
             console.log(err);
@@ -116,6 +129,7 @@ module.exports = function(Journalist) {
   };
 
   Journalist.decrementBadge = function (userId, next) {
+    var dd = Journalist.app.DD('Journalist', 'decrementBadge');
     Journalist.updateAll({ 
       username: userId,
       badge: { gt: 0 }
@@ -125,6 +139,7 @@ module.exports = function(Journalist) {
         badge: -1
       }
     }, function (err, res) {
+      dd.lap('Journalist.updateAll');
       if(err) {
         console.log('Failed to decrement the badge number!');
         console.log(err);
@@ -132,6 +147,8 @@ module.exports = function(Journalist) {
       } else {
         if(res.count) {
           Journalist.findById(userId, function (err, res) {
+            dd.lap('Journalist.findById');
+            dd.elapsed();
             if( err) {
               console.log('Failed to decrement the badge number!');
               console.log(err);
@@ -149,12 +166,15 @@ module.exports = function(Journalist) {
   };
 
   Journalist.clearBadge = function (id, next) {
+    var dd = Journalist.app.DD('Journalist', 'clearBadge');
     Journalist.updateAll({ 
       username: id,
     },
     {
       badge: 0
     }, function (err, res) {
+      dd.lap('Journalist.updateAll');
+      dd.elapsed();
       if(err || res.count !== 1) {
         console.log('Failed to clear the badge number!');
         console.log(err);
@@ -172,6 +192,7 @@ module.exports = function(Journalist) {
   };
 
   Journalist.requestPasswordReset = function (user, next) {
+    var dd = Journalist.app.DD('Journalist', 'requestPasswordReset');
     var query = {
       where: {}
     };
@@ -188,6 +209,7 @@ module.exports = function(Journalist) {
     }
 
     Journalist.findOne(query, function (err, res) {
+      dd.lap('Journalist.findOne');
       if(err) {
         return next(err);
       }
@@ -205,6 +227,7 @@ module.exports = function(Journalist) {
         };
 
         res.requestPasswordReset(options, function(err, res) {
+          dd.lap('Journalist.requestPasswordReset');
           if( err) {
             console.error('Error: Failed to verify the email ' + user.email);
             console.error(err.stack);
@@ -219,6 +242,7 @@ module.exports = function(Journalist) {
   }; 
 
   Journalist.on('resetPasswordRequest', function (info) {
+    var dd = Journalist.app.DD('Journalist', 'onRequestPasswordReset');
     //TODO randomToken does not set the accesstoken at all
     //  Solve by adding generateAccessToken function to options of resetPassword
     var html = '<p>Password reset code: <b>' + info.accessToken.id + '</b></p>';
@@ -228,6 +252,7 @@ module.exports = function(Journalist) {
       subject: 'Password Reset',
       html: html
     }, function (err) {
+      dd.elapsed();
       if (err) {
         console.error(err.stack);
       } else {
@@ -267,6 +292,7 @@ module.exports = function(Journalist) {
   };
 
   Journalist.passwordReset = function (user, next) {
+    var dd = Journalist.app.DD('Journalist', 'passwordReset');
     var query = {
       where: {}
     };
@@ -292,6 +318,7 @@ module.exports = function(Journalist) {
     }
 
     Journalist.findOne(query, function (err, res) {
+      dd.lap('Journalist.findOne');
       if(err) {
         return next(err);
       }
@@ -301,6 +328,7 @@ module.exports = function(Journalist) {
         return next(err);
       } else {
         Journalist.app.models.AccessToken.findById(user.token, function (err, token) {
+          dd.lap('AccessToken.findById');
           if ( err) {
             err = new Error('The token is invalid');
             err.status = 404;
@@ -313,6 +341,8 @@ module.exports = function(Journalist) {
               next(err);
             } else {
               res.updateAttribute('password', Journalist.hashPassword(user.password), function (err, res) {
+                dd.lap('Journalist.updateAttribute');
+                dd.elapsed();
                 next(err);
               });
             }
