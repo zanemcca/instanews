@@ -347,8 +347,8 @@ module.exports = function(app) {
         };
 
         if(inst.type) {
-          var modelName = inst.type.slice(6).toLowerCase();
-          if(data[modelName]) {
+          var modName = inst.type.slice(6).toLowerCase();
+          if(data[modName]) {
             dat[modelName] = true;
           }
         }
