@@ -41,8 +41,10 @@ module.exports = function(app) {
   });
 
   View.observe('before delete', function(ctx, next) {
+    var dd = app.DD('View','beforeDelete');
     debug('before delete', ctx, next);
     View.findOne({ where: ctx.where }, function (err, res) {
+      dd.lap('View.findOne');
       if(err) {
         return next(err);
       }
@@ -53,8 +55,10 @@ module.exports = function(app) {
           '$inc': {
             viewCount: -1 
           }
-        },
-        next);
+        }, function(err) {
+          dd.lap('View.updateViewableAttributes');
+          next(err);
+        });
       } else {
         console.warn('Warning: There should have been a viewable instance present');
         next();
@@ -63,6 +67,7 @@ module.exports = function(app) {
   });
 
   View.observe('after save', function(ctx, next) {
+    var dd = app.DD('View','beforeDelete');
     debug('after save', ctx, next);
     var inst = ctx.instance;
 
@@ -71,8 +76,10 @@ module.exports = function(app) {
         '$inc': {
           viewCount: 1
         }
-      },
-      next);
+      }, function(err) {
+        dd.lap('View.updateViewableAttributes');
+        next(err);
+      });
     }
     else {
       console.warn('Warning: Instance is invalid after view creation');
@@ -81,11 +88,14 @@ module.exports = function(app) {
   });
 
   View.updateViewableAttributes = function(ctx, data, next) {
-    var timer = app.Timer('View.updateViewableAttributes.time');
+    var dd = app.DD('View','updateViewableAttributes');
     debug('updateViewableAttributes', ctx, data, next);
     var inst = ctx.instance;
     if(inst) {
-      Base.deferUpdate(inst.viewableId, inst.viewableType, data, next);
+      Base.deferUpdate(inst.viewableId, inst.viewableType, data, function(err) {
+        dd.lap('Base.deferUpdate');
+        next(err);
+      });
       /*
       inst.viewable(function(err, res) {
         timer.lap('View.updateViewableAttributes.findViewable');
