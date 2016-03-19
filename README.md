@@ -100,3 +100,7 @@ The default is `server`
 # Scaling Cluster
  - 1. Scale the node cluster in Tutum
  - 2. Add the new nodes to the AWS ELB
+
+### Autoupdate DBs
+- `export AUTOUPDATE_DB=true`
+- `grunt start`
