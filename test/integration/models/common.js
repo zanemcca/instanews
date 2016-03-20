@@ -55,6 +55,19 @@ exports.run = function() {
 
       it('should have a conflict because the version number is different than expected', function(done) {
         var Model = {
+          definition: {
+            name: 'article'
+          },
+          app: {
+            DD: function() {
+              return {
+                lap: function () {},
+                elapsed: function () {},
+                increment: function () {},
+                decrement: function () {}
+              };
+            }
+          },
           find: function(query, cb) {
             cb(null, [{
               id: 'id',
