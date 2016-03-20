@@ -1,13 +1,11 @@
 machine:
    services:
       - docker
-   environment: 
-      NODE_ENV: staging
 
 # Replace the Dockerfile with a staging version 
 checkout:
    post: 
-      - mv Dockerfile.staging Dockerfile
+      - mv Dockerfile.test Dockerfile
 
 dependencies:
    cache_directories:
@@ -18,12 +16,15 @@ dependencies:
       - if [[ -e ~/docker/instanews.tar ]]; then docker load -i ~/docker/instanews.tar; fi
       - docker build -t instanews .
       - mkdir -p ~/docker; docker save instanews > ~/docker/instanews.tar
+      - docker run --name mongo -d mongo 
+      - docker run --name redis -d redis 
       - npm install -g grunt-cli
       - cd client && bower install && npm install && cd ..
 test:
    override:
      - cd client && grunt karma && cd ..
-     - docker run -t instanews
+     - docker run --link "redis:redis" --link "mongo:mongodb" -e "AUTOUPDATE_DB=true" instanews
+     #- docker run -t instanews
        #- docker run -e "NODE_ENV=staging" -e "ENCRYPT_PASSWORD=couchesareabit2fly4me" -t instanews /bin/bash -c "npm install && npm install -g grunt-cli && grunt coverage"
 
 #deployment:
