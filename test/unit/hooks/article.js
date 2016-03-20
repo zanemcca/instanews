@@ -25,7 +25,7 @@ exports.run = function () {
       sandbox.restore();
     });
 
-    describe('triggerRating', function() {
+    describe.skip('triggerRating', function() {
       it('should call Stat.updateRating', function() {
         var where = {
           id: 5
