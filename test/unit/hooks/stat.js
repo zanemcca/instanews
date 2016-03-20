@@ -481,7 +481,7 @@ order: 'rating DESC'
 });
 */
 
-    describe('triggerRating', function() {
+    describe.skip('triggerRating', function() {
       var where, modify, prep, trigger;
       beforeEach(function() {
         where = {
