@@ -16,8 +16,6 @@ if( mongo.username && mongo.password) {
 
 mongodb  += mongo.url;
 
-console.log('MongoUrl: ' + mongodb);
-
 var options = '?connectTimeoutMS=30000';
 if(mongo.replicaSet) {
   options += '&replicaSet=' + mongo.replicaSet;
