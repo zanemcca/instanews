@@ -98,7 +98,21 @@ else {
   keys = [{
     key: 'mongo',
     value: {
-      url: 'localhost:27017/'
+      url: (process.env.MONGODB_PORT_27017_TCP_ADDR || 'localhost') + ':' + (process.env.MONGODB_PORT_27027_TCP_PORT || 27017) + '/'
+    }
+  },
+  {
+    key: 'sendgrid',
+    value: {
+      user: 'instanews-dev',
+      key: 'couchesareabit2fly4me'
+    }
+  },
+  {
+    key: 'redis',
+    value: {
+      host: (process.env.REDIS_PORT_6379_TCP_ADDR || 'localhost'),
+      port: (process.env.REDIS_PORT_6379_TCP_PORT || 6379)
     }
   }];
 }

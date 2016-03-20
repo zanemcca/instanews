@@ -241,12 +241,14 @@ if(cluster.isMaster && numCPUs > 1 && process.env.NODE_ENV === 'production') {
       }
     };
 
-    if(process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'staging') {
+    //if(process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'staging') {
       var redis = cred.get('redis');
       options.port = redis.port;
       options.host = redis.host;
       options.password = redis.password;
-    }
+    //}
+
+    console.dir(options);
 
     app.redisClient = new Redis(options);
 
