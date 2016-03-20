@@ -531,7 +531,6 @@ exports.run = function () {
         ctx.instance.clickableType = 'someType';
 
         var defer = sandbox.stub(Base, 'deferUpdate', function (id, type, opts, cb) {
-          console.log('Hello0');
           cb();
         });
       });
@@ -682,7 +681,6 @@ exports.run = function () {
           ctx.instance.type = null;
           ctx.Model.modelName = 'upVote';
           ctx.instance.clickable = function(cb) {
-            console.log('Hello1');
             cb(error);
           };
 
