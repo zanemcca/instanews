@@ -32,6 +32,19 @@ exports.run = function () {
       options;
       beforeEach(function() {
         Model = {
+          definition: {
+            name: 'model'
+          },
+          app: {
+            DD: function() {
+              return {
+                lap: function () {},
+                elapsed: function () {},
+                increment: function () {},
+                decrement: function () {}
+              };
+            }
+          },
           find: function (query, cb) {
             cb(null, []);
           },

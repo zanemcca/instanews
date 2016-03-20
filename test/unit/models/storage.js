@@ -9,6 +9,16 @@ var sinon = require('sinon');
 
 var Storage = {
   disableRemoteMethod: function () {},
+  app: {
+    DD: function() {
+      return {
+        lap: function () {},
+        elapsed: function () {},
+        increment: function () {},
+        decrement: function () {}
+      };
+    }
+  },
   remoteMethod: function () {}
 };
 
@@ -16,6 +26,14 @@ var findOne;
 function start() {
   Storage = {
     app: {
+      DD: function() {
+        return {
+          lap: function () {},
+          elapsed: function () {},
+          increment: function () {},
+          decrement: function () {}
+        };
+      },
       models: {
         Subarticle: {
           clearPending: function () {},

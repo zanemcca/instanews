@@ -17,6 +17,14 @@ var Stat = {
       objectIdWithTimestamp: function () {
       }
     },
+    DD: function() {
+      return {
+        lap: function () {},
+        elapsed: function () {},
+        increment: function () {},
+        decrement: function () {}
+      };
+    },
     dd: {
       increment: function () {},
       timing: function () {}
