@@ -10,7 +10,8 @@
         "clickableId": 1
       },
       "options": {
-        "unique": true
+        "unique": true,
+        "background": true
       }
     }
   },

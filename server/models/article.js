@@ -1,4 +1,8 @@
 
+var ONE_DAY = 24*60*60*1000; // 1 Day in millisecs
+var ONE_WEEK = 7*ONE_DAY; // 1 Week in millisecs
+var ONE_MONTH = 30*ONE_DAY; // 1 Month in millisecs
+
 var common = require('./common');
 
 module.exports = function(Article) {
@@ -6,12 +10,14 @@ module.exports = function(Article) {
   common.initBase(Article);
 
   Article.clearPending = function (id, next) {
+    var dd = Article.app.DD('Article', 'clearPending');
     //Find the article if it has a pending flag
     Article.findById(id, {
       pending: {
         exists: true
       }
     }, function (err, res) {
+      dd.lap('Article.findById');
       if(err) {
         console.error('Failed to find clear pending flag for article ' + id);
         console.error(err);
@@ -22,6 +28,7 @@ module.exports = function(Article) {
             pending: ''
            }
         }, function (err, res) {
+           dd.lap('Article.updateAttributes');
            if(err) {
             console.error('Failed to find clear pending flag for article ' + id);
             console.error(err);
@@ -45,7 +52,7 @@ module.exports = function(Article) {
   };
 
   Article.getHeatMap = function (box, cb) {
-    console.dir(box);
+    var dd = Article.app.DD('Article', 'getHeatMap');
     Article.find({
       limit: 500,
       fields: {
@@ -61,10 +68,15 @@ module.exports = function(Article) {
         },
         pending: {
           exists: false
+        },
+        id: {
+          gt: Article.app.utils.objectIdWithTimestamp(Date.now() - 2 * ONE_WEEK)
         }
       },
       order: 'rating DESC'
     }, function (err, res) {
+      dd.lap('Article.find');
+      dd.elapsed();
       // istanbul ignore if
       if(err) {
         console.error('Failed to find articles for the heatmap!');

@@ -152,6 +152,7 @@ viewCount: 270
   var criticalValueInfinity = 0.674;
 
   Stat.getRating  = function(rateable) {
+    var dd = Stat.app.DD('Stat', 'getRating');
     var upVoteCount = rateable.upVoteCount || 0;
     var downVoteCount = rateable.downVoteCount || 0;
     var getCommentsCount = rateable.getCommentsCount || 0;
@@ -294,7 +295,7 @@ viewCount: 270
     //rating = Stat.getUnion(Pup, Pclick) - Stat.getIntersection(Pclick, Pdown);
 
     // The rating is the probability of not downvoting and then positively interacting
-    rating = (1 - Pdown)*(Pup + (1 - Pdown - Pup)*Pclick);
+    var rating = (1 - Pdown)*(Pup + (1 - Pdown - Pup)*Pclick);
 
     /*
     // Click Thru
@@ -318,6 +319,7 @@ viewCount: 270
 
 
     if(rating > 1 || rating < 0 || isNaN(rating)) {
+      dd.increment('Stat.brokenRating');
       console.warn('The returned probability is not unitary!: ' + rating);
       return rateable.rating;
     }

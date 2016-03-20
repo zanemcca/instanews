@@ -212,7 +212,6 @@ app.service('Notifications', [
       setSeen(data);
     };
 
-
     var setSeen = function (data) {
       data = data || this;
 
@@ -289,7 +288,8 @@ app.service('Notifications', [
     spec.update = update;
     spec.options = spec.options || {};
     spec.options.filter = {
-      order: 'created DESC' 
+      order: 'created DESC',
+      limit: 50 
     };
 
     // Create a list for articles within view

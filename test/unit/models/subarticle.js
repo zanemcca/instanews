@@ -16,6 +16,14 @@ var findOne, find;
 function start() {
   Subarticle = {
     app: {
+      DD: function() {
+        return {
+          lap: function () {},
+          elapsed: function () {},
+          increment: function () {},
+          decrement: function () {}
+        };
+      },
       models: {
         Article: {
           clearPending: function (id, next) {

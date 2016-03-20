@@ -10,11 +10,13 @@ module.exports = function(app) {
   var debug = app.debug('hooks:notification');
 
   Notification.observe('after save', function(ctx, next) {
+    var dd = app.DD('Notification', 'afterSave');
     debug('after save', ctx, next);
     var note = ctx.instance;
     if (note && ctx.isNewInstance) {
 
       Journalist.incrementBadge(note.username, function (err, num) {
+        dd.lap('Journalist.incrementBadge');
         if(err) {
           console.error(err.stack);
           return next();
@@ -28,12 +30,14 @@ module.exports = function(app) {
             userId: note.username
           }
         }, function(err, res) {
+          dd.lap('Installation.find');
           if (err)
             console.error('Error finding installation!: ' + err);
           else {
             if( res.length > 0) {
 
               var report = function(err) {
+                dd.elapsed('Push.notifyById');
                 if (err) {
                   console.error('Error pushing notification: ' + err);
                 }

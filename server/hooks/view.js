@@ -4,6 +4,7 @@
 module.exports = function(app) {
 
   var View = app.models.view;
+  var Base = app.models.Base;
   var Stat = app.models.stat;
   var loopback = require('loopback');
   var debug = app.debug('hooks:view');
@@ -40,8 +41,10 @@ module.exports = function(app) {
   });
 
   View.observe('before delete', function(ctx, next) {
+    var dd = app.DD('View','beforeDelete');
     debug('before delete', ctx, next);
     View.findOne({ where: ctx.where }, function (err, res) {
+      dd.lap('View.findOne');
       if(err) {
         return next(err);
       }
@@ -52,8 +55,10 @@ module.exports = function(app) {
           '$inc': {
             viewCount: -1 
           }
-        },
-        next);
+        }, function(err) {
+          dd.lap('View.updateViewableAttributes');
+          next(err);
+        });
       } else {
         console.warn('Warning: There should have been a viewable instance present');
         next();
@@ -62,6 +67,7 @@ module.exports = function(app) {
   });
 
   View.observe('after save', function(ctx, next) {
+    var dd = app.DD('View','beforeDelete');
     debug('after save', ctx, next);
     var inst = ctx.instance;
 
@@ -70,8 +76,10 @@ module.exports = function(app) {
         '$inc': {
           viewCount: 1
         }
-      },
-      next);
+      }, function(err) {
+        dd.lap('View.updateViewableAttributes');
+        next(err);
+      });
     }
     else {
       console.warn('Warning: Instance is invalid after view creation');
@@ -80,10 +88,17 @@ module.exports = function(app) {
   });
 
   View.updateViewableAttributes = function(ctx, data, next) {
+    var dd = app.DD('View','updateViewableAttributes');
     debug('updateViewableAttributes', ctx, data, next);
     var inst = ctx.instance;
     if(inst) {
+      Base.deferUpdate(inst.viewableId, inst.viewableType, data, function(err) {
+        dd.lap('Base.deferUpdate');
+        next(err);
+      });
+      /*
       inst.viewable(function(err, res) {
+        timer.lap('View.updateViewableAttributes.findViewable');
         if(err) {
           console.warn('Warning: Failed to fetch viewable');
           return next(err);
@@ -92,6 +107,7 @@ module.exports = function(app) {
         // istanbul ignore else
         if(res) {
           res.updateAttributes(data, function(err,res) {
+            timer.lap('View.updateViewableAttributes.updateViewable');
             if(err) {
               console.warn('Warning: Failed to save viewable');
               next(err);
@@ -102,6 +118,8 @@ module.exports = function(app) {
               inst.viewableType,
               null,
               function(err, res) {
+                timer.lap('View.updateViewableAttributes.triggerRating');
+                timer.elapsed('View.updateViewableAttributes.total');
                 if(err) { 
                   //Conflicts are ok because it means that 
                   //someone else has just triggered the rating.
@@ -122,6 +140,7 @@ module.exports = function(app) {
           next();
         }
       });
+     */
     } else {
       var error = new Error('Invalid instance for updateViewableAttributes');
       error.status = 400;

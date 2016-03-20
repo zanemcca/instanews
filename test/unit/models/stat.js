@@ -11,7 +11,25 @@ var common =  require('../../common');
 var app = common.req('server');
 
 var Stat = {
-  on: function (event, cb) {}
+  on: function (event, cb) {},
+  app: {
+    utils: {
+      objectIdWithTimestamp: function () {
+      }
+    },
+    DD: function() {
+      return {
+        lap: function () {},
+        elapsed: function () {},
+        increment: function () {},
+        decrement: function () {}
+      };
+    },
+    dd: {
+      increment: function () {},
+      timing: function () {}
+    }
+  }
 };
 common.req('models/stat')(Stat);
 

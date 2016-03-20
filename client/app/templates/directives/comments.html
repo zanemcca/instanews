@@ -8,7 +8,7 @@
   <button class="ng-cloak show-more button ion-refresh button-icon dark"
     style="float: left;"
     ng-show="Comments.areItemsAvailable()"
-    ng-click="Comments.load()">
+    ng-click="Comments.more(10)">
     <i ng-if="owner.modelName !== 'comment'">Show more</i>
     <i ng-if="owner.modelName === 'comment'">Show older</i>
   </button>

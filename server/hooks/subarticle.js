@@ -15,6 +15,7 @@ module.exports = function(app) {
   var debug = app.debug('hooks:subarticle');
 
   Subarticle.afterRemote('prototype.__get__comments', function(ctx, inst,next){
+    var dd = app.DD('Subarticle','afterGetComments');
     ctx.options = {
       clickType: 'getComments'
     };
@@ -23,6 +24,7 @@ module.exports = function(app) {
       ctx,
       // istanbul ignore next
       function (err) {
+        dd.lap('Base.createClickAfterRemote');
       if(err) {
         console.error(err.stack);
       }
@@ -31,6 +33,7 @@ module.exports = function(app) {
   });
 
    Subarticle.observe('before save', function(ctx, next) {
+      var dd = app.DD('Subarticle','beforeSave');
       debug('before save', ctx, next);
       var inst = ctx.instance;
       /* istanbul ignore else */
@@ -38,6 +41,7 @@ module.exports = function(app) {
         /* istanbul ignore else */
          if ( inst._file ) {
            File.beforeSave(inst._file, function (err) {
+             dd.lap('File.beforeSave');
              if(err) {
                return next(err);
              } else {
@@ -58,6 +62,8 @@ module.exports = function(app) {
       }
    });
 
+  /*
+   * Unused due to deferred updates
   Subarticle.triggerRating = function(where, modify, cb) {
     debug('triggerRating', where, modify, cb);
     if(where && Object.getOwnPropertyNames(where).length > 0) {
@@ -98,8 +104,10 @@ module.exports = function(app) {
       cb(error);
     }
   };
+ */
 
   Subarticle.observe('after save', function(ctx, next) {
+    var dd = app.DD('Subarticle','afterSave');
     debug('after save', ctx, next);
     var inst = ctx.instance;
     if(!inst) {
@@ -113,6 +121,7 @@ module.exports = function(app) {
         clickableType: 'article',
         clickableId: inst.parentId
       }, function(err, res) {
+        dd.lap('Click.create');
         if(err) {
           console.error(
             'Error: Failed to create a click for subarticle creation');
@@ -121,6 +130,7 @@ module.exports = function(app) {
           Subarticle.notify(inst);
 
           Article.clearPending(inst.parentId, function(err) {
+            dd.lap('Article.clearPending');
             if(err) {
               console.log('Failed to clear pending flag on article ' + inst.parentId);
               console.error(err);
@@ -226,8 +236,10 @@ module.exports = function(app) {
   };
 
   Subarticle.observe('before delete', function(ctx, next) {
+    var dd = app.DD('Subarticle','beforeDelete');
     debug('before delete', ctx, next);
     Subarticle.find({ where: ctx.where }, function (err, res) {
+      dd.lap('Subarticle.find');
       if(err) {
         console.error(err.stack);
         next(err);
@@ -237,6 +249,7 @@ module.exports = function(app) {
 
         res.forEach(function(inst) {
           Storage.archive(inst, function(err) {
+            dd.elapsed('Storage.archive');
             if(err) {
               console.error('Failed to archive the item');
               console.error(inst);
@@ -244,6 +257,7 @@ module.exports = function(app) {
             } 
 
             inst.comments.destroyAll(function (err, res) {
+              dd.elapsed('Subarticle.comments.destroyAll');
               if(err) {
                 console.error('Failed to delete subarticles comments');
                 console.error(err.stack);
@@ -252,6 +266,20 @@ module.exports = function(app) {
               var id = ctx.where.id || ctx.where._id;
               // Rerank the parent if this element was deleted individually 
               if(JSON.stringify(id) === JSON.stringify(inst.id)) {
+                Base.deferUpdate(id, 'article', {
+                  subarticle: true
+                }, function(err) {
+                  dd.elapsed('Base.deferUpdate');
+                  if(err) {
+                    console.log(err.stack);
+                    return next(err);
+                  }
+                  deleteMedia(inst, function(err) {
+                    dd.elapsed('Subarticle.delteMedia');
+                    next(err);
+                  });
+                });
+                /*
                 inst.article(function (err, res) {
                   var data = {
                     $mul: {
@@ -278,8 +306,12 @@ module.exports = function(app) {
                     });
                   });
                 });
+                */
               } else {
-                deleteMedia(inst, next);
+                deleteMedia(inst, function(err) {
+                  dd.elapsed('Subarticle.delteMedia');
+                  next(err);
+                });
               }
             });
           });
@@ -291,6 +323,7 @@ module.exports = function(app) {
   });
 
   Subarticle.observe('after delete', function(ctx, next) {
+    var dd = app.DD('Subarticle','afterDelete');
     debug('before delete', ctx, next);
     //If one subarticle was deleted then destroy the parent article
     if(ctx.options && ctx.options.instances && ctx.options.instances.length === 1) {
@@ -299,6 +332,7 @@ module.exports = function(app) {
       Subarticle.count({
         parentId: inst.parentId
       }, function (err, count) {
+        dd.lap('Subarticle.count');
         if(err) {
           console.error('Failed to count subarticles');
           console.error(err.stack);
@@ -306,6 +340,7 @@ module.exports = function(app) {
 
         if(count === 0) {
             Article.destroyById(inst.parentId, function(err) {
+              dd.lap('Article.destroyById');
               if(err) {
                 console.error('Failed to delete subarticles article');
               }

@@ -2,6 +2,7 @@
 var cluster = require('cluster');
 var numCPUs = require('os').cpus().length;
 var loopback = require('loopback');
+var Timer = require('./timer.js');
 var http,
 datadog;
 
@@ -27,7 +28,7 @@ function objectIdWithTimestamp(timestamp) {
 // istanbul ignore next 
 var setupMonitoring = function () {
   // Monitoring only necessary when in production
-  if(process.env.NODE_ENV === 'production') {
+  if(process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'staging') {
     var dd = require('node-dogstatsd').StatsD;
     var datadogHost = 'localhost';
     for(var i in process.env) {
@@ -50,6 +51,68 @@ var setupMonitoring = function () {
     console.log('Connecting statsd to ' + datadogHost);
     app.dd = new dd(datadogHost, 8125);
 
+    /*
+     *TODO Get this working
+    app.dd.socket.on('error', function (e) {
+      console.warn('Socket error with Datadog');
+      console.error(e);
+      return;
+    });
+   */
+
+    app.DD = function(modelName, functionName) {
+      if(!modelName || !functionName) {
+        console.warn('modelName and functionName are required to monitor stats!');
+        return;
+      }
+
+      //The calling function becomes a tag on the reported function
+      var tags = ['model:' + modelName, 'function:' + modelName + '.' + functionName];
+
+      var start = Date.now();
+      var time = start;
+
+      var name = function (given) {
+        given = given || modelName + '_' + functionName;
+        return 'app.' + given.replace('.','_');
+      };
+
+      var dd = {};
+      dd.increment = function(key, val) {
+        val = val || 1;
+        app.dd.increment(name(key), val, tags);
+      };
+
+      dd.decrement = function(key, val) {
+        val = val || 1;
+        app.dd.decrement(name(key), val, tags);
+      };
+
+      dd.timing = function(key, val) {
+        app.dd.timing(name(key), val, tags);
+      };
+
+      dd.histogram = function(key, val) {
+        app.dd.histogram(name(key), val, tags);
+      };
+
+      dd.lap = function (key) {
+        var temp = Date.now();
+        var lap = temp - time;
+        time = temp;
+        dd.timing(key, lap);
+        return lap;
+      };
+
+      dd.elapsed =  function (key) {
+        var total = Date.now() - start;
+        dd.timing(key, total);
+        return total;
+      };
+
+      return dd;
+    };
+
     datadog = require('connect-datadog')({ 
       dogstatsd: app.dd,
       response_code: true,
@@ -60,16 +123,23 @@ var setupMonitoring = function () {
     });
   } else {
     app.dd = {
+      lap: function () {},
+      elapsed: function () {},
       histogram: function () {},
       timing: function () {},
       increment: function () {},
       decrement: function () {}
+    };
+
+    app.DD = function () {
+      return app.dd;
     };
   }
 };
 
 var app = loopback();
 setupMonitoring();
+app.Timer = Timer.bind(this, app);
 
 app.utils = {
   objectIdWithTimestamp: objectIdWithTimestamp
@@ -154,6 +224,78 @@ if(cluster.isMaster && numCPUs > 1 && process.env.NODE_ENV === 'production') {
   var fs = require('fs');
   var debounce = require('debounce');
   var cred = require('./conf/credentials');
+  var Redis = require('ioredis');
+  var kue = require('kue');
+
+  var setupRedis = function () {
+    var options = {
+      reconnectOnError: function (err) {
+        console.warn('Redis error!');
+        console.warn(err); 
+        var targetError = 'READONLY';
+        if (err.message.slice(0, targetError.length) === targetError) {
+          console.log('Reconnecting Redis!');
+          // Only reconnect when the error starts with "READONLY"
+          return true; // or `return 1;`
+        }
+      }
+    };
+
+    if(process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'staging') {
+      var redis = cred.get('redis');
+      options.port = redis.port;
+      options.host = redis.host;
+      options.password = redis.password;
+    }
+
+    app.redisClient = new Redis(options);
+
+    app.jobs = kue.createQueue({
+      redis: {
+        createClientFactory: function () {
+          return new Redis(options);
+        }
+      }
+    });
+
+    //TODO Secure this so we can expose it for debugging production
+    kue.app.listen(5001);
+
+    //Process the updateBase queue
+    app.jobs.process('deferredUpdate', function (job, done) {
+      var dd = app.DD('Jobs', 'processDeferredUpdate');
+      app.models.Base.processUpdate(job.data.key, function (err) {
+        if(err) {
+          console.error('Failed to process the job!');
+          console.error(err);
+          return done(err);
+        }
+
+        dd.lap('Base.processUpdate');
+        done();
+      });
+    });
+
+    //Catch queue errors
+    app.jobs.on('error', function(err) {
+      console.error('Jobs queue error!');
+      console.error(err);
+    });
+
+    //Gracefully shutdown the queue
+    process.once('SIGTERM', function (sig) {
+      app.jobs.shutdown( 5000, function (err) {
+        if(err) {
+          console.error('Failed to shutdown the jobs queue!');
+          console.error(err);
+          process.exit(-1);
+        } else {
+          console.log('Shutdown the jobs queue!');
+          process.exit(0);
+        }
+      });
+    });
+  };
 
   var setupBrute = function () {
     var store = new MongoStore(function (ready) {
@@ -261,15 +403,18 @@ if(cluster.isMaster && numCPUs > 1 && process.env.NODE_ENV === 'production') {
 
     var dataSource;
 
-    for(var name in app.dataSources) {
-      dataSource = app.dataSources[name];
-      dataSource.on('connected', onConnected.bind(onConnected, dataSource)); 
+    if(process.env.AUTOUPDATE_DB) {
+      for(var name in app.dataSources) {
+        dataSource = app.dataSources[name];
+        dataSource.on('connected', onConnected.bind(onConnected, dataSource)); 
+      }
     }
   };
 
   var setupMiddleware = function () {
     // Setup 
   //  setupMonitoring();
+    setupRedis();
     setupBrute();
     setupLogging();
 
@@ -330,6 +475,9 @@ if(cluster.isMaster && numCPUs > 1 && process.env.NODE_ENV === 'production') {
   } else {
     app.use(loopback.static(path.resolve(__dirname, '../client/www/')));
   }
+
+  // Create a healthcheck API
+  app.use('/healthcheck', require('express-healthcheck')());
 
   // Bootstrap the application, config ure models, datasources and middleware.
   // Sub-apps like REST API are mounted via boot scripts.

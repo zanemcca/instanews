@@ -1,8 +1,9 @@
 <!DOCTYPE html>
 <div ng-if="media.type && media.type.indexOf('image') > -1"
   class="no-padding image-container"
+  ng-style="containerStyle()"
   ng-controller="imageCtrl">
-  <img height="auto" width="auto" ng-src="{{source}}">
+  <img ng-style="imgStyle()" ng-src="{{source}}">
 </div>
 
 <div ng-if="media.type && media.type.indexOf('video') > -1" 

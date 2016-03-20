@@ -1,4 +1,7 @@
 
+var ONE_DAY = 24*60*60*1000; // 1 Day in millisecs
+var ONE_WEEK = 7*ONE_DAY; // 1 Week in millisecs
+var ONE_MONTH = 30*ONE_DAY; // 1 Month in millisecs
 
 var PRELOAD_LIMIT = 1; //WARNING: Changing this could break the ranking algorithm
 
@@ -17,12 +20,14 @@ module.exports = function(app) {
   var debug = app.debug('hooks:article');
 
   Article.afterRemote('prototype.__get__comments', function(ctx, instance, next){
+    var dd = app.DD('Article','afterGetComments');
     ctx.options = {
       clickType: 'getComments'
     };
     debug('afterRemote prototype.__get__comments', ctx, instance, next);
 
     Base.createClickAfterRemote(ctx, function (err) {
+      dd.lap('Base.createClickAfterRemote');
       /* istanbul ignore next */
       if(err) {
         console.error(err.stack);
@@ -33,6 +38,7 @@ module.exports = function(app) {
   });
 
   Article.afterRemote('prototype.__get__subarticles', function(ctx, inst, next){
+    var dd = app.DD('Article','afterGetSubarticles');
     ctx.options = {
       clickType: 'getSubarticles'
     };
@@ -48,6 +54,7 @@ module.exports = function(app) {
     }
 
     Base.createClickAfterRemote(ctx, function (err) {
+      dd.lap('Base.createClickAfterRemote');
       /* istanbul ignore next */
       if(err) {
         console.error(err.stack);
@@ -72,6 +79,7 @@ module.exports = function(app) {
   });
 
   Article.observe('after save', function(ctx, next) {
+    var dd = app.DD('Article','afterSave');
     debug('observe after save', ctx);
     var inst = ctx.instance;
     if(!inst) {
@@ -84,6 +92,7 @@ module.exports = function(app) {
         viewableType: 'article',
         viewableId: inst.id
       }, function(err, res) {
+        dd.lap('View.create');
         /* istanbul ignore else */
         if(err) {
           console.error(
@@ -101,14 +110,17 @@ module.exports = function(app) {
   });
 
   Article.observe('before delete', function(ctx, next) {
+    var dd = app.DD('Article','beforeDelete');
     debug('before delete', ctx, next);
     Article.find({ where: ctx.where }, function (err, res) {
+      dd.lap('Article.find');
       if(err) {
         console.error(err.stack);
         next(err);
       } else if(res.length > 0) {
         res.forEach(function(inst) {
           Storage.archive(inst, function(err) {
+            dd.elapsed('Storage.archive');
             var error;
             if(err) {
               console.error(err.stack);
@@ -116,12 +128,14 @@ module.exports = function(app) {
             } 
 
             inst.comments.destroyAll(function (err, res) {
+              dd.elapsed('Article.comments.destroyAll');
               if(err) {
                 console.error(err.stack);
                 error = error || err;
               }
 
               inst.subarticles.destroyAll(function (err, res) {
+                dd.elapsed('Article.subarticles.destroyAll');
                 if(err) {
                   console.error(err.stack);
                   error = error || err;
@@ -137,9 +151,26 @@ module.exports = function(app) {
     });
   });
 
+  Article.beforeRemote('find', function(ctx, unused, next){
+    debug('beforeRemote.find', ctx, next);
+
+    var filter = {};
+    if(ctx.args.filter) { 
+      filter = JSON.parse(ctx.args.filter);
+    }
+
+    filter.where = filter.where || {};
+    filter.where.id = filter.where.id || { gt: app.utils.objectIdWithTimestamp(Date.now() - 2 * ONE_WEEK) };
+    ctx.args.filter = JSON.stringify(filter);
+
+    next();
+  });
+
   /*
   Article.observe('access', function(ctx, next) {
     debug('observe access', ctx);
+
+    /*
     if(ctx.options.rate) {
       var context = loopback.getCurrentContext();
       if(context) {
@@ -166,13 +197,17 @@ module.exports = function(app) {
     }
     next();
   });
- */
+   */
 
+  /*
+   * Unused due to deferred updates
   Article.triggerRating = function(where, modify, cb) {
+    var timer = app.Timer('Article.triggerRating');
     debug('triggerRating', where, modify);
     if(where && where.id) {
       //Update the article
       Stat.updateRating(where, Article.modelName, modify, function(err, res) {
+        timer.elapsed();
         if(err) {
           console.warn('Warning: Failed to update an article');
           return cb(err);
@@ -187,4 +222,5 @@ module.exports = function(app) {
       cb(error);
     }
   };
+  */
 };
