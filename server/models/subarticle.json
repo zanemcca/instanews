@@ -4,7 +4,12 @@
   "strict": false,
   "indexes": {
     "parent_index": {
-      "parentId": 1
+      "keys": {
+        "parentId": 1
+      },
+      "options": {
+        "background": true
+      }
     }
   },
   "properties": {

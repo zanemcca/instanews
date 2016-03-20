@@ -4,6 +4,7 @@ var LIMIT = 10;
 module.exports = function(app) {
 
   var loopback = require('loopback');
+  var async = require('async');
   var uuid = require('node-uuid');
 
   var Journalist = app.models.journalist;
@@ -39,7 +40,8 @@ module.exports = function(app) {
   });
 
   Journalist.afterRemoteError('login', function(ctx, next) {
-    app.dd.increment('journalist.login.error');
+    var dd = app.DD('Journalist', 'afterLoginError');
+    dd.increment('Journalist.error');
     debug('afterRemoteError login', ctx, next);
     app.brute.prevent(ctx.req, ctx.res, function() {
       next();
@@ -47,7 +49,8 @@ module.exports = function(app) {
   });
 
   Journalist.afterRemoteError('confirm', function (ctx,next) {
-    app.dd.increment('journalist.confirm.error');
+    var dd = app.DD('Journalist', 'afterConfirmError');
+    dd.increment('Journalist.error');
     debug('afterRemoteError confirm', ctx);
     app.brute.prevent(ctx.req, ctx.res, function() {
       next();
@@ -55,6 +58,7 @@ module.exports = function(app) {
   });
 
   Journalist.beforeRemote('create', function(ctx, instance, done) {
+    var dd = app.DD('Journalist','beforeCreate');
     debug('beforeRemote create', ctx, instance, done);
     // var excTime = Date.now();
     var next = function (err) {
@@ -140,6 +144,7 @@ module.exports = function(app) {
             username: user.username
           }]
         }, function(err, count) {
+          dd.lap('Journalist.count');
           if( err) {
             next(err);
           }
@@ -162,8 +167,12 @@ module.exports = function(app) {
   });
 
   Journalist.afterRemote('create', function(ctx, user, next) {
+    var dd = app.DD('Journalist','afterCreate');
     debug('after create', user, next);
-    Journalist.sendConfirmation(user, next);
+    Journalist.sendConfirmation(user, function(err) {
+      dd.lap('Journalist.sendConfirmation');
+      next(err);
+    });
   });
 
   Journalist.observe('access', function(ctx, next) {
@@ -177,8 +186,31 @@ module.exports = function(app) {
   });
 
   var checkLoadedUser = function (instance, next) {
+    var dd = app.DD('Journalist','checkLoadedUser');
     var userId;
     var includeSecrets = false;
+
+    var done = function () {
+      if(!includeSecrets) {
+        instance.unsetAttribute('email');
+        instance.unsetAttribute('uniqueId');
+      } else {
+        //TODO This Read-Modify-Write operation is not Atomic
+        // Adds a uniqueId to the user if they are missing it
+        if(!instance.uniqueId) {
+          instance.setAttribute('uniqueId', uuid.v4());
+          return instance.save(function (err) {
+            dd.lap('Journalist.save');
+            if( err) {
+              console.error('Failed to create a uniqueId!');
+              console.error(err.stack);
+            }
+            next(err);
+          });
+        }
+      }
+      next();
+    };
 
     var check = function () {
        if(userId === instance.username) {
@@ -196,11 +228,13 @@ module.exports = function(app) {
         principalType: RoleMapping.USER,
         principalId: userId 
       }, function(err, exists) {
+        dd.lap('Role.isInRole');
         if(exists) {
           Role.isInRole('admin', {
             principalType: RoleMapping.USER,
             principalId: instance.username
           }, function(err, exists) {
+            dd.lap('Role.isInRole');
             if(exists) {
               instance.isAdmin = true;
             }
@@ -210,27 +244,6 @@ module.exports = function(app) {
           done();
         }
       });
-    };
-
-    var done = function () {
-      if(!includeSecrets) {
-        instance.unsetAttribute('email');
-        instance.unsetAttribute('uniqueId');
-      } else {
-        //TODO This Read-Modify-Write operation is not Atomic
-        // Adds a uniqueId to the user if they are missing it
-        if(!instance.uniqueId) {
-          instance.setAttribute('uniqueId', uuid.v4());
-          return instance.save(function (err) {
-            if( err) {
-              console.error('Failed to create a uniqueId!');
-              console.error(err.stack);
-            }
-            next(err);
-          });
-        }
-      }
-      next();
     };
 
     var context = loopback.getCurrentContext();
@@ -254,23 +267,31 @@ module.exports = function(app) {
   };
 
   Journalist.afterRemote('findById', function(ctx, instance, next) {
+    var dd = app.DD('Journalist','afterFindById');
     debug('afterRemote findById', instance, next);
     console.log('Checking!');
 
     if(instance) {
       instance.findById = true;
-      checkLoadedUser(instance, next);
+      checkLoadedUser(instance, function(err) {
+        dd.lap('Journalist.checkLoadedUser');
+        next(err);
+      });
     } else {
       next();
     }
   });
 
   Journalist.afterRemote('findOne', function(ctx, instance, next) {
+    var dd = app.DD('Journalist','afterFindOne');
     debug('afterRemote findOne', instance, next);
     console.log('Checking! findOne');
 
     if(instance) {
-      checkLoadedUser(instance, next);
+      checkLoadedUser(instance, function(err) {
+        dd.lap('Journalist.checkLoadedUser');
+        next(err);
+      });
     } else {
       next();
     }
@@ -278,13 +299,19 @@ module.exports = function(app) {
 
   //TODO Test this and use it if we ever open up Journalist.find
   Journalist.afterRemote('find', function(ctx, instances, next) {
-    debug('afterRemote find', instance, next);
+    var dd = app.DD('Journalist','afterFind');
+    debug('afterRemote find', instances, next);
     console.log('Checking! find');
 
     if(instances.length) {
       var funcs = [];
       instances.forEach( function (instance) {
-        funcs.push(checkLoadedUser.bind(this, instance));
+        funcs.push(function(cb) {
+          checkLoadedUser(instance, function(err) {
+            dd.elapsed('Journalist.checkLoadedUser');
+            cb(err);
+          });
+        });
       });
       async.parallel(funcs, function(err) {
         next(err);

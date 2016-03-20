@@ -20,6 +20,7 @@ module.exports = function(app) {
   var debug = app.debug('hooks:base');
 
   Base.createClickAfterRemote = function(ctx, next){
+    var dd = app.DD('Base', 'createClickAfterRemote');
     debug('createClickAfterRemote', ctx);
     if(ctx &&
        ctx.req &&
@@ -38,6 +39,7 @@ module.exports = function(app) {
               clickableId: ctx.req.remotingContext.instance.id
             };
             Click.create(click, function(err, res) {
+              dd.lap('Click.create');
               if(err) {
                 console.error(err.stack);
               }
@@ -67,9 +69,11 @@ module.exports = function(app) {
       ctx.query.limit = LIMIT;
     }
 
+    /*
     ctx.query.where = ctx.query.where || {};
     //Limit the requests to be within the last two weeks
     ctx.query.where.id = ctx.query.where.id || { gt: app.utils.objectIdWithTimestamp(Date.now() - 2 * ONE_WEEK) };
+    */
 
     /*
     if(ctx.query.include) {
@@ -121,6 +125,7 @@ module.exports = function(app) {
   });
 
   Base.observe('before save', function(ctx, next) {
+    var dd = app.DD('Base', 'beforeSave');
     debug('observe.before save', ctx);
     var inst = ctx.instance;
     if (!inst) {
@@ -179,6 +184,7 @@ module.exports = function(app) {
         }
 
         var rating = Stat.getRating(inst);
+        dd.lap('Stat.getRating');
         inst.rating = rating;
       }
       else {
@@ -207,10 +213,7 @@ module.exports = function(app) {
           ctx.data.$inc.version = 1;
         }
 
-        var set = ctx.data.$set;
-        if(!set) {
-          set = {};
-        }
+        var set = ctx.data.$set || {};
 
         var names = Object.getOwnPropertyNames(ctx.data);
         for(var i in names) {
@@ -239,6 +242,8 @@ module.exports = function(app) {
   });
 
   /* istanbul ignore next */
+  /* 
+   * Unused in current implementation
   Base.updateStats = function(id, modelName, data, next) {
     debug('updateStats', id, modelName, data, next);
     if(app.models[modelName]) {
@@ -288,6 +293,7 @@ module.exports = function(app) {
       return next(err);
     }
   };
+  */
 
   /*
      Base.observe('loaded', function(ctx, next) {

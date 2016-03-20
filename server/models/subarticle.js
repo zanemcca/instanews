@@ -12,6 +12,7 @@ module.exports = function(Subarticle) {
   Subarticle.notify = common.notify.bind(this, Subarticle);
 
   Subarticle.clearPending = function(message, next) {
+    var dd = Subarticle.app.DD('Subarticle','clearPending');
     var Article = Subarticle.app.models.Article;
     var Storage = Subarticle.app.models.Storage;
 
@@ -20,6 +21,7 @@ module.exports = function(Subarticle) {
         pending: message.jobId
       }
     }, function (err, res) {
+      dd.lap('Subarticle.findOne');
       if(err) {
         console.log('Failed to find the subarticle');
         return next(err);
@@ -44,12 +46,14 @@ module.exports = function(Subarticle) {
         Subarticle.notify(res);
 
         res.updateAttributes(query, function (err, result) {
+          dd.lap('Subarticle.updateAttributes');
           if(err) {
             console.error('Failed to update attributes!');
             return next(err);
           }
 
           Article.clearPending(parentId, function (err) { 
+            dd.lap('Article.clearPending');
             if(err) {
               console.error('Failed to clear article pending flag!');
               return next(err);
@@ -58,7 +62,10 @@ module.exports = function(Subarticle) {
             if(res._file.type.indexOf('video') > -1) {
               var srcs = res._file.sources.slice();
               srcs.push(res._file.poster);
-              Storage.updateCacheControl('instanews-videos', srcs, next);
+              Storage.updateCacheControl('instanews-videos', srcs, function(err) {
+                dd.lap('Storage.updateCacheControl');
+                next(err);
+              });
             } else {
               next();
             }
