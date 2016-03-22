@@ -149,7 +149,7 @@ module.exports = function(grunt) {
     shell: {
       debug: {
         command: function (file) { 
-          return 'node-debug --hidden node_modules/ ' + file;
+          return 'node-debug -p 8081 --hidden node_modules/ ' + file;
         }
       },
       debugTest: {
