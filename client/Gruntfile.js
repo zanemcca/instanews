@@ -125,6 +125,7 @@ module.exports = function (grunt) {
           ENV: {
             name: 'staging',
             apiEndpoint: 'https://turtle.instanews.com/api',
+            storageEndpoint: 'https://turtle.instanews.com/api',
             videoEndpoint: 'https://turtlevideos.instanews.com',
             photoEndpoint: 'https://turtlephotos.instanews.com'
           }
@@ -135,6 +136,7 @@ module.exports = function (grunt) {
           ENV: {
             name: 'production',
             apiEndpoint: 'https://api.instanews.com/api',
+            storageEndpoint: 'https://storage.instanews.com/api',
             videoEndpoint: 'https://videos.instanews.com',
             photoEndpoint: 'https://photos.instanews.com'
           }
