@@ -143,7 +143,7 @@ app.service('Uploads', [
             item.resolved = true;
             if(item.subarticle._file) {
               var getServer = function() {
-                var urlBase = ENV.apiEndpoint;
+                var urlBase = ENV.storageEndpoint;
                 return urlBase + '/storages/' + item.container + '/upload/';
               };
 
