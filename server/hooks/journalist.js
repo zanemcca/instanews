@@ -57,6 +57,28 @@ module.exports = function(app) {
     });
   });
 
+
+  //Override the old User.confirm function to accept both username and email
+  var oldConfirm = Journalist.confirm;
+  Journalist.confirm = function(uid, token, redirect, fn) {
+    if(uid.indexOf('@') > -1) {
+      Journalist.findOne({ where: { email: uid }}, function(err, res) {
+        if(err) {
+          return fn(err);
+        }
+        if(res) {
+          oldConfirm.call(Journalist, res.username, token, redirect, fn);
+        } else {
+          err = new Error('Failed to find a journalist: ' + uid);
+          err.status = 404;
+          fn(err);
+        }
+      });
+    } else {
+      oldConfirm.call(Journalist, uid, token, redirect, fn);
+    }
+  };
+
   Journalist.beforeRemote('create', function(ctx, instance, done) {
     var dd = app.DD('Journalist','beforeCreate');
     debug('beforeRemote create', ctx, instance, done);

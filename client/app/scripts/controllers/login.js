@@ -282,7 +282,11 @@ app.controller('LoginCtrl', [
       $scope.resendConfirmation = function () {
         var usr = {};
         if($scope.cred.username) {
-          usr.username = $scope.cred.username;
+          if($scope.cred.username.indexOf('@') > -1) {
+            usr.email = $scope.cred.username;
+          } else {
+            usr.username = $scope.cred.username;
+          }
         } else if($scope.cred.email) {
           usr.email = $scope.cred.email;
         } else {
