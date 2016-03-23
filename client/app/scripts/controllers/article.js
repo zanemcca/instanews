@@ -176,17 +176,6 @@ app.controller('ArticleCtrl', [
         }
         $scope.$broadcast('scroll.refreshComplete');
       });
-
-      spec.options.filter.limit = Math.max(Subs.get(), 100);
-      spec.options.filter.skip = 0;
-      Subs.load(function (err) {
-        if(err) {
-          console.log(err);
-        } else {
-          $scope.Subarticles.sync();
-          $scope.$broadcast('scroll.refreshComplete');
-        }
-      });
     };
 
     $ionicModal.fromTemplateUrl('templates/modals/upload.html', {
