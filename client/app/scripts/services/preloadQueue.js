@@ -19,6 +19,8 @@ function PreloadQueueFactory($q) {
       if(queue.length > 1) {
         console.log('Flush initiated...');
         flushing = true;
+      } else {
+        console.log('Not flushing because length = ' + queue.length);
       }
     };
 
