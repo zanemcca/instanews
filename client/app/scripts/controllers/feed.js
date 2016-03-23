@@ -31,6 +31,19 @@ app.controller('FeedCtrl', [
   ) {
     $scope.Articles = Articles.getLoader({
       preload: true,
+      filter: function(articles) {
+        //Ensure articles are w ithin view before adding to the list
+        //This takes care of any race conditions between the preloading queue and bounds updating
+        var arts = [];
+        for(var i in articles) {
+          var position = Position.posToLatLng(articles[i].location);
+          if(Position.withinBounds(position)) {
+            arts.push(articles[i]);
+          }
+        }
+
+        return arts;
+      },
       keepSync: true
     });
 
@@ -70,7 +83,6 @@ app.controller('FeedCtrl', [
       list: $scope.Articles
     });
 
-    Position.registerBoundsObserver(Preload.reset);
     //$scope.plot = Preload.plot;
 
     $scope.badge = Notifications.getBadge();
@@ -113,8 +125,16 @@ app.controller('FeedCtrl', [
       Navigate.go('app.articlePost');
     };
 
+    //Register an observer on the bounds that will restart the predictor
+    Position.registerBoundsObserver(function () {
+      if(Articles.inView) {
+        Preload.reset();
+      }
+    });
+
     //Refresh the map everytime we enter the view
     $scope.$on('$ionicView.afterEnter', function() {
+      Articles.inView = true;
       Preload.reset();
       var map = Maps.getFeedMap();
       /* istanbul ignore else */
@@ -129,6 +149,7 @@ app.controller('FeedCtrl', [
     });
 
     $scope.$on('$ionicView.beforeLeave', function() {
+      Articles.inView = false;
       Preload.stop();
     });
   }

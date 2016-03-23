@@ -288,6 +288,10 @@ function ListFactory (Platform, PreloadQueue, User) {
       lSpec = lSpec || {};
       lSpec.preload = lSpec.preload || false;
       lSpec.keepSync = lSpec.keepSync || false;
+      lSpec.filter = lSpec.filter || function(items) {
+        return items;
+      };
+
       lSpec.items = [];
 
       var more = function (rate, cb) {
@@ -338,14 +342,18 @@ function ListFactory (Platform, PreloadQueue, User) {
           /*
           console.log('QueueAvg: ' + Math.round(PreloadQueue.stats.queueDelay) +
                       '\tLoadAvg: ' + Math.round(PreloadQueue.stats.loadDelay) +
-                      '\tQueueLength: ' + PreloadQueue.stats.getLength());
-                     */
-                     
-          add(lSpec.items, item, function(err) {
-            if(err) {
-              console.log('Failed to add preloaded item');
-            }
-          });
+                      '\tQueueLength: ' + PreloadQueue.stats.getLength());*/
+
+          var items = lSpec.filter([item]);
+          if(items.length) {
+            add(lSpec.items, items, function(err) {
+              if(err) {
+                console.log('Failed to add preloaded item');
+              }
+            });
+          } else {
+            console.log('Item ' + item.id + ' was filtered after preloading');
+          }
         };
 
         var error = function (err) {
@@ -380,7 +388,17 @@ function ListFactory (Platform, PreloadQueue, User) {
             preloadItems(newItems);
             cb(null, lSpec.items);
           } else {
-            add(lSpec.items, newItems, cb);
+            var items = lSpec.filter(newItems);
+            if(items.length) {
+              if(items.length < newItems.length) {
+                var filtered = newItems.length - items.length;
+                console.log(filtered + ' items were filtered during adding');
+              }
+              add(lSpec.items, items, cb);
+            } else {
+              console.log(newItems.length + 'items were filtered during adding');
+              cb(null, lSpec.items);
+            }
           }
         }, 
         reload: function(cb) {
@@ -396,6 +414,7 @@ function ListFactory (Platform, PreloadQueue, User) {
         },
         sync: function() {
           var items = getSegment(Math.max(10, lSpec.items.length));
+          console.log('Synchronized: ' + items.length);
           lSpec.items = [];
 
           if(lSpec.preload) {

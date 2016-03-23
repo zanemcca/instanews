@@ -64,6 +64,11 @@ function PreloadFactory(Navigate, Platform, PreloadQueue) {
 
       if(!continuous) {
         var pos = scroll.getPosition();
+        if(!pos.top) {
+          pos = {
+            top: 0
+          };
+        }
         //positions = [pos,pos,pos];
         positions = [pos,pos];
       }
