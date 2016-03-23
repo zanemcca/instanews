@@ -115,6 +115,7 @@ module.exports = function (grunt) {
           ENV: {
             name: 'development',
             apiEndpoint: url,
+            storageEndpoint: url,
             videoEndpoint: url + '/storages/instanews-videos/download',
             photoEndpoint: url + '/storages/instanews-photos/download'
           }
