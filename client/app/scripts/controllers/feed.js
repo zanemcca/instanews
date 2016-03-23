@@ -83,7 +83,6 @@ app.controller('FeedCtrl', [
       list: $scope.Articles
     });
 
-    Position.registerBoundsObserver(Preload.reset);
     //$scope.plot = Preload.plot;
 
     $scope.badge = Notifications.getBadge();
@@ -126,8 +125,16 @@ app.controller('FeedCtrl', [
       Navigate.go('app.articlePost');
     };
 
+    //Register an observer on the bounds that will restart the predictor
+    Position.registerBoundsObserver(function () {
+      if(Articles.inView) {
+        Preload.reset();
+      }
+    });
+
     //Refresh the map everytime we enter the view
     $scope.$on('$ionicView.afterEnter', function() {
+      Articles.inView = true;
       Preload.reset();
       var map = Maps.getFeedMap();
       /* istanbul ignore else */
@@ -142,6 +149,7 @@ app.controller('FeedCtrl', [
     });
 
     $scope.$on('$ionicView.beforeLeave', function() {
+      Articles.inView = false;
       Preload.stop();
     });
   }

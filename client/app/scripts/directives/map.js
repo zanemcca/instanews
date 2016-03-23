@@ -86,8 +86,10 @@ app.directive('inmap', [
 
                 //Listener on bounds changing on the map
                 google.maps.event.addListener(map, 'bounds_changed', _.debounce(function() {
-                  console.log('Updating bounds');
-                  Position.setBounds(map.getBounds());
+                  if(Articles.inView) {
+                    console.log('Updating bounds');
+                    Position.setBounds(map.getBounds());
+                  }
                 }, 100));
 
                 //TODO Use this to create teh localization button on the map
