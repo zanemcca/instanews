@@ -225,44 +225,48 @@ app.service('Articles', [
 
     //Update the filter bounds 
     var updateBounds = function() {
-      var bounds = Position.getBounds();
+      if(articles.inView) {
+        var bounds = Position.getBounds();
 
-      // istanbul ignore else
-      if(bounds) {
-        var sw = bounds.getSouthWest();
-        var ne = bounds.getNorthEast();
-        spec.options.filter.where.location = {
-          geoWithin: {
-            $box: [
-              [sw.lat(), sw.lng()],
-              [ne.lat(), ne.lng()]
-            ]
-          }
-        };
-      }
-      else {
-        console.log('Bounds not set yet!');
-      }
-
-      spec.options.filter.skip = 0;
-      spec.options.filter.limit = 100;
-
-      console.log('UpateBounds');
-
-      Platform.loading.show();
-
-      updateRating = true;
-      articles.load(function (err) {
-        updateRating = false;
-        Platform.loading.hide();
-
-        if(err) {
-          return console.log(err);
+        // istanbul ignore else
+        if(bounds) {
+          var sw = bounds.getSouthWest();
+          var ne = bounds.getNorthEast();
+          spec.options.filter.where.location = {
+            geoWithin: {
+              $box: [
+                [sw.lat(), sw.lng()],
+                [ne.lat(), ne.lng()]
+              ]
+            }
+          };
         }
-        //TODO Lets rethink this potentially unnecessary reorganize
-        reorganize();
-      });
+        else {
+          console.log('Bounds not set yet!');
+        }
+
+        spec.options.filter.skip = 0;
+        spec.options.filter.limit = 100;
+
+        console.log('UpateBounds');
+
+        Platform.loading.show();
+
+        updateRating = true;
+        articles.load(function (err) {
+          updateRating = false;
+          Platform.loading.hide();
+
+          if(err) {
+            return console.log(err);
+          }
+          //TODO Lets rethink this potentially unnecessary reorganize
+          reorganize();
+        });
+      }
     };
+
+    articles.inView = false;
 
     Position.registerBoundsObserver(updateBounds);
 

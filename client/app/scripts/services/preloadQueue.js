@@ -13,20 +13,28 @@ function PreloadQueueFactory($q) {
       totalProcessed: 0 
     };
 
-    var flushing = false;
+    var flushing = 0;
 
     var flush = function () {
-      if(queue.length > 1) {
+      flushing = queue.length;
+      if(flushing) {
         console.log('Flush initiated...');
-        flushing = true;
       }
+
+      queue = [];
     };
 
     var resolve = function(entry) {
       if(flushing) {
+        if(flushing < 0) {
+          console.log('Error: ' + (-flushing) + ' excess items flushed');
+          flushing = 0;
+        } else {
+          flushing--;
+        }
+
         entry.reject('flush');
-        if(queue.length === 0) {
-          flushing = false;
+        if(flushing === 0) {
           console.log('...Flush resolved');
         }
       } else {
@@ -58,22 +66,32 @@ function PreloadQueueFactory($q) {
             entry.loadDelay = Date.now() - resolving;
             stats.loadDelay = entry.loadDelay*0.3 + stats.loadDelay*0.7;
 
+            if(flushing) {
+              flushing--;
+              deferred.reject('flush');
+              if(flushing === 0) {
+                console.log('...Flush resolved');
+              }
+            } else {
+              var res = queue.shift();
+              if(item.id && res.item.id !== item.id) {
+                console.log(item);
+                console.log(res);
+                console.log('Error: Queue did not remove the correct item!');
+              } 
+
+              deferred.resolve(item);
+            }
+          });
+        },
+        reject: function(err) {
+          if(!flushing) {
             var res = queue.shift();
-            if(item.id && res.item.id !== item.id) {
+            if(!res || (item.id && res.item.id !== item.id)) {
               console.log(item);
               console.log(res);
               console.log('Error: Queue did not remove the correct item!');
             } 
-
-            deferred.resolve(item);
-          });
-        },
-        reject: function(err) {
-          var res = queue.shift();
-          if(item.id && res.item.id !== item.id) {
-            console.log(item);
-            console.log(res);
-            console.log('Error: Queue did not remove the correct item!');
           }
           deferred.reject(err);
         },
