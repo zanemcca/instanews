@@ -119,18 +119,25 @@ app.service('Articles', [
               });
             }
           }
-        };
+        };  
 
         if(!article.Subarticles) {
           article.Subarticles = Subarticles.findOrCreate(article.id);
 
-          //TODO This should be removed on destroy event
+          //TODO Remove after all articles have topSubarticles 
+          //Or maybe not. This provides a hot reload of the top subarticle
+          //after they are loaded while article.topSubarticle is only used to
+          //initialize the item. Also it might not be that annoying to not see the 
+          //topSubarticle at the top of the list. But it would be refreshed after a 
+          //30 sec delay so presumably the topSubarticle would be number 2 or 3 at most
           article.Subarticles.registerObserver(update);
         }
 
-        var top = article.Subarticles.getTop();
+        //var top = article.Subarticles.getTop();
+        var top = article.topSubarticle;
 
         if(top) {
+          article.Subarticles.add(top);
           article.Subarticles.preLoad(top, function (err, sub) {
             if(err) {
               article.preloaded = false;
@@ -141,6 +148,8 @@ app.service('Articles', [
             cb(null, article);
           });
         } else {
+          //TODO Remove after all articles have topSubarticles 
+          console.log('Deprecated! This code should not be called anymore as embedded topSubarticles replace this');
           var spec = article.Subarticles.getSpec();
           spec.options.filter.skip = 0;
           spec.options.filter.limit = 1;
