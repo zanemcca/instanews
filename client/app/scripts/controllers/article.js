@@ -94,9 +94,7 @@ app.controller('ArticleCtrl', [
       afterLoaded();
     });
 
-    $scope.map = {
-      id: 'articleMap'
-    };
+    $scope.map = {};
 
     var marker;
     var uploadObserver;
@@ -109,6 +107,7 @@ app.controller('ArticleCtrl', [
 
     //Refresh the map everytime we enter the view
     $scope.$on('$ionicView.afterEnter', function() {
+      $scope.map.id = 'articleMap';
       Preload.start();
       afterLoaded();
       var map = Maps.getArticleMap($stateParams.id);
@@ -175,17 +174,6 @@ app.controller('ArticleCtrl', [
           console.log(err);
         }
         $scope.$broadcast('scroll.refreshComplete');
-      });
-
-      spec.options.filter.limit = Math.max(Subs.get(), 100);
-      spec.options.filter.skip = 0;
-      Subs.load(function (err) {
-        if(err) {
-          console.log(err);
-        } else {
-          $scope.Subarticles.sync();
-          $scope.$broadcast('scroll.refreshComplete');
-        }
       });
     };
 
