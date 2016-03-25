@@ -75,7 +75,6 @@ app.factory('Post', [
       };
 
       uploads.slice().forEach(function (upload) {
-        var failed = false;
         upload.isPosting = true;
         upload.complete.promise.then( function () {
           var sub = upload.subarticle;
