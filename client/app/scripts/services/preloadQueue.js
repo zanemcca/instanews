@@ -86,6 +86,7 @@ function PreloadQueueFactory($q) {
         },
         reject: function(err) {
           if(!flushing) {
+            //TODO There is an off-by-one error with flushing that causes this to be run on the final instance
             var res = queue.shift();
             if(!res || (item.id && res.item.id !== item.id)) {
               console.log(item);
