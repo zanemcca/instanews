@@ -94,9 +94,7 @@ app.controller('ArticleCtrl', [
       afterLoaded();
     });
 
-    $scope.map = {
-      id: 'articleMap'
-    };
+    $scope.map = {};
 
     var marker;
     var uploadObserver;
@@ -109,6 +107,7 @@ app.controller('ArticleCtrl', [
 
     //Refresh the map everytime we enter the view
     $scope.$on('$ionicView.afterEnter', function() {
+      $scope.map.id = 'articleMap';
       Preload.start();
       afterLoaded();
       var map = Maps.getArticleMap($stateParams.id);
