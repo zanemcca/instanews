@@ -122,7 +122,7 @@ app.service('Navigate', [
         loginSuccess = cb;
         go('app.login');
       } else {
-        cb();
+        cb(true);
       }
     };
 

@@ -253,6 +253,7 @@ function ListFactory (Platform, PreloadQueue, User) {
     var reload = function (cb) {
       spec.options.filter.skip = 0;
       spec.options.filter.limit = Math.max(get().length + 1, defaultLimit);
+      spec.options.filter.limit = spec.options.filter.limit || defaultLimit;
       load(function (err, items) {
         if(err) {
           return console.log(err);

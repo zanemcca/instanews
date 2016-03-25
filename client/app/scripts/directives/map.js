@@ -28,7 +28,8 @@ app.directive('inmap', [
       },
       link: function(
         scope,
-        elem
+        elem,
+        attrs
       ) {
 
         var element = elem[0].querySelector('#map');
@@ -217,8 +218,18 @@ app.directive('inmap', [
           }
         };
 
-        initializeMap();
+        if(scope.map.id) {
+          initializeMap();
+        } else {
+          var unregisterWatch = scope.$watch(attrs.map, function(newMap, oldMap) {
+            if(newMap.id && newMap.id !== oldMap.id) {
+              initializeMap();
+              unregisterWatch();
+            }
+          }, true);
+        }
       },
       templateUrl: 'templates/directives/map.html'
     };
-  }]);
+  }
+]);
