@@ -31,6 +31,8 @@ app.directive('incomments', [
           keepSync: true
         });
 
+        $scope.Comments.sync();
+
         $scope.$watch('owner.showComments', function (newVal, oldVal) {
           if( newVal && !oldVal) {
             $scope.Comments.reload();
