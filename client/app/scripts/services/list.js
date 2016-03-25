@@ -2,7 +2,7 @@
 'use strict';
 var app = angular.module('instanews.service.list', ['ionic', 'ngCordova']);
 
-function ListFactory (Platform, PreloadQueue, User) {
+function ListFactory (observable, Platform, PreloadQueue, User) {
   //var list = function (spec, my) {
   var list = function (spec) {
     var that;
@@ -33,6 +33,10 @@ function ListFactory (Platform, PreloadQueue, User) {
       }
     };
 
+    //Focus object
+    //TODO add all focus logic to this object
+    var focus = observable();
+
     // Add or update items in the list
     var add = function (items, newItems, cb) {
       if(!Array.isArray(newItems)) {
@@ -44,10 +48,11 @@ function ListFactory (Platform, PreloadQueue, User) {
 
       if(newItems.length) {
 
+        var shouldEnableFocus = false;
         newItems.forEach(function (newItem) {
           // Enable the flag if any items are flagged with 'enableFocus'
           if(newItem.enableFocus) {
-            that.enableFocus = true;
+            shouldEnableFocus = true;
           }
 
           var update = false;
@@ -112,6 +117,11 @@ function ListFactory (Platform, PreloadQueue, User) {
           spec.items.sort(spec.sortingFunction);
           spec.options.filter.skip = spec.items.length;
           notifyObservers();
+        }
+
+        if(shouldEnableFocus) {
+          that.enableFocus = true;
+          focus.notifyObservers();
         }
       } else {
         console.log('No items pased to list.add');
@@ -237,6 +247,7 @@ function ListFactory (Platform, PreloadQueue, User) {
       });
       spec.items.sort(spec.sortingFunction);
       that.enableFocus = false;
+      focus.notifyObservers();
     };
 
     // Register and notify observers of the list
@@ -289,6 +300,17 @@ function ListFactory (Platform, PreloadQueue, User) {
       lSpec = lSpec || {};
       lSpec.preload = lSpec.preload || false;
       lSpec.keepSync = lSpec.keepSync || false;
+
+      lSpec.onItemFocus = lSpec.onItemFocus || function() {
+        loader.enableFocus = that.enableFocus;
+        if(that.enableFocus) {
+          loader.sync();
+        }
+        //TODO Maybe we should sync after disable as well
+        //The only problem is unfocusAll is called a lot I think.
+        //Investigate it.
+      };
+
       lSpec.filter = lSpec.filter || function(items) {
         return items;
       };
@@ -384,6 +406,7 @@ function ListFactory (Platform, PreloadQueue, User) {
       };
 
       var loader = {
+        enableFocus: that.enableFocus,
         add: function(newItems, cb) {
           if(lSpec.preload) {
             preloadItems(newItems);
@@ -439,6 +462,8 @@ function ListFactory (Platform, PreloadQueue, User) {
         //TODO Clear observer
         registerObserver(loader.sync);
       }
+
+      focus.registerObserver(lSpec.onItemFocus);
 
       return loader;
     };
@@ -537,6 +562,7 @@ function ListFactory (Platform, PreloadQueue, User) {
 }
 
 app.factory('list', [
+  'observable',
   'Platform',
   'PreloadQueue',
   'User',
