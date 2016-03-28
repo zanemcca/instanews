@@ -555,21 +555,26 @@ module.exports = function(Storage) {
         params: {}
       });
     } else {
-
-      console.log(container);
-      console.log(fileName);
-      console.log(type);
-
       var policy = {
         expiration: new Date(new Date().getTime() + 1000*60*10), //Expires in 10 minutes
         conditions: [
           { bucket: container },
           { key: fileName },
           { acl: 'public-read' },
-          [ 'starts-with', '$Content-Type', ''],
-          ['content-length-range', 0, 524288000]
-        ]
-       };
+          { 'Content-Type': type }]
+      };
+
+      if(container.indexOf('video') > -1) {
+        policy.conditions.push(['content-length-range', 0, 500*1024*1024]); //500Mb video size limit
+      } else if(container.indexOf('photo') > -1) {
+        policy.conditions.push(['content-length-range', 0, 50*1024*1024]); //50Mb photo size limit
+      } else {
+        var e = new Error('Unknown container!'); 
+        e.status = 404;
+        console.error(container);
+        console.error(e);
+        return cb(e);
+      }
 
       var policyBase64 = new Buffer(JSON.stringify(policy), 'utf8').toString('base64');
       var signature = crypto.createHmac('sha1', credentials.key).update(policyBase64).digest('base64');
@@ -586,42 +591,7 @@ module.exports = function(Storage) {
           'Content-Type': type
         }
       });
-
-      /*
-      var s3_params = {
-        Bucket: req.query.container,
-        Key: req.query.fileName,
-        ContentType: req.query.type,
-        Expires: 60,
-        ACL: 'public-read'
-      };
-
-      s3.getSignedUrl('putObject', s3_params, function(err, data){
-        if(err){
-          console.log(err);
-          next(err);
-        } else{
-          var pairs = data.slice(data.lastIndexOf('?') + 1, data.length).split('&');
-          var params = {};
-
-          for(var i in pairs) {
-            var pair = pairs[i].split('=');
-            params[pair[0]] = pair[1];
-          }
-
-          var return_data = {
-            params: params,
-            signed_request: data,
-            url: 'https://' + req.query.container + '.s3.amazonaws.com/' 
-          };
-
-          res.write(JSON.stringify(return_data));
-          res.end();
-        }
-      });
-      */
     }
-
   };
 
   Storage.remoteMethod(
