@@ -13,8 +13,8 @@ app.factory('FileTransfer', [
     rfc4122
   ) {
 
-  var upload = function(server, filePath, options) {
-    return $cordovaFileTransfer.upload(server, filePath, options);
+  var upload = function(server, filePath, options, trustAllHosts) {
+    return $cordovaFileTransfer.upload(server, filePath, options, trustAllHosts);
   };
 
   var download = function(server, filePath, options) {

@@ -2181,6 +2181,42 @@ module.factory(
           url: urlBase + "/storages/transcodingComplete",
           method: "POST"
         },
+
+        /**
+         * @ngdoc method
+         * @name lbServices.Storage#getUploadKey
+         * @methodOf lbServices.Storage
+         *
+         * @description
+         *
+         * Retrieves an upload key for storage
+         *
+         * @param {Object=} parameters Request parameters.
+         *
+         *  - `ctx` – `{object=}` - 
+         *
+         *  - `container` – `{string=}` - 
+         *
+         *  - `fileName` – `{string=}` - 
+         *
+         * @param {function(Object,Object)=} successCb
+         *   Success callback with two arguments: `value`, `responseHeaders`.
+         *
+         * @param {function(Object)=} errorCb Error callback with one argument:
+         *   `httpResponse`.
+         *
+         * @returns {Object} An empty reference that will be
+         *   populated with the actual data once the response is returned
+         *   from the server.
+         *
+         * Data properties:
+         *
+         *  - `key` – `{object=}` - 
+         */
+        "getUploadKey": {
+          url: urlBase + "/storages/uploadKey",
+          method: "GET"
+        },
       }
     );
 

@@ -11,6 +11,7 @@ app.service('Uploads', [
   'TextInput',
   'Platform',
   'Navigate',
+  'Storage',
   'rfc4122',
   'observable',
   'User',
@@ -22,6 +23,7 @@ app.service('Uploads', [
     TextInput,
     Platform,
     Navigate,
+    Storage,
     rfc4122,
     observable,
     User
@@ -136,16 +138,25 @@ app.service('Uploads', [
           var removed = uploadItems.splice(uploadItems.indexOf(item), 1);
           uploads.notifyObservers();
           return removed;
-        };
+        }; 
 
+        //TODO Take in an optional retry object that will omit previously successful steps
         item.resolve = function () {
           if(!item.resolved) {
             item.resolved = true;
             if(item.subarticle._file) {
-              var getServer = function() {
-                var urlBase = ENV.storageEndpoint;
-                return urlBase + '/storages/' + item.container + '/upload/';
+              /*
+              var getServer = function(url) {
+                if(url) {
+                  var server = url.slice(0, url.lastIndexOf('/'));
+                  console.log(server);
+                  return server;
+                } else {
+                  var urlBase = ENV.storageEndpoint;
+                  return urlBase + '/storages/' + item.container + '/upload/';
+                }
               };
+             */
 
               var waitForTranscoding;
               if(item.progress && item.progress.complete) {
@@ -157,16 +168,54 @@ app.service('Uploads', [
 
               waitForTranscoding.promise.then(function () {
                 item.loaded = 0;
-                FileTransfer.upload(getServer(), item.uri, item.options)
-                .then(function () {
-                  item.complete.resolve();
-                }, function (err) {
+
+                Storage.getUploadKey({
+                  container: item.container,
+                  type: item.options.mimeType,
+                  fileName: item.options.fileName
+                },
+                function (res) {
+                  console.log(res);
+                  console.log(item);
+
+                  item.options.chunkedMode = false;
+                  //item.options.httpMethod = 'PUT';
+                  item.options.headers = {
+                  //  'Content-Type': item.options.mimeType,
+                    Connection: 'close'//,
+                  //  'x-amz-acl': 'public-read'
+                  };
+
+                  //item.options.encodeURI = false;
+
+                  item.options.params = res.data.params;
+
+                  console.log(item.options);
+
+                  FileTransfer.upload(res.data.url, item.uri, item.options, true)
+                  .then(function () {
+                    item.complete.resolve();
+                  },
+                  function (err) {
+                    //TODO Create retry object
+                    item.complete.reject(err);
+                    console.log(err);
+                    console.log('Failed to upload the file');
+                  },
+                  function (progress) {
+                    item.loaded = progress.loaded/progress.total * 100;
+                  });
+                },
+                function(err) {
+                  //TODO Create retry object
                   item.complete.reject(err);
                   console.log(err);
-                }, function (progress) {
-                  item.loaded = progress.loaded/progress.total * 100;
+                  console.log('Failed to get upload key');
                 });
-              }, function (err) {
+              },
+              function (err) {
+                //TODO Create retry object
+                item.complete.reject(err);
                 console.log(err);
                 console.log('Error transcoding!');
               });
