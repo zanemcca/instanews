@@ -38,31 +38,15 @@ app.factory('FileTransfer', [
             }
 
             if(whitelist.indexOf(baseType.toLowerCase()) > -1) {
-              var message;
-              //TODO Move this into the upload service where it belongs
-              /*
-              if(videos.indexOf(baseType.toLowerCase()) > -1) {
-                if(fileObj.size > 250*1024*1024) {
-                  //100Mb video size limit
-                  message = 'Sorry but videos must be less than 250Mb';
-                }
-              } else if(fileObj.size > 5*1024*1024) {
-                //5Mb photo size limit
-                message = 'Sorry but photos must be less than 5Mb';
-              }
-             */
-
-              if(message) {
-                Platform.showToast(message);
-                return;
-              }
-
               var newName = rfc4122.v4() + '.' + baseType;
 
               window.resolveLocalFileSystemURL(Platform.getDataDir(), function(filesystem2) {
                 fileEntry.copyTo(filesystem2, newName, function(entry) {
                   entry.lastModified = fileObj.lastModified;
-                  cb(entry);
+                  entry.file(function(file) {
+                    entry.size = file.size;
+                    cb(entry);
+                  });
                 }, function(err) {
                   console.log(err);
                   console.log('Error: Failed to move the file');
