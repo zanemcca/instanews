@@ -131,19 +131,25 @@ angular.module('instanews', [
 })
 
 .controller('AppCtrl', [
+  '$q',
+  '_',
   '$ionicModal',
   '$scope',
   'Navigate',
   'Notifications',
   'Platform',
+  'Post',
   'User',
   'Uploads',
   function (
+    $q,
+    _,
     $ionicModal,
     $scope,
     Navigate,
     Notifications,
     Platform,
+    Post,
     User,
     Uploads
   ) {
@@ -183,6 +189,28 @@ angular.module('instanews', [
     $scope.pending = [];
 
     $scope.Uploads = Uploads;
+    $scope.Post = Post;
+
+    //Retry failed uploads
+    $scope.retry = _.debounce(function(article) {
+      var id = article.spec.options.id;
+      var uploads = article.uploads.get();
+      for(var i in uploads) {
+        if(!uploads[i].resolved) {
+          uploads[i].complete = $q.defer();
+          uploads[i].resolve();
+        }
+      }
+
+      Post.post(article.uploads, id, function (err) {
+        if(!err) {
+          console.log('Successful post retry!');
+        } else {
+          console.log(err);
+        }
+      });
+    }, 300);
+
     $scope.Platform = Platform;
 
      $ionicModal.fromTemplateUrl('templates/modals/pending.html', {
