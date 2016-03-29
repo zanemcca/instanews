@@ -5,6 +5,7 @@
 var app = angular.module('instanews.service.post', ['ionic', 'ngResource']);
 
 app.factory('Post', [
+  '$q',
   'Article',
   'Camera',
   'Maps',
@@ -13,6 +14,7 @@ app.factory('Post', [
   'Subarticles',
   'Uploads',
   function(
+    $q,
     Article,
     Camera,
     Maps,
@@ -56,6 +58,7 @@ app.factory('Post', [
       var completed = 0;
       var failed = 0;
       var uploads = Uplds.get();
+      var hasMediaItems = Uplds.hasMediaItems();
       var total = uploads.length;
 
       var done = function () {
@@ -66,10 +69,38 @@ app.factory('Post', [
 
           if(failed) {
             Platform.analytics.trackEvent('Post Subarticles', 'failed');
-            Platform.showAlert('Uh-Oh! Some of your content failed to upload! Please try again.');
-          } else if(Uplds.hasMediaItems()) {
+
+            Platform.showConfirm('Something went wrong with your post!', 'Post failed', ['Retry', 'Try Later'], function(idx) {
+              switch(idx) {
+                case 1: //Retry
+                  uploads = Uplds.get();
+                  for(var i in uploads) {
+                    if(!uploads[i].resolved) {
+                      uploads[i].complete = $q.defer();
+                      uploads[i].resolve();
+                    }
+                  }
+                  postSubarticles(Uplds, parentId);
+                  break;
+                  /*
+                case 3: //Cancel
+                  console.log('Delete the objects');
+                  uploads = Uplds.get();
+                  for(var i in uploads) {
+                    uploads[i].remove();
+                  }
+                  break;
+                 */
+                default: //Try later
+                  console.log('Leave the objects');
+                  break;
+              }
+            });
+          } else {
             Platform.analytics.trackEvent('Post Subarticles', 'success');
-            Platform.showToast('Your content has finished uploading and should be available soon');
+            if(hasMediaItems) {
+              Platform.showToast('Your content has finished uploading and should be available soon');
+            }
           }
         }
       };
@@ -84,14 +115,15 @@ app.factory('Post', [
           Article.subarticles.create(sub)
           .$promise
           .then(function () {
-            done();
             upload.remove();
+            done();
             upload.isPosting = false;
             Platform.analytics.trackEvent('Post Subarticles', 'createSubarticle');
           }, 
           // istanbul ignore next
           function(err) {
             failed++;
+            upload.isPosting = false;
             console.log('Failed to upload subarticle');
             Platform.analytics.trackEvent('Post Subarticles', 'createSubarticle', 'error', err.toString());
             console.log(err);
@@ -100,6 +132,7 @@ app.factory('Post', [
         }, 
         // istanbul ignore next
         function (err) {
+          upload.isPosting = false;
           failed++;
           Platform.analytics.trackEvent('Post Subarticles', 'upload', 'error', err.toString());
           console.log(err);

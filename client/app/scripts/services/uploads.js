@@ -140,94 +140,268 @@ app.service('Uploads', [
           return removed;
         }; 
 
-        //TODO Take in an optional retry object that will omit previously successful steps
-        //Use async.waterfall with an array of functions. Then we can trim the array depending
-        //on what has already been executed
         item.resolve = function () {
           if(!item.resolved) {
             item.resolved = true;
             if(item.subarticle._file) {
-              /*
-              var getServer = function(url) {
-                if(url) {
-                  var server = url.slice(0, url.lastIndexOf('/'));
-                  console.log(server);
-                  return server;
-                } else {
-                  var urlBase = ENV.storageEndpoint;
-                  return urlBase + '/storages/' + item.container + '/upload/';
-                }
-              };
-             */
-
-              var waitForTranscoding;
-              if(item.progress && item.progress.complete) {
-                waitForTranscoding = item.progress.complete;
-              } else {
-                waitForTranscoding = $q.defer();
-                waitForTranscoding.resolve();
-              }
-
-              waitForTranscoding.promise.then(function () {
-                item.loaded = 0;
-
-                Storage.getUploadKey({
-                  container: item.container,
-                  type: item.options.mimeType,
-                  fileName: item.options.fileName
-                },
-                function (res) {
-                  item.options.chunkedMode = false;
-                  item.options.params = res.data.params;
-                  item.options.headers = {
-                    Connection: 'close'
-                  };
-
-                  /*
-                   * Other unused options
-                  item.options.httpMethod = 'PUT';
-                  item.options.encodeURI = false;
-                  item.options.headers = {
-                    'Content-Type': item.options.mimeType,
-                    'x-amz-acl': 'public-read'
-                  };
-                 */
-
-                  FileTransfer.upload(res.data.url, item.uri, item.options, true)
-                  .then(function () {
-                    item.complete.resolve();
-                  },
-                  function (err) {
-                    //TODO Create retry object
-                    item.complete.reject(err);
-                    console.log(err);
-                    console.log('Failed to upload the file');
-                  },
-                  function (progress) {
-                    item.loaded = progress.loaded/progress.total * 100;
-                  });
-                },
-                function(err) {
-                  //TODO Create retry object
-                  item.complete.reject(err);
-                  console.log(err);
-                  console.log('Failed to get upload key');
-                });
-              },
-              function (err) {
-                //TODO Create retry object
-                item.complete.reject(err);
-                console.log(err);
-                console.log('Error transcoding!');
-              });
+              attemptUpload();
             } else {
               item.complete.resolve();
             }
           }
         };
 
+        var attemptUpload = function() {
+          console.log(item.failed);
+          var funcs = [];
+          switch(item.failed) {
+            case 'transcode':
+              transcode(item);
+              funcs = [waitForTranscoding, getUploadKey, uploadFile];
+              break;
+            case 'uploadFile':
+              funcs = [uploadFile];
+              break;
+            case 'getUploadKey':
+              funcs = [getUploadKey, uploadFile];
+              break;
+            default:
+              funcs = [waitForTranscoding, getUploadKey, uploadFile];
+              break;
+          }
+
+          item.failed = null;
+          console.log(funcs);
+
+          async.waterfall(funcs, function(err) { 
+            if(err) {
+              item.resolved = false;
+              console.log(err);
+              item.complete.reject(err);
+
+            } else {
+              item.complete.resolve();
+            }
+          });
+        };
+
+        var getUploadKey = function(cb) {
+          Storage.getUploadKey({
+            container: item.container,
+            type: item.options.mimeType,
+            fileName: item.options.fileName
+          },
+          function (res) {
+            item.uploadKey = res.data;
+            cb();
+          },
+          function(err) {
+            item.failed = 'getUploadKey';
+            console.log('Failed to get upload key');
+            cb(err);
+          });
+        };
+
+        var uploadFile = function(cb) {
+          item.loaded = 0;
+          item.options.chunkedMode = false;
+          item.options.params = item.uploadKey.params;
+          item.options.headers = {
+            Connection: 'close'
+          };
+
+          /*
+           * Other unused options
+          item.options.httpMethod = 'PUT';
+          item.options.encodeURI = false;
+          item.options.headers = {
+            'Content-Type': item.options.mimeType,
+            'x-amz-acl': 'public-read'
+          };
+         */
+
+          FileTransfer.upload(item.uploadKey.url, item.uri, item.options, true)
+          .then(function () {
+            cb();
+          },
+          function (err) {
+            item.failed = 'uploadFile';
+            console.log('Failed to upload the file');
+            cb(err);
+          },
+          function (progress) {
+            item.loaded = progress.loaded/progress.total * 100;
+          });
+        };
+
+        var waitForTranscoding = function(cb) {
+          var wait;
+          if(item.progress && item.progress.complete) {
+            wait = item.progress.complete;
+          } else {
+            wait = $q.defer();
+            wait.resolve();
+          }
+
+          wait.promise.then(function () {
+            cb();
+          },
+          function (err) {
+            item.failed = 'transcode';
+            console.log('Error transcoding!');
+            cb(err);
+          });
+        }; 
+
         uploadItems.unshift(item);
+        item.resolve();
         uploads.notifyObservers();
+      };
+
+      var transcode = function(upload) {
+        function completeSetup(vid) {
+          upload.subarticle._file.sources = [vid.nativeURL];
+          upload.subarticle._file.size = vid.size;
+          upload.subarticle._file.type = vid.type;
+          upload.subarticle._file.name = vid.name;
+          upload.uri = vid.nativeURL;
+          upload.options.fileName = vid.name;
+          upload.options.mimeType = vid.type;
+        }
+
+        upload.progress = {
+          current: 0,
+          duration: 0,
+          complete: $q.defer()
+        };
+
+        upload.loaded = 0;
+
+        // Transcode the file
+        FileTransfer.createFile(Platform.getDataDir(), rfc4122.v4() + '.mp4', function(outputFile) {
+          if(!outputFile) {
+            var e = new Error('Failed to create an output file for the video');
+            console.log(e);
+            upload.progress.complete.reject(e);
+            return;
+          }
+
+          window.FilePath.resolveNativePath(upload.nativeURL, function(filePath) {
+            if(!filePath) {
+              var e = new Error('Failed to resolve the filepath');
+              console.log(e);
+              upload.progress.complete.reject(e);
+              return;
+            }
+
+            //TODO Read the input video and copy it if it is not >720p
+            // instead of up transcoding it
+
+            var ffmpegCmd = [
+              '-y',
+              '-i', filePath.replace('file://',''),
+              '-vf', 'scale=720:720:force_original_aspect_ratio=increase',
+              '-preset', 'ultrafast',
+              '-strict','-2',
+              outputFile.nativeURL.replace('file://', '')
+            ];
+
+            /* jshint undef: false */
+            //VideoEditor.transcodeVideo(function (result) {
+            VideoEditor.execFFMPEG(function () {
+              FileTransfer.resolve(outputFile.nativeURL, function(fileEntry) {
+                if(fileEntry) {
+                  fileEntry.type = 'video/mp4';
+                  //TODO Get the file size
+                  completeSetup(fileEntry);
+                  upload.progress.complete.resolve();
+                } else {
+                  var e = new Error('Failed to resolve the nativeURL');
+                  console.log(e);
+                  upload.progress.complete.reject(e);
+                }
+              });
+            },
+            function (err) {
+              console.log('Failed to transcode the video');
+              console.log(err);
+              upload.progress.complete.reject(err);
+            },
+            {
+              /*
+              fileUri: vid.nativeURL,
+              outputFileName: rfc4122.v4(),
+              quality: VideoEditorOptions.Quality.HIGH_QUALITY,
+              outputFileType: VideoEditorOptions.OutputFileType.MPEG4,
+              saveToLibrary: false,
+              deleteInputFile: false,
+              optimizeForNetworkUse: VideoEditorOptions.OptimizeForNetworkUse.YES,
+             */
+              cmd: ffmpegCmd,
+              progress: function (info) {
+                // info on android will be shell output from android-ffmpeg-java 
+                // info on ios will be a number from 0 to 100 
+                if (Platform.isIOS()) {
+                  upload.loaded = info;
+                  return; // the code below is for android 
+                }
+
+                // for android this arithmetic below can be used to track the progress  
+                // of ffmpeg by using info provided by the android-ffmpeg-java shell output 
+                // this is a modified version of http://stackoverflow.com/a/17314632/1673842 
+
+                // get duration of source 
+                var matches, ar;
+                if (!upload.progress.duration) {
+                  matches = (info) ? info.match(/Duration: (.*?), start:/) : [];
+                  if (matches && matches.length > 0) {
+                    var rawDuration = matches[1];
+                    // convert rawDuration from 00:00:00.00 to seconds. 
+                    ar = rawDuration.split(':').reverse();
+                    upload.progress.duration = parseFloat(ar[0]);
+                    if (ar[1]) {
+                      upload.progress.duration += parseInt(ar[1]) * 60;
+                    }
+                    if (ar[2]) {
+                      upload.progress.duration += parseInt(ar[2]) * 60 * 60;  
+                    }
+                  }
+                  return;
+                }
+
+                // get the time  
+                matches = info.match(/time=(.*?) bitrate/g);
+
+                if (matches && matches.length > 0) {
+                  var time = 0;
+                  var completed = 0;
+                  var rawTime = matches.pop();
+                  rawTime = rawTime.replace('time=', '').replace(' bitrate', '');
+
+                  // convert rawTime from 00:00:00.00 to seconds. 
+                  ar = rawTime.split(':').reverse();
+                  time = parseFloat(ar[0]);
+                  if (ar[1]) {
+                    time += parseInt(ar[1]) * 60;
+                  }
+                  if (ar[2]) {
+                    time += parseInt(ar[2]) * 60 * 60;
+                  }
+
+                  //calculate the progress 
+                  completed = Math.round((time / upload.progress.duration) * 100);
+
+                  upload.progress.current = time;
+                  upload.loaded = completed; 
+                }
+               }
+            });
+          }, function(err) {
+            console.log('Failed to resolve the filepath');
+            console.log(err);
+            upload.progress.complete.reject(err);
+          });
+        });
       };
 
       function video(vid) {
@@ -249,6 +423,7 @@ app.service('Uploads', [
 
         var upload = {
           container: 'instanews-videos-in',
+          nativeURL: vid.nativeURL,
           options: {
             headers: { 'Authorization': User.getToken()}
           },
@@ -262,132 +437,7 @@ app.service('Uploads', [
 
         if(vid.size < 500*1024*1024) {
           if( Platform.isAndroid()) {
-            upload.progress = {
-              current: 0,
-              duration: 0,
-              complete: $q.defer()
-            };
-            upload.loaded = 0;
-
-            FileTransfer.createFile(Platform.getDataDir(), rfc4122.v4() + '.mp4', function(outputFile) {
-              if(!outputFile) {
-                console.log('Failed to create an output file for the video');
-                return;
-              }
-
-              window.FilePath.resolveNativePath(vid.nativeURL, function(filePath) {
-                if(!filePath) {
-                  console.log('Failed to resolve the filepath');
-                  return;
-                }
-
-                //TODO Read the input video and copy it if it is not >720p
-                // instead of up transcoding it
-
-                var ffmpegCmd = [
-                  '-y',
-                  '-i', filePath.replace('file://',''),
-                  '-vf', 'scale=720:720:force_original_aspect_ratio=increase',
-                  '-preset', 'ultrafast',
-                  '-strict','-2',
-                  outputFile.nativeURL.replace('file://', '')
-                ];
-
-                /* jshint undef: false */
-                //VideoEditor.transcodeVideo(function (result) {
-                VideoEditor.execFFMPEG(function () {
-                  FileTransfer.resolve(outputFile.nativeURL, function(fileEntry) {
-                    if(fileEntry) {
-                      fileEntry.type = 'video/mp4';
-                      //TODO Get the file size
-                      completeSetup(fileEntry);
-                      upload.progress.complete.resolve();
-                    } else {
-                      Platform.showToast('There was an error uploading your video. Please try again!');
-                      upload.progress.complete.reject();
-                    }
-                  });
-                },
-                function (err) {
-                  console.log(err);
-                  Platform.showToast('There was an error preparing your video. Please try again!');
-                  upload.progress.complete.reject();
-                },
-                {
-                  /*
-                  fileUri: vid.nativeURL,
-                  outputFileName: rfc4122.v4(),
-                  quality: VideoEditorOptions.Quality.HIGH_QUALITY,
-                  outputFileType: VideoEditorOptions.OutputFileType.MPEG4,
-                  saveToLibrary: false,
-                  deleteInputFile: false,
-                  optimizeForNetworkUse: VideoEditorOptions.OptimizeForNetworkUse.YES,
-                 */
-                  cmd: ffmpegCmd,
-                  progress: function (info) {
-                    // info on android will be shell output from android-ffmpeg-java 
-                    // info on ios will be a number from 0 to 100 
-                    if (Platform.isIOS()) {
-                      upload.loaded = info;
-                      return; // the code below is for android 
-                    }
-
-                    // for android this arithmetic below can be used to track the progress  
-                    // of ffmpeg by using info provided by the android-ffmpeg-java shell output 
-                    // this is a modified version of http://stackoverflow.com/a/17314632/1673842 
-
-                    // get duration of source 
-                    var matches, ar;
-                    if (!upload.progress.duration) {
-                      matches = (info) ? info.match(/Duration: (.*?), start:/) : [];
-                      if (matches && matches.length > 0) {
-                        var rawDuration = matches[1];
-                        // convert rawDuration from 00:00:00.00 to seconds. 
-                        ar = rawDuration.split(':').reverse();
-                        upload.progress.duration = parseFloat(ar[0]);
-                        if (ar[1]) {
-                          upload.progress.duration += parseInt(ar[1]) * 60;
-                        }
-                        if (ar[2]) {
-                          upload.progress.duration += parseInt(ar[2]) * 60 * 60;  
-                        }
-                      }
-                      return;
-                    }
-
-                    // get the time  
-                    matches = info.match(/time=(.*?) bitrate/g);
-
-                    if (matches && matches.length > 0) {
-                      var time = 0;
-                      var completed = 0;
-                      var rawTime = matches.pop();
-                      rawTime = rawTime.replace('time=', '').replace(' bitrate', '');
-
-                      // convert rawTime from 00:00:00.00 to seconds. 
-                      ar = rawTime.split(':').reverse();
-                      time = parseFloat(ar[0]);
-                      if (ar[1]) {
-                        time += parseInt(ar[1]) * 60;
-                      }
-                      if (ar[2]) {
-                        time += parseInt(ar[2]) * 60 * 60;
-                      }
-
-                      //calculate the progress 
-                      completed = Math.round((time / upload.progress.duration) * 100);
-
-                      upload.progress.current = time;
-                      upload.loaded = completed; 
-                    }
-                   }
-                });
-              }, function(err) {
-                console.log('Failed to resolve the filepath');
-                console.log(err);
-                return;
-              });
-            });
+            transcode(upload);
           } else {
             completeSetup(vid);
           }

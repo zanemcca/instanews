@@ -28,7 +28,8 @@
     "angular-underscore-module": "~1.0.3",
     "angular-material": "~0.11.4",
     "angular-elastic": "~2.5.1",
-    "angular-chart.js": "^0.8.8"
+    "angular-chart.js": "^0.8.8",
+    "async": "^1.5.2"
   },
   "resolutions": {
     "angular": "1.4.3"

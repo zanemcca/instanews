@@ -76,9 +76,6 @@ app.directive(
             }
           };
         },
-        link: function ($scope) {
-          $scope.upload.resolve();
-        },
         templateUrl: 'templates/directives/upload.html'
       };
     }]
