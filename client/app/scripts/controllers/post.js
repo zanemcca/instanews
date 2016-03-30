@@ -33,12 +33,9 @@ app.controller('PostCtrl', [
     $scope.getMarker = Maps.getMarker;
     $scope.Platform = Platform;
 
-    $scope.Uploads = Uploads.findOrCreate();
-
     var updateUser = function() {
       $scope.user = User.get();
     };
-
     User.registerObserver(updateUser);
 
     $scope.$watch('newArticle.title', function (newTitle, oldTitle) {
@@ -58,6 +55,7 @@ app.controller('PostCtrl', [
 
     //Refresh the map everytime we enter the view
     $scope.$on('$ionicView.beforeEnter', function() {
+      $scope.Uploads = Uploads.findOrCreate();
       $scope.newArticle = Post.getNewArticle();
       if(!$scope.newArticle.title) {
         $scope.newArticle.title = '';
