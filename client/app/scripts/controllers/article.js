@@ -40,8 +40,6 @@ app.controller('ArticleCtrl', [
       preload: true
     });
 
-    $scope.Uploads = Uploads.findOrCreate($stateParams.id);
-    $scope.uploads = [];
 
     $scope.preScrollToTop = function (cb) {
       Preload.stop();
@@ -99,6 +97,35 @@ app.controller('ArticleCtrl', [
     var marker;
     var uploadObserver;
 
+    var refreshUploads = function() {
+      $scope.Uploads = Uploads.findOrCreate($stateParams.id);
+      $scope.uploads = $scope.Uploads.get();
+
+      if(uploadObserver) {
+        uploadObserver.unregister();
+      }
+
+      uploadObserver = $scope.Uploads.registerObserver(function () {
+        var uploads = $scope.Uploads.get();
+        $scope.uploads = uploads;
+        if(uploads.length > 0) {
+          var noFile = true;
+          uploads.forEach(function (upload) {
+            noFile = noFile && upload.noFile;
+          });
+          if(!noFile) {
+            $scope.uploadModal.show();
+          } else {
+            $scope.post();
+          }
+        } else {
+          if($scope.uploadModal) {
+            $scope.uploadModal.hide();
+          }
+        }
+      });
+    };
+
 
     $scope.$on('$ionicView.unloaded', function () {
       console.log('Destroying article view!');
@@ -125,25 +152,7 @@ app.controller('ArticleCtrl', [
         }
       });
 
-      uploadObserver = $scope.Uploads.registerObserver(function () {
-        var uploads = $scope.Uploads.get();
-        $scope.uploads = uploads;
-        if(uploads.length > 0) {
-          var noFile = true;
-          uploads.forEach(function (upload) {
-            noFile = noFile && upload.noFile;
-          });
-          if(!noFile) {
-            $scope.uploadModal.show();
-          } else {
-            $scope.post();
-          }
-        } else {
-          if($scope.uploadModal) {
-            $scope.uploadModal.hide();
-          }
-        }
-      });
+      refreshUploads();
 
       Platform.analytics.trackView('Article View');
     });
@@ -177,13 +186,22 @@ app.controller('ArticleCtrl', [
       });
     };
 
+    var disableAdd = false;
+    $scope.$on('modal.shown', function() {
+      console.log('Modal is shown!');
+      disableAdd = false;
+      refreshUploads();
+    });
+
     $ionicModal.fromTemplateUrl('templates/modals/upload.html', {
       scope: $scope,
       animation: 'slide-in-up'
     }).then( function (modal) {
       $scope.uploadModal = modal;
       $scope.post = function (){
+        disableAdd = true;
         Post.post($scope.Uploads, $stateParams.id, function (err) {
+          refreshUploads();
           if(!err) {
             modal.hide();
           } else {
@@ -192,8 +210,8 @@ app.controller('ArticleCtrl', [
         });
       };
 
-      $scope.isPosting = function () {
-        return Uploads.isPending($stateParams.id);
+      $scope.addDisabled = function () {
+        return !($scope.uploads && $scope.uploads.length) || disableAdd;
       };
 
       $scope.clear = function () {
