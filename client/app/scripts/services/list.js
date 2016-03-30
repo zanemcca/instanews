@@ -121,7 +121,9 @@ function ListFactory (observable, Platform, PreloadQueue, User) {
 
         if(shouldEnableFocus) {
           that.enableFocus = true;
-          focus.notifyObservers();
+          if(items === spec.items) {
+            focus.notifyObservers();
+          }
         }
       } else {
         console.log('No items pased to list.add');
