@@ -195,6 +195,12 @@ angular.module('instanews', [
     $scope.retry = _.debounce(function() {
       var Uplds = Uploads.getPending();
 
+      var postCB = function (err) {
+        if(err) {
+          console.log(err);
+        }
+      };
+
       for(var j in Uplds) { 
         var article = Uplds[j];
         var id = article.spec.options.id;
@@ -206,13 +212,7 @@ angular.module('instanews', [
           }
         }
 
-        Post.post(article.uploads, id, function (err) {
-          if(!err) {
-            console.log('Successful post retry!');
-          } else {
-            console.log(err);
-          }
-        });
+        Post.post(article.uploads, id, postCB);
       }
     }, 300);
 
