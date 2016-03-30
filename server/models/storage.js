@@ -413,7 +413,7 @@ module.exports = function(Storage) {
       cb();
     } else {
       if(container && keys.length) {
-        if(process.env.NODE_ENV !== 'production') {
+        if(process.env.NODE_ENV !== 'production' && container.indexOf('test') === -1) {
           container += '-test';
         }
 
@@ -540,7 +540,7 @@ module.exports = function(Storage) {
   Storage.getUploadKey = function (container, fileName, type, cb) {
     var dd = Storage.app.DD('Storage','getUploadKey');
 
-    if(process.env.NODE_ENV !== 'production') {
+    if(process.env.NODE_ENV !== 'production' && container.indexOf('test') === -1) {
       if(process.env.NODE_ENV === 'staging') {
         container = container.slice(0, container.lastIndexOf('-in')) + '-test-in';
       } else {
