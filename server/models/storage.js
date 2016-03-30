@@ -1,6 +1,7 @@
 
 var common = require('./common');
 var cred = require('../conf/credentials');
+var crypto = require('crypto');
 var aws = require('aws-sdk');
 var async = require('async');
 var MessageValidator = require('sns-validator');
@@ -230,6 +231,11 @@ module.exports = function(Storage) {
 
   Storage.triggerTranscoding = function (containerName, file, cb) {
     var dd = Storage.app.DD('Storage','triggerTranscoding');
+
+    if(process.env.NODE_ENV === 'staging' && containerName.indexOf('test') === -1) {
+      containerName = containerName.slice(0, containerName.lastIndexOf('-in')) + '-test-in';
+    }
+
     var params = getTranscoderParams(containerName, file);
     var type = getContainerType(containerName);
 
@@ -531,6 +537,63 @@ module.exports = function(Storage) {
     });
   };
 
+  Storage.getUploadKey = function (container, fileName, type, cb) {
+    var dd = Storage.app.DD('Storage','getUploadKey');
+
+    if(process.env.NODE_ENV !== 'production') {
+      if(process.env.NODE_ENV === 'staging') {
+        container = container.slice(0, container.lastIndexOf('-in')) + '-test-in';
+      } else {
+        container += '-test';
+      }
+    }
+
+    if(!process.env.NODE_ENV  || process.env.NODE_ENV === 'development') {
+      cb(null, {
+        url: 'http://localhost:3000/api/storages/' + container + '/upload/',
+        container: container,
+        params: {}
+      });
+    } else {
+      var policy = {
+        expiration: new Date(new Date().getTime() + 1000*60*10), //Expires in 10 minutes
+        conditions: [
+          { bucket: container },
+          { key: fileName },
+          { acl: 'public-read' },
+          { 'Content-Type': type }]
+      };
+
+      if(container.indexOf('video') > -1) {
+        policy.conditions.push(['content-length-range', 0, 500*1024*1024]); //500Mb video size limit
+      } else if(container.indexOf('photo') > -1) {
+        policy.conditions.push(['content-length-range', 0, 50*1024*1024]); //50Mb photo size limit
+      } else {
+        var e = new Error('Unknown container!'); 
+        e.status = 404;
+        console.error(container);
+        console.error(e);
+        return cb(e);
+      }
+
+      var policyBase64 = new Buffer(JSON.stringify(policy), 'utf8').toString('base64');
+      var signature = crypto.createHmac('sha1', credentials.key).update(policyBase64).digest('base64');
+
+      cb(null, {
+        url: 'https://' + container + '.s3.amazonaws.com/',
+        container: container,
+        params: {
+          'key': fileName,
+          'AWSAccessKeyId': credentials.keyId,
+          'acl': 'public-read',
+          'policy': policyBase64,
+          'signature': signature,
+          'Content-Type': type
+        }
+      });
+    }
+  };
+
   Storage.remoteMethod(
     'transcodingComplete',
     {
@@ -538,6 +601,24 @@ module.exports = function(Storage) {
       accepts: [{
         arg: 'ctx', type: 'object', 'http': { source: 'context'}
       }]
+    }
+  );
+
+  Storage.remoteMethod(
+    'getUploadKey',
+    {
+      description: 'Retrieves an upload key for storage',
+      accepts: [{
+        arg: 'container', type: 'string'
+      },
+      {
+        arg: 'fileName', type: 'string'
+      },
+      {
+        arg: 'type', type: 'string'
+      }],
+      returns: { arg: 'data', type: 'object'},
+      http: { path: '/uploadKey', verb: 'get'}
     }
   );
 };

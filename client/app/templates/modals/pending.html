@@ -13,6 +13,11 @@
        ng-click="continue()">
        CONTINUE
      </button-->
+     <button class="button buttons button-clear"
+       ng-hide="Post.isPosting() || !Uploads.getPending().length"
+       ng-click="retry()">
+       RETRY
+     </button>
    </ion-header-bar>
    <ion-content>
       <div class="list">
