@@ -28,19 +28,15 @@ app.service('Uploads', [
     observable,
     User
   ){
-    var articles = [];
+
+    var inProgress = {};
+
     var pending = [];
 
     var findOrCreate = function (parentId) {
       parentId = parentId || 'newArticle';
 
-      var parent;
-      articles.forEach(function(article) {
-        if(article.spec.options.id === parentId) {
-          console.log('Found cached copy of uploads');
-          parent = article;
-        }
-      });
+      var parent = inProgress[parentId]; 
 
       if(!parent) {
         parent = {
@@ -56,7 +52,7 @@ app.service('Uploads', [
           return parent.spec;
         };
 
-        articles.push(parent);
+        inProgress[parentId] = parent;
       }
 
       return parent.uploads;
@@ -66,23 +62,16 @@ app.service('Uploads', [
       parentId = parentId || 'newArticle';
       newId = newId || parentId;
 
-      var i = 0;
-      var pend;
-      for(; i < articles.length; i++) {
-        var article = articles[i];
-        if(article.spec.options.id === parentId) {
-          console.log('Found cached copy of uploads');
-          pend = article;
-          break;
-        }
-      }
+      var pend = inProgress[parentId];
 
       if(!pend) {
         console.log('Error: There are no uploads for ' + parentId);
         return;
       }
 
-      pend = articles.splice(i,1)[0];
+      // Clear the inProgress copy 
+      inProgress[parentId] = null;
+
       pend.spec.options.id = newId;
 
       pending.push(pend);
@@ -173,6 +162,7 @@ app.service('Uploads', [
           item.failed = null;
           console.log(funcs);
 
+          // jshint undef: false
           async.waterfall(funcs, function(err) { 
             if(err) {
               item.resolved = false;
@@ -219,6 +209,14 @@ app.service('Uploads', [
             'x-amz-acl': 'public-read'
           };
          */
+
+        /*
+         * Convenient tool to simulate failures for testing
+        if(!item.firstUpload) {
+          item.firstUpload = true;
+          return cb(new Error('error'));
+        }
+       */
 
           FileTransfer.upload(item.uploadKey.url, item.uri, item.options, true)
           .then(function () {
