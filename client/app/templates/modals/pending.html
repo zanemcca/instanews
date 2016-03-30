@@ -13,6 +13,11 @@
        ng-click="continue()">
        CONTINUE
      </button-->
+     <button class="button buttons button-clear"
+       ng-hide="Post.isPosting() || !Uploads.getPending().length"
+       ng-click="retry()">
+       RETRY
+     </button>
    </ion-header-bar>
    <ion-content>
       <div class="list">
@@ -21,11 +26,6 @@
             <!--h1 class="title">
               {{article.title}}
             </h1-->
-            <button class="button buttons button-clear"
-              ng-hide="Post.isPosting()"
-              ng-click="retry(article)">
-              <i class="icon"
-                ng-class="Platform.isIOS() ? 'ion-ios-refresh-empty' : 'ion-android-refresh'"></i>
           </div>
           <div ng-repeat="upload in article.uploads.get()">
             <inUpload upload="upload"></inUpload>

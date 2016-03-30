@@ -192,23 +192,28 @@ angular.module('instanews', [
     $scope.Post = Post;
 
     //Retry failed uploads
-    $scope.retry = _.debounce(function(article) {
-      var id = article.spec.options.id;
-      var uploads = article.uploads.get();
-      for(var i in uploads) {
-        if(!uploads[i].resolved) {
-          uploads[i].complete = $q.defer();
-          uploads[i].resolve();
-        }
-      }
+    $scope.retry = _.debounce(function() {
+      var Uplds = Uploads.getPending();
 
-      Post.post(article.uploads, id, function (err) {
-        if(!err) {
-          console.log('Successful post retry!');
-        } else {
-          console.log(err);
+      for(var j in Uplds) { 
+        var article = Uplds[j];
+        var id = article.spec.options.id;
+        var uploads = article.uploads.get();
+        for(var i in uploads) {
+          if(!uploads[i].resolved) {
+            uploads[i].complete = $q.defer();
+            uploads[i].resolve();
+          }
         }
-      });
+
+        Post.post(article.uploads, id, function (err) {
+          if(!err) {
+            console.log('Successful post retry!');
+          } else {
+            console.log(err);
+          }
+        });
+      }
     }, 300);
 
     $scope.Platform = Platform;
