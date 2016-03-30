@@ -54,7 +54,7 @@ app.factory('Post', [
         console.log('Warning: Posting count is ' + posting);
         posting = 0;
       }
-      return posting;
+      return (posting > 0);
     };
 
 
