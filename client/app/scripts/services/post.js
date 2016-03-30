@@ -24,7 +24,7 @@ app.factory('Post', [
     Uploads
   ) {
 
-    var posting = false;
+    var posting = 0;
 
     var isValidArticle = function(article) {
       if( article.title && typeof article.title === 'string' && article.title.length > 0 &&
@@ -50,8 +50,13 @@ app.factory('Post', [
     };
 
     var isPosting = function() {
+      if(posting < 0) {
+        console.log('Warning: Posting count is ' + posting);
+        posting = 0;
+      }
       return posting;
     };
+
 
     var postSubarticles = function (Uplds, parentId) {
       Platform.analytics.trackEvent('Post Subarticles', 'start');
@@ -64,7 +69,7 @@ app.factory('Post', [
       var done = function () {
         completed++;
         if(completed === total) {
-          posting = false;
+          posting--;
           Subarticles.findOrCreate(parentId).reload();
 
           if(failed) {
@@ -80,6 +85,7 @@ app.factory('Post', [
                       uploads[i].resolve();
                     }
                   }
+                  posting++;
                   postSubarticles(Uplds, parentId);
                   break;
                   /*
@@ -143,7 +149,7 @@ app.factory('Post', [
 
     var post = function (Uplds, article, cb) {
       var uploads = Uplds.get();
-      posting = true;
+      posting++;
 
       // istanbul ignore else
       if(uploads.length) {
@@ -181,7 +187,7 @@ app.factory('Post', [
               postSubarticles(Uplds, res.id);
               cb();
             }, function (err) {
-              posting = false;
+              posting--;
               console.log('Failed to create article');
               console.log(err);
               cb(err);
