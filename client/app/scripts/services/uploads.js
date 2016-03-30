@@ -210,10 +210,13 @@ app.service('Uploads', [
           };
          */
 
+        /*
+         * Convenient tool to simulate failures for testing
         if(!item.firstUpload) {
           item.firstUpload = true;
           return cb(new Error('error'));
         }
+       */
 
           FileTransfer.upload(item.uploadKey.url, item.uri, item.options, true)
           .then(function () {
