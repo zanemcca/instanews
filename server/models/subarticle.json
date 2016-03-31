@@ -3,9 +3,10 @@
   "base": "base",
   "strict": false,
   "indexes": {
-    "parent_index": {
+    "parentId_1_rating_-1": {
       "keys": {
-        "parentId": 1
+        "parentId": 1,
+        "rating: -1
       },
       "options": {
         "background": true

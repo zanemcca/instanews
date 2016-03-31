@@ -14,8 +14,18 @@
     },
     "location": {
       "type": "geopoint",
-      "required": true,
-      "index": true
+      "required": true
+    }
+  },
+  "indexes": {
+    "location_1_rating_-1": {
+      "keys": {
+        "location": 1,
+        "rating: -1
+      },
+      "options": {
+        "background": true
+      }
     }
   },
   "validations": [],
