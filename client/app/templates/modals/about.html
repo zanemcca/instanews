@@ -13,12 +13,18 @@
    <ion-content>
       <div class="list">
         <div class="item">
-           <button ng-if="!user.userId" class="button button-block button-dark" nav-clear menu-close ng-click="login()">
-              Login
-           </button>
-           <button ng-if="user.userId" class="button button-outline button-block button-dark" nav-clear menu-close ng-click="logout()">
-              Logout
-           </button>
+          <span ng-switch="!!user.userId">
+            <div class="fade-switch" ng-switch-when="true"> 
+              <div class="button button-outline button-block button-dark" nav-clear menu-close ng-click="logout()">
+                Logout
+              </div>
+            </div>
+            <div class="fade-switch" ng-switch-default>
+              <div class="button button-block button-dark" nav-clear menu-close ng-click="login()">
+                Sign Up / Login
+              </div>
+            </div>
+          </span>
         </div>
         <div class="item item-divider">
           Having an issue? 

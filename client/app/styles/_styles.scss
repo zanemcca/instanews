@@ -247,3 +247,21 @@
 .scroll-to-top.ng-leave.ng-leave-active {
   top: -55px;
 }
+
+
+// fade switch
+.fade-switch.ng-animate {
+  transition: all cubic-bezier(0.250, 0.460, 0.450, 0.940) 0.5s;
+}
+
+.fade-switch.ng-leave,
+.fade-switch.ng-leave.ng-leave-active {
+  display: none;
+}
+.fade-switch.ng-enter {
+  opacity: 0;
+}
+
+.fade-switch.ng-enter.ng-enter-active {
+  opacity: 1;
+}
