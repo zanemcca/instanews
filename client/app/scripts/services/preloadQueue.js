@@ -4,24 +4,37 @@ var app = angular.module('instanews.service.preloadQueue', []);
 
 function PreloadQueueFactory($q) {
   if(!this.that) {
-    var queue = [];
+    var lastEntry;
+    var queueLength = 0;
+
+    var increment = function() {
+      queueLength++;
+    };
+
+    var decrement = function() {
+      if(queueLength > 0) {
+        queueLength--;
+      } else if(queueLength === 0) {
+        console.log('Error: Cannot decrement. Queue is already empty!');
+      }
+    };
 
     var stats = {
       queueDelay: 0,
       loadDelay: 0,
-      getLength: function () { return queue.length; },
+      getLength: function () { return queueLength; },
       totalProcessed: 0 
     };
 
     var flushing = 0;
 
     var flush = function () {
-      flushing = queue.length;
+      flushing = queueLength;
       if(flushing) {
-        console.log('Flush initiated...');
+        console.log('Flushing ' + flushing + ' items...');
       }
 
-      queue = [];
+      queueLength = 0;
     };
 
     var resolve = function(entry) {
@@ -59,6 +72,7 @@ function PreloadQueueFactory($q) {
             if(err) {
               console.log('Failed to preLoad!');
               console.log(item);
+              decrement();
               return deferred.reject(err);
             }
 
@@ -73,39 +87,22 @@ function PreloadQueueFactory($q) {
                 console.log('...Flush resolved');
               }
             } else {
-              var res = queue.shift();
-              if(item.id && res.item.id !== item.id) {
-                console.log(item);
-                console.log(res);
-                console.log('Error: Queue did not remove the correct item!');
-              } 
-
+              decrement();
               deferred.resolve(item);
             }
           });
         },
-        reject: function(err) {
-          if(!flushing) {
-            //TODO There is an off-by-one error with flushing that causes this to be run on the final instance
-            var res = queue.shift();
-            if(!res || (item.id && res.item.id !== item.id)) {
-              console.log(item);
-              console.log(res);
-              console.log('Error: Queue did not remove the correct item!');
-            } 
-          }
-          deferred.reject(err);
+        reject: function(message) {
+          deferred.reject(message);
         },
         promise: deferred.promise
       };
 
-      queue.push(entry);
+      increment();
 
-      if(queue.length === 1) {
-        entry.resolve();
-      } else {
+      if(lastEntry) {
         //Wait for the previous queue to be flushed
-        queue[queue.length - 2].promise.then(function () {
+        lastEntry.promise.then(function () {
           resolve(entry);
         }, function (err) {
           if(err !== 'flush') {
@@ -114,6 +111,10 @@ function PreloadQueueFactory($q) {
           }
           resolve(entry);
         });
+        lastEntry = entry;
+      } else {
+        lastEntry = entry;
+        resolve(entry);
       }
 
       return deferred.promise;
