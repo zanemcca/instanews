@@ -24,6 +24,7 @@ app.controller('LoginCtrl', [
     Journalist) {
 
       $scope.terms = Terms.getTerms();
+      $scope.Terms = Terms;
 
       $scope.cred = {
         username: '',
