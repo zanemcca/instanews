@@ -91,11 +91,20 @@ app.controller('LoginCtrl', [
         $scope.reset.forgotModal = modal;
       });
 
+      $ionicModal.fromTemplateUrl('templates/modals/terms.html', {
+        scope: $scope,
+        backdropClickToClose: false,
+        animation: 'slide-in-up'
+      }).then( function (modal) {
+        $scope.termsModal = modal;
+      });
+
       // Cleanup modals
       $scope.$on('$destroy', function () {
         $scope.reset.forgotModal.remove();
         $scope.reset.Modal.remove();
         $scope.verifyModal.remove();
+        $scope.termsModal.remove();
         $scope.loginModal.remove();
       });
 
