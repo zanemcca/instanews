@@ -198,11 +198,9 @@ app.controller('LoginCtrl', [
               console.log(err);
               Journalist.logout(function() {
                 Platform.loading.hide();
-                Platform.showAlert('Sorry but you must accept the terms and conditions to login');
               }, function(err) {
                 console.log(err);
                 Platform.loading.hide();
-                Platform.showAlert('Sorry but you must accept the terms and conditions to login');
               });
             }, user);
           }, function (err) {
@@ -269,7 +267,7 @@ app.controller('LoginCtrl', [
           console.log(err);
           Platform.loading.hide();
           Platform.analytics.trackEvent('Login', 'error', 'status', err.status);
-          Platform.showAlert('There is no user with the given username');
+          Platform.showAlert('There is no user with the given username' , 'Invalid Username');
         });
       }; 
 
@@ -288,7 +286,7 @@ app.controller('LoginCtrl', [
           $scope.invalid.token = true;
           Platform.loading.hide();
           Platform.analytics.trackEvent('Verify', 'error', 'status', err.status);
-          Platform.showAlert('The token you entered is invalid. Please try again');
+          Platform.showAlert('The token you entered is invalid. Please try again', 'Invalid Token');
         });
       };
 
@@ -342,7 +340,7 @@ app.controller('LoginCtrl', [
           }
         } else {
           Platform.analytics.trackEvent('ResetPassword', 'badCredentials');
-          Platform.showAlert('A username or an email are required to reset a password');
+          Platform.showAlert('A username or an email are required to reset a password', 'Invalid Credentials');
           return;
         }
 
@@ -374,19 +372,19 @@ app.controller('LoginCtrl', [
           }
         } else {
           Platform.analytics.trackEvent('ResetPassword', 'usernameOrEmailNeeded');
-          Platform.showAlert('A username or an email are required to reset a password');
+          Platform.showAlert('A username or an email are required to reset a password', 'Invalid Credentials');
           return;
         }
 
         if(!$scope.reset.token || $scope.reset.token.length !== 6) {
           Platform.analytics.trackEvent('ResetPassword', 'invalidToken');
-          Platform.showAlert('The token given is invalid');
+          Platform.showAlert('The token given is invalid', 'Invalid Token');
         } else if(checkPasswordStrength($scope.reset.password) <= 0) {
           Platform.analytics.trackEvent('ResetPassword', 'weakPassword');
           Platform.showAlert('You must have at least 8 characters', 'Password to weak');
         } else if ($scope.reset.password !== $scope.reset.confirmPassword) {
           Platform.analytics.trackEvent('ResetPassword', 'passwordMismatch');
-          Platform.showAlert('The confirmation password does not match the original');
+          Platform.showAlert('The confirmation password does not match the original', 'Password Mismatch');
         } else {
           usr.password = $scope.reset.password;
           usr.token = $scope.reset.token;
@@ -438,7 +436,7 @@ app.controller('LoginCtrl', [
         } else if(!$scope.validEmail()) {
           $scope.invalid.email = true;
           Platform.analytics.trackEvent('Signup', 'badEmail');
-          Platform.showAlert('The email you entered is not properly formatted!');
+          Platform.showAlert('The email you entered is not properly formatted!', 'Invalid Email');
         } else {
           Platform.loading.show();
           //Verify that the email and username is unique
@@ -451,7 +449,7 @@ app.controller('LoginCtrl', [
               Platform.loading.hide();
               $scope.invalid.email = true;
               Platform.analytics.trackEvent('Signup', 'emailAlreadyUsed');
-              Platform.showAlert('The email you entered is already used!');
+              Platform.showAlert('The email you entered is already used!', 'Email Used');
             } else {
               /* istanbul ignore else */
               if ( $scope.newUser.username ) {
@@ -459,7 +457,7 @@ app.controller('LoginCtrl', [
               } else {
                 Platform.loading.hide();
                 Platform.analytics.trackEvent('Signup', 'usernameRequired');
-                Platform.showAlert('You must enter a username!');
+                Platform.showAlert('You must enter a username!', 'Invalid Username');
                 $scope.invalid.username = true;
                 return;
               }
@@ -473,7 +471,7 @@ app.controller('LoginCtrl', [
                   Platform.loading.hide();
                   $scope.invalid.username = true;
                   Platform.analytics.trackEvent('Signup', 'usernameAlreadyUsed');
-                  Platform.showAlert('The username you entered is already used. Please try another one');
+                  Platform.showAlert('The username you entered is already used. Please try another one', 'Username Taken');
                 }
                 else {
                   Journalist.create(user, function (res) {
