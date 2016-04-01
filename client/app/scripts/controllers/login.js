@@ -96,20 +96,11 @@ app.controller('LoginCtrl', [
         $scope.reset.forgotModal = modal;
       });
 
-      $ionicModal.fromTemplateUrl('templates/modals/terms.html', {
-        scope: $scope,
-        backdropClickToClose: false,
-        animation: 'slide-in-up'
-      }).then( function (modal) {
-        $scope.termsModal = modal;
-      });
-
       // Cleanup modals
       $scope.$on('$destroy', function () {
         $scope.reset.forgotModal.remove();
         $scope.reset.Modal.remove();
         $scope.verifyModal.remove();
-        $scope.termsModal.remove();
         $scope.loginModal.remove();
       });
 
@@ -177,26 +168,42 @@ app.controller('LoginCtrl', [
           //Therefore the first findOne does not get the user and this one is required
           Journalist.findOne({ filter: query}, function (user) {
             res.user = user;
-            User.set(res);
-
-            $scope.cred = {
-              username: '',
-              password: '',
-              email: '',
-              remember: true
-            };
 
             $scope.invalidLogin = false;
 
-            if($scope.loginModal) {
-              $scope.loginModal.hide();
-            }
+            var succ = function() {
+              User.set(res);
 
-            Platform.loading.hide();
+              $scope.cred = {
+                username: '',
+                password: '',
+                email: '',
+                remember: true
+              };
 
-            Navigate.goOrGoBack();
+              if($scope.loginModal) {
+                $scope.loginModal.hide();
+              }
 
-            Platform.analytics.trackEvent('Login', 'success');
+              Platform.loading.hide();
+              Navigate.goOrGoBack();
+              Platform.analytics.trackEvent('Login', 'success');
+            };
+
+            Terms.ensure(function () {
+              succ();
+            }, function(err) {
+              console.log('Terms & Conditions are out of date. Cannot login!');
+              console.log(err);
+              Journalist.logout(function() {
+                Platform.loading.hide();
+                Platform.showAlert('Sorry but you must accept the terms and conditions to login');
+              }, function(err) {
+                console.log(err);
+                Platform.loading.hide();
+                Platform.showAlert('Sorry but you must accept the terms and conditions to login');
+              });
+            }, user);
           }, function (err) {
             Platform.loading.hide();
             Platform.analytics.trackEvent('Login', 'error', 'status', err.status);
@@ -249,7 +256,7 @@ app.controller('LoginCtrl', [
           if(!res.emailVerified) {
             Platform.loading.hide();
             $scope.verifyModal.show();
-          } else {
+          } else { 
             Journalist.login({
               //  include: 'user',
               rememberMe: $scope.cred.remember
@@ -444,8 +451,7 @@ app.controller('LoginCtrl', [
               $scope.invalid.email = true;
               Platform.analytics.trackEvent('Signup', 'emailAlreadyUsed');
               Platform.showAlert('The email you entered is already used!');
-            }
-            else {
+            } else {
               /* istanbul ignore else */
               if ( $scope.newUser.username ) {
                 user.username = $scope.newUser.username.toLowerCase();
