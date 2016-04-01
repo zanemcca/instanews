@@ -695,7 +695,7 @@ app.factory('Platform', [
                     showConfirm('We need your help changing your location permissions', 'Go to Settings', function (idx) {
                       if(idx === 1) {
                         cordova.plugins.diagnostic.switchToSettings( function() {
-                          permissions.location.isAuthorization(succ, error);
+                          permissions.location.isAuthorized(succ, error);
                         }, error);
                       } else {
                         succ(false);
