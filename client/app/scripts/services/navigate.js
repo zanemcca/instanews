@@ -12,6 +12,7 @@ app.service('Navigate', [
   '$timeout',
   '$window',
   'Platform',
+  'Terms',
   'User',
   function(
     $ionicNavBarDelegate,
@@ -23,6 +24,7 @@ app.service('Navigate', [
     $timeout,
     $window,
     Platform,
+    Terms,
     User
   ){
 
@@ -83,7 +85,12 @@ app.service('Navigate', [
           redirect.prev = current.stateId; 
           $state.go('app.login');
         } else {
-          $state.go(state, params);
+          Terms.ensure(function() {
+            $state.go(state, params);
+          },function() {
+            console.log('Navigation is invalid because terms were not agreed to!');
+            Platform.loading.hide();
+          });
         }
       } else if(current.stateName === state && (!params.id || params.id === current.stateParams.id)) {
         console.log('Not navigating to the same state!');
@@ -122,7 +129,12 @@ app.service('Navigate', [
         loginSuccess = cb;
         go('app.login');
       } else {
-        cb(true);
+        Terms.ensure(function() {
+          cb(true);
+        }, function(err) {
+          console.log('Terms & Conditions are out of date!');
+          console.log(err);
+        });
       }
     };
 
