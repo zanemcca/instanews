@@ -265,3 +265,23 @@
 .fade-switch.ng-enter.ng-enter-active {
   opacity: 1;
 }
+
+// Terms footer
+@mixin text-wrapper {
+  overflow:visible !important;
+  white-space:normal !important;
+  text-overflow:ellipsis !important;
+}
+
+.text-wrapper {
+  @include text-wrapper
+}
+
+.terms-footer {
+  @include text-wrapper;
+  text-align:center !important;
+  line-height:20px !important;
+  color: black !important;
+  font-size: 12px !important;
+  opacity:0.5 !important;
+}
