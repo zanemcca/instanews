@@ -8,6 +8,7 @@ app.controller('LoginCtrl', [
   '$ionicModal',
   'Navigate',
   'Platform',
+  'Terms',
   'User',
   'LocalStorage',
   'Journalist',
@@ -17,9 +18,12 @@ app.controller('LoginCtrl', [
     $ionicModal,
     Navigate,
     Platform,
+    Terms,
     User,
     LocalStorage,
     Journalist) {
+
+      $scope.terms = Terms.getTerms();
 
       $scope.cred = {
         username: '',
@@ -30,6 +34,7 @@ app.controller('LoginCtrl', [
       $scope.verify = {
         token: null
       };
+
       $scope.reset = {
         token: null
       };
@@ -415,6 +420,7 @@ app.controller('LoginCtrl', [
         var user = {
           email: $scope.newUser.email,
           lastUpdated: Date.now(),
+          termsVersion: Terms.getVersion(),
           password: $scope.newUser.password
         };
 
