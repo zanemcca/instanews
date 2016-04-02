@@ -152,5 +152,9 @@ app.controller('FeedCtrl', [
       Articles.inView = false;
       Preload.stop();
     });
+
+    $scope.$on('$ionicView.unloaded', function() {
+      $scope.Articles.remove();
+    });
   }
 ]);

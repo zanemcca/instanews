@@ -31,6 +31,10 @@ app.directive('incomments', [
           keepSync: true
         });
 
+        $scope.$on('$destroy', function() {
+          $scope.Comments.remove();
+        });
+
         $scope.Comments.sync();
 
         $scope.$watch('owner.showComments', function (newVal, oldVal) {

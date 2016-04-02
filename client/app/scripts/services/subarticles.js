@@ -22,7 +22,28 @@ app.service('Subarticles', [
   ){
     var articles = [];
 
-    //TODO Create a preload function that will preload images
+    /*
+     * TODO Enable this, test it and use it to clear the cache in an LRU fashion
+     * Be careful not to clear anything that still has a view for it. It should not but 
+     * be careful anyway.
+    var remove = function (parentId) {
+      var parent;
+      console.log('Removing ' + parentType + ' ' + parentId + ' from ' + items.length);
+
+      var art;
+      var i = -1;
+      for(i in articles) {
+        if(articless[i].spec.options.id === parentId) {
+          art = articles[i];
+          break;
+        }
+      }
+
+      if(art) {
+        articles.splice(i,1);
+      }
+    };
+    */
 
     var findOrCreate = function (parentId) {
       var parent;
@@ -37,10 +58,7 @@ app.service('Subarticles', [
         parent = {
           spec: {
             options: {
-              id: parentId,
-              filter: {
-                limit: 1
-              }
+              id: parentId
             }
           }
         };
