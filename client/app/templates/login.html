@@ -1,6 +1,6 @@
 <!DOCTYPE html>
-<ion-view view-title="Signup">
-  <ion-nav-title>Signup</ion-nav-title>
+<ion-view view-title="Sign Up">
+  <ion-nav-title>Sign Up</ion-nav-title>
   <ion-content>
     <div class="list list-inset" style="margin-top:10;">
       <label class="item item-input item-floating-label"
@@ -25,12 +25,11 @@
         <input type="password" placeholder="Password" ng-model="newUser.password" required>
       </label>
       <button class="button button-positive button-block" ng-click="signup()" ng-disabled="passwordStrength <= 0">
-        Signup
+        Sign Up
       </button>
       <button class="button button-clear button-full" ng-click="loginModal.show()">
         Already have an account?
       </button>
-
 
       <!--div class="item item-divider item-toggle"
       style="border-bottom: 0px; border-left: 0px; border-right:0px; min-height:47px">
@@ -63,4 +62,11 @@
       -->
     </div>
   </ion-content>
+  <ion-footer-bar class="bar-clear">
+    <div class="title terms-footer">
+      <p>
+      By signing up, you agree to our <span ng-click="Terms.modal.show()" style="color: blue;">Terms and Conditions</span>.
+      </p>
+    </div>
+  </ion-footer-bar>
 </ion-view>
