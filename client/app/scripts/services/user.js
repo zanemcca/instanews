@@ -214,6 +214,7 @@ app.service('User', [
       isAdmin: isAdmin,
       reload: reload,
       get: get,
+      agreeToTerms: Journalist.agreeToTerms.bind(Journalist),
       getToken: getToken,
       set: set,
       registerObserver: registerObserver
