@@ -129,6 +129,7 @@ app.controller('ArticleCtrl', [
     $scope.$on('$ionicView.unloaded', function () {
       console.log('Destroying article view!');
       Maps.deleteArticleMap($stateParams.id);
+      $scope.Subarticles.remove();
     });
 
 
