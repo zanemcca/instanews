@@ -191,6 +191,32 @@ module.exports = function(Journalist) {
     });
   };
 
+  Journalist.agreeToTerms = function (id, version, next) {
+    var dd = Journalist.app.DD('Journalist', 'agreeToTerms');
+    Journalist.updateAll({ 
+      username: id,
+    },
+    {
+      termsVersion: version
+    }, function (err, res) {
+      dd.lap('Journalist.updateAll');
+      dd.elapsed();
+      if(err || res.count !== 1) {
+        console.log('Failed to agreeToTerms!');
+        console.log(err);
+        if(!err) {
+          err = new Error('Failed to agreeToTerms');
+          err.status = 404;
+        }
+
+        next(err);
+      } else {
+        console.log('Successfully agreed to terms!');
+        next(null, 0);
+      }
+    });
+  };
+
   Journalist.requestPasswordReset = function (user, next) {
     var dd = Journalist.app.DD('Journalist', 'requestPasswordReset');
     var query = {
@@ -358,6 +384,19 @@ module.exports = function(Journalist) {
       accepts: { arg: 'id', type: 'string', required: true},
       http: {
         path: '/:id/clearBadge', verb: 'put'
+      }
+    }
+  );
+
+  Journalist.remoteMethod(
+    'agreeToTerms',
+    {
+      accepts: [
+        { arg: 'id', type: 'string', required: true},
+        { arg: 'version', type: 'number', required: true}
+      ],
+      http: {
+        path: '/:id/agreeToTerms', verb: 'put'
       }
     }
   );

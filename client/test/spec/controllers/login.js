@@ -32,6 +32,18 @@ describe('Login: ', function(){
         };
       });
 
+      $provide.service('Terms', function() {
+        return {
+          getTerms: function() {},
+          ensure: function(succ, fail) {
+            succ();
+          },
+          getVersion: function() {
+            return 0;
+          }
+        };
+      });
+
       $provide.service('User', function() {
         var set = function(cred) {
         };
@@ -101,6 +113,7 @@ describe('Login: ', function(){
     $cordovaDevice,
     Navigate,
     Platform,
+    Terms,
     User,
     LocalStorage,
     Journalist
@@ -108,6 +121,7 @@ describe('Login: ', function(){
     scope = $rootScope.$new(); 
     state = $state;
     user = User;
+    terms = Terms;
     navigate = Navigate;
     journalist = Journalist;
     storage = LocalStorage;
@@ -120,6 +134,7 @@ describe('Login: ', function(){
       $cordovaDevice: $cordovaDevice,
       Navigate: Navigate,
       Platform: Platform,
+      Terms: terms,
       User: User,
       LocalStorage: LocalStorage,
       Journalist: Journalist
