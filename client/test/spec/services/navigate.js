@@ -4,6 +4,7 @@ describe('instanews.service.navigate', function() {
 
   var navigate,
   user,
+  terms,
   ionicSideMenuDelegate,
   ionicScrollDelegate,
   ionicHistory;
@@ -16,6 +17,15 @@ describe('instanews.service.navigate', function() {
       $provide.service('User', function() {
         return {
           get: function () {}
+        };
+      });
+
+      $provide.service('Terms', function() {
+        return {
+          getTerms: function() {},
+          getVersion: function() {
+            return 0;
+          }
         };
       });
 
@@ -35,11 +45,13 @@ describe('instanews.service.navigate', function() {
     $ionicHistory,
     Navigate,
     Platform,
+    Terms,
     User
   ) {
     navigate = Navigate;
     user = User;
     platform = Platform;
+    terms = Terms;
     ionicSideMenuDelegate = $ionicSideMenuDelegate;
     ionicScrollDelegate = $ionicScrollDelegate;
     ionicHistory = $ionicHistory;

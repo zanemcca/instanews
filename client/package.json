@@ -83,6 +83,8 @@
   ],
   "dependencies": {
     "cordova": "^5.4.1",
-    "ionic": "^1.7.14"
+    "ionic": "^1.7.14",
+    "karma-phantomjs-launcher": "^1.0.0",
+    "phantomjs-prebuilt": "^2.1.7"
   }
 }

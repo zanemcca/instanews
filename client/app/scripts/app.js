@@ -67,6 +67,7 @@ angular.module('instanews', [
   'instanews.service.uploads',
   'instanews.service.user',
   'instanews.service.votes',
+  'instanews.terms',
   'lbServices',
   'ui.router',
   'angularMoment',
