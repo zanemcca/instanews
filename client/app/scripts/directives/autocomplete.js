@@ -3,9 +3,11 @@
 var app = angular.module('instanews.directive.autocomplete', ['ionic', 'ngResource']);
 
 app.directive('inautocomplete', [
+  '_',
   'Platform',
   'Maps',
   function (
+    _,
     Platform,
     Maps
   ) {
@@ -111,7 +113,7 @@ app.directive('inautocomplete', [
 
         $scope.done = true;
 
-        $scope.search = function () {
+        $scope.search = _.debounce(function () {
           $scope.done = true;
           if($scope.input.value && $scope.input.value.length > 0) {
             Maps.autocomplete($scope.input.value, $scope.place, function (predictions) {
@@ -125,7 +127,7 @@ app.directive('inautocomplete', [
           }
 
           Platform.keyboard.hide();
-        };
+        }, 100, true);
 
         Platform.ready
         .then( function() {
