@@ -105,13 +105,13 @@ app.service('Subarticles', [
         .$promise
         .then(function () {
           console.log('Succesfully deleted the subarticle');
+          subarticles.remove(function (subarticle) {
+            return (subarticle.id === id); 
+          });
         },
         function (err) {
           console.log(err);
-        });
-
-        subarticles.remove(function (subarticle) {
-          return (subarticle.id === id); 
+          Platform.showAlert('Please try again.', 'Delete Failed!');
         });
       }; 
 
@@ -126,7 +126,7 @@ app.service('Subarticles', [
 
       var filter = {
         skip: 0,
-        limit: 1,
+        limit: 100,
         where: {
           pending: {
             exists: false

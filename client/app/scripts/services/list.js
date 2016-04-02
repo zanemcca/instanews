@@ -204,6 +204,11 @@ function ListFactory (observable, Platform, PreloadQueue, User) {
         spec.options.filter.skip = spec.items.length;
         notifyObservers();
       }
+
+      /*
+      console.log('Removed ' + removed.length + ' items');
+      console.log(removed);
+     */
       return removed;
     };
 
@@ -275,6 +280,23 @@ function ListFactory (observable, Platform, PreloadQueue, User) {
         if(spec.items.length) {
           spec.items = [];
         }
+
+        /*
+         * This might be a cleaner solution for implicit delete
+         * rather than clearing the list and then adding everything back
+         * as it would not need to clear the list.
+         *
+        var implicitDeleteComparator = function(item) {
+           for(var j in items) {
+             if(items[j].id === item.id) {
+               return false;
+             }
+           }
+           return true;
+        };
+        remove(implicitDeleteComparator);
+       */
+
 
         if(items && items.length) {
           that.add(items, cb);
