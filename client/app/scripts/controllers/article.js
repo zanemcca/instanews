@@ -37,6 +37,7 @@ app.controller('ArticleCtrl', [
     $scope.Platform = Platform;
     var Subs = Subarticles.findOrCreate($stateParams.id);
     $scope.Subarticles = Subs.getLoader({
+      keepSync: true,
       preload: true
     });
 
@@ -52,8 +53,6 @@ app.controller('ArticleCtrl', [
       //$timeout: $timeout,
       list: $scope.Subarticles
     });
-
-    var spec = Subs.getSpec();
 
     $scope.article = {
       modelName: 'article',
@@ -130,6 +129,12 @@ app.controller('ArticleCtrl', [
     $scope.$on('$ionicView.unloaded', function () {
       console.log('Destroying article view!');
       Maps.deleteArticleMap($stateParams.id);
+      $scope.Subarticles.remove();
+    });
+
+
+    $scope.$on('$ionicView.beforeEnter', function() {
+      $scope.Subarticles.reload();
     });
 
     //Refresh the map everytime we enter the view
@@ -141,16 +146,6 @@ app.controller('ArticleCtrl', [
       if(map) {
         google.maps.event.trigger(map, 'resize');
       }
-
-      spec.options.filter.limit = Math.max(Subs.get(), 100);
-      spec.options.filter.skip = 0;
-      Subs.load(function (err) {
-        if(err) {
-          console.log(err);
-        } else {
-          $scope.Subarticles.sync();
-        }
-      });
 
       refreshUploads();
 

@@ -61,12 +61,19 @@ app.factory('Camera', [
                   }
                 };
 
+                var processEntry = function(entry) {
+                  entry.file(function(file) {
+                    entry.size = file.size;
+                    afterCopy(entry);
+                  });
+                };
+
                 //Copy all of the videos into the app directory and create a thumbnail for each
                 for(var  i = 0; i < videoData.length; i++) {
                   if(Platform.isAndroid()) {
                     //Android video is compressed later so copying would be redundunt.
                     //Also android videos are too large to copy sometimes
-                    FileTransfer.resolve(videoData[i].fullPath, afterCopy);
+                    FileTransfer.resolve(videoData[i].fullPath, processEntry);
                   } else {
                     copyFile(videoData[i].fullPath, afterCopy);
                   }

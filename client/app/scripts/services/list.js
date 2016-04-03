@@ -5,7 +5,22 @@ var app = angular.module('instanews.service.list', ['ionic', 'ngCordova']);
 function ListFactory (observable, Platform, PreloadQueue, User) {
   //var list = function (spec, my) {
   var list = function (spec) {
+    var that = observable(spec);
+    /*
     var that;
+
+    // Register and notify observers of the list
+    var registerObserver = function(cb) {
+      spec.observerCallbacks.push(cb);
+    };
+
+    var notifyObservers = function() {
+      angular.forEach(spec.observerCallbacks, function(cb) {
+        cb();
+      });
+    };
+   */
+
     var ogFilter = {}; // A place to keep the original filter for resets
 
     // Retreives the list of items
@@ -116,7 +131,7 @@ function ListFactory (observable, Platform, PreloadQueue, User) {
         if(items === spec.items) {
           spec.items.sort(spec.sortingFunction);
           spec.options.filter.skip = spec.items.length;
-          notifyObservers();
+          that.notifyObservers();
         }
 
         if(shouldEnableFocus) {
@@ -202,8 +217,13 @@ function ListFactory (observable, Platform, PreloadQueue, User) {
       if(removed.length) {
         spec.items = remaining;
         spec.options.filter.skip = spec.items.length;
-        notifyObservers();
+        that.notifyObservers();
       }
+
+      /*
+      console.log('Removed ' + removed.length + ' items');
+      console.log(removed);
+     */
       return removed;
     };
 
@@ -211,7 +231,7 @@ function ListFactory (observable, Platform, PreloadQueue, User) {
     var clear = function () {
       if(spec.items.length) {
         spec.items = [];
-        notifyObservers();
+        that.notifyObservers();
       }
     };
 
@@ -252,17 +272,6 @@ function ListFactory (observable, Platform, PreloadQueue, User) {
       focus.notifyObservers();
     };
 
-    // Register and notify observers of the list
-    var registerObserver = function(cb) {
-      spec.observerCallbacks.push(cb);
-    };
-
-    var notifyObservers = function() {
-      angular.forEach(spec.observerCallbacks, function(cb) {
-        cb();
-      });
-    };
-
     var reload = function (cb) {
       spec.options.filter.skip = 0;
       spec.options.filter.limit = Math.max(get().length + 1, defaultLimit);
@@ -276,10 +285,27 @@ function ListFactory (observable, Platform, PreloadQueue, User) {
           spec.items = [];
         }
 
+        /*
+         * This might be a cleaner solution for implicit delete
+         * rather than clearing the list and then adding everything back
+         * as it would not need to clear the list.
+         *
+        var implicitDeleteComparator = function(item) {
+           for(var j in items) {
+             if(items[j].id === item.id) {
+               return false;
+             }
+           }
+           return true;
+        };
+        remove(implicitDeleteComparator);
+       */
+
+
         if(items && items.length) {
           that.add(items, cb);
         } else {
-          notifyObservers();
+          that.notifyObservers();
           if(cb) {
             cb();
           }
@@ -408,6 +434,11 @@ function ListFactory (observable, Platform, PreloadQueue, User) {
       };
 
       var loader = {
+        remove: function() {
+          if(lSpec.Observer) {
+            lSpec.Observer.unregister();
+          }
+        },
         enableFocus: that.enableFocus,
         add: function(newItems, cb) {
           if(lSpec.preload) {
@@ -461,8 +492,7 @@ function ListFactory (observable, Platform, PreloadQueue, User) {
       };
 
       if(lSpec.keepSync) {
-        //TODO Clear observer
-        registerObserver(loader.sync);
+        lSpec.Observer = that.registerObserver(loader.sync);
       }
 
       focus.registerObserver(lSpec.onItemFocus);
@@ -552,8 +582,8 @@ function ListFactory (observable, Platform, PreloadQueue, User) {
       },
       remove: remove,
       preLoad: preLoad,
-      registerObserver: registerObserver,
-      notifyObservers: notifyObservers,
+      registerObserver: that.registerObserver,
+      notifyObservers: that.notifyObservers,
       areItemsAvailable: areItemsAvailable
     };
 

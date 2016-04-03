@@ -1,38 +1,27 @@
 <!DOCTYPE html>
 
-<form ng-submit="search()" class="list dynamic-box dynamic-autocomplete"
+<form class="list dynamic-box dynamic-autocomplete"
   ng-class="{'card' : Platform.getWidth() >= 768 || Platform.isLandscape() }"
   style="padding-bottom: 0;">
   <div class="bar bar-white item-input">
+    <button type="submit" ng-click="search()" class="button" style="position:absolute;left:-9999px;top:-9999px;height:0;width:0;"></button>
     <label class="item item-input-wrapper"
       style="border:0px;">
      <i class="icon ion-search placeholder-icon"></i>
-     <input ng-if="!isIOS()"
-      type="search"
-      style="max-width: 80%"
-      ng-focus="disableTap()"
-      ng-click="click(this)"
-      on-return="search()"
-      onClick="this.select();"
-      type="text" id="search-input"
-      ng-model="input.value"
-      placeholder="{{input.placeholder}}">
-    <input ng-if="isIOS()"
-      type="search"
-      style="max-width: 80%"
-      ng-focus="disableTap()"
-      ng-click="click()"
-      on-return="search()"
-      onclick="this.setSelectionRange(0, this.value.length);"
-      type="text" id="search-input"
-      ng-model="input.value"
-      placeholder="{{input.placeholder}}">
+     <input type="search"
+       style="max-width: 80%"
+       ng-focus="disableTap()"
+       ng-click="click()"
+       on-return="search()"
+       onClick="SelectText()"
+       type="text" id="search-input"
+       ng-model="input.value"
+       placeholder="{{input.placeholder}}">
     </label>
     <button class="button button-clear"
       ng-click="localize()">
       <i class="icon ion-android-locate dark"></i>
      </button>
-    <button type="submit" class="button" style="position:absolute;left:-9999px;top:-9999px;height:0;width:0;"></button>
   </div>
 </form>
 <div ng-if="!done" class="list dynamic-box" 

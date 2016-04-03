@@ -87,7 +87,6 @@ app.service('Articles', [
       if(!article.preloaded) {
         article.preloaded = true;
 
-        //TODO This should be within a $scope.$apply in order to be rendered
         var update = function () {
           //console.log('Trying to get topSubarticle');
           //If all the subarticles have been removed then remove the article
@@ -121,16 +120,10 @@ app.service('Articles', [
           }
         };  
 
-        if(!article.Subarticles) {
+        if(!article.SubarticleObserver) {
           article.Subarticles = Subarticles.findOrCreate(article.id);
 
-          //TODO Remove after all articles have topSubarticles 
-          //Or maybe not. This provides a hot reload of the top subarticle
-          //after they are loaded while article.topSubarticle is only used to
-          //initialize the item. Also it might not be that annoying to not see the 
-          //topSubarticle at the top of the list. But it would be refreshed after a 
-          //30 sec delay so presumably the topSubarticle would be number 2 or 3 at most
-          article.Subarticles.registerObserver(update);
+          article.SubarticleObserver = article.Subarticles.registerObserver(update);
         }
 
         //var top = article.Subarticles.getTop();
@@ -215,11 +208,16 @@ app.service('Articles', [
       var total = articles.get().length;// + hiddenArticles.get().length;
       console.log('Reorganizing ' + total + ' articles!');
       //var toOutView = 
-      articles.remove(function (article) {
+      var removed = articles.remove(function (article) {
         var position = Position.posToLatLng(article.location);
         return !Position.withinBounds(position);
       });
 
+      for(var i in removed) {
+        if(removed[i].SubarticleObserver) {
+          removed[i].SubarticleObserver.unregister();
+        }
+      }
       /*
       var toInView = hiddenArticles.remove(function (article) {
         var position = Position.posToLatLng(article.location);
