@@ -8,26 +8,15 @@
     <label class="item item-input-wrapper"
       style="border:0px;">
      <i class="icon ion-search placeholder-icon"></i>
-     <input ng-if="!isIOS()"
-      type="search"
-      style="max-width: 80%"
-      ng-focus="disableTap()"
-      ng-click="click(this)"
-      on-return="search()"
-      onClick="this.select();"
-      type="text" id="search-input"
-      ng-model="input.value"
-      placeholder="{{input.placeholder}}">
-    <input ng-if="isIOS()"
-      type="search"
-      style="max-width: 80%"
-      ng-focus="disableTap()"
-      ng-click="click()"
-      on-return="search()"
-      onClick="this.setSelectionRange(0, this.value.length);"
-      type="text" id="search-input"
-      ng-model="input.value"
-      placeholder="{{input.placeholder}}">
+     <input type="search"
+       style="max-width: 80%"
+       ng-focus="disableTap()"
+       ng-click="click()"
+       on-return="search()"
+       onClick="SelectText()"
+       type="text" id="search-input"
+       ng-model="input.value"
+       placeholder="{{input.placeholder}}">
     </label>
     <button class="button button-clear"
       ng-click="localize()">
