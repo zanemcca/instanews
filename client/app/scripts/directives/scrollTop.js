@@ -38,12 +38,7 @@ app.directive('inScrollTop', [
         };
 
         $scope.$on('$ionicView.unloaded', function () {
-          $ionicGesture.off($scope.swipeDownObj, 'swipedown', function (err) {
-            if(err) {
-              console.log('Error: Failed to clear gesture!');
-              console.log(err.stack);
-            }
-          });
+          $ionicGesture.off(swipeGesture, 'swipedown', onSwipeDown);
         });
 
         $scope.showScrollToTop = function () {
@@ -65,7 +60,7 @@ app.directive('inScrollTop', [
         }, 3000, true);
 
         var element = angular.element(document.getElementById($scope.scrollHandle));
-        $ionicGesture.on('swipedown', onSwipeDown, element, $scope.swipeDownObj);
+        var swipeGesture = $ionicGesture.on('swipedown', onSwipeDown, element, $scope.swipeDownObj);
       },
       templateUrl: 'templates/directives/scrollTop.html'
     };
