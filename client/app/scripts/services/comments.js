@@ -32,6 +32,29 @@ app.service('Comments', [
       subarticle: Subarticle
     }; 
 
+    /*
+    var remove = function (commentableType, commentableId) {
+      var parent;
+      var items = cache[commentableType];
+      if(!items) {
+        console.log(commentableType + ' is not a valid commentableType');
+        return;
+      }
+      console.log('Removing ' + commentableType + ' ' + commentableId + ' from ' + items.length);
+
+      var i = -1;
+      for(i in items) {
+        if(items[i].spec.options.id === commentableId) {
+          break;
+        }
+      }
+
+      if(i > -1) {
+        items.splice(i,1);
+      }
+    };
+    */
+
     var findOrCreate = function (commentableType, commentableId) {
       var parent;
       var items = cache[commentableType];
@@ -102,13 +125,12 @@ app.service('Comments', [
         .$promise
         .then(function () {
           console.log('Succesfully deleted the comment');
+          comments.remove(function (comment) {
+            return (comment.id === id); 
+          });
         },
         function (err) {
           console.log(err);
-        });
-
-        comments.remove(function (comment) {
-          return (comment.id === id); 
         });
       };
 
@@ -134,7 +156,7 @@ app.service('Comments', [
 
       var filter = {
         skip: 0,
-        limit: 5,
+        limit: 100,
         order: 'rating DESC'
       };
 
