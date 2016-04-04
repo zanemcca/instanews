@@ -3,57 +3,55 @@ module.exports = function(options) {
 
   var email = require('../helpers/email.js').email;
 
-  return function errorHandler(err, req, res, next) {
     /* istanbul ignore if */
-    if(process.env.NODE_ENV === 'production' ||
-       process.env.NODE_ENV === 'staging') {
+  return function errorHandler(err, req, res, next) {
 
-      if(err.status) { 
-        res.statusCode = err.status;
-      }
+    res.statusCode = err.status || err.statusCode || res.statusCode;
 
-      if(!res.statusCode || res.statusCode < 400) {
-        res.statusCode = 500;
-      }
+    if(!res.statusCode || res.statusCode < 400) {
+      res.statusCode = 500;
+    }
 
-      var e = {
-        error: err.code || 'server_error'
-      };
+    var e = {
+      status: res.statusCode,
+      error: err.code || 'server_error'
+    };
 
-      if(res.statusCode === 404) {
-        e.message = 'This is not the page you are looking for ...';
-      } else if( err.status === 401 || err.status === 403 ) {
-        e.message = 'Thou shalt not pass!!!';
-      }
-      else {
-        console.error('Unrecoverable - error status code!');
-        console.error(err.stack);
-
-//        if(process.env.NODE_ENV === 'production') {
-          //Send a notification to the backend manager
-          //transport.sendMail({
-          email.send({
-            from: 'error@instanews.com',
-            to: 'alertbackend@instanews.com',
-            subject: err.message,
-            text: err.stack
-          }, function(err, info) {
-            if (err) {
-              console.log('Failed to send email!');
-              console.error(err);
-            } else {
-              console.log('Error report has been mailed to' +
-                          'alertbackend@instanews.com\n');
-            }
-            process.exit(1);
-          });
-  //      }
-      }
-
+    if(res.statusCode === 404) {
+      e.message = 'This is not the page you are looking for ...';
       res.send(e);
+    } else if( res.statusCode === 401 || res.statusCode === 403 ) {
+      e.message = 'Thou shalt not pass!!!';
+      res.send(e);
+    } else {
+      console.error('Unrecoverable - error status code!');
+      console.error(err.stack);
+
+      if(process.env.NODE_ENV === 'production' ||
+         process.env.NODE_ENV === 'staging') {
+        //Send a notification to the backend manager
+        email.send({
+          from: 'error@instanews.com',
+          to: 'alertbackend@instanews.com',
+          subject: err.message,
+          text: err.stack
+        }, function(err, info) {
+          if (err) {
+            console.log('Failed to send email!');
+            console.error(err);
+          } else {
+            console.log('Error report has been mailed to' +
+                        'alertbackend@instanews.com\n');
+          }
+          process.exit(1);
+        });
+        res.send(e);
+      } else {
+        e.stack = err.stack;
+        res.send(e);
+        process.exit(1);
+      }
     }
-    else {
-      next(err);
-    }
+
   };
 };

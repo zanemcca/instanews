@@ -507,6 +507,14 @@ if(cluster.isMaster && numCPUs > 1 && process.env.NODE_ENV === 'production') {
     app.start();
   }
 
+
+  //Setup error handler last
+  var errorHandler = require('./middleware/errorHandler.js')();
+  app.get('remoting').errorHandler = {
+    handler: errorHandler,
+    disableStackTrace: (process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'staging')
+  };
+
   //export the app for testing
   exports = module.exports = app;
 }
