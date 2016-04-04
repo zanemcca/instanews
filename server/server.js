@@ -351,7 +351,7 @@ if(cluster.isMaster && numCPUs > 1 && process.env.NODE_ENV === 'production') {
   };
 
   var setupLogging = function () {
-    app.debug = require('./logging.js').debug;
+    app.debug = require('./helpers/logging.js').debug;
     // istanbul ignore if
     if( process.env.NODE_ENV === 'production') {
          var loggerFmt = 'method: :method,,' +
@@ -368,6 +368,10 @@ if(cluster.isMaster && numCPUs > 1 && process.env.NODE_ENV === 'production') {
     } else {
       app.use(loopback.logger('dev'));
     }
+  };
+
+  var setupEmail = function () {
+    app.email = require('./helpers/email.js').email;
   };
 
   // istanbul ignore next

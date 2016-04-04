@@ -3,7 +3,7 @@ module.exports = function(Stat) {
 
   Stat.averageId = 'averageJoe';
 
-  var debug = require('../logging').debug('models:stat');
+  var debug = require('../helpers/logging').debug('models:stat');
 
   //TODO Create a probability and statistics library for javascript
   // Takes all arguments and calculates the 
