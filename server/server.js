@@ -259,18 +259,28 @@ if(cluster.isMaster && numCPUs > 1 && process.env.NODE_ENV === 'production') {
     //TODO Secure this so we can expose it for debugging production
     kue.app.listen(5001);
 
-    //Process the updateBase queue
-    app.jobs.process('deferredUpdate', function (job, done) {
-      var dd = app.DD('Jobs', 'processDeferredUpdate');
-      app.models.Base.processUpdate(job.data.key, function (err) {
-        if(err) {
-          console.error('Failed to process the job!');
-          console.error(err);
-          return done(err);
-        }
+    //Recover stuck jobs every 10 sec
+    app.jobs.watchStuckJobs(10000);
 
-        dd.lap('Base.processUpdate');
-        done();
+    //Process the updateBase queue
+    app.jobs.process('deferredUpdate', function (job, ctx, done) {
+      var dd = app.DD('Jobs', 'processDeferredUpdate');
+      ctx.pause(500, function(err) {
+        app.models.Base.processUpdate(job.data.key, function (err) {
+          if(err) {
+            console.error('Failed to process the job!');
+            console.error(err);
+            return done(err);
+          }
+
+          dd.lap('Base.processUpdate');
+          done();
+
+          // Max 1 job/sec/node
+          setTimeout(function() {
+            ctx.resume();
+          }, 1000);
+        });
       });
     });
 

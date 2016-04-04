@@ -281,7 +281,12 @@ module.exports = function(Base) {
         .on('failed attempt', function () {
           dd.increment('Jobs.failedAttempt');
         })
+        /*
+         * TODO Need to recreate the item since processUpdate gets and destroys the update atomically
         .attempts(5)
+        .backoff({type:'exponential'})
+        */
+        .priority('low')
         .removeOnComplete(true)
         .save();
       }
