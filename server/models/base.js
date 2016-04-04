@@ -49,14 +49,14 @@ module.exports = function(Base) {
       }
       if(data.$inc) {
         for(var i in data.$inc) {
-          console.log('data.$inc.' + i + ' = ' + data.$inc[i]);
+          //console.log('data.$inc.' + i + ' = ' + data.$inc[i]);
           red = red.hincrby(key, i, data.$inc[i]);
         }
       }
       if(data.$set) {
         var args = [];
         for(var j in data.$set) {
-          console.log('data.$set.' + j + ' = ' + data.$set[j]);
+          //console.log('data.$set.' + j + ' = ' + data.$set[j]);
           args.push(j);
           args.push(data.$set[j]);
         }
@@ -84,10 +84,11 @@ module.exports = function(Base) {
   };
 
   Base.processUpdate = function(key, next) {
+    var debug = Base.app.debug('models:base');
     var dd = Base.app.DD('Base','processUpdate');
+    debug('processUpdate', key);
 
     var redis = Base.app.redisClient;
-    console.log('Processing: ' + key);
     redis.multi().hgetall(key).del(key).exec(function(err, res) {
       dd.lap('Redis.getAndDelete');
       if(err) {
@@ -125,9 +126,6 @@ module.exports = function(Base) {
             return cb(err);
           }
 
-          console.log('Found Comments');
-          console.log(res);
-
           notCommentRating = 1;
           commentCount = res.length;
           for(var i in res) {
@@ -152,10 +150,6 @@ module.exports = function(Base) {
             //TODO Don't worry about it. Just create a new deferred update
             return cb(err);
           }
-
-          console.log('Found Subarticles');
-          console.log(res);
-
 
           notSubarticleRating = 1;
           subarticleCount = res.length;
@@ -224,21 +218,21 @@ module.exports = function(Base) {
           getDeferredUpdateType(key),
           function(instance) {
             for(var i in incs) {
-              console.log('Incrementing ' + i + ': ' + incs[i]);
+              //console.log('Incrementing ' + i + ': ' + incs[i]);
               instance[i] += incs[i];
             }
             if(notSubarticleRating >= 0) {
-              console.log('Updating notSubarticleRating: ' + notSubarticleRating);
-              console.log('Updating createSubarticleCount: ' + subarticleCount);
-              console.log('Updating topSub: ');
-              console.log(topSubarticle);
+              //console.log('Updating notSubarticleRating: ' + notSubarticleRating);
+              //console.log('Updating createSubarticleCount: ' + subarticleCount);
+              //console.log('Updating topSub: ');
+              //console.log(topSubarticle);
               instance.createSubarticleCount = subarticleCount;
               instance.notSubarticleRating = notSubarticleRating;
               instance.topSubarticle = topSubarticle;
             }
             if(notCommentRating >= 0) {
-              console.log('Updating notCommentRating: ' + notCommentRating);
-              console.log('Updating createCommentCount: ' + commentCount);
+              //console.log('Updating notCommentRating: ' + notCommentRating);
+              //console.log('Updating createCommentCount: ' + commentCount);
               instance.createCommentCount = commentCount;
               instance.notCommentRating = notCommentRating;
             }
@@ -260,10 +254,9 @@ module.exports = function(Base) {
   };
 
   Base.deferUpdate = function (id, type, data, next) {
+    var debug = Base.app.debug('models:base');
     var dd = Base.app.DD('Base', 'deferUpdate');
-
-    console.log('Creating an update job for ' + type + ': ' + id);
-    console.log(data);
+    debug('deferUpdate', id, type, data);
 
     createOrUpdateDeferredUpdate(id, type, data, function(err, newInstance) {
       dd.lap('Redis.createOrUpdate');
@@ -288,7 +281,7 @@ module.exports = function(Base) {
         .on('failed attempt', function () {
           dd.increment('Jobs.failedAttempt');
         })
-        //.attempts(5)
+        .attempts(5)
         .removeOnComplete(true)
         .save();
       }

@@ -34,14 +34,12 @@ module.exports = function(Article) {
             console.error(err);
             return next(err);
           } else {
-            console.log('Successfully cleared the pending flag on the article');
             next();
           }
          });
       } 
       // istanbul ignore else
       else {
-        console.log('The pending flag on the article has already been cleared');
         next();
       } 
     });
@@ -52,6 +50,7 @@ module.exports = function(Article) {
   };
 
   Article.getHeatMap = function (box, cb) {
+    var debug = Article.app.debug('models:article');
     var dd = Article.app.DD('Article', 'getHeatMap');
     Article.find({
       limit: 500,
@@ -82,7 +81,7 @@ module.exports = function(Article) {
         console.error('Failed to find articles for the heatmap!');
         console.error(err.stack);
       } else {
-        console.log('Found ' + res.length + ' articles for the heatmap');
+        debug('getHeatMap', res.length);
         cb(null, res);
       }
     });

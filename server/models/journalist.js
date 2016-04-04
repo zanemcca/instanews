@@ -120,7 +120,6 @@ module.exports = function(Journalist) {
             console.log(err);
             next(err);
           } else {
-            console.log('Successfully incremented the badge number!');
             next(null, res.badge);
           }
         });
@@ -154,7 +153,6 @@ module.exports = function(Journalist) {
               console.log(err);
               next(err);
             } else {
-              console.log('Successfully decremented the badge number!');
               next(null, res.badge);
             }
           });
@@ -185,7 +183,6 @@ module.exports = function(Journalist) {
 
         next(err);
       } else {
-        console.log('Successfully cleared the badge number!');
         next(null, 0);
       }
     });
@@ -211,7 +208,6 @@ module.exports = function(Journalist) {
 
         next(err);
       } else {
-        console.log('Successfully agreed to terms!');
         next(null, 0);
       }
     });
@@ -281,8 +277,6 @@ module.exports = function(Journalist) {
       dd.elapsed();
       if (err) {
         console.error(err.stack);
-      } else {
-        console.log('Successful password reset email sent');
       }
     });
   });
@@ -360,7 +354,6 @@ module.exports = function(Journalist) {
             err.status = 404;
             next(err);
           } else {
-            console.log(token);
             if(!token || token.userId !== res.username) {
               err = new Error('Unauthorized password reset request');
               err.status = 401;

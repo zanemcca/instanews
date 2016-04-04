@@ -228,6 +228,7 @@ module.exports = function(Storage) {
   };
 
   Storage.triggerTranscoding = function (containerName, file, cb) {
+    var debug = Storage.app.debug('models:storage');
     var dd = Storage.app.DD('Storage','triggerTranscoding');
 
     if(process.env.NODE_ENV === 'staging' && containerName.indexOf('test') === -1) {
@@ -270,7 +271,7 @@ module.exports = function(Storage) {
               obj.outputs.push(key);
             }
 
-            console.log('Transcoding Job ' + id + ' has started!');
+            debug('triggerTranscoding',id);
             cb(null, obj);
           });
         } else {
@@ -285,7 +286,7 @@ module.exports = function(Storage) {
             console.error(err.stack); // an error occurred
             cb(err);
           } else {
-            console.log('imageTranscoding of ' + file + ' has started succeffully');
+            debug('triggerTranscoding', file);
             cb();
           }
         });
@@ -300,6 +301,7 @@ module.exports = function(Storage) {
   };
 
   Storage.transcodingComplete = function (ctx, next) {
+    var debug = Storage.app.debug('models:storage');
     var dd = Storage.app.DD('Storage','transcodingComplete');
     var Subarticle = Storage.app.models.Subarticle;
     var req = ctx.req;
@@ -352,7 +354,7 @@ module.exports = function(Storage) {
                 Subarticle.clearPending(message, function (err) {
                   dd.lap('Subarticle.clearPending');
                   dd.elapsed();
-                  console.log('Transcoding Job ' + message.jobId + ' has finished!');
+                  debug('transcodingComplete', message.jobId);
                   if(err) {
                     console.error(err);
                   }
