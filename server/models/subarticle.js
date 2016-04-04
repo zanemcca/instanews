@@ -35,7 +35,6 @@ module.exports = function(Subarticle) {
           }
         };
 
-        console.log(res);
         if(message.sources) {
           query.$set = {
             '_file.sources': message.sources 

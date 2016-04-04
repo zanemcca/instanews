@@ -26,6 +26,9 @@ var findOne;
 function start() {
   Storage = {
     app: {
+      debug: function(string) {
+        return function() {};
+      },
       DD: function() {
         return {
           lap: function () {},

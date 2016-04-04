@@ -353,16 +353,6 @@ module.exports = function(app) {
           }
         }
 
-          /*
-           * This is covered by the update job processing
-          var variable = 'not' + modelName + 'Rating';
-          if(!data.$mul) {
-            data.$mul = {};
-          }
-          data.$mul[variable] = (1 - Stat.getDefaultRating(modelName));
-          //console.log('Click ' + variable + ': ' + data.$mul[variable]);
-         */
-
         Base.deferUpdate(inst.clickableId, inst.clickableType, { updateRating: true }, function (err) { 
           dd.lap('Base.deferUpdate');
           if(err) {
@@ -370,8 +360,6 @@ module.exports = function(app) {
             return next(err);
           }
 
-          console.log('Updating info immediately!');
-          console.log(data);
           inst.clickable(function(err, res) {
             dd.lap('Click.clickable');
             if(err || !res) {
@@ -407,28 +395,6 @@ module.exports = function(app) {
               }
               else {
                 next();
-                /*
-                 * The deferred update will trigger the rating
-                Stat.triggerRating({
-                  id: inst.clickableId
-                },
-                inst.clickableType,
-                null,
-                function(err, res) {
-                  timer.lap('Click.updateClickableAttributes.triggerRating');
-                  if(err) { 
-                    //Conflicts are ok because it means that 
-                    //someone else has just triggered the rating.
-                    //So we will not throw an error
-                    console.error('Error: Failed to update the rating for ' +
-                                  inst.clickableType + ' - ' + inst.clickableId +
-                                  ' from click ' + inst.id);
-                    console.error(err.stack);
-                    return next(err);
-                  }
-                  next();
-                }); 
-               */
               }
             });
           });
