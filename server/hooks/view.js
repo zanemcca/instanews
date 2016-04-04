@@ -67,7 +67,7 @@ module.exports = function(app) {
   });
 
   View.observe('after save', function(ctx, next) {
-    var dd = app.DD('View','beforeDelete');
+    var dd = app.DD('View','afterSave');
     debug('after save', ctx, next);
     var inst = ctx.instance;
 
