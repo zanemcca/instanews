@@ -111,7 +111,7 @@ app.directive('inautocomplete', [
 
         $scope.localize = function () {
           if($scope.place.post) {
-            $scope.place.localize(18, function(pos) {
+            $scope.place.localize({ zoom: 18 }, function(pos) {
               if(pos) {
                 Maps.setMarker($scope.place.getMap(), pos);
               }

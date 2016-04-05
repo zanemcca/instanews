@@ -449,7 +449,7 @@ return gradient;
         getMap: getPostMap,
         ignore: ['country', 'administrative_area_level_1'],
         onLocalize: function () {}, //Ovverriden in autocomplete directive
-        localize: function (zoom, cb) {
+        localize: function (options, cb) {
           cb = cb || function () {};
           place.onLocalize();
           // istanbul ignore else 
@@ -464,7 +464,7 @@ return gradient;
                 setTimeout(function () {
                   map = place.getMap();
                   if(map) {
-                    localize(map, zoom, function (err, pos) {
+                    localize(map, options, function (err, pos) {
                       if(err) {
                         console.log('Error: ' + err);
                         cb();
