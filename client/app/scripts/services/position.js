@@ -185,7 +185,7 @@ app.service('Position', [
 
       Platform.ready
       .then( function() {
-        if(Platform.isIOS() && !Platform.isBrowser()) {
+        if(Platform.isIOS() || Platform.isBrowser()) {
           LocalStorage.secureRead('geolocationPermission', function(err, res) {
             if(err || !res || !res.hasPermission) {
               if(err) {
@@ -196,9 +196,9 @@ app.service('Position', [
               Platform.showConfirm(
                 'To see news in your area, allow instanews to use your location.',
                 'instanews never shares your location!',
-                ['Later', 'Allow'],
+                ['Allow', 'Later'],
                 function (buttonIdx) {
-                  if(buttonIdx === 2) {
+                  if(buttonIdx === 1) {
                     var permission = {
                       hasPermission: true
                     };
@@ -215,7 +215,7 @@ app.service('Position', [
               cb();
             }
           });
-        } else if (Platform.isAndroid6() && !Platform.isBrowser()) {
+        } else if (Platform.isAndroid6()) {
           Platform.permissions.location.requestAuthorization(function (authorized) {
             if(authorized) {
               setupGeolocation();
