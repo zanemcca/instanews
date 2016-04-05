@@ -24,6 +24,9 @@ function start() {
           return "id";
         }
       },
+      debug: function(string) {
+        return function() {};
+      },
       DD: function() {
         return {
           lap: function () {},

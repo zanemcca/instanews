@@ -415,12 +415,8 @@ function ListFactory (observable, Platform, PreloadQueue, User) {
         };
 
         for(var i in items) {
-          if(!items[i].preloaded) {
-            items[i].preLoad = preLoad.bind(this, items[i]);
-            PreloadQueue.add(items[i]).then(done, error);
-          } else {
-            done(items[i]);
-          }
+          items[i].preLoad = preLoad.bind(this, items[i]);
+          PreloadQueue.add(items[i]).then(done, error);
         }
       };
 

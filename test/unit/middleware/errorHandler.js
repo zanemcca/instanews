@@ -86,9 +86,9 @@ exports.run = function () {
       });
     } else {
       describe('development mode', function () {
-        it('should call next with the error', function (done) {
-          Next = function (e) {
-            expect(e).to.equal(err);
+        it('should call res.send with a new error', function (done) {
+          res.send = function (e) {
+            expect(e).to.not.equal(err);
             done();
           };
           run();

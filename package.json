@@ -40,6 +40,7 @@
     "node-uuid": "^1.4.7",
     "nodemailer": "~1.10.0",
     "pem": "^1.7.2",
+    "sendgrid": "^2.0.0",
     "serve-favicon": "^2.0.1",
     "sns-validator": "^0.2.0",
     "sprintf-js": "^1.0.3"

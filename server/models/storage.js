@@ -199,17 +199,15 @@ module.exports = function(Storage) {
           }
           cntr.Params.Outputs[j].ThumbnailPattern = thumbnail;
         }
-        console.dir(cntr.Params);
         return cntr.Params;
       } else if(cntr.Type === 'photo') {
         cntr.Params.Payload = JSON.stringify({
           name: filename,
           container: containerName
         });
-        console.dir(cntr.Params);
         return cntr.Params;
       } else {
-        console.log('Unknown container type!');
+        console.warn('Unknown container type!');
         console.dir(cntr);
       }
     }
@@ -230,6 +228,7 @@ module.exports = function(Storage) {
   };
 
   Storage.triggerTranscoding = function (containerName, file, cb) {
+    var debug = Storage.app.debug('models:storage');
     var dd = Storage.app.DD('Storage','triggerTranscoding');
 
     if(process.env.NODE_ENV === 'staging' && containerName.indexOf('test') === -1) {
@@ -272,7 +271,7 @@ module.exports = function(Storage) {
               obj.outputs.push(key);
             }
 
-            console.log('Transcoding Job ' + id + ' has started!');
+            debug('triggerTranscoding',id);
             cb(null, obj);
           });
         } else {
@@ -287,8 +286,7 @@ module.exports = function(Storage) {
             console.error(err.stack); // an error occurred
             cb(err);
           } else {
-            console.log('imageTranscoding of ' + file + ' has started succeffully');
-            console.dir(data);           // successful response
+            debug('triggerTranscoding', file);
             cb();
           }
         });
@@ -303,6 +301,7 @@ module.exports = function(Storage) {
   };
 
   Storage.transcodingComplete = function (ctx, next) {
+    var debug = Storage.app.debug('models:storage');
     var dd = Storage.app.DD('Storage','transcodingComplete');
     var Subarticle = Storage.app.models.Subarticle;
     var req = ctx.req;
@@ -322,12 +321,9 @@ module.exports = function(Storage) {
           //job = JSON.parse(job);
         } catch(e) {
           var err = new Error('Failed to parse the raw body');
-          console.log(e);
+          console.error(e);
           return next(err);
         }
-
-        console.log('\nJob After Parse');
-        console.dir(job, { colors: true });
 
         validator.validate(job, function(err, job) {
           dd.lap('Validator.validate');
@@ -342,24 +338,23 @@ module.exports = function(Storage) {
 
                 try {
                   message = JSON.parse(message);
-                  console.dir(message, { colors: true });
                 } catch(e) {
                   err = new Error('Failed to parse the notification message');
-                  console.log(e);
+                  console.error(e);
                   return next(err);
                 }
 
                 if(!message.jobId) {
                   var e = new Error('No JobId was given in the notification message');
                   e.status = 400;
-                  console.log(e);
+                  console.error(e);
                   return next(e);
                 }
 
                 Subarticle.clearPending(message, function (err) {
                   dd.lap('Subarticle.clearPending');
                   dd.elapsed();
-                  console.log('Transcoding Job ' + message.jobId + ' has finished!');
+                  debug('transcodingComplete', message.jobId);
                   if(err) {
                     console.error(err);
                   }
@@ -397,7 +392,7 @@ module.exports = function(Storage) {
           }
         });
       } else {
-        console.log('No data passed into transcodingComplete');
+        console.warn('No data passed into transcodingComplete');
         next();
       }
     });
@@ -513,7 +508,7 @@ module.exports = function(Storage) {
       dd.lap('S3.copyObject');
       if( err) {
         console.error('Failed to copy the given instance');
-        console.log(params);
+        console.dir(params);
         console.error(err.stack);
         next(err);
       } else {
@@ -526,7 +521,7 @@ module.exports = function(Storage) {
           dd.lap('S3.deleteObject');
           if(err) {
             console.error('Failed to delete the given instance');
-            console.log(params);
+            console.dir(params);
             console.error(err.stack);
             next(err);
           } else {

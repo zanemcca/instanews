@@ -7,6 +7,7 @@ var app = angular.module('instanews.directive.map', [
 
 app.directive('inmap', [
   '$stateParams',
+  '$ionicGesture',
   'Position',
   'Maps',
   'Platform',
@@ -14,6 +15,7 @@ app.directive('inmap', [
   '_',
   function (
     $stateParams,
+    $ionicGesture,
     Position,
     Maps,
     Platform,
@@ -85,19 +87,37 @@ app.directive('inmap', [
                 map.mapTypes.set(instanewsMapTypeId, instanewsMapType);
                 map.setMapTypeId(instanewsMapTypeId);
 
+
                 //Listener on bounds changing on the map
                 google.maps.event.addListener(map, 'bounds_changed', _.debounce(function() {
+                  //console.log('Bounds changed!');
+                 // options.cancel = true;
                   if(Articles.inView) {
                     console.log('Updating bounds');
                     Position.setBounds(map.getBounds());
                   }
                 }, 100));
 
-                //TODO Use this to create teh localization button on the map
+                //TODO Use this to create the localization button on the map
                 //map.controls[google.maps.ControlPosition.TOP_CENTER].push(TEMPLATE);
 
                 Maps.setFeedMap(map);
-                Maps.localize(map);
+
+                var options = {
+                  cancel: false
+                };
+
+                var feed = angular.element(document.getElementById('feed'));
+
+                var touchListener = function() {
+                  options.cancel = true;
+                  $ionicGesture.off(touchGesture, 'touch', touchListener);
+                };
+                var touchGesture = $ionicGesture.on('touch', touchListener, feed); 
+
+                Maps.localize(map, options, function(err) {
+                  console.log(err);
+                });
 
                 break;
               }

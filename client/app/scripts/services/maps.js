@@ -276,41 +276,45 @@ return gradient;
       }
     };
 
-    var localize = function(map, zoom, cb) {
-      var position; 
-      if(!zoom || typeof zoom === 'function') {
-        if(zoom && !cb) {
-          cb = zoom;
+    var localize = function(map, options, cb) {
+      if(!options || typeof options === 'function') {
+        if(options && !cb) {
+          cb = options;
         }
-        zoom = 10;
+        options = {};
       }
+      options.zoom = options.zoom || 10;
 
       var finish = function () {
-        if (setCenter(map, position)) {
-          map.setZoom(zoom);
-          if(zoom >= 18) {
-            map.setTilt(45);
-          }
-          if(cb) {
-            cb(null, position);
+        if(options.cancel) {
+          cb('Cancelled localization!');
+        } else {
+          var position = Position.getPosition(); 
+          if (setCenter(map, position)) {
+            map.setZoom(options.zoom);
+            if(options.zoom >= 18) {
+              map.setTilt(45);
+            }
+            if(cb) {
+              cb(null, position);
+            }
+            else {
+              console.log('Successful localization!');
+            }
           }
           else {
-            console.log('Successful localization!');
-          }
+            if(cb) {
+              cb('Failed localization!');
+            }
+            else {
+              console.log('FAILED localization!');
+            }
+          } 
         }
-        else {
-          if(cb) {
-            cb('Failed localization!');
-          }
-          else {
-            console.log('FAILED localization!');
-          }
-        } 
       };
 
       Position.getPermission( function() {
         Position.ready.then(function () {
-          position = Position.getPosition(); 
           finish();
         });
       }, function () {
