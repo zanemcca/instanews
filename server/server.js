@@ -259,18 +259,28 @@ if(cluster.isMaster && numCPUs > 1 && process.env.NODE_ENV === 'production') {
     //TODO Secure this so we can expose it for debugging production
     kue.app.listen(5001);
 
-    //Process the updateBase queue
-    app.jobs.process('deferredUpdate', function (job, done) {
-      var dd = app.DD('Jobs', 'processDeferredUpdate');
-      app.models.Base.processUpdate(job.data.key, function (err) {
-        if(err) {
-          console.error('Failed to process the job!');
-          console.error(err);
-          return done(err);
-        }
+    //Recover stuck jobs every 10 sec
+    app.jobs.watchStuckJobs(10000);
 
-        dd.lap('Base.processUpdate');
-        done();
+    //Process the updateBase queue
+    app.jobs.process('deferredUpdate', function (job, ctx, done) {
+      var dd = app.DD('Jobs', 'processDeferredUpdate');
+      ctx.pause(500, function(err) {
+        app.models.Base.processUpdate(job.data.key, function (err) {
+          if(err) {
+            console.error('Failed to process the job!');
+            console.error(err);
+            return done(err);
+          }
+
+          dd.lap('Base.processUpdate');
+          done();
+
+          // Max 1 job/sec/node
+          setTimeout(function() {
+            ctx.resume();
+          }, 1000);
+        });
       });
     });
 
@@ -351,7 +361,7 @@ if(cluster.isMaster && numCPUs > 1 && process.env.NODE_ENV === 'production') {
   };
 
   var setupLogging = function () {
-    app.debug = require('./logging.js').debug;
+    app.debug = require('./helpers/logging.js').debug;
     // istanbul ignore if
     if( process.env.NODE_ENV === 'production') {
          var loggerFmt = 'method: :method,,' +
@@ -368,6 +378,10 @@ if(cluster.isMaster && numCPUs > 1 && process.env.NODE_ENV === 'production') {
     } else {
       app.use(loopback.logger('dev'));
     }
+  };
+
+  var setupEmail = function () {
+    app.email = require('./helpers/email.js').email;
   };
 
   // istanbul ignore next
@@ -492,6 +506,14 @@ if(cluster.isMaster && numCPUs > 1 && process.env.NODE_ENV === 'production') {
   if (require.main === module) {
     app.start();
   }
+
+
+  //Setup error handler last
+  var errorHandler = require('./middleware/errorHandler.js')();
+  app.get('remoting').errorHandler = {
+    handler: errorHandler,
+    disableStackTrace: (process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'staging')
+  };
 
   //export the app for testing
   exports = module.exports = app;

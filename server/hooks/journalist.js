@@ -283,6 +283,8 @@ module.exports = function(app) {
     if (!instance.findById) {
       instance.unsetAttribute('username');
       instance.setAttribute('used', true);
+    } else {
+      instance.unsetAttribute('findById');
     }
 
     done();
@@ -291,7 +293,6 @@ module.exports = function(app) {
   Journalist.afterRemote('findById', function(ctx, instance, next) {
     var dd = app.DD('Journalist','afterFindById');
     debug('afterRemote findById', instance, next);
-    console.log('Checking!');
 
     if(instance) {
       instance.findById = true;
@@ -307,7 +308,6 @@ module.exports = function(app) {
   Journalist.afterRemote('findOne', function(ctx, instance, next) {
     var dd = app.DD('Journalist','afterFindOne');
     debug('afterRemote findOne', instance, next);
-    console.log('Checking! findOne');
 
     if(instance) {
       checkLoadedUser(instance, function(err) {
@@ -323,7 +323,6 @@ module.exports = function(app) {
   Journalist.afterRemote('find', function(ctx, instances, next) {
     var dd = app.DD('Journalist','afterFind');
     debug('afterRemote find', instances, next);
-    console.log('Checking! find');
 
     if(instances.length) {
       var funcs = [];

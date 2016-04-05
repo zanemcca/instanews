@@ -14,7 +14,6 @@ module.exports = function(app) {
         return next(err);
       }
 
-      console.log('Finished transcoding trigger!');
       if(res) {
         inst.sources = res.outputs;
         inst.poster = res.posters[0];
@@ -26,8 +25,6 @@ module.exports = function(app) {
 
       inst.unsetAttribute('source');
       inst.unsetAttribute('container');
-
-      console.dir(inst);
 
       next();
     });
