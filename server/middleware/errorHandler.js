@@ -8,7 +8,7 @@ module.exports = function(options) {
 
     res.statusCode = err.status || err.statusCode || res.statusCode;
 
-    if(!res.statusCode || res.statusCode < 400) {
+    if(!res.statusCode) {
       res.statusCode = 500;
     }
 
@@ -17,14 +17,19 @@ module.exports = function(options) {
       error: err.code || 'server_error'
     };
 
-    if(res.statusCode === 404) {
+    if(res.statusCode < 400) {
+      res.send(err);
+    } else if(res.statusCode === 404) {
       e.message = 'This is not the page you are looking for ...';
       res.send(e);
     } else if( res.statusCode === 401 || res.statusCode === 403 ) {
       e.message = 'Thou shalt not pass!!!';
       res.send(e);
+    } else if( [422, 400, 429].indexOf(res.statusCode) > -1) {
+      e.error = err.error;
+      res.send(e);
     } else {
-      console.error('Unrecoverable - error status code!');
+      console.error('Unrecoverable - error status code ' + res.statusCode);
       console.error(err.stack);
 
       if(process.env.NODE_ENV === 'production' ||
