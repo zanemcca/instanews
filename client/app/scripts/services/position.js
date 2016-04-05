@@ -89,7 +89,7 @@ app.service('Position', [
           }
         };
 
-        if(Platform.isIOS()) {
+        if(Platform.isIOS() && !Platform.isBrowser()) {
           LocalStorage.secureWrite('position', pos);
         }
 
@@ -154,7 +154,7 @@ app.service('Position', [
               enableHighAccuracy: true   //GPS & Network based location
             });
 
-            if(Platform.isIOS()) {
+            if(Platform.isIOS() && !Platform.isBrowser()) {
               //If the users location is not found in one second then try and read the last known position
               setTimeout(function () {
                 // istanbul ignore else
@@ -185,7 +185,7 @@ app.service('Position', [
 
       Platform.ready
       .then( function() {
-        if(Platform.isIOS()) {
+        if(Platform.isIOS() && !Platform.isBrowser()) {
           LocalStorage.secureRead('geolocationPermission', function(err, res) {
             if(err || !res || !res.hasPermission) {
               if(err) {
@@ -215,7 +215,7 @@ app.service('Position', [
               cb();
             }
           });
-        } else if (Platform.isAndroid6()) {
+        } else if (Platform.isAndroid6() && !Platform.isBrowser()) {
           Platform.permissions.location.requestAuthorization(function (authorized) {
             if(authorized) {
               setupGeolocation();
