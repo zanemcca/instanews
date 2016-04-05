@@ -14,7 +14,11 @@ app.service('LocalStorage', [
 
   var writeFile = function(dir ,filename, data) {
     if(Platform.isBrowser()) {
-      console.log('Cannot write files in the browser');
+      if(typeof(data) === 'string') {
+        window.localStorage[dir + '-' + filename] = data;
+      } else {
+        window.localStorage[dir + '-' + filename] = JSON.stringify(data);
+      }
     } else {
       var write = function() {
         var path = Platform.getDataDir();
@@ -85,7 +89,19 @@ app.service('LocalStorage', [
 
   var readFile = function(dir, filename, cb) {
     if(Platform.isBrowser()) {
-      console.log('Cannot read files in the browser');
+      var res =  window.localStorage[dir + '-' + filename];
+      if(res) {
+        console.log('Read this:');
+        console.log(res);
+        try {
+          var obj = JSON.parse(res);
+          cb(null, obj);
+        } catch(e) {
+          cb(null, res);
+        }
+      } else {
+        cb();
+      }
     } else {
       var path = Platform.getDataDir();
       if(dir.length > 0) {
@@ -98,7 +114,11 @@ app.service('LocalStorage', [
 
         var res;
         if( type === 'json' ) {
-          res = JSON.parse(text);
+          try { 
+            res = JSON.parse(text);
+          } catch(e) {
+            return cb(e);
+          }
         } else {
           res = text;
         }
@@ -118,52 +138,44 @@ app.service('LocalStorage', [
 
    //TODO Use native encryption on Android and keychain on iOS
    var secureWrite = function(key, value) {
-    if(Platform.isBrowser()) {
-      console.log('Cannot write files in the browser');
-    } else {
-      var val = JSON.stringify(value);
-      var encrypted = CryptoJS.AES.encrypt(val, key).toString();
+     var val = JSON.stringify(value);
+     var encrypted = CryptoJS.AES.encrypt(val, key).toString();
 
-      var file = getFileName(CryptoJS.SHA256(key));
- //     console.log('Trying to write \"'+ val + '\" to ' + file);
- //     console.log('Encrypted to: ' + encrypted);
+     var file = getFileName(CryptoJS.SHA256(key));
+//     console.log('Trying to write \"'+ val + '\" to ' + file);
+//     console.log('Encrypted to: ' + encrypted);
 
-      writeFile('', file, encrypted);
-      //console.log('Successfully wrote ' + JSON.stringify(value, 'utf8', '  ') + ' to ' + key + ' (' + file + ')');
-     }
+     writeFile('', file, encrypted);
    };
 
    var secureRead = function(key, cb) {
-    if(Platform.isBrowser()) {
-      console.log('Cannot read files in the browser');
-    } else {
-      var file = getFileName(CryptoJS.SHA256(key));
- //     console.log('Trying to read ' + file);
+     var file = getFileName(CryptoJS.SHA256(key));
+//     console.log('Trying to read ' + file);
 
-      readFile('', file, function(err, encrypted) {
-        if(!err) {
-         var decrypted = JSON.parse(CryptoJS.AES.decrypt(encrypted, key).toString(CryptoJS.enc.Utf8));
+    readFile('', file, function(err, encrypted) {
+      if(!err) {
+       try {
          //console.log('Successfully read ' + JSON.stringify(decrypted, 'utf8', '  ') +
          //' from ' + key + ' (' + file + ')');
+         var decrypted = JSON.parse(CryptoJS.AES.decrypt(encrypted, key).toString(CryptoJS.enc.Utf8));
 
          if(decrypted) {
            cb(null, decrypted);
          } else {
            cb();
          }
-        } else {
-         console.log('Error reading file: '+ err.message);
-         cb(err.message, null);
-        }
-      });
-    }
+       } catch(e) {
+         cb(e);
+       }
+      } else {
+       console.log('Error reading file: '+ err.message);
+       cb(err.message, null);
+      }
+    });
    };
 
    //TODO Ensure the data gets overwritten at the deletion address
    var secureDelete = function(key) {
-    if(Platform.isBrowser()) {
-      console.log('Cannot delete files in the browser');
-    } else {
       var file = getFileName(CryptoJS.SHA256(key));
       //console.log('Trying to delete ' + file);
 
@@ -173,11 +185,11 @@ app.service('LocalStorage', [
       }, function (err) {
          console.log('Error deleting file: '+ err.message);
       });
-    }
    };
 
    var deleteFile = function(dir, file) {
     if(Platform.isBrowser()) {
+      delete window.localStorage[dir + '-' + filename];
       console.log('Cannot delete files in the browser');
     } else {
       $cordovaFile.removeFile(Platform.getDataDir() + dir, file)
