@@ -65,7 +65,7 @@ app.controller('PostCtrl', [
       $scope.title = Case.title($scope.newArticle.title);
       if($scope.newArticle.title === '' && $scope.Uploads.get().length === 0) {
         console.log('New post!');
-        $scope.place.localize(18, function (pos) {
+        $scope.place.localize( { zoom: 18 }, function (pos) {
           if(pos) {
             Maps.setMarker($scope.place.getMap(), pos);
           }
