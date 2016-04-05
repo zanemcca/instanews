@@ -73,6 +73,11 @@ app.factory('Platform', [
       }
     };
 
+    var isMobile = function() {
+      var ip = ionic.Platform;
+      return (ip && (ip.isIOS() || ip.isAndroid() || ip.isWindowsPhone()));
+    };
+
     /*
      * Sets or unsets the back button depending on if we are
      * running on a device or in the browser respectivelly
@@ -329,18 +334,22 @@ app.factory('Platform', [
 
     var loading = {
       show: function () {
-        if(!loading.loader ) {
-           loading.loader = $ionicLoading.show({
-            delay: 100,
-            template: 'Loading...'
-          });
-          return loading.loader;
+        if(isMobile()) {
+          if(!loading.loader ) {
+             loading.loader = $ionicLoading.show({
+              delay: 100,
+              template: 'Loading...'
+            });
+            return loading.loader;
+          }
         }
       },
       hide: function () {
-        if(loading.loader) {
-          $ionicLoading.hide();
-          loading.loader = null;
+        if(isMobile()) {
+          if(loading.loader) {
+            $ionicLoading.hide();
+            loading.loader = null;
+          }
         }
       }
     };
@@ -614,7 +623,7 @@ app.factory('Platform', [
         runtimes.push(runtime);
       }
 
-      if(isAndroid6()) {
+      if(isAndroid6() && !isBrowser()) {
         cordova.plugins.diagnostic.getPermissionsAuthorizationStatus( function(statuses) {
           var res = true;
           for(var runtime in statuses) {
@@ -637,7 +646,7 @@ app.factory('Platform', [
         runtimes.push(runtime);
       }
 
-      if(isAndroid6()) {
+      if(isAndroid6() && !isBrowser()) {
         isAuthorized(runtimes, function (authorized) {
           if(authorized) {
             succ(true);
@@ -715,8 +724,7 @@ app.factory('Platform', [
       }
     };
 
-
-    if(isAndroid6()) {
+    if(isAndroid6() && !isBrowser()) {
       permissions.storage = {
         isAuthorized: isAuthorized.bind(this, [
           cordova.plugins.diagnostic.runtimePermission.READ_EXTERNAL_STORAGE,
@@ -758,6 +766,7 @@ app.factory('Platform', [
       isAndroid: isAndroid,
       isAndroid6: isAndroid6,
       isBrowser: isBrowser,
+      isMobile: isMobile,
       isCameraPresent: isCameraPresent,
       isVideoPresent: isVideoPresent,
       isTablet: isTablet,
