@@ -189,7 +189,7 @@ app.service('LocalStorage', [
 
    var deleteFile = function(dir, file) {
     if(Platform.isBrowser()) {
-      delete window.localStorage[dir + '-' + filename];
+      delete window.localStorage[dir + '-' + file];
       console.log('Cannot delete files in the browser');
     } else {
       $cordovaFile.removeFile(Platform.getDataDir() + dir, file)
