@@ -6,6 +6,7 @@ app.controller('FeedCtrl', [
   '$scope',
   '$location',
   '$timeout',
+  '$ionicNavBarDelegate',
   'Article',
   'Maps',
   'Position',
@@ -19,6 +20,7 @@ app.controller('FeedCtrl', [
     $scope,
     $location,
     $timeout,
+    $ionicNavBarDelegate,
     Article,
     Maps,
     Position,
@@ -29,6 +31,7 @@ app.controller('FeedCtrl', [
     Notifications,
     User
   ) {
+
     $scope.Articles = Articles.getLoader({
       preload: true,
       filter: function(articles) {
@@ -131,6 +134,15 @@ app.controller('FeedCtrl', [
         Preload.reset();
       }
     });
+
+    if(Platform.isBrowser()) {
+      $scope.$on('$ionicView.beforeEnter', function() {
+        $ionicNavBarDelegate.showBar(false);
+        Platform.ready.then(function() {
+          $ionicNavBarDelegate.showBar(false);
+        });
+      });
+    }
 
     //Refresh the map everytime we enter the view
     $scope.$on('$ionicView.afterEnter', function() {
