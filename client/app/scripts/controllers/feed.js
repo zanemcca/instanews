@@ -135,7 +135,7 @@ app.controller('FeedCtrl', [
       }
     });
 
-    if(Platform.isBrowser()) {
+    if(Platform.isBrowser() && Platform.isMobile()) {
       $scope.$on('$ionicView.beforeEnter', function() {
         $ionicNavBarDelegate.showBar(false);
         Platform.ready.then(function() {
