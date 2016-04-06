@@ -90,7 +90,6 @@ app.directive('inmap', [
 
                 //Listener on bounds changing on the map
                 google.maps.event.addListener(map, 'bounds_changed', _.debounce(function() {
-                  options.cancel = true;
                   if(Articles.inView) {
                     console.log('Updating bounds');
                     Position.setBounds(map.getBounds());
@@ -106,8 +105,18 @@ app.directive('inmap', [
                   cancel: false
                 };
 
-                var feed = angular.element(document.getElementById('feed'));
+                var event = 'touch';
+                if(Platform.isBrowser() && !Platform.isMobile()) {
+                  event = 'mousedown';
+                }
 
+                var mapListener = function() {
+                  options.cancel = true;
+                  $ionicGesture.off(mapGesture, event, mapListener);
+                };
+                var mapGesture = $ionicGesture.on(event, mapListener, elem); 
+
+                var feed = angular.element(document.getElementById('feed'));
                 var scrollListener = function() {
                   options.cancel = true;
                   $ionicGesture.off(scrollGesture, 'scroll', scrollListener);
