@@ -40,6 +40,7 @@ describe('Position service', function() {
 
       $provide.service('Platform', function() {
         return {
+          isBrowser: function() {},
           isIOS: function () {
             return false;
           },
