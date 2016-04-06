@@ -6,10 +6,12 @@ app.directive('inScrollTop', [
   'Navigate',
   '$ionicGesture',
   '$timeout',
+  'Platform',
   function (
     Navigate,
     $ionicGesture,
-    $timeout
+    $timeout,
+    Platform
   ) {
     return {
       restrict: 'E',
@@ -45,22 +47,24 @@ app.directive('inScrollTop', [
           return $scope.scroll.showScrollToTop;
         };
 
-        var onSwipeDown = _.debounce(function () {
-          if(!$scope.scroll.showScrollToTop) {
-            //Only display scroll to top if we are scrolled down far enough
-            if($scope.scroll.getPosition().top > 2000) {
-              $scope.$apply(function () {
-                $scope.scroll.showScrollToTop = true;
-                $timeout(function() {
-                  $scope.scroll.showScrollToTop = false;
-                }, 2000);
-              });
+        if(!Platform.isBrowser()) {
+          var onSwipeDown = _.debounce(function () {
+            if(!$scope.scroll.showScrollToTop) {
+              //Only display scroll to top if we are scrolled down far enough
+              if($scope.scroll.getPosition().top > 2000) {
+                $scope.$apply(function () {
+                  $scope.scroll.showScrollToTop = true;
+                  $timeout(function() {
+                    $scope.scroll.showScrollToTop = false;
+                  }, 2000);
+                });
+              }
             }
-          }
-        }, 3000, true);
+          }, 3000, true);
 
-        var element = angular.element(document.getElementById($scope.scrollHandle));
-        var swipeGesture = $ionicGesture.on('swipedown', onSwipeDown, element, $scope.swipeDownObj);
+          var element = angular.element(document.getElementById($scope.scrollHandle));
+          var swipeGesture = $ionicGesture.on('swipedown', onSwipeDown, element, $scope.swipeDownObj);
+        }
       },
       templateUrl: 'templates/directives/scrollTop.html'
     };
