@@ -388,9 +388,8 @@ app.factory('Platform', [
             m.parentNode.insertBefore(a,m);
           })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
 
-          ga('create', 'UA-74478035-2', 'auto');
-          ga('send', 'pageview');
-          analytics.ga = ga;
+          window.ga('create', 'UA-74478035-2', 'auto');
+          analytics.ga = window.ga;
         }
       },
       setUser: function (userId) {
