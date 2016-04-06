@@ -74,6 +74,7 @@ describe('Feed: ', function(){
       $provide.service('Platform', function() {
         return {
           showSheet: function(sheet) {},
+          isBrowser: function() {},
           analytics: {
             trackView: function () {},
             trackEvent: function () {},
