@@ -249,7 +249,7 @@ app.service('Articles', [
           };
         }
         else {
-          console.log('Bounds not set yet!');
+          return console.log('Bounds not set yet!');
         }
 
         spec.options.filter.skip = 0;
@@ -276,6 +276,7 @@ app.service('Articles', [
     articles.inView = false;
 
     Position.registerBoundsObserver(updateBounds);
+    updateBounds();
 
     articles.reorganize = reorganize;
     articles.getSpec = function () {
