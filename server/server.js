@@ -227,6 +227,27 @@ if(cluster.isMaster && numCPUs > 1 && process.env.NODE_ENV === 'production') {
   var Redis = require('ioredis');
   var kue = require('kue');
 
+  var setupModerator = function () {
+    if(['staging', 'production'].indexOf(process.env.NODE_ENV) > -1) {
+      var WebPurify = require('webpurify');
+      var creds = cred.get('webpurify');
+      var wp = new WebPurify({
+        api_key: creds.apiKey 
+      });
+      app.moderator = wp;
+    } else {
+      app.moderator = {
+        check: function() {
+          return {
+            then: function(cb) {
+              cb();
+            }
+          };
+        }
+      };
+    }
+  };
+
   var setupRedis = function () {
     var options = {
       reconnectOnError: function (err) {
@@ -429,6 +450,7 @@ if(cluster.isMaster && numCPUs > 1 && process.env.NODE_ENV === 'production') {
     setupRedis();
     setupBrute();
     setupLogging();
+    setupModerator();
 
     //context for use in hooks
     app.use(loopback.context());

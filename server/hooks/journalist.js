@@ -1,5 +1,9 @@
 
 var LIMIT = 10;
+// A black list of regexps that match invalid usernames
+var blacklist = {
+  usernames: [ /instanews/, /^anonymous$/, /^someone$/, /^admin/, /admin$/]
+};
 
 module.exports = function(app) {
 
@@ -146,9 +150,24 @@ module.exports = function(app) {
       user.email = user.email.toLowerCase();
     }
 
-    function validUsername(username) {
+    function validUsername(username, cb) {
       var valid =  /^[a-z0-9_-]{3,16}$/;
-      return valid.test(username);
+      if(valid.test(username)) {
+        for(var i in blacklist.usernames) {
+          if(blacklist.usernames[i].test(username)) {
+            return cb(false);
+          }
+        }
+
+        // Check for profanity
+        app.moderator.check(username)
+        .then(function(profanity) {
+          dd.lap('Moderator.check');
+          cb(!profanity);
+        });
+      } else {
+        return cb(false);
+      }
     }
 
     if(checkPasswordStrength(user.password) <= 0) {
@@ -157,34 +176,36 @@ module.exports = function(app) {
       next(e);
     }
     else {
-      if(validUsername(user.username)) {
-        Journalist.count({
-          or: [{
-            email: user.email
-          },
-          {
-            username: user.username
-          }]
-        }, function(err, count) {
-          dd.lap('Journalist.count');
-          if( err) {
-            next(err);
-          }
-          else if(count === 0) {
-            user.uniqueId = uuid.v4();
-            next();
-          }
-          else {
-            var er = new Error('Username or email is already used!'); 
-            er.status = 403;
-            next(er);
-          }
-        });
-      } else {
-        e = new Error('Username is invalid!');
-        e.status = 403;
-        next(e);
-      }
+      validUsername(user.username, function(valid) {
+        if(valid) {
+          Journalist.count({
+            or: [{
+              email: user.email
+            },
+            {
+              username: user.username
+            }]
+          }, function(err, count) {
+            dd.lap('Journalist.count');
+            if( err) {
+              next(err);
+            }
+            else if(count === 0) {
+              user.uniqueId = uuid.v4();
+              next();
+            }
+            else {
+              var er = new Error('Username or email is already used!'); 
+              er.status = 403;
+              next(er);
+            }
+          });
+        } else {
+          e = new Error('Username is invalid!');
+          e.status = 403;
+          next(e);
+        }
+      });
     }
   });
 
