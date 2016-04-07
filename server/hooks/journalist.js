@@ -1,5 +1,9 @@
 
 var LIMIT = 10;
+// A black list of regexps that match invalid usernames
+var blacklist = {
+  usernames: [ /instanews/, /^anonymous$/, /^someone$/]
+};
 
 module.exports = function(app) {
 
@@ -148,7 +152,16 @@ module.exports = function(app) {
 
     function validUsername(username) {
       var valid =  /^[a-z0-9_-]{3,16}$/;
-      return valid.test(username);
+      if(valid.test(username)) {
+        for(var i in blacklist.usernames) {
+          if(blacklist.usernames[i].test(username)) {
+            return false;
+          }
+        }
+        return true;
+      } else {
+        return false;
+      }
     }
 
     if(checkPasswordStrength(user.password) <= 0) {
