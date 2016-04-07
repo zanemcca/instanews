@@ -190,10 +190,10 @@
 
 //Hack to fix squashed title on iOS
 // ionic issue #4661
-.platform-ios,
-.platform-browser {
+.platform-ios {
   .title.title-center.header-item {
-    right: 64px!important;
+    left: 49px!important;
+    right: 49px!important;
   }
 }
 
@@ -202,6 +202,13 @@
     right: 68px!important;
   }
 }
+
+.platform-browser {
+  .title.title-center.header-item {
+    right: 15px!important;
+  }
+}
+
 
 // For the end of a list
 .list-end {
