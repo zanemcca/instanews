@@ -4,8 +4,12 @@ Dockerfile**
 
 circle.yml
 
-client/
 server/boot/explorer.js
+client/node_modules/
+client/platforms/
+client/test/
+client/plugins/
+client/www/
 
 .strong-pm/
 *npm-debug.log
