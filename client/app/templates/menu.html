@@ -1,81 +1,88 @@
 <!DOCTYPE html>
 <div ng-controller="AppCtrl">
-   <ion-side-menus enable-menu-with-back-views="false">
+   <div ng-switch="Platform.isBrowser()">
+     <div ng-switch-default>
+       <ion-nav-view name="menuContent"></ion-nav-view>
+     </div>
+     <div ng-switch-when="false">
+       <ion-side-menus enable-menu-with-back-views="false">
 
-      <ion-side-menu-content>
-         <ion-nav-view name="menuContent"></ion-nav-view>
-      </ion-side-menu-content>
+          <ion-side-menu-content>
+             <ion-nav-view name="menuContent"></ion-nav-view>
+          </ion-side-menu-content>
 
-      <ion-side-menu side="left">
-         <ion-content sidemenu="sidemenu-gradient">
-         <div profile="profile-large-transparant">
-          <div class="avatar">
-            <img src="images/instanews.png">
-          </div>
-          <div ng-if="user.userId">
-            <p>
-               {{user.userId}}
-            </p>
-          </div>
-          <div ng-if="!user.userId">
-            <p>
-               anonymous
-            </p>
-          </div>
+          <ion-side-menu side="left">
+             <ion-content sidemenu="sidemenu-gradient">
+             <div profile="profile-large-transparant">
+              <div class="avatar">
+                <img src="images/instanews.png">
+              </div>
+              <div ng-if="user.userId">
+                <p>
+                   {{user.userId}}
+                </p>
+              </div>
+              <div ng-if="!user.userId">
+                <p>
+                   anonymous
+                </p>
+              </div>
 
-          <!--div class="leftcol">
-            <p><i class="icon ion-ios-people-outline"></i> 28</p>
-          </div>
-          <div class="middlecol">
-            <p><i class="icon ion-ios-upload-outline"></i> 6</p>
-          </div>
-          <div class="rightcol">
-            <p><i class="icon ion-ios-personadd-outline"></i> 2</p>
-          </div-->
-         </div>
-         <div class="sidemenu-item" 
-           nav-clear menu-close
-           ng-show="Platform.support.unreadCount"
-           ng-click="showConversations();">
-          <i class="icon ion-person"></i>
-            Support
-            <span class="badge badge-assertive spanposition">{{Platform.support.unreadCount}}</span>
-         </div>
-         <div class="sidemenu-item" 
-           nav-clear menu-close
-           ng-show="Uploads.getPending().length"
-           ng-click="pendingModal.show();">
-          <i class="icon"
-            ng-class="Platform.isIOS() ? 'ion-ios-upload-outline' : 'ion-android-upload'"></i>
-             Uploads
-            <span class="badge badge-assertive spanposition">{{Uploads.getPending().length}}</span>
-         </div>
-         <in-list list="Notifications"
-           is-card="false"> 
-         </in-list>
+              <!--div class="leftcol">
+                <p><i class="icon ion-ios-people-outline"></i> 28</p>
+              </div>
+              <div class="middlecol">
+                <p><i class="icon ion-ios-upload-outline"></i> 6</p>
+              </div>
+              <div class="rightcol">
+                <p><i class="icon ion-ios-personadd-outline"></i> 2</p>
+              </div-->
+             </div>
+             <div class="sidemenu-item" 
+               nav-clear menu-close
+               ng-show="Platform.support.unreadCount"
+               ng-click="showConversations();">
+              <i class="icon ion-person"></i>
+                Support
+                <span class="badge badge-assertive spanposition">{{Platform.support.unreadCount}}</span>
+             </div>
+             <div class="sidemenu-item" 
+               nav-clear menu-close
+               ng-show="Uploads.getPending().length"
+               ng-click="pendingModal.show();">
+              <i class="icon"
+                ng-class="Platform.isIOS() ? 'ion-ios-upload-outline' : 'ion-android-upload'"></i>
+                 Uploads
+                <span class="badge badge-assertive spanposition">{{Uploads.getPending().length}}</span>
+             </div>
+             <in-list list="Notifications"
+               is-card="false"> 
+             </in-list>
 
-         <!--div class="sidemenu-item center-horizontal" 
-           nav-clear menu-close
-           style="bottom:0;padding-right:16px;color:#AAAAAA;"
-           ng-click="aboutModal.show();">
-              About
-         </div-->
+             <!--div class="sidemenu-item center-horizontal" 
+               nav-clear menu-close
+               style="bottom:0;padding-right:16px;color:#AAAAAA;"
+               ng-click="aboutModal.show();">
+                  About
+             </div-->
 
-         </ion-content>
-         <ion-footer-bar class="bar-dark button-bar">
-           <div class="button button-clear" nav-clear menu-close ng-click="aboutModal.show()">
-             Settings 
-           </div>
-            <!--div class="row">
-               <button ng-if="!user.userId" class="col button button-clear" nav-clear menu-close ng-click="login()">
-                  Login
-               </button>
-               <button ng-if="user.userId" class="col button button-clear" nav-clear menu-close ng-click="logout()">
-                  Logout
-               </button>
-            </div-->
-         </ion-footer-bar>
-      </ion-side-menu>
+             </ion-content>
+             <ion-footer-bar class="bar-dark button-bar">
+               <div class="button button-clear" nav-clear menu-close ng-click="aboutModal.show()">
+                 Settings 
+               </div>
+                <!--div class="row">
+                   <button ng-if="!user.userId" class="col button button-clear" nav-clear menu-close ng-click="login()">
+                      Login
+                   </button>
+                   <button ng-if="user.userId" class="col button button-clear" nav-clear menu-close ng-click="logout()">
+                      Logout
+                   </button>
+                </div-->
+             </ion-footer-bar>
+          </ion-side-menu>
 
-   </ion-side-menus>
+       </ion-side-menus>
+     </div>
+   </div>
 </div>

@@ -22,11 +22,12 @@ module.exports = function(options) {
     } else if(res.statusCode === 404) {
       e.message = 'This is not the page you are looking for ...';
       res.send(e);
-    } else if( res.statusCode === 401 || res.statusCode === 403 ) {
+    } else if( res.statusCode === 401) {
       e.message = 'Thou shalt not pass!!!';
       res.send(e);
-    } else if( [422, 400, 429].indexOf(res.statusCode) > -1) {
+    } else if( [403, 422, 400, 429].indexOf(res.statusCode) > -1) {
       e.error = err.error;
+      e.message = err.message;
       res.send(e);
     } else {
       console.error('Unrecoverable - error status code ' + res.statusCode);
