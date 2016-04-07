@@ -2,7 +2,7 @@
 var LIMIT = 10;
 // A black list of regexps that match invalid usernames
 var blacklist = {
-  usernames: [ /instanews/, /^anonymous$/, /^someone$/]
+  usernames: [ /instanews/, /^anonymous$/, /^someone$/, /^admin/, /admin$/]
 };
 
 module.exports = function(app) {
