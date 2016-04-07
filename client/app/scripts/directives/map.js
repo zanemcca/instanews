@@ -90,8 +90,6 @@ app.directive('inmap', [
 
                 //Listener on bounds changing on the map
                 google.maps.event.addListener(map, 'bounds_changed', _.debounce(function() {
-                  //console.log('Bounds changed!');
-                 // options.cancel = true;
                   if(Articles.inView) {
                     console.log('Updating bounds');
                     Position.setBounds(map.getBounds());
@@ -107,13 +105,23 @@ app.directive('inmap', [
                   cancel: false
                 };
 
-                var feed = angular.element(document.getElementById('feed'));
+                var event = 'touch';
+                if(Platform.isBrowser() && !Platform.isMobile()) {
+                  event = 'mousedown';
+                }
 
-                var touchListener = function() {
+                var mapListener = function() {
                   options.cancel = true;
-                  $ionicGesture.off(touchGesture, 'touch', touchListener);
+                  $ionicGesture.off(mapGesture, event, mapListener);
                 };
-                var touchGesture = $ionicGesture.on('touch', touchListener, feed); 
+                var mapGesture = $ionicGesture.on(event, mapListener, elem); 
+
+                var feed = angular.element(document.getElementById('feed'));
+                var scrollListener = function() {
+                  options.cancel = true;
+                  $ionicGesture.off(scrollGesture, 'scroll', scrollListener);
+                };
+                var scrollGesture = $ionicGesture.on('scroll', scrollListener, feed); 
 
                 Maps.localize(map, options, function(err) {
                   console.log(err);

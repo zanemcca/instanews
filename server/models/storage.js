@@ -20,6 +20,11 @@ module.exports = function(Storage) {
     'getFile'
   ];
 
+  if(process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'staging') {
+    //Download is not used in production or staging and it exposes a stacktrace when there is an error
+    staticDisable.push('download');
+  }
+
   common.disableRemotes(Storage, staticDisable,true);
 
   var validator = new MessageValidator();
