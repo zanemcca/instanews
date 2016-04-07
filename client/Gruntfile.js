@@ -4,7 +4,13 @@
 
 var _ = require('lodash');
 var path = require('path');
-var cordovaCli = require('cordova');
+
+var cordovaCli;
+try {
+  var cordovaCli = require('cordova');
+} catch(e) {
+  console.log(e);
+}
 var spawn = process.platform === 'win32' ? require('win-spawn') : require('child_process').spawn;
 
 module.exports = function (grunt) {
@@ -537,37 +543,39 @@ module.exports = function (grunt) {
 
   });
 
-  grunt.loadNpmTasks('grunt-cordovacli');
+  if(cordovaCli) {
+    grunt.loadNpmTasks('grunt-cordovacli');
 
-  // Register tasks for all Cordova commands
-  _.functions(cordovaCli).forEach(function (name) {
-    if(name === 'clean') {
-      name = 'cordovaclean';
-    }
-
-    grunt.registerTask(name, function () {
-      this.args.unshift(name.replace('cordova:', ''));
-      // Handle URL's being split up by Grunt because of `:` characters
-      if (_.contains(this.args, 'http') || _.contains(this.args, 'https')) {
-        this.args = this.args.slice(0, -2).concat(_.last(this.args, 2).join(':'));
+    // Register tasks for all Cordova commands
+    _.functions(cordovaCli).forEach(function (name) {
+      if(name === 'clean') {
+        name = 'cordovaclean';
       }
-      var done = this.async();
-      var exec = process.platform === 'win32' ? 'cordova.cmd' : 'cordova';
-      var cmd = path.resolve('./node_modules/cordova/bin', exec);
-      var flags = process.argv.splice(3);
-      var child = spawn(cmd, this.args.concat(flags));
-      child.stdout.on('data', function (data) {
-        grunt.log.writeln(data);
-      });
-      child.stderr.on('data', function (data) {
-        grunt.log.error(data);
-      });
-      child.on('close', function (code) {
-        code = code ? false : true;
-        done(code);
+
+      grunt.registerTask(name, function () {
+        this.args.unshift(name.replace('cordova:', ''));
+        // Handle URL's being split up by Grunt because of `:` characters
+        if (_.contains(this.args, 'http') || _.contains(this.args, 'https')) {
+          this.args = this.args.slice(0, -2).concat(_.last(this.args, 2).join(':'));
+        }
+        var done = this.async();
+        var exec = process.platform === 'win32' ? 'cordova.cmd' : 'cordova';
+        var cmd = path.resolve('./node_modules/cordova/bin', exec);
+        var flags = process.argv.splice(3);
+        var child = spawn(cmd, this.args.concat(flags));
+        child.stdout.on('data', function (data) {
+          grunt.log.writeln(data);
+        });
+        child.stderr.on('data', function (data) {
+          grunt.log.error(data);
+        });
+        child.on('close', function (code) {
+          code = code ? false : true;
+          done(code);
+        });
       });
     });
-  });
+  }
 
   // Since Apache Ripple serves assets directly out of their respective platform
   // directories, we watch all registered files and then copy all un-built assets
@@ -634,7 +642,7 @@ module.exports = function (grunt) {
 
   grunt.registerTask('serve', function (target) {
     if (target === 'compress') {
-      return grunt.task.run(['compress', 'ionic:serve']);
+      return grunt.task.run(['clean', 'compress', 'ionic:serve']);
     }
 
     grunt.config('concurrent.ionic.tasks', ['ionic:serve', 'watch']);
@@ -699,7 +707,6 @@ module.exports = function (grunt) {
   ]);
 
   grunt.registerTask('compress', [
-    'clean',
     'ngconstant:production',
     'wiredep',
     'useminPrepare',
@@ -726,6 +733,7 @@ module.exports = function (grunt) {
     'wiredep',
     'newer:jshint',
     'karma:continuous',
+    'clean',
     'compress',
     'ionic:build:--release'
   ]);
