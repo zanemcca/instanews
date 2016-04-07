@@ -10,6 +10,7 @@ client/platforms/
 client/test/
 client/plugins/
 client/www/
+client/app/bower_components/
 
 .strong-pm/
 *npm-debug.log

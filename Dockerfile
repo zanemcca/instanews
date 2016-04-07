@@ -23,9 +23,12 @@ COPY package.json /usr/src/app/
 RUN npm install --production
 
 # Install frontend depencencies
+# NPM
 COPY client/package.json /usr/src/app/client/
-COPY client/bower.json /usr/src/app/client/
 RUN cd client && npm install --production
+# Bower
+COPY client/bower.json /usr/src/app/client/
+COPY client/.bowerrc /usr/src/app/client/
 RUN cd client && bower install --allow-root
  
 # Copy the source code over
