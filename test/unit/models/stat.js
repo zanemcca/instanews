@@ -20,12 +20,14 @@ var Stat = {
     DD: function() {
       return {
         lap: function () {},
+        histogram: function () {},
         elapsed: function () {},
         increment: function () {},
         decrement: function () {}
       };
     },
     dd: {
+      histogram: function () {},
       increment: function () {},
       timing: function () {}
     }
