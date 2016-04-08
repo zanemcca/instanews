@@ -78,35 +78,43 @@ var setupMonitoring = function () {
       };
 
       var dd = {};
-      dd.increment = function(key, val) {
+      dd.increment = function(key, val, tgs) {
         val = val || 1;
-        app.dd.increment(name(key), val, tags);
+        tgs = tgs || [];
+        tgs = tgs.join(tags);
+        app.dd.increment(name(key), val, tgs);
       };
 
-      dd.decrement = function(key, val) {
+      dd.decrement = function(key, val, tgs) {
         val = val || 1;
+        tgs = tgs || [];
+        tgs = tgs.join(tags);
         app.dd.decrement(name(key), val, tags);
       };
 
-      dd.timing = function(key, val) {
+      dd.timing = function(key, val, tgs) {
+        tgs = tgs || [];
+        tgs = tgs.join(tags);
         app.dd.timing(name(key), val, tags);
       };
 
-      dd.histogram = function(key, val) {
+      dd.histogram = function(key, val, tgs) {
+        tgs = tgs || [];
+        tgs = tgs.join(tags);
         app.dd.histogram(name(key), val, tags);
       };
 
-      dd.lap = function (key) {
+      dd.lap = function (key, tgs) {
         var temp = Date.now();
         var lap = temp - time;
         time = temp;
-        dd.timing(key, lap);
+        dd.timing(key, lap, tgs);
         return lap;
       };
 
-      dd.elapsed =  function (key) {
+      dd.elapsed =  function (key, tgs) {
         var total = Date.now() - start;
-        dd.timing(key, total);
+        dd.timing(key, total, tgs);
         return total;
       };
 
