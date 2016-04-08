@@ -331,6 +331,8 @@ viewCount: 270
       rating = 0.0001;
     }
 
+    dd.histogram('Stat.rating', rating, ['instanceId:' + rateable.id, 'instanceType:' + rateable.modelName]);
+
     return rating;
   }; 
 
