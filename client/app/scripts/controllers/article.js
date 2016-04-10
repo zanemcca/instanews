@@ -6,29 +6,27 @@ app.controller('ArticleCtrl', [
   '$ionicModal',
   '$scope',
   '$stateParams',
-  'Article',
   'Articles',
   'Comments',
-  'preload',
-  'Subarticles',
   'Maps',
   'Navigate',
-  'Post',
   'Platform',
+  'Post',
+  'preload',
+  'Subarticles',
   'Uploads',
   function(
     $ionicModal,
     $scope,
     $stateParams,
-    Article,
     Articles,
     Comments,
-    preload,
-    Subarticles,
     Maps,
     Navigate,
-    Post,
     Platform,
+    Post,
+    preload,
+    Subarticles,
     Uploads
   ) {
 
@@ -40,7 +38,6 @@ app.controller('ArticleCtrl', [
       keepSync: true,
       preload: true
     });
-
 
     $scope.preScrollToTop = function (cb) {
       Preload.stop();
@@ -125,13 +122,11 @@ app.controller('ArticleCtrl', [
       });
     };
 
-
     $scope.$on('$ionicView.unloaded', function () {
       console.log('Destroying article view!');
       Maps.deleteArticleMap($stateParams.id);
       $scope.Subarticles.remove();
     });
-
 
     $scope.$on('$ionicView.beforeEnter', function() {
       $scope.Subarticles.reload();
