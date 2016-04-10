@@ -533,16 +533,7 @@ module.exports = function (grunt) {
         keepAlive: true,
         configFile: '<%= yeoman.test %>/e2e/protractor.conf.js',
       },
-      auto: {
-        /*
-        keepAlive: true,
-        options: {
-          args: {
-            seleniumPort: 4444
-          }
-        }
-       */
-      }
+      auto: {}
     },
 
     protractor_webdriver: {
