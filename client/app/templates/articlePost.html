@@ -5,10 +5,10 @@
   <!--ion-nav-back-button class="button-clear" ng-click="goBack()"></button>
   </ion-nav-back-button-->
   <ion-nav-buttons side="secondary">
-      <button class="button button-clear" ng-click="post()"
-        ng-disabled="alreadyPosting || !newArticle.title || !getMarker() || !Uploads.get().length">
-        POST
-      </button>
+    <button class="button button-clear" ng-click="post()"
+      ng-disabled="alreadyPosting || !newArticle.title || !getMarker() || !Uploads.get().length">
+      POST
+    </button>
   </ion-nav-buttons>
   <ion-content overflow-scroll="true">
       <inAutocomplete place="place"></inAutocomplete>
