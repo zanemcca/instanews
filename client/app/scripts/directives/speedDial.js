@@ -27,8 +27,6 @@ app.directive('inSpeedDial', [
           return $scope.uploads.getText(text);
         };
 
-        // Workaround for issue #7981 on angular material
-        // aka - Fixes our 'spacebar' issue #293
         var keyboardListener = function() {
           $scope.fab.isOpen = false;
           $scope.$digest();
