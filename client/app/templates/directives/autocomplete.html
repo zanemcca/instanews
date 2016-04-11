@@ -13,8 +13,7 @@
        ng-focus="disableTap()"
        ng-click="click()"
        on-return="search()"
-       onClick="SelectText()"
-       type="text" id="search-input"
+       type="text" ng-attr-id="{{searchId}}" 
        ng-model="input.value"
        placeholder="{{input.placeholder}}">
     </label>

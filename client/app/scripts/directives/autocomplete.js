@@ -4,14 +4,14 @@ var app = angular.module('instanews.directive.autocomplete', ['ionic', 'ngResour
 
 var isIOS;
 // jshint unused: false
-function SelectText() {
+function selectText(id) {
   setTimeout(function() {
-    var input = document.getElementById('search-input');
+    var input = document.getElementById(id);
     if(input) {
       input.focus();
       if(!isIOS || !isIOS()) {
         input.select();
-      } else {
+      } else if(input.value.length) {
         input.setSelectionRange(0, input.value.length);
       }
     } else {
@@ -33,6 +33,7 @@ app.directive('inautocomplete', [
     return {
       restrict: 'E',
       scope: {
+        searchId: '@',
         place: '='
       },
       controller: function(
@@ -186,6 +187,7 @@ app.directive('inautocomplete', [
             if($scope.input.placeholder !== defaultPlaceholder) {
               $scope.input.value = $scope.input.placeholder;
             }
+            selectText($scope.searchId);
           }
         };
 
