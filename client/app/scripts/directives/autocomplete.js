@@ -180,6 +180,16 @@ app.directive('inautocomplete', [
           });
         });
 
+
+        $scope.blur = function() {
+          if(!$scope.done) {
+            $scope.input.value = '';
+            $scope.place.predictions = [];
+            $scope.done = true;
+            $scope.safeApply();
+          }
+        };
+
         $scope.click = function () {
           // istanbul ignore else 
           if($scope.done) {
@@ -198,7 +208,7 @@ app.directive('inautocomplete', [
           angular.element(container).attr('data-tap-disabled', 'true');
           // leave input field if google-address-entry is selected
           angular.element(container).on('click', function(){
-            document.getElementById('search-input').blur();
+            document.getElementById($scope.searchId).blur();
           });
 
         };
