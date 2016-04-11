@@ -26,7 +26,7 @@
     "angular-uuid-service": "~0.1.0",
     "angular-moment": "~0.10.3",
     "angular-underscore-module": "~1.0.3",
-    "angular-material": "~0.11.4",
+    "angular-material": "^1.0.7",
     "angular-elastic": "~2.5.1",
     "angular-chart.js": "^0.8.8",
     "async": "^1.5.2"
