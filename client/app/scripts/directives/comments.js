@@ -54,6 +54,7 @@ app.directive('incomments', [
         $scope.create = function () {
           Navigate.ensureLogin( function () {
             var textInput = TextInput.get();
+            textInput.maxLength = 2200;
             if($scope.owner.commentableId) {
               textInput.placeholder = 'Write a reply...';
             }
