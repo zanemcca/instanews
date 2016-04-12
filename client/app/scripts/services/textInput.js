@@ -16,6 +16,9 @@ app.factory('TextInput', [
     Navigate,
     Platform
   ) {
+
+    $rootScope.Platform = Platform;
+
     var current;
     var modal = {
       text: '',
