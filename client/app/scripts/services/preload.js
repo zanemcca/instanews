@@ -127,6 +127,14 @@ function PreloadFactory(Navigate, Platform, PreloadQueue) {
       var avgHeight = 500;
 
       var needed = Math.round(pred/avgHeight) - length;
+      var maxScrollTop =  scroll.getBottom();
+      var height = scroll.getPosition().top;
+
+      // Ensure we always predict more will be needed if we are within 3 elements from the bottom
+      if(needed < 5 && (maxScrollTop - height) < 3*avgHeight) {
+        needed = 5;
+      }
+
       if(needed > 0 && spec.list.areItemsAvailable()) {
         if(needed + length > max) {
           var limit = Math.min(needed, 50);

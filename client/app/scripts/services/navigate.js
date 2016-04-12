@@ -196,6 +196,15 @@ app.service('Navigate', [
         return delegate.getScrollPosition();
       };
 
+      var getBottom = function () {
+        var delegate = $ionicScrollDelegate;
+        if(spec.scrollHandle) {
+          delegate = delegate.$getByHandle(spec.scrollHandle);
+        }
+        var view = delegate.getScrollView();
+        return view.options.getContentHeight() - view.__contentHeight;
+      };
+
       var resize = function () {
         var delegate = $ionicScrollDelegate;
         if(spec.scrollHandle) {
@@ -256,6 +265,7 @@ app.service('Navigate', [
       };
       
       return {
+        getBottom: getBottom,
         scrollTop: scrollTop,
         getPosition: getPosition,
         resize: resize,
