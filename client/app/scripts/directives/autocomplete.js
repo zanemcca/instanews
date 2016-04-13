@@ -4,14 +4,14 @@ var app = angular.module('instanews.directive.autocomplete', ['ionic', 'ngResour
 
 var isIOS;
 // jshint unused: false
-function SelectText() {
+function selectText(id) {
   setTimeout(function() {
-    var input = document.getElementById('search-input');
+    var input = document.getElementById(id);
     if(input) {
       input.focus();
       if(!isIOS || !isIOS()) {
         input.select();
-      } else {
+      } else if(input.value.length) {
         input.setSelectionRange(0, input.value.length);
       }
     } else {
@@ -33,6 +33,7 @@ app.directive('inautocomplete', [
     return {
       restrict: 'E',
       scope: {
+        searchId: '@',
         place: '='
       },
       controller: function(
@@ -179,6 +180,16 @@ app.directive('inautocomplete', [
           });
         });
 
+
+        $scope.blur = function() {
+          if(!$scope.done) {
+            $scope.input.value = '';
+            $scope.place.predictions = [];
+            $scope.done = true;
+            $scope.safeApply();
+          }
+        };
+
         $scope.click = function () {
           // istanbul ignore else 
           if($scope.done) {
@@ -186,6 +197,7 @@ app.directive('inautocomplete', [
             if($scope.input.placeholder !== defaultPlaceholder) {
               $scope.input.value = $scope.input.placeholder;
             }
+            selectText($scope.searchId);
           }
         };
 
@@ -196,7 +208,7 @@ app.directive('inautocomplete', [
           angular.element(container).attr('data-tap-disabled', 'true');
           // leave input field if google-address-entry is selected
           angular.element(container).on('click', function(){
-            document.getElementById('search-input').blur();
+            document.getElementById($scope.searchId).blur();
           });
 
         };

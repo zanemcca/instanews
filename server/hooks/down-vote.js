@@ -60,7 +60,7 @@ module.exports = function(app) {
     var inst = ctx.instance;
 
     if(inst && ctx.isNewInstance) {
-      dd.increment('DownVote', ['instanceId:' + inst.clickableId,'instanceType:' + inst.clickableType, 'viewId:' + inst.viewableId]);
+      //dd.increment('DownVote', ['instanceId:' + inst.clickableId,'instanceType:' + inst.clickableType, 'viewId:' + inst.viewableId]);
       DownVote.notify(inst);
       //The click after save should have added an incrementation parameter
       if(ctx.inc && typeof(ctx.inc) === 'object') {

@@ -57,6 +57,7 @@ app.directive(
             $scope.caption = {
               edit: function () {
                 textInput = TextInput.get('modal');
+                textInput.maxLength = 2200;
                 textInput.placeholder = 'What\'s the caption?';
                 newText = newText || $scope.upload.subarticle._file.caption || '';
                 textInput.text = newText;

@@ -300,7 +300,7 @@ module.exports = function(app) {
         next();
       }
       else {
-        dd.increment((ctx.instance.type || 'click'), ['instanceId:' + inst.clickableId,'instanceType:' + inst.clickableType, 'viewId:' + inst.viewableId]);
+        //dd.increment((ctx.instance.type || 'click'), ['instanceId:' + inst.clickableId,'instanceType:' + inst.clickableType, 'viewId:' + inst.viewableId]);
         Click.updateClickableAttributes(ctx, data, function(err) {
           dd.lap('Click.updateClickableAttributes');
           next(err);

@@ -5,7 +5,7 @@
   style="border:0;margin:0;"
   ng-style="{'font-weight': votable.upVoted ? 'bold' : 'normal'}"
    ng-click="upvote()">
-    {{Platform.numToString(votable.upVoteCount)}}
+      {{Platform.numToString(votable.upVoteCount)}}
  </button>
 <button class="item button button-clear button-small ion-arrow-down-b"
   ng-disabled="Platform.isBrowser()"
@@ -13,7 +13,7 @@
   ng-style="{'font-weight': votable.downVoted ? 'bold' : 'normal'}"
   style="border:0;margin:0;"
   ng-click="downvote()">
-   {{Platform.numToString(votable.downVoteCount)}}
+     {{Platform.numToString(votable.downVoteCount)}}
 </button>
 <button ng-if="votable.commentableType !== 'comment'"
   class="item button button-clear button-small"
@@ -23,9 +23,9 @@
   id="{{votable.id}}"
   ng-click="toggleComments()">
   <span ng-if="votable.modelName !== 'comment'">
-    {{Platform.numToString(votable.createCommentCount)}} Comments
+      {{Platform.numToString(votable.createCommentCount)}} Comments
   </span>
   <span ng-if="votable.modelName === 'comment'">
-    {{Platform.numToString(votable.createCommentCount)}} Replies
+      {{Platform.numToString(votable.createCommentCount)}} Replies
   </span>
 </button>
