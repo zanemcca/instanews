@@ -6,7 +6,7 @@
     "angular-mocks": "~1.4.1"
   },
   "dependencies": {
-    "angular": "~1.4.3",
+    "angular": "~1.4.8",
     "underscore": "~1.8.3",
     "ngCordova": "~0.1.14-alpha",
     "ngAutocomplete": "~1.0.0",
@@ -21,17 +21,18 @@
     "moment": "~2.10.6",
     "Case": "^1.4.1",
     "ionic": "^1.2.4",
-    "angular-animate": "~1.4.3",
-    "angular-resource": "~1.4.3",
+    "angular-animate": "^1.5.3",
+    "angular-resource": "^1.5.3",
     "angular-uuid-service": "~0.1.0",
     "angular-moment": "~0.10.3",
     "angular-underscore-module": "~1.0.3",
-    "angular-material": "~0.11.4",
+    "angular-material": "^1.0.7",
     "angular-elastic": "~2.5.1",
-    "angular-chart.js": "^0.8.8",
     "async": "^1.5.2"
   },
   "resolutions": {
-    "angular": "1.4.3"
+    "angular": "~1.4.8",
+    "angular-animate": "~1.4.3",
+    "angular-resource": "~1.4.3"
   }
 }

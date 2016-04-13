@@ -192,6 +192,7 @@ app.directive('inListItem', [
               $event.stopPropagation();
             }
             textInput = TextInput.get();
+            textInput.maxLength = 100;
             textInput.placeholder = 'What\'s the title?';
             newTitle = newTitle || $scope.item.title || '';
             textInput.text = newTitle;
@@ -225,6 +226,7 @@ app.directive('inListItem', [
               $scope.caption = {
                 edit: function () {
                   textInput = TextInput.get();
+                  textInput.maxLength = 2200;
                   textInput.placeholder = 'What\'s the caption?';
                   newText = newText || $scope.item._file.caption || '';
                   textInput.text = newText;
@@ -244,6 +246,7 @@ app.directive('inListItem', [
             newText = '';
             $scope.edit = function () {
               textInput = TextInput.get();
+              textInput.maxLength = 2200;
               textInput.placeholder = 'Add a comment...';
               newText = newText || $scope.item.content || '';
               textInput.text = newText;

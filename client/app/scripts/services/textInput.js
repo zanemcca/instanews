@@ -16,46 +16,63 @@ app.factory('TextInput', [
     Navigate,
     Platform
   ) {
+
+    $rootScope.Platform = Platform;
+
     var current;
     var modal = {
       text: '',
       placeholder: 'What\'s the story?',
       maxLength: 50000,
       open: function (done, interrupted) {
-        modal.modal.show();
+        if(modal.modal) {
+          console.log('WARNING: The textinput modal should be destroyed and recreated after each use to ensure it stays ontop');
+          modal.modal.remove();
+        }
 
-        modal.saveText = function () {
-          unregister();
-          done(modal.text);
-          modal.text = '';
-          modal.placeholder = 'What\'s the story?';
-          modal.maxLength = 50000;
-          modal.modal.hide();
-        };
+        initModal(function() {
+          modal.modal.show();
 
-        var unregister = $rootScope.$on('modal.hidden', function() {
-          Platform.keyboard.hide();
-          unregister();
-          interrupted(modal.text);
+          modal.saveText = function () {
+            unregister();
+            done(modal.text);
+            modal.text = '';
+            modal.placeholder = 'What\'s the story?';
+            modal.maxLength = 50000;
+            modal.modal.hide();
+            modal.modal.remove();
+            modal.modal = null;
+          };
+
+          var unregister = $rootScope.$on('modal.hidden', function() {
+            Platform.keyboard.hide();
+            unregister();
+            interrupted(modal.text);
+            modal.modal.remove();
+            modal.modal = null;
+          });
+
+          $timeout(Platform.keyboard.show, 16);
+          $timeout(function () {
+            Navigate.focus('text-input-modal');
+          }, 16);
         });
-
-        $timeout(Platform.keyboard.show, 16);
-        $timeout(function () {
-          Navigate.focus('text-input-modal');
-        }, 16);
       }
     };
 
     var count = 0;
 
-    $ionicModal.fromTemplateUrl('templates/modals/textInput.html', {
-      scope: $rootScope,
-      focusFirstInput: true,
-      animation: 'slide-in-up'
-    }).then( function (textModal) {
-      modal.modal = textModal;
-      $rootScope.textInput = modal;
-    });
+    var initModal = function (cb) {
+      $ionicModal.fromTemplateUrl('templates/modals/textInput.html', {
+        scope: $rootScope,
+        focusFirstInput: true,
+        animation: 'slide-in-up'
+      }).then( function (textModal) {
+        modal.modal = textModal;
+        $rootScope.textInput = modal;
+        cb();
+      });
+    };
 
     var register = function (input) {
       current = input;

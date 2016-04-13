@@ -10,6 +10,7 @@ app.factory('Platform', [
   '$ionicLoading',
   '$ionicNavBarDelegate',
   '$q',
+  'ENV',
   function(
     $cordovaDevice,
     $cordovaDialogs,
@@ -17,7 +18,8 @@ app.factory('Platform', [
     $ionicActionSheet,
     $ionicLoading,
     $ionicNavBarDelegate,
-    $q
+    $q,
+    ENV
   ) {
 
     var ready = $q.defer();
@@ -62,7 +64,7 @@ app.factory('Platform', [
 
     var isBrowser = function() {
       var ip = ionic.Platform;
-      if(ip && window.cordova) {
+      if((ip && window.cordova) || ENV.name === 'development') {
         if(ip.isIOS() || ip.isAndroid() || ip.isWindowsPhone()) {
           return false;
         } else {

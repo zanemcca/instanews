@@ -11,10 +11,10 @@
      <input type="search"
        style="max-width: 80%"
        ng-focus="disableTap()"
+       ng-blur="blur()"
        ng-click="click()"
        on-return="search()"
-       onClick="SelectText()"
-       type="text" id="search-input"
+       type="text" ng-attr-id="{{searchId}}" 
        ng-model="input.value"
        placeholder="{{input.placeholder}}">
     </label>
@@ -26,7 +26,7 @@
 </form>
 <div ng-if="!done" class="list dynamic-box" 
   ng-class="{'card' : Platform.getWidth() >= 768 || Platform.isLandscape()}"
-  style="height: 0; overflow:visible; z-index:100;">
+  style="height: 0; overflow:visible; z-index:100;max-width: 560px;">
   <div ng-repeat="prediction in place.predictions">
     <div class="item" ng-click="set(prediction)">
       {{prediction.description}}

@@ -206,7 +206,7 @@ app.controller('LoginCtrl', [
           }, function (err) {
             Platform.loading.hide();
             Platform.analytics.trackEvent('Login', 'error', 'status', err.status);
-            Platform.showAlert('There was an error logging in. Please try again');
+            Platform.showAlert('There was an unknown error while logging in', 'Please try again');
             console.log(err);
           });
         }; 
@@ -223,10 +223,10 @@ app.controller('LoginCtrl', [
             if(err.data && err.data.error && err.data.error.status === 401) {
               Platform.showAlert('Please try again!', 'Invalid credentials');
             } else {
-              Platform.showAlert('There was an error logging in. Please try again');
+              Platform.showAlert('There was an unknown error while logging in', 'Please try again');
             }
           } else {
-            Platform.showAlert('There was an error logging in. Please try again');
+            Platform.showAlert('There was an unknown error while logging in', 'Please try again');
           }
         };
 
@@ -267,7 +267,7 @@ app.controller('LoginCtrl', [
           console.log(err);
           Platform.loading.hide();
           Platform.analytics.trackEvent('Login', 'error', 'status', err.status);
-          Platform.showAlert('There is no user with the given username' , 'Invalid Username');
+          Platform.showAlert('There is no user with the given username or email' , 'Invalid Username');
         });
       }; 
 
@@ -488,10 +488,14 @@ app.controller('LoginCtrl', [
                   }, 
                   /* istanbul ignore next */
                   function(err) {
+                    console.log(err);
                     Platform.loading.hide();
                     Platform.analytics.trackEvent('Signup', 'error', 'status', err.status);
-                    Platform.showAlert('There was an error signing up. Please try again');
-                    console.log(err);
+                    if([403, 422].indexOf(err.status) > -1) {
+                      Platform.showAlert((err.data && err.data.message) || 'There was an error with your credentials', 'Please try again');
+                    } else {
+                      Platform.showAlert('There was an unknown error while signing up', 'Please try again');
+                    }
                   });
                 }
               },
@@ -499,7 +503,7 @@ app.controller('LoginCtrl', [
               function(err) {
                 Platform.loading.hide();
                 Platform.analytics.trackEvent('Signup', 'error', 'status', err.status);
-                Platform.showAlert('There was an error signing up. Please try again');
+                Platform.showAlert('There was an unknown error while signing up', 'Please try again');
                 console.log(err);
               });
             }
@@ -508,7 +512,7 @@ app.controller('LoginCtrl', [
           function(err) {
             Platform.loading.hide();
             Platform.analytics.trackEvent('Signup', 'error', 'status', err.status);
-            Platform.showAlert('There was an error signing up. Please try again');
+            Platform.showAlert('There was an unknown error while signing up', 'Please try again');
             console.log(err);
           });
         }

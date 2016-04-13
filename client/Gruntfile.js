@@ -528,6 +528,28 @@ module.exports = function (grunt) {
       }
     },
 
+    protractor: {
+      options: {
+        keepAlive: true,
+        configFile: '<%= yeoman.test %>/e2e/protractor.conf.js',
+      },
+      auto: {}
+    },
+
+    protractor_webdriver: {
+      options: {
+      }
+    },
+
+    shell: {
+      protractor: {
+        options: {
+          stdout: true
+        },
+        command: path.resolve('node_modules/protractor/bin/webdriver-manager') + ' update --standalone --chrome'
+      }
+    }, 
+
     // ngAnnotate tries to make the code safe for minification automatically by
     // using the Angular long form for dependency injection.
     ngAnnotate: {
@@ -630,6 +652,7 @@ module.exports = function (grunt) {
     });
   });
 
+  /*
   grunt.registerTask('test', [
     'wiredep',
     'clean',
@@ -639,6 +662,39 @@ module.exports = function (grunt) {
     'karma:unit:start',
     'watch:karma'
   ]);
+  */
+
+  grunt.registerTask('test', function () {
+    if(this.args.indexOf('unit') > -1) {
+      this.args.splice(this.args.indexOf('unit'),1);
+      return grunt.task.run(['karma']);
+    } else if(this.args.indexOf('e2e') > -1) {
+      this.args.splice(this.args.indexOf('e2e'),1);
+      return grunt.task.run([
+        'shell:protractor',
+        'protractor_webdriver',
+        'protractor:' + this.args.join(':')
+      ]);
+    } else if(this.args.indexOf('continuous') > -1) {
+      this.args.splice(this.args.indexOf('continuous'),1);
+      return grunt.task.run([
+        'wiredep',
+        'clean',
+        'concurrent:test',
+        'postcss',
+        'targethtml:dev',
+        'karma:unit:start',
+        'watch:karma'
+      ]);
+    } else {
+      return grunt.task.run([
+        'karma',
+        'shell:protractor',
+        'protractor_webdriver',
+        'protractor'
+      ]);
+    } 
+  });
 
   grunt.registerTask('serve', function (target) {
     if (target === 'compress') {

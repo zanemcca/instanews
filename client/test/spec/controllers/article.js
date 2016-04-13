@@ -2,212 +2,27 @@
 describe('Article controller: ', function(){
 
   var deferred;
-  var art;
 
   //Load the module and create mocks for all dependencies
   beforeEach( function() {
-    art = {
-      location: {
-        lat: 45,
-        lng: 45
-      }
-    };
-
     module('instanews.controller.article');
+    module('mock.services.articles');
+    module('mock.services.post');
+    module('mock.services.preload');
+    module('mock.services.platform');
+    module('mock.services.uploads');
+    module('mock.services.comments');
+    module('mock.services.subarticles');
+    module('mock.services.maps');
+    module('mock.services.navigate');
 
     module(function($provide) {
-
-      $provide.service('Article', function() {
-        return {
-          find: function(filter) {
-            return art;
-          },
-        };
-      });
-
       $provide.service('$ionicModal', function($q) {
         return {
           fromTemplateUrl: function(uri, obj) {
             deferred = $q.defer()
             return deferred.promise;
           }
-        };
-      });
-
-      $provide.service('Post', function() {
-        return {
-          post: function(uploads, cb) {
-            cb();
-          },
-        };
-      });
-
-      $provide.service('Platform', function() {
-        return {
-          loading: {
-            show: function () {},
-            hide: function () {}
-          },
-          analytics: {
-            trackView: function () {},
-            trackEvent: function () {},
-          },
-          initBackButton: function() {},
-          isIOS: function() {
-            return true;
-          },
-        };
-      });
-
-      $provide.service('preload', function() {
-        return function () {
-          return {
-            reset: function () {},
-            start: function () {},
-            stop: function () {}
-          };
-        };
-      });
-
-      $provide.service('Uploads', function() {
-        return {
-          findOrCreate: function(id) {
-            return {
-              get: function() {
-                return uploads;
-              },
-              registerObserver: function (cb) {
-                return {
-                  unregister: function () {
-                    cb();
-                  }
-                };
-              }
-            };
-          }
-        };
-      });
-
-      $provide.service('Subarticles', function() {
-        return {
-          load: function(id, cb) {
-            cb();
-          },
-          registerObserver: function(cb) {
-            cb();
-          },
-          unregisterObserver: function() {},
-          findOrCreate: function () {
-            return {
-              getSpec: function () {
-                return { 
-                  options: {
-                    filter: {}
-                  }
-                };
-              },
-              getLoader: function (spec) {
-                return {
-                  more: function (num, cb) {
-                    cb() 
-                  } 
-                };
-              },
-              get: function () {
-                return [1];
-              },
-              reload: function () {},
-              unfocusAll: function () {},
-              load: function () {
-              }
-            };
-          },
-          getSpec: function () {},
-          deleteAll: function() {},
-          get: function(id) {
-            return [1,2,3];
-          }
-        };
-      });
-
-      $provide.service('Comments', function() {
-        return {
-          load: function(id, cb) {
-            cb();
-          },
-          registerObserver: function(cb) {
-            cb();
-          },
-          unregisterObserver: function() {},
-          findOrCreate: function () {
-            return {
-              getSpec: function () {
-                return { 
-                  options: {
-                    filter: {}
-                  }
-                };
-              },
-              load: function () {},
-              unfocusAll: function () {}
-            };
-          },
-          getSpec: function () {},
-          deleteAll: function() {},
-          get: function(id) {
-            return [1,2,3];
-          }
-        };
-      });
-
-      $provide.service('Maps', function() {
-        return {
-          getArticleMap: function() {
-            return {
-              map: 'I am map'
-            };
-          },
-          registerObserver: function(cb) {
-            return {
-              unregister: function () {
-                //cb();
-              }
-            };
-          },
-          setMarker: function(map, position) {
-            return {
-              name: 'marker'
-            };
-          },
-          deleteMarker: function(marker) {},
-          localize: function() {
-          }
-        };
-      });
-
-      $provide.service('Articles', function() {
-        return {
-          get: function() {
-            return [];
-          },
-          add: function(articles) {
-          },
-          findById: function(articles) {
-          },
-          deleteAll: function() {},
-          areItemsAvailable: function() {
-            return true;
-          },
-          load: function(cb) {
-            cb();
-          },
-          registerObserver: function(cb) {
-          }
-        };
-      });
-
-      $provide.service('Navigate', function() {
-        return {
         };
       });
     });
@@ -219,7 +34,6 @@ describe('Article controller: ', function(){
     $rootScope,
     $stateParams,
     $ionicModal,
-    Article,
     Articles,
     Comments,
     Subarticles,
@@ -232,7 +46,6 @@ describe('Article controller: ', function(){
     scope = $rootScope.$new(); 
     stateParams = $stateParams;
     ionicModal = $ionicModal;
-    article = Article;
     maps = Maps;
     subarticles = Subarticles;
     Preload = preload;
@@ -248,7 +61,6 @@ describe('Article controller: ', function(){
       $scope: scope,
       $stateParams: stateParams,
       $ionicModal: ionicModal,
-      Article: article,
       Articles: articles,
       Comments: comments,
       Subarticles: subarticles,

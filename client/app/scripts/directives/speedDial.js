@@ -15,6 +15,10 @@ app.directive('inSpeedDial', [
       controller: function(
         $scope
       ){ 
+        $scope.fab = {
+          isOpen: false
+        };
+
         var text = {
           partial: ''
         };
@@ -22,6 +26,16 @@ app.directive('inSpeedDial', [
         $scope.getText = function () {
           return $scope.uploads.getText(text);
         };
+
+        var keyboardListener = function() {
+          $scope.fab.isOpen = false;
+          $scope.$digest();
+        };
+
+        window.addEventListener('native.keyboardshow', keyboardListener);
+        $scope.$on('$destroy', function() {
+          window.removeEventListener('native.keyboardshow', keyboardListener);
+        });
       },
       link: function($scope) {
         if(!$scope.position) {

@@ -4,6 +4,7 @@
 describe('Position service', function() {
 
   var value,
+  isIOS = false,
   location,
   watchPos,
   err;
@@ -27,37 +28,8 @@ describe('Position service', function() {
 
   beforeEach(function() {
     module('instanews.service.position');
-
-    module(function($provide) {
-      $provide.service('LocalStorage', function() {
-        return {
-          secureWrite: function(key, val) {},
-          secureRead: function(key, cb) {
-            cb(err, value);
-          },
-        };
-      });
-
-      $provide.service('Platform', function() {
-        return {
-          isBrowser: function() {},
-          isIOS: function () {
-            return false;
-          },
-          isAndroid6: function () {
-            return false;
-          },
-          ready: {
-            then: function (cb) {
-              cb();
-            }
-          },
-          getUUID: function () {
-            return 'uuid';
-          }
-        };
-      });
-    });
+    module('mock.services.platform');
+    module('mock.services.localStorage');
   });
 
   var 
@@ -73,6 +45,8 @@ describe('Position service', function() {
     localStorage = LocalStorage;
     platform = Platform;
     position = Position;
+
+    sinon.stub(platform, 'isIOS').returns(isIOS);
   }));
 
   describe('successful watch', function () {
@@ -276,6 +250,10 @@ describe('Position service', function() {
       });
 
       it('should read the position from memory', function (done) {
+        sinon.stub(localStorage, 'secureRead', function(key, cb) {
+          cb(err, value);
+        });
+
         value = location;
 
         position.getPermission(function () {

@@ -9,15 +9,15 @@
           class="button button-clear icon ion-plus">
         </button>
       </div>
-      <div ng-hide="uploads.length > 0">
+      <div ng-cloak ng-hide="uploads.length > 0">
         <in-speed-dial style="width:34px;" position="'top-right'" uploads="Uploads"></in-speed-dial>
       </div>
     </div>
   </ion-nav-buttons>
 
-  <in-scroll-top scroll-handle="subarticle" 
+  <!--in-scroll-top scroll-handle="subarticle" 
   preScroll="preScrollToTop">
-  </in-scroll-top>
+  </in-scroll-top-->
 
   <ion-content id="subarticle" delegate-handle="subarticle" on-swipe-down="onSwipeDown()" overflow-scroll="true" class="gpu">
     <ion-refresher pulling-text="Fresh Stuff" on-refresh="onRefresh()">

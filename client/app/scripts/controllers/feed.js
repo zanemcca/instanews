@@ -82,7 +82,7 @@ app.controller('FeedCtrl', [
 
     var Preload = preload({
       scrollHandle: 'feed',
-//      $timeout: $timeout,
+      $timeout: $timeout.bind(this),
       list: $scope.Articles
     });
 
