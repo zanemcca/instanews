@@ -6,6 +6,7 @@ app.controller('ArticleCtrl', [
   '$ionicModal',
   '$scope',
   '$stateParams',
+  '$timeout',
   'Articles',
   'Comments',
   'Maps',
@@ -19,6 +20,7 @@ app.controller('ArticleCtrl', [
     $ionicModal,
     $scope,
     $stateParams,
+    $timeout,
     Articles,
     Comments,
     Maps,
@@ -47,7 +49,7 @@ app.controller('ArticleCtrl', [
 
     var Preload = preload({
       scrollHandle: 'subarticle',
-      //$timeout: $timeout,
+      $timeout: $timeout.bind(this),
       list: $scope.Subarticles
     });
 
