@@ -10,17 +10,15 @@ function PreloadFactory(Navigate, Platform, PreloadQueue) {
       return console.log('Invalid spec for PreloadFactory');
     }
 
-    spec.$timeout = spec.$timeout || setTimeout;
+    spec.$timeout = spec.$timeout || setTimeout.bind(this);
 
-    spec.sampleTime = spec.sampleTime || 16;
+    spec.sampleTime = spec.sampleTime || 100;
     spec.msFromNow = spec.msFromNow || 3000;
     spec.avgTime = spec.avgTime || 500;
 
     if(!spec.msFromNow || spec.msFromNow < spec.sampleTime) {
       spec.msFromNow = spec.sampleTime;
     }
-
-    var timeSteps = Math.floor(spec.msFromNow / spec.sampleTime);
 
     var scroll = Navigate.scroll(spec);
 
@@ -31,11 +29,39 @@ function PreloadFactory(Navigate, Platform, PreloadQueue) {
     var M2 = 0;
     */
 
+   var interval = function(func, wait, iterations) {
+     var stop = false;
+
+     var itvl = function() {
+       if(!stop && (typeof iterations !== 'number' || iterations > 0)) {
+         if(typeof iterations === 'number') {
+           iterations--;
+         }
+         spec.$timeout(itvl, wait);
+         try {
+           func.call(null);
+         } catch(e) {
+           stop = true;
+           console.log('Interval error!');
+           console.log(e);
+         }
+       }
+     };
+
+     itvl();
+
+     return {
+       clear: function() {
+         stop = true;
+       }
+     };
+   };
+
     var positions = [{top: 0}, {top:0}];
     var M = 1;
     var M1 = 0;
 
-    var predictScroll = function () { 
+    var predictScroll = function (timeSteps) { 
       //The Kinematic Equation
       // S = So + dS/dt*(t-to) + 1/2*d^2S/dt^2*(t-to)^2
       // S(m+n) = (1 + n + n^2)*S(m) - (n + 2*n^2)*S(m-1) + n^2*S(m-2)
@@ -60,6 +86,7 @@ function PreloadFactory(Navigate, Platform, PreloadQueue) {
       var count = 0;
       var avgPrediction = 0;
       var avgPos = 0;
+      var avgVel = 0;
       var deltaN = Math.floor(spec.avgTime/spec.sampleTime);
 
       if(!continuous) {
@@ -73,32 +100,49 @@ function PreloadFactory(Navigate, Platform, PreloadQueue) {
         positions = [pos,pos];
       }
 
-      var average = setInterval(function () {
+      var last = Date.now();
+      var average = interval(function () {
+        var cur = Date.now();
+        var deltaT = cur - last;
+        last = cur;
+        /*
+         * TODO Find a more reliable way of getting the 
+         * scroll height and position since the interval can vary
+         * so drastically. If we could measure velocity directly then we 
+         * would not need to wory about this at all.
+         *
+        if(deltaT > spec.sampleTime*2) {
+          console.log('Warning! Sampling is off: ' + deltaT);
+        }
+       */
+
         positions.push(scroll.getPosition());
         positions.shift();
         var prediction;
         if(continuous) {
           //Continous gives a prediction for msFromNow after callback is called 
           //First result called after avgTime delay
-          prediction = predictScroll(spec.msFromNow + spec.avgTime/2);
+          prediction = predictScroll(Math.floor((spec.msFromNow + spec.avgTime/2) / deltaT));
         } else {
           //Gives a prediction for (msFromNow) after the call was made
           //It takes avgTime to compute the result so it would be (msFromNow - avgTime)ms in the future
-          prediction = predictScroll(spec.msFromNow - spec.avgTime/2);
+          prediction = predictScroll(Math.floor((spec.msFromNow - spec.avgTime/2) / deltaT));
         }
 
         avgPrediction += prediction/deltaN;
         avgPos += positions[M].top/deltaN;
+        avgVel += ((positions[M].top - positions[M1].top)/(deltaT/1000))/deltaN;
 
         count++;
         if(count === deltaN) {
-          cb(avgPrediction, avgPos);
+          cb(avgPrediction, avgPos, avgVel);
           if(continuous) {
+            avgVel = 0;
             avgPrediction = 0;
             avgPos = 0;
             count = 0;
           } else {
-            clearInterval(average);
+            average.clear();
           }
         }
       }, spec.sampleTime);
@@ -106,13 +150,13 @@ function PreloadFactory(Navigate, Platform, PreloadQueue) {
       if(continuous) {
         return {
           stop: function () {
-           clearInterval(average);
+            average.clear();
           }
         };
       } 
     };
 
-    var update = function (pred) {
+    var update = function (pred, pos, vel) {
       var length = spec.list.get().length;
 
       /*
@@ -127,11 +171,12 @@ function PreloadFactory(Navigate, Platform, PreloadQueue) {
       var avgHeight = 500;
 
       var needed = Math.round(pred/avgHeight) - length;
-      var maxScrollTop =  scroll.getBottom();
       var height = scroll.getPosition().top;
+      var maxScrollTop =  scroll.getBottom();
 
       // Ensure we always predict more will be needed if we are within 3 elements from the bottom
-      if(needed < 5 && (maxScrollTop - height) < 3*avgHeight) {
+      if(needed < 5 && height <= maxScrollTop && maxScrollTop &&(maxScrollTop - height) < 3*avgHeight) {
+        console.log('Bottom Proximity! Height: ' + height + '\tmaxScrollTop: ' + maxScrollTop);
         needed = 5;
       }
 
@@ -146,7 +191,6 @@ function PreloadFactory(Navigate, Platform, PreloadQueue) {
               max = length;
               console.log('Failed to get more!');
               console.log(err);
-              return;
             }
             /*
             if(items) {
@@ -156,6 +200,13 @@ function PreloadFactory(Navigate, Platform, PreloadQueue) {
           });
         }
       }
+
+      //console.log('Height: ' + height + '\tPrediction: ' + pred + '\tVelocity: ' + vel);
+      //Scroll to the top if we scroll faster than 2 items/sec and if we are scrolled down at least 5 
+      if(vel <= -4*avgHeight && height > 5*avgHeight) {
+        console.log('Scrolling to top! ' + vel);
+        scroll.scrollTop();
+      }
     };
 
     //var started = false;
@@ -163,8 +214,8 @@ function PreloadFactory(Navigate, Platform, PreloadQueue) {
     var predictor;
 
     var startMonitor = function () {
-      var after = function (pred, pos) {
-        update(pred, pos);
+      var after = function (pred, pos, vel) {
+        update(pred, pos, vel);
        // plotCallback(pred,pos);
       };
 
