@@ -517,14 +517,44 @@ module.factory(
 
         /**
          * @ngdoc method
+         * @name lbServices.Article#heatMap
+         * @methodOf lbServices.Article
+         *
+         * @description
+         *
+         * Accepts an array in the following form [[sw-lng, sw-lat],[ne-lng, ne-lat]] and returns the top articles contained within the rectangle
+         *
+         * @param {Object=} parameters Request parameters.
+         *
+         *  - `box` – `{*}` - 
+         *
+         * @param {function(Object,Object)=} successCb
+         *   Success callback with two arguments: `value`, `responseHeaders`.
+         *
+         * @param {function(Object)=} errorCb Error callback with one argument:
+         *   `httpResponse`.
+         *
+         * @returns {Object} An empty reference that will be
+         *   populated with the actual data once the response is returned
+         *   from the server.
+         *
+         * Data properties:
+         *
+         *  - `data` – `{*=}` - 
+         */
+        "heatMap": {
+          url: urlBase + "/articles/heatMap",
+          method: "GET"
+        },
+
+        /**
+         * @ngdoc method
          * @name lbServices.Article#getHeatMap
          * @methodOf lbServices.Article
          *
          * @description
          *
-         * <em>
-         * (The remote method definition does not provide any description.)
-         * </em>
+         * DEPRECATED
          *
          * @param {Object=} parameters Request parameters.
          *

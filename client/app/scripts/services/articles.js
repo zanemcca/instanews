@@ -209,7 +209,7 @@ app.service('Articles', [
       console.log('Reorganizing ' + total + ' articles!');
       //var toOutView = 
       var removed = articles.remove(function (article) {
-        var position = Position.posToLatLng(article.location);
+        var position = Position.posToLatLng(article.loc);
         return !Position.withinBounds(position);
       });
 
@@ -220,7 +220,7 @@ app.service('Articles', [
       }
       /*
       var toInView = hiddenArticles.remove(function (article) {
-        var position = Position.posToLatLng(article.location);
+        var position = Position.posToLatLng(article.loc);
         return Position.withinBounds(position);
       });
 
@@ -239,11 +239,16 @@ app.service('Articles', [
         if(bounds) {
           var sw = bounds.getSouthWest();
           var ne = bounds.getNorthEast();
-          spec.options.filter.where.location = {
+
+          if(sw.lat() === ne.lat() || sw.lng() === ne.lng()) {
+            return console.log('Bounds invalid!');
+          }
+
+          spec.options.filter.where.loc = {
             geoWithin: {
               $box: [
-                [sw.lat(), sw.lng()],
-                [ne.lat(), ne.lng()]
+                [sw.lng(), sw.lat()],
+                [ne.lng(), ne.lat()]
               ]
             }
           };

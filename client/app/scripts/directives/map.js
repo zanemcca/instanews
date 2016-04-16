@@ -180,7 +180,7 @@ app.directive('inmap', [
                   Articles.findById($stateParams.id, function(article) {
                     scope.article = article;
                     if(article) {
-                      mapOptions.center = new google.maps.LatLng(scope.article.location.lat, scope.article.location.lng);
+                      mapOptions.center = new google.maps.LatLng(scope.article.loc.coordinates[1], scope.article.loc.coordinates[0]);
                       mapOptions.zoom = 18;
                       //mapOptions.minZoom = 9;
                       mapOptions.tilt = 45;

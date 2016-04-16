@@ -56,6 +56,7 @@ app.service('Maps', [
 
     var heatmap;
 
+    //TODO This only needs to be run once
     var createGradient = function() {
       //Original
       var start = {
@@ -214,11 +215,16 @@ return gradient;
       if(bounds) {
         var sw = bounds.getSouthWest();
         var ne = bounds.getNorthEast();
+
         console.log('Getting heatmap');
-        Article.getHeatMap({
+        if(sw.lat() === ne.lat() || sw.lng() === ne.lng()) {
+          return console.log('Bounds invalid!');
+        }
+
+        Article.heatMap({
           box: [
-            [sw.lat(), sw.lng()],
-            [ne.lat(), ne.lng()]
+            [sw.lng(), sw.lat()],
+            [ne.lng(), ne.lat()]
           ]
         }).$promise
         .then(function (res) {
@@ -242,7 +248,7 @@ return gradient;
           }
 
           for(i = 0; i < articles.length; i++) {
-            var position = Position.posToLatLng(articles[i].location);
+            var position = Position.posToLatLng(articles[i].loc);
             var rating = articles[i].rating;
             if(rating < 0) {
               rating = 0.1;
@@ -497,8 +503,15 @@ return gradient;
     var geocoder = new google.maps.Geocoder();
     //Returna geocoded location (aka Google place)
     var getPlace = function (location, cb) {
+      var loc = location;
+      if(location.coordinates) {
+        loc = {
+          lng: location.coordinates[0],
+          lat: location.coordinates[1]
+        };
+      }
       geocoder.geocode({
-        location: location
+        location: loc
       }, function (results, status) {
         if(status === google.maps.GeocoderStatus.OK) {
           cb(results[0]);

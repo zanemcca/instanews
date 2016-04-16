@@ -72,8 +72,8 @@ app.controller('ArticleCtrl', [
     var afterLoaded = function () {
       var map = Maps.getArticleMap($stateParams.id);
       /* istanbul ignore else */
-      if(map && $scope.article.location) { 
-        setMarker(map, $scope.article.location);
+      if(map && $scope.article.loc) { 
+        setMarker(map, $scope.article.loc);
         Platform.loading.hide();
         mapObserver.unregister();
       }
