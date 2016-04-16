@@ -73,6 +73,20 @@ module.exports = function(app) {
 
     if(inst && ctx.isNewInstance) {
       inst.pending = true;
+      //TODO Remove this once all v0.5.0 devices are gone
+      if(inst.location && !inst.loc) {
+        // Convert legacy location to geoJSON
+        inst.loc = {
+          type: 'Point',
+          coordinates: [ inst.location.lng, inst.location.lat ]
+        };
+      } else if(inst.loc && !inst.location) {
+        // We need to maintain the legacy location until v0.5.0 frontend is expired
+        inst.location = {
+          lat: inst.loc.coordinates[1],
+          lng: inst.loc.coordinates[0]
+        };
+      }
     }
 
     next();
@@ -161,6 +175,31 @@ module.exports = function(app) {
 
     filter.where = filter.where || {};
     filter.where.id = filter.where.id || { gt: app.utils.objectIdWithTimestamp(Date.now() - 2 * ONE_WEEK) };
+
+    var loc = filter.where.loc || filter.where.location;
+    if(loc) {
+      if(loc.geoWithin && loc.geoWithin.$box) {
+        var box = loc.geoWithin.$box;
+        var geom;
+        if(filter.where.loc) {
+          geom = Article.generateBoxGeometry(box[0],box[1]);
+          filter.where.loc = {
+            geoWithin: {
+              $geometry: geom
+            }
+          };
+        } else {
+          geom = Article.generateBoxGeometry([box[0][1], box[0][0]], [box[1][1], box[1][0]]);
+          filter.where.loc = {
+            geoWithin: {
+              $geometry: geom
+            }
+          };
+          delete filter.where.location;
+        }
+      }
+    }
+
     ctx.args.filter = JSON.stringify(filter);
 
     next();

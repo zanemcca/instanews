@@ -39,7 +39,7 @@ app.controller('FeedCtrl', [
         //This takes care of any race conditions between the preloading queue and bounds updating
         var arts = [];
         for(var i in articles) {
-          var position = Position.posToLatLng(articles[i].location);
+          var position = Position.posToLatLng(articles[i].loc);
           if(Position.withinBounds(position)) {
             arts.push(articles[i]);
           }
@@ -103,7 +103,7 @@ app.controller('FeedCtrl', [
             Maps.fitBounds(map, place.geometry.viewport);
           }
           else {
-            Maps.setCenter(map, place.geometry.location);
+            Maps.setCenter(map, place.geometry.loc);
           }
         };
 

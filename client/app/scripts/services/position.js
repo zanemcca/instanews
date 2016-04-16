@@ -106,6 +106,9 @@ app.service('Position', [
       if( position.coords) {
         //Position as returned from navigator.geolocation
         return new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
+      } else if( position.coordinates) {
+        //Position as in geoJSON format 
+        return new google.maps.LatLng(position.coordinates[1], position.coordinates[0]);
       }
       // istanbul ignore else
       else if(position.lat && position.lng) {

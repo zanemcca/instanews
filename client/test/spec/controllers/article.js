@@ -113,9 +113,9 @@ describe('Article controller: ', function(){
     beforeEach(function() {
       initController();
       scope.article = {
-        location: {
-          lat: 45,
-          lng: -64
+        loc: {
+          type: 'Point',
+          coordinates: [ -64, 45]
         }
       };
     });

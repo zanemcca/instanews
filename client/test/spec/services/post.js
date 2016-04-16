@@ -54,9 +54,9 @@ describe('Post service', function() {
 
     newArticle = { 
       title: 'Title',
-      location: {
-        lat: 1,
-        lng: 2
+      loc: {
+        type: 'Point',
+        coordinates: [ 2, 1]
       }
     };
 
@@ -550,38 +550,33 @@ describe('Post service', function() {
   describe('isValidArticle', function () {
     var valid = [{
       title: 'article title',
-      location: {
-        lat: 1,
-        lng: 2
+      loc: { 
+        type: 'Point',
+        coordinates: [ 1, 2]
       }
     }];
 
     var invalid = [{
       title: 'article title',
-      location: {
-        lat: 'string',
-        lng: 2
-      }
+      loc: {
+        type: 'Point',
+        coordinates: [ 'string', 2]
+      } 
     },
     {
-      location: {}
+      loc: {}
     },
     {
-      location: {
-        lat: 1,
-        lng: 2
-      }
-    },
-    {
-      title: 'article title',
-      location: {
-        lng: 2
-      }
+      loc: {
+        type: 'Point',
+        coordinates: [ 1, 2]
+      } 
     },
     {
       title: 'article title',
-      location: {
-        lat: 1
+      loc: {
+        type: 'Point',
+        coordinates: [ 1]
       }
     }];
 
@@ -666,9 +661,9 @@ describe('Post service', function() {
 
         sinon.stub(article, 'create', function(obj) {
           expect(obj).to.deep.equal({
-            location: {
-              lat: 1,
-              lng: 2
+            loc: {
+              type: 'Point',
+              coordinates: [2,1]
             },
             place: place.address_components, 
             title: 'Title' 
