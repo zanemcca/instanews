@@ -18,8 +18,20 @@ module.exports = function(app) {
   };
 
   var nearBy = function(loc1, loc2) {
-
     if(loc1 && loc2) {
+      if(loc1.coordinates) {
+        loc1 = {
+          lng: loc1.coordinates[0],
+          lat: loc1.coordinates[1]
+        };
+      }
+      if(loc2.coordinates) {
+        loc2 = {
+          lng: loc2.coordinates[0],
+          lat: loc2.coordinates[1]
+        };
+      }
+
       //haversine method
       var lat1 = loc1.lat.toRad();
       var lat2 = loc2.lat.toRad();
@@ -373,7 +385,7 @@ module.exports = function(app) {
             //extra read
             if(ctx.Model.modelName === 'upVote' &&
                res.modelName === 'article' && !res.verified &&
-                 nearBy(res.location, inst.location)
+                 nearBy(res.loc, inst.location)
             ) {
 
               if(res.username !== inst.username) {

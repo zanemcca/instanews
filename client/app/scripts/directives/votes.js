@@ -126,8 +126,8 @@ app.directive('invotes', [
                 // istanbul ignore else 
                 if(position) {
                   vote.location = {
-                    lat: position.coords.latitude,
-                    lng: position.coords.longitude
+                    type: 'Point',
+                    coordinates: [ position.coords.longitude, position.coords.latitude]
                   };
                 }
 
@@ -181,8 +181,8 @@ app.directive('invotes', [
                 // istanbul ignore else 
                 if(position) {
                   vote.location = {
-                    lat: position.coords.latitude,
-                    lng: position.coords.longitude
+                    type: 'Point',
+                    coordinates: [ position.coords.longitude, position.coords.latitude]
                   };
                 }
 

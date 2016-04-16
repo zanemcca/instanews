@@ -20,9 +20,6 @@
   "properties": {
     "created": {
       "type": "date"
-    },
-    "location": {
-      "type": "geopoint"
     }
   },
   "validations": [],

@@ -167,13 +167,13 @@ app.controller('PostCtrl', [
           Platform.loading.show();
 
           var position = {
-            lat: marker.getPosition().lat(),
-            lng: marker.getPosition().lng()
+            type: 'Point',
+            coordinates: [ marker.getPosition().lng(), marker.getPosition().lat()]
           };
 
           var article = {
             isPrivate: false,
-            location: position,
+            loc: position,
             title: $scope.title
           };
 
