@@ -570,9 +570,9 @@ exports.run = function () {
           clickable = {
             modelName: 'article',
             verified: false,
-            location: {
-              lat: 45,
-              lng: -67
+            loc: {
+              type: 'Point',
+              coordinates: [ -67, 45]
             },
             updateAttributes: function(data, cb) {cb();}
           };
