@@ -323,8 +323,8 @@ app.directive('inListItem', [
             // istanbul ignore else
             if(position && position.coords) {
               view.location = {
-                lat: position.coords.latitude,
-                lng: position.coords.longitude
+                type: 'Point',
+                coordinates: [ position.coords.longitude, position.coords.latitude]
               };
             }
             else {

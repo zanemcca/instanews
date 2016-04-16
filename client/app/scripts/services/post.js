@@ -28,8 +28,8 @@ app.factory('Post', [
 
     var isValidArticle = function(article) {
       if( article.title && typeof article.title === 'string' && article.title.length > 0 &&
-         article.location && article.location.lat && article.location.lng &&
-         typeof article.location.lat === 'number' && typeof article.location.lng === 'number' 
+         article.loc && article.loc.coordinates && article.loc.coordinates.length === 2 &&
+         typeof article.loc.coordinates[0] === 'number' && typeof article.loc.coordinates[1] === 'number' 
         ) {
           return true;
         }
@@ -159,7 +159,7 @@ app.factory('Post', [
           cb();
           // istanbul ignore else 
         } else if(isValidArticle(article)) { 
-          Maps.getPlace(article.location, function (place) {
+          Maps.getPlace(article.loc, function (place) {
             article.place = [];
             var whitelist = [
               'route',

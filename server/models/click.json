@@ -18,14 +18,12 @@
   },
   "hidden": [
     "location",
+    "loc",
     "viewId"
   ],
   "properties": {
     "created": {
       "type": "date"
-    },
-    "location": {
-      "type": "geopoint"
     }
   },
   "validations": [],
