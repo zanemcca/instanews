@@ -22,6 +22,7 @@ app.service('Articles', [
     var updateRating = false;
     // Triggered when an item in the list wants to be updated
     var update = function (newValue, oldValue) {
+      oldValue.enableFocus = oldValue.enableFocus || newValue.enableFocus;
       if( newValue.modified >= oldValue.modified ) {
         if(updateRating) {
           oldValue.rating = newValue.rating;
