@@ -72,8 +72,8 @@ function TermsFactory($rootScope, $ionicModal, Term, User, Platform) {
       if(!user || !user.user) {
         fail();
       } else if(!user.user.termsVersion || user.user.termsVersion < terms.terms.version) {
-        Platform.showConfirm('Our Terms of Service has changed. Do you accept the new terms?',
-        'Terms of Service',
+        Platform.showConfirm('Our Terms of Use has changed. Do you accept the new terms?',
+        'Terms of Use',
         ['Agree', 'Cancel', 'Show Me'],
         function(idx) {
           switch(idx) {
