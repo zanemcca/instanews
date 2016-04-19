@@ -1,6 +1,17 @@
 {
   "name": "notif",
   "base": "PersistedModel",
+  "indexes": {
+    "username_1_created_-1": {
+      "keys": {
+        "username": 1,
+        "created": -1
+      },
+      "options": {
+        "background": true
+      }
+    }
+  },
   "properties": {
     "seen": {
       "type": "boolean"
@@ -12,17 +23,6 @@
     "modified": {
       "type": "date",
       "required": true
-    }
-  },
-  "indexes": {
-    "username_1_created_-1": {
-      "keys": {
-        "username": 1,
-        "created": -1
-      },
-      "options": {
-        "background": true
-      }
     }
   },
   "validations": [],
