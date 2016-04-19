@@ -292,3 +292,14 @@
   font-size: 12px !important;
   opacity:0.5 !important;
 }
+
+// Wrap wrapper
+.wrap-it {
+  white-space: normal !important;
+}
+
+.wrap-it {
+  * {
+    white-space: normal !important;
+  }
+}
