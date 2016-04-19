@@ -137,6 +137,7 @@ app.controller(
         }
 
         isVideo = false;
+        urlBase = ENV.photoEndpoint;
         // If this is a video then it will
         // have a poster which should be used
         // instead of other sources
@@ -189,7 +190,7 @@ app.controller(
           };
         } else {
           return {
-            'heighx': 'auto',
+            'height': 'auto',
             'width': 'auto'
            };
         }
