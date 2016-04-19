@@ -215,6 +215,7 @@ app.service('User', [
       reload: reload,
       get: get,
       agreeToTerms: Journalist.agreeToTerms.bind(Journalist),
+      agreeToPrivacy: Journalist.agreeToPrivacy.bind(Journalist),
       getToken: getToken,
       set: set,
       registerObserver: registerObserver

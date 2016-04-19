@@ -1334,8 +1334,6 @@ module.factory(
          *
          *  - `id` – `{string}` - 
          *
-         *  - `version` – `{number}` - 
-         *
          * @param {function(Object,Object)=} successCb
          *   Success callback with two arguments: `value`, `responseHeaders`.
          *
@@ -1350,6 +1348,43 @@ module.factory(
          */
         "agreeToTerms": {
           url: urlBase + "/journalists/:id/agreeToTerms",
+          method: "PUT"
+        },
+
+        /**
+         * @ngdoc method
+         * @name lbServices.Journalist#agreeToPrivacy
+         * @methodOf lbServices.Journalist
+         *
+         * @description
+         *
+         * <em>
+         * (The remote method definition does not provide any description.)
+         * </em>
+         *
+         * @param {Object=} parameters Request parameters.
+         *
+         *   This method does not accept any parameters.
+         *   Supply an empty object or omit this argument altogether.
+         *
+         * @param {Object} postData Request data.
+         *
+         *  - `id` – `{string}` - 
+         *
+         * @param {function(Object,Object)=} successCb
+         *   Success callback with two arguments: `value`, `responseHeaders`.
+         *
+         * @param {function(Object)=} errorCb Error callback with one argument:
+         *   `httpResponse`.
+         *
+         * @returns {Object} An empty reference that will be
+         *   populated with the actual data once the response is returned
+         *   from the server.
+         *
+         * This method returns no data.
+         */
+        "agreeToPrivacy": {
+          url: urlBase + "/journalists/:id/agreeToPrivacy",
           method: "PUT"
         },
 
@@ -2869,6 +2904,116 @@ module.factory(
     * i.e. `View`.
     */
     R.modelName = "View";
+
+
+    return R;
+  }]);
+
+/**
+ * @ngdoc object
+ * @name lbServices.Term
+ * @header lbServices.Term
+ * @object
+ *
+ * @description
+ *
+ * A $resource object for interacting with the `Term` model.
+ *
+ * ## Example
+ *
+ * See
+ * {@link http://docs.angularjs.org/api/ngResource.$resource#example $resource}
+ * for an example of using this object.
+ *
+ */
+module.factory(
+  "Term",
+  ['LoopBackResource', 'LoopBackAuth', '$injector', function(Resource, LoopBackAuth, $injector) {
+    var R = Resource(
+      urlBase + "/terms/:id",
+      { 'id': '@id' },
+      {
+
+        /**
+         * @ngdoc method
+         * @name lbServices.Term#terms
+         * @methodOf lbServices.Term
+         *
+         * @description
+         *
+         * Returns the latest Terms of Service
+         *
+         * @param {Object=} parameters Request parameters.
+         *
+         *   This method does not accept any parameters.
+         *   Supply an empty object or omit this argument altogether.
+         *
+         * @param {function(Object,Object)=} successCb
+         *   Success callback with two arguments: `value`, `responseHeaders`.
+         *
+         * @param {function(Object)=} errorCb Error callback with one argument:
+         *   `httpResponse`.
+         *
+         * @returns {Object} An empty reference that will be
+         *   populated with the actual data once the response is returned
+         *   from the server.
+         *
+         * Data properties:
+         *
+         *  - `terms` – `{object=}` - 
+         */
+        "terms": {
+          url: urlBase + "/terms",
+          method: "GET"
+        },
+
+        /**
+         * @ngdoc method
+         * @name lbServices.Term#privacy
+         * @methodOf lbServices.Term
+         *
+         * @description
+         *
+         * Returns the latest Privacy Policy
+         *
+         * @param {Object=} parameters Request parameters.
+         *
+         *   This method does not accept any parameters.
+         *   Supply an empty object or omit this argument altogether.
+         *
+         * @param {function(Object,Object)=} successCb
+         *   Success callback with two arguments: `value`, `responseHeaders`.
+         *
+         * @param {function(Object)=} errorCb Error callback with one argument:
+         *   `httpResponse`.
+         *
+         * @returns {Object} An empty reference that will be
+         *   populated with the actual data once the response is returned
+         *   from the server.
+         *
+         * Data properties:
+         *
+         *  - `policy` – `{object=}` - 
+         */
+        "privacy": {
+          url: urlBase + "/terms/privacy",
+          method: "GET"
+        },
+      }
+    );
+
+
+
+
+    /**
+    * @ngdoc property
+    * @name lbServices.Term#modelName
+    * @propertyOf lbServices.Term
+    * @description
+    * The name of the model represented by this $resource,
+    * i.e. `Term`.
+    */
+    R.modelName = "Term";
 
 
     return R;
