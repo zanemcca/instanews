@@ -1,13 +1,15 @@
 module.exports = function(Term) {
 
+  var fs = require('fs');
+
   Term.term = {
     version: 1,
-    text: 'Here are some terms and conditions'
+    text: fs.readFileSync(__dirname + '/../public/TermsOfService.html', 'utf8')
   };
 
   Term.policy = {
     version: 2,
-    text: 'Here is a Privacy Policy'
+    text: fs.readFileSync(__dirname + '/../public/PrivacyPolicy.html', 'utf8')
   };
 
   Term.terms = function (cb) {
