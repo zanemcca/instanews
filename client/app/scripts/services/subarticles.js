@@ -77,6 +77,7 @@ app.service('Subarticles', [
     var subarticleList = function (spec) {
       // Triggered when an item in the list wants to be updated
       var update = function (newValue, oldValue) {
+        oldValue.enableFocus = oldValue.enableFocus || newValue.enableFocus;
         if( newValue.modified >= oldValue.modified ) {
           oldValue.rating = newValue.rating;
           oldValue.modified = newValue.modified;
