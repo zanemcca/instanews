@@ -298,14 +298,21 @@
   white-space: normal !important;
 }
 
+.wrap-it * {
+  font-family: inherit;
+}
+
 .wrap-it {
   * {
     white-space: normal !important;
-    margin: initial;
-    padding: initial;
-    border: initial;
     list-style: inherit;
     overflow: visible;
+  }
+
+  font-family: inherit;
+
+  i {
+    font-style: italic;
   }
 
   ol, ul {
