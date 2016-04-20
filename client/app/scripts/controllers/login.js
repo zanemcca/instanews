@@ -23,7 +23,7 @@ app.controller('LoginCtrl', [
     LocalStorage,
     Journalist) {
 
-      $scope.terms = Terms.getTerms();
+//      $scope.terms = Terms.getTerms();
       $scope.Terms = Terms;
 
       $scope.cred = {
@@ -423,79 +423,94 @@ app.controller('LoginCtrl', [
 
       $scope.signup = function () {
         Platform.analytics.trackEvent('Signup', 'start');
-        var user = {
-          email: $scope.newUser.email,
-          lastUpdated: Date.now(),
-          termsVersion: Terms.getVersion(),
-          password: $scope.newUser.password
-        };
+        Terms.getTermsVersion(function(termsVersion) {
+          Terms.getPrivacyVersion(function(policyVersion) {
+            var user = {
+              email: $scope.newUser.email,
+              lastUpdated: Date.now(),
+              termsVersion: termsVersion,
+              policyVersion: policyVersion,
+              password: $scope.newUser.password
+            };
 
-        if( $scope.passwordStrength <= 0) {
-          Platform.analytics.trackEvent('Signup', 'weakPassword');
-          Platform.showAlert('You must have at least 8 characters', 'Password to weak');
-        } else if(!$scope.validEmail()) {
-          $scope.invalid.email = true;
-          Platform.analytics.trackEvent('Signup', 'badEmail');
-          Platform.showAlert('The email you entered is not properly formatted!', 'Invalid Email');
-        } else {
-          Platform.loading.show();
-          //Verify that the email and username is unique
-          Journalist.count({
-            where: {
-              email: user.email
-            }
-          }, function(res) {
-            if( res.count > 0) {
-              Platform.loading.hide();
+            if( !termsVersion || !policyVersion) {
+              Platform.analytics.trackEvent('Signup', 'badTerms');
+              Platform.showAlert('There was an unknown error while signing up', 'Please try again');
+            } else if( $scope.passwordStrength <= 0) {
+              Platform.analytics.trackEvent('Signup', 'weakPassword');
+              Platform.showAlert('You must have at least 8 characters', 'Password to weak');
+            } else if(!$scope.validEmail()) {
               $scope.invalid.email = true;
-              Platform.analytics.trackEvent('Signup', 'emailAlreadyUsed');
-              Platform.showAlert('The email you entered is already used!', 'Email Used');
+              Platform.analytics.trackEvent('Signup', 'badEmail');
+              Platform.showAlert('The email you entered is not properly formatted!', 'Invalid Email');
             } else {
-              /* istanbul ignore else */
-              if ( $scope.newUser.username ) {
-                user.username = $scope.newUser.username.toLowerCase();
-              } else {
-                Platform.loading.hide();
-                Platform.analytics.trackEvent('Signup', 'usernameRequired');
-                Platform.showAlert('You must enter a username!', 'Invalid Username');
-                $scope.invalid.username = true;
-                return;
-              }
-
+              Platform.loading.show();
+              //Verify that the email and username is unique
               Journalist.count({
                 where: {
-                  username: user.username
+                  email: user.email
                 }
               }, function(res) {
                 if( res.count > 0) {
                   Platform.loading.hide();
-                  $scope.invalid.username = true;
-                  Platform.analytics.trackEvent('Signup', 'usernameAlreadyUsed');
-                  Platform.showAlert('The username you entered is already used. Please try another one', 'Username Taken');
-                }
-                else {
-                  Journalist.create(user, function (res) {
-                    console.log(res);
-                    console.log('Signed up');
-                    $scope.cred = {
-                      username: user.username,
-                      password: user.password,
-                      remember: $scope.newUser.remember
-                    };
-                    Platform.analytics.trackEvent('Signup', 'success');
-                    $scope.login();
-                    $scope.trashNewUser();
-                  }, 
+                  $scope.invalid.email = true;
+                  Platform.analytics.trackEvent('Signup', 'emailAlreadyUsed');
+                  Platform.showAlert('The email you entered is already used!', 'Email Used');
+                } else {
+                  /* istanbul ignore else */
+                  if ( $scope.newUser.username ) {
+                    user.username = $scope.newUser.username.toLowerCase();
+                  } else {
+                    Platform.loading.hide();
+                    Platform.analytics.trackEvent('Signup', 'usernameRequired');
+                    Platform.showAlert('You must enter a username!', 'Invalid Username');
+                    $scope.invalid.username = true;
+                    return;
+                  }
+
+                  Journalist.count({
+                    where: {
+                      username: user.username
+                    }
+                  }, function(res) {
+                    if( res.count > 0) {
+                      Platform.loading.hide();
+                      $scope.invalid.username = true;
+                      Platform.analytics.trackEvent('Signup', 'usernameAlreadyUsed');
+                      Platform.showAlert('The username you entered is already used. Please try another one', 'Username Taken');
+                    }
+                    else {
+                      Journalist.create(user, function (res) {
+                        console.log(res);
+                        console.log('Signed up');
+                        $scope.cred = {
+                          username: user.username,
+                          password: user.password,
+                          remember: $scope.newUser.remember
+                        };
+                        Platform.analytics.trackEvent('Signup', 'success');
+                        $scope.login();
+                        $scope.trashNewUser();
+                      }, 
+                      /* istanbul ignore next */
+                      function(err) {
+                        console.log(err);
+                        Platform.loading.hide();
+                        Platform.analytics.trackEvent('Signup', 'error', 'status', err.status);
+                        if([403, 422].indexOf(err.status) > -1) {
+                          Platform.showAlert((err.data && err.data.message) || 'There was an error with your credentials', 'Please try again');
+                        } else {
+                          Platform.showAlert('There was an unknown error while signing up', 'Please try again');
+                        }
+                      });
+                    }
+                  },
                   /* istanbul ignore next */
                   function(err) {
-                    console.log(err);
                     Platform.loading.hide();
                     Platform.analytics.trackEvent('Signup', 'error', 'status', err.status);
-                    if([403, 422].indexOf(err.status) > -1) {
-                      Platform.showAlert((err.data && err.data.message) || 'There was an error with your credentials', 'Please try again');
-                    } else {
-                      Platform.showAlert('There was an unknown error while signing up', 'Please try again');
-                    }
+                    Platform.showAlert('There was an unknown error while signing up', 'Please try again');
+                    console.log(err);
                   });
                 }
               },
@@ -507,15 +522,8 @@ app.controller('LoginCtrl', [
                 console.log(err);
               });
             }
-          },
-          /* istanbul ignore next */
-          function(err) {
-            Platform.loading.hide();
-            Platform.analytics.trackEvent('Signup', 'error', 'status', err.status);
-            Platform.showAlert('There was an unknown error while signing up', 'Please try again');
-            console.log(err);
           });
-        }
+        });
       };
     }
 ]);

@@ -188,13 +188,13 @@ module.exports = function(Journalist) {
     });
   };
 
-  Journalist.agreeToTerms = function (id, version, next) {
+  Journalist.agreeToTerms = function (id, next) {
     var dd = Journalist.app.DD('Journalist', 'agreeToTerms');
     Journalist.updateAll({ 
       username: id,
     },
     {
-      termsVersion: version
+      termsVersion: Journalist.app.models.Term.term.version 
     }, function (err, res) {
       dd.lap('Journalist.updateAll');
       dd.elapsed();
@@ -203,6 +203,31 @@ module.exports = function(Journalist) {
         console.log(err);
         if(!err) {
           err = new Error('Failed to agreeToTerms');
+          err.status = 404;
+        }
+
+        next(err);
+      } else {
+        next(null, 0);
+      }
+    });
+  };
+
+  Journalist.agreeToPrivacy = function (id, next) {
+    var dd = Journalist.app.DD('Journalist', 'agreeToPolicy');
+    Journalist.updateAll({ 
+      username: id,
+    },
+    {
+      policyVersion: Journalist.app.models.Term.policy.version 
+    }, function (err, res) {
+      dd.lap('Journalist.updateAll');
+      dd.elapsed();
+      if(err || res.count !== 1) {
+        console.log('Failed to agreeToPolicy!');
+        console.log(err);
+        if(!err) {
+          err = new Error('Failed to agreeToPolicy');
           err.status = 404;
         }
 
@@ -385,11 +410,22 @@ module.exports = function(Journalist) {
     'agreeToTerms',
     {
       accepts: [
-        { arg: 'id', type: 'string', required: true},
-        { arg: 'version', type: 'number', required: true}
+        { arg: 'id', type: 'string', required: true}
       ],
       http: {
         path: '/:id/agreeToTerms', verb: 'put'
+      }
+    }
+  );
+
+  Journalist.remoteMethod(
+    'agreeToPrivacy',
+    {
+      accepts: [
+        { arg: 'id', type: 'string', required: true}
+      ],
+      http: {
+        path: '/:id/agreeToPrivacy', verb: 'put'
       }
     }
   );

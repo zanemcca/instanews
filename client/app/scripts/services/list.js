@@ -272,7 +272,12 @@ function ListFactory (observable, Platform, PreloadQueue, User) {
       focus.notifyObservers();
     };
 
-    var reload = function (cb) {
+    var reload = function (softReload, cb) {
+      if(typeof softReload === 'function') {
+        cb = softReload;
+        softReload = false;
+      }
+
       spec.options.filter.skip = 0;
       spec.options.filter.limit = Math.max(get().length + 1, defaultLimit);
       spec.options.filter.limit = spec.options.filter.limit || defaultLimit;
@@ -281,26 +286,24 @@ function ListFactory (observable, Platform, PreloadQueue, User) {
           return console.log(err);
         }
 
-        if(spec.items.length) {
-          spec.items = [];
-        }
-
-        /*
-         * This might be a cleaner solution for implicit delete
-         * rather than clearing the list and then adding everything back
-         * as it would not need to clear the list.
-         *
-        var implicitDeleteComparator = function(item) {
-           for(var j in items) {
-             if(items[j].id === item.id) {
-               return false;
+        if(softReload) {
+          //Soft reload will only remove implicitly deleted content 
+          //and then update what remains
+          var implicitDeleteComparator = function(item) {
+             for(var j in items) {
+               if(items[j].id === item.id) {
+                 return false;
+               }
              }
-           }
-           return true;
-        };
-        remove(implicitDeleteComparator);
-       */
-
+             return true;
+          };
+          remove(implicitDeleteComparator);
+        } else {
+          //Hard reload clears all content and reloads it
+          if(spec.items.length) {
+            spec.items = [];
+          }
+        }
 
         if(items && items.length) {
           that.add(items, cb);
@@ -454,8 +457,12 @@ function ListFactory (observable, Platform, PreloadQueue, User) {
             }
           }
         }, 
-        reload: function(cb) {
-          reload(function (err) {
+        reload: function(softReload, cb) {
+          if(typeof softReload === 'function') {
+            cb = softReload;
+            softReload = false;
+          }
+          reload(softReload, function (err) {
             cb = cb || function () {};
             if(err) {
               console.log('Failed to reload!');

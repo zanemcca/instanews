@@ -292,3 +292,41 @@
   font-size: 12px !important;
   opacity:0.5 !important;
 }
+
+// Wrap wrapper
+.wrap-it {
+  white-space: normal !important;
+}
+
+.wrap-it * {
+  font-family: inherit;
+}
+
+.wrap-it {
+  * {
+    white-space: normal !important;
+    list-style: inherit;
+    overflow: visible;
+  }
+
+  font-family: inherit;
+
+  i {
+    font-style: italic;
+  }
+
+  ol, ul {
+    padding-left: 40px;
+    * {
+      overflow: visible;
+    }
+  }
+
+  ol[type="i"] {
+    list-style-type: lower-roman;
+  }
+
+  ol[type="a"] {
+    list-style-type: lower-alpha;
+  }
+}

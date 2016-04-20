@@ -38,8 +38,11 @@ describe('Login: ', function(){
           ensure: function(succ, fail) {
             succ();
           },
-          getVersion: function() {
-            return 0;
+          getPrivacyVersion: function(cb) {
+            cb(1);
+          },
+          getTermsVersion: function(cb) {
+            cb(1);
           }
         };
       });

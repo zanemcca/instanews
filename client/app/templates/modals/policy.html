@@ -2,21 +2,22 @@
 <ion-modal-view>
    <ion-header-bar class="bar-dark">
      <button class="button buttons back-button button-clear"
-      ng-click="terms.modal.hide()">
+      ng-click="policy.modal.hide()">
       <i class="icon"
         ng-class="Platform.isIOS() ? 'ion-ios-arrow-back' : 'ion-android-arrow-back'"></i>
      </button>
      <h1 class="title">
-       Terms of Use 
+       Privacy Policy
      </h1>
      <button class="button buttons button-clear"
-       ng-show="terms.scope.showAgree"
-       ng-click="terms.scope.agree()">
+       ng-show="policy.scope.showAgree"
+       ng-click="policy.scope.agree()">
        AGREE 
      </button>
    </ion-header-bar>
    <ion-content>
-      <div class="item wrap-it" ng-bind-html="terms.text"></div>
+      <div class="item wrap-it" ng-bind-html="policy.text">
+      </div>
    </ion-content>
 </ion-modal-view>
 

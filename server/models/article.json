@@ -3,16 +3,6 @@
   "base": "base",
   "strict": false,
   "idInjection": false,
-  "properties": {
-    "isPrivate": {
-      "type": "boolean",
-      "required": true
-    },
-    "title": {
-      "type": "string",
-      "required": true
-    }
-  },
   "indexes": {
     "location_1_rating_-1": {
       "keys": {
@@ -22,6 +12,16 @@
       "options": {
         "background": true
       }
+    }
+  },
+  "properties": {
+    "isPrivate": {
+      "type": "boolean",
+      "required": true
+    },
+    "title": {
+      "type": "string",
+      "required": true
     }
   },
   "validations": [],
