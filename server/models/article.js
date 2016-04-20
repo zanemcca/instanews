@@ -97,7 +97,6 @@ module.exports = function(Article) {
   };
 
   Article.generateBoxGeometry = function(sw, ne) {
-    console.log('Generating a geometry!');
     var geometry = {
       type: 'Polygon',
       coordinates: [],
@@ -146,11 +145,7 @@ module.exports = function(Article) {
       return cb(err);
     }
 
-    console.log('HEATMAP');
     var geometry = Article.generateBoxGeometry(sw, ne);
-    console.log('Geometry!');
-
-    console.log(geometry.coordinates);
 
     Article.find({
       limit: 500,

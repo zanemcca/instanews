@@ -41,7 +41,7 @@
   },
   "notif": {
     "dataSource": "Articles",
-    "public": true 
+    "public": true
   },
   "admin": {
     "dataSource": "Admins",
@@ -97,6 +97,10 @@
   },
   "view": {
     "dataSource": "Interactions",
+    "public": true
+  },
+  "term": {
+    "dataSource": null,
     "public": true
   }
 }

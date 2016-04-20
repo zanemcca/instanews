@@ -15,8 +15,8 @@
       }
     }
   },
-  "properties": {},
   "strictDelete": true,
+  "properties": {},
   "validations": [],
   "relations": {},
   "acls": [

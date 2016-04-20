@@ -131,7 +131,7 @@ app.controller('ArticleCtrl', [
     });
 
     $scope.$on('$ionicView.beforeEnter', function() {
-      $scope.Subarticles.reload();
+      $scope.Subarticles.reload(true);
     });
 
     //Refresh the map everytime we enter the view
