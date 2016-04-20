@@ -72,6 +72,9 @@ describe('instanews.service.user', function() {
           agreeToTerms: function(data, succ, fail) {
             succ();
           },
+          agreeToPrivacy: function(data, succ, fail) {
+            succ();
+          },
           findById: function (id, succ, fail) {
             succ(journalist);
           },
