@@ -140,6 +140,7 @@ angular.module('instanews', [
   'Notifications',
   'Platform',
   'Post',
+  'Terms',
   'User',
   'Uploads',
   function (
@@ -151,6 +152,7 @@ angular.module('instanews', [
     Notifications,
     Platform,
     Post,
+    Terms,
     User,
     Uploads
   ) {
@@ -218,6 +220,7 @@ angular.module('instanews', [
     }, 300);
 
     $scope.Platform = Platform;
+    $scope.Terms = Terms;
 
      $ionicModal.fromTemplateUrl('templates/modals/pending.html', {
         scope: $scope,
