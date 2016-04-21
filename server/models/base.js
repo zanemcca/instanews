@@ -71,10 +71,10 @@ module.exports = function(Base) {
       red.exec(function(err, res) {
         if(err) {
           console.error('Failed to perform redis transaction!');
-          console.error(err.stack);
+          console.dir(err);
         }
 
-        cb(null, !res[0][1]);
+        cb(err, !res[0][1]);
       });
     } else {
       var err = new Error('Invalid update data given!');
@@ -93,7 +93,7 @@ module.exports = function(Base) {
       dd.lap('Redis.getAndDelete');
       if(err) {
         console.error('Failed to complete the update transaction!');
-        console.error(err.stack);
+        console.dir(err);
         return next(err);
       }
       var data = res[0][1];
@@ -201,15 +201,29 @@ module.exports = function(Base) {
         };
       }
 
+      var fail = function(err) {
+        Base.deferUpdate(id, type, data, function(e) {
+          if(e) {
+            console.error('Failed to recover from defered update failure!');
+            console.dir(e);
+            process.exit(-1);
+          } else {
+            next(err);
+          }
+        });
+      };
+
       addCommentRating(function(err) {
         if(err) {
           console.error('Failed to addCommentRating');
-          return next(err);
+          console.dir(err);
+          return fail(err);
         }
         addSubarticleRating(function(err) {
           if(err) {
             console.error('Failed to addSubarticleRating');
-            return next(err);
+            console.dir(err);
+            return fail(err);
           }
 
           Base.app.models.Stat.updateRating({ 
@@ -242,9 +256,8 @@ module.exports = function(Base) {
             dd.lap('Stat.updateRating');
             if(err) {
               console.error('Failed to update the rating!'); 
-              console.error(err);
-              //TODO Create a new deferred update with all of the missed information to retry
-              return next(err);
+              console.dir(err);
+              return fail(err);
             }
             next();
           });
@@ -261,7 +274,7 @@ module.exports = function(Base) {
     createOrUpdateDeferredUpdate(id, type, data, function(err, newInstance) {
       dd.lap('Redis.createOrUpdate');
       if(err) {
-        console.error(err.stack);
+        console.dir(err);
         return next(err);
       }
 
@@ -275,7 +288,9 @@ module.exports = function(Base) {
         .on('complete', function () {
           dd.increment('Jobs.complete');
         })
-        .on('failed', function () {
+        .on('failed', function (err) {
+          console.error('Job Failed!');
+          console.dir(err);
           dd.increment('Jobs.failed');
         })
         .on('failed attempt', function () {

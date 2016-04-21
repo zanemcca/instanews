@@ -260,12 +260,15 @@ if(cluster.isMaster && numCPUs > 1 && process.env.NODE_ENV === 'production') {
     var options = {
       reconnectOnError: function (err) {
         console.warn('Redis error!');
-        console.warn(err); 
+        console.dir(err); 
         var targetError = 'READONLY';
         if (err.message.slice(0, targetError.length) === targetError) {
           console.log('Reconnecting Redis!');
           // Only reconnect when the error starts with "READONLY"
           return true; // or `return 1;`
+        } else {
+          console.error('Redis error is fatal!');
+          process.exit(-1);
         }
       }
     };
@@ -294,29 +297,39 @@ if(cluster.isMaster && numCPUs > 1 && process.env.NODE_ENV === 'production') {
     //Process the updateBase queue
     app.jobs.process('deferredUpdate', function (job, ctx, done) {
       var dd = app.DD('Jobs', 'processDeferredUpdate');
+      app.models.Base.processUpdate(job.data.key, function (err) {
+        if(err) {
+          console.error('Failed to process the job!');
+          console.dir(err);
+          return done(err);
+        }
+
+        dd.lap('Base.processUpdate');
+        done();
+      });
+
       ctx.pause(500, function(err) {
-        app.models.Base.processUpdate(job.data.key, function (err) {
-          if(err) {
-            console.error('Failed to process the job!');
-            console.error(err);
-            return done(err);
-          }
-
-          dd.lap('Base.processUpdate');
-          done();
-
-          // Max 1 job/sec/node
-          setTimeout(function() {
-            ctx.resume();
-          }, 1000);
-        });
+        // Max 1 job/sec/node
+        setTimeout(function() {
+          ctx.resume();
+        }, 1000);
       });
     });
 
     //Catch queue errors
     app.jobs.on('error', function(err) {
       console.error('Jobs queue error!');
-      console.error(err);
+      console.dir(err);
+      app.jobs.shutdown( 5000, function(err) {
+        if(err) {
+          console.error('Failed to shutdown the jobs queue!');
+          console.dir(err);
+          process.exit(-1);
+        } else {
+          console.log('Shutdown the jobs queue!');
+          process.exit(-1);
+        }
+      });
     });
 
     //Gracefully shutdown the queue
@@ -324,7 +337,7 @@ if(cluster.isMaster && numCPUs > 1 && process.env.NODE_ENV === 'production') {
       app.jobs.shutdown( 5000, function (err) {
         if(err) {
           console.error('Failed to shutdown the jobs queue!');
-          console.error(err);
+          console.dir(err);
           process.exit(-1);
         } else {
           console.log('Shutdown the jobs queue!');
