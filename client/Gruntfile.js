@@ -2,7 +2,7 @@
 // jshint camelcase: false
 'use strict';
 
-var _ = require('lodash');
+var _ = require('underscore');
 var path = require('path');
 
 var cordovaCli;
