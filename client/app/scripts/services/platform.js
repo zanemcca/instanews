@@ -2,6 +2,13 @@
 'use strict';
 var app = angular.module('instanews.service.platform', ['ionic', 'ngCordova']);
 
+// jshint unused:false
+function DeepLinkHandler(data) {
+  //TODO Handle deeplinks
+  console.log('Deep link handler');
+  console.log(data);
+}
+
 app.factory('Platform', [
   '$cordovaDevice',
   '$cordovaDialogs',
@@ -453,18 +460,21 @@ app.factory('Platform', [
         if(!window.cordova) {
           (function(b,r,a,n,c,h,_,s,d,k){
             if(!b[n]||!b[n]._q){
-              for(;s<_.length;) c(h,_[s++]);
-                d=r.createElement(a);
-                d.async=1;
-                d.src='https://cdn.branch.io/branch-latest.min.js';
-                k=r.getElementsByTagName(a)[0];
-                k.parentNode.insertBefore(d,k);b[n]=h
+              for(;s<_.length;) {
+                c(h,_[s++]);
+              }
+              d=r.createElement(a);
+              d.async=1;
+              d.src='https://cdn.branch.io/branch-latest.min.js';
+              k=r.getElementsByTagName(a)[0];
+              k.parentNode.insertBefore(d,k);
+              b[n]=h;
             }
           })(window,document,'script','branch',
           function(b,r){
             b[r]=function(){
-              b._q.push([r,arguments])
-            }
+              b._q.push([r,arguments]);
+            };
           },{_q:[],_v:1},('addListener applyCode banner closeBanner creditHistory credits data ' + 
             'deepview deepviewCta first getCode init link logout redeem referrals removeListener ' + 
             'sendSMS setIdentity track validateCode').split(' '), 0
@@ -481,7 +491,11 @@ app.factory('Platform', [
               downloadAppButtonText: 'Download'
           }, {});
         } else {
-          //TODO setup a fake
+          var onResume = function() {
+            branch.branch.initSession();
+          };
+          document.addEventListener('resume', onResume, false);
+          onResume();
         }
       }
     };
