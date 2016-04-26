@@ -448,6 +448,44 @@ app.factory('Platform', [
       }
     };
 
+    var branch = {
+      init: function() {
+        if(!window.cordova) {
+          (function(b,r,a,n,c,h,_,s,d,k){
+            if(!b[n]||!b[n]._q){
+              for(;s<_.length;) c(h,_[s++]);
+                d=r.createElement(a);
+                d.async=1;
+                d.src='https://cdn.branch.io/branch-latest.min.js';
+                k=r.getElementsByTagName(a)[0];
+                k.parentNode.insertBefore(d,k);b[n]=h
+            }
+          })(window,document,'script','branch',
+          function(b,r){
+            b[r]=function(){
+              b._q.push([r,arguments])
+            }
+          },{_q:[],_v:1},('addListener applyCode banner closeBanner creditHistory credits data ' + 
+            'deepview deepviewCta first getCode init link logout redeem referrals removeListener ' + 
+            'sendSMS setIdentity track validateCode').split(' '), 0
+          );
+          window.branch.init('key_live_lbo1wHTU65sACNHMqWdJndbdtBfIG34J');
+
+          branch.branch = window.branch;
+
+          branch.branch.banner({
+              icon: 'images/instanews.png',
+              title: 'instanews',
+              description: 'Crowdsourced Local News',
+              mobileSticky: true,
+              downloadAppButtonText: 'Download'
+          }, {});
+        } else {
+          //TODO setup a fake
+        }
+      }
+    };
+
     // Initialize the platform
     ready.promise
       .then(function() {
@@ -495,6 +533,7 @@ app.factory('Platform', [
       }
 
       analytics.init();
+      branch.init();
     });
 
 
