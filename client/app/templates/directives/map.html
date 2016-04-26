@@ -1,5 +1,13 @@
-<div class="item card map-exterior" data-tap-disabled="true" >
-   <div class="map-interior">
-     <div style="width:100%;height:100%" id="map"></div>
-   </div>
+<div ng-class="{'no-margin-bottom': Platform.isBrowser()}" 
+  class="item card map-exterior" data-tap-disabled="true" >
+  <div class="map-interior">
+    <div style="width:100%;height:100%" id="map"></div>
+  </div>
+</div>
+<div class="item dynamic-box no-padding no-border no-margin-top"
+  style="font-size:smaller;background-color:transparent;"
+  ng-if="Platform.isBrowser()">
+  <a href="https://api.instanews.com/TermsOfService.html">Terms of Use</a> &bull; 
+  <a href="https://api.instanews.com/PrivacyPolicy.html">Privacy Policy</a> &bull; 
+  <a href="https://api.instanews.com/DMCAPolicy.html">DMCA</a>
 </div>
