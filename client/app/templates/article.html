@@ -3,14 +3,21 @@
   style="background: #F0F0F0">
   <ion-nav-title>{{article.title}}</ion-nav-title>
   <ion-nav-buttons side="secondary">
-    <div ng-if="!Platform.isBrowser()" style="width:34px;">
-      <div ng-show="uploads.length > 0">
-        <button  ng-click="uploadModal.show();"
+    <div ng-switch="Platform.isBrowser()" style="width:34px;">
+      <div ng-switch-when="true">
+        <button ng-click="openApp()"
           class="button button-clear icon ion-plus">
         </button>
       </div>
-      <div ng-cloak ng-hide="uploads.length > 0">
-        <in-speed-dial style="width:34px;" position="'top-right'" uploads="Uploads"></in-speed-dial>
+      <div ng-switch-when="false">
+        <div ng-show="uploads.length > 0">
+          <button  ng-click="uploadModal.show();"
+            class="button button-clear icon ion-plus">
+          </button>
+        </div>
+        <div ng-cloak ng-hide="uploads.length > 0">
+          <in-speed-dial style="width:34px;" position="'top-right'" uploads="Uploads"></in-speed-dial>
+        </div>
       </div>
     </div>
   </ion-nav-buttons>
