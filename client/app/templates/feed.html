@@ -35,6 +35,13 @@
       is-card="true"> 
       <inAutocomplete search-id="feed-search" place="place"></inAutocomplete>
       <inMap map="map"></inMap>
+      <div class="item dynamic-box no-padding no-border no-margin-top"
+        style="font-size:smaller;background-color:transparent;"
+        ng-if="Platform.isBrowser()">
+        <a href="https://api.instanews.com/TermsOfService.html">Terms of Use</a> &bull; 
+        <a href="https://api.instanews.com/PrivacyPolicy.html">Privacy Policy</a> &bull; 
+        <a href="https://api.instanews.com/DMCAPolicy.html">DMCA</a>
+      </div>
     </in-list>
     <div class="list-end">
       <ion-spinner ng-show="Articles.areItemsAvaialable()">
