@@ -188,7 +188,8 @@ app.service('Position', [
 
       Platform.ready
       .then( function() {
-        if(Platform.isIOS() || Platform.isBrowser()) {
+        //if(Platform.isIOS() || Platform.isBrowser()) {
+        if(Platform.isIOS()) {
           LocalStorage.secureRead('geolocationPermission', function(err, res) {
             if(err || !res || !res.hasPermission) {
               if(err) {
