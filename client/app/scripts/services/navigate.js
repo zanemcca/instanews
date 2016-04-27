@@ -57,8 +57,6 @@ app.service('Navigate', [
 
     var getBackView = function() {
       var view = $ionicHistory.backView();
-      console.log('Getting backview');
-      console.log(view);
       return view;
     };
 
