@@ -9,6 +9,7 @@ app.controller('ArticleCtrl', [
   '$timeout',
   'Articles',
   'Comments',
+  'Device',
   'Maps',
   'Navigate',
   'Platform',
@@ -23,6 +24,7 @@ app.controller('ArticleCtrl', [
     $timeout,
     Articles,
     Comments,
+    Device,
     Maps,
     Navigate,
     Platform,
@@ -35,7 +37,18 @@ app.controller('ArticleCtrl', [
     Platform.initBackButton();
 
     $scope.Platform = Platform;
+    $scope.Device = Device;
     $scope.Navigate = Navigate;
+
+    $scope.openApp = function () {
+      if(Device.isBrowser()) {
+        var data = {
+          focusId: $stateParams.id,
+          focusType: 'article'
+        };
+        Platform.branch.viewInApp(data, function() {});
+      }
+    };
 
     var Subs = Subarticles.findOrCreate($stateParams.id);
     $scope.Subarticles = Subs.getLoader({
