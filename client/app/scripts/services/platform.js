@@ -507,23 +507,21 @@ app.factory('Platform', [
           if((isIOS() || isAndroid())) { //Compatible mobile devices 
             branch.viewInApp = function (data, cb) {
               var showMe = function () {
-                if(!data) {
-                  b.deepviewCta();
-                } else {
-                  b.deepview({
-                    'channel': 'mobile_web',
-                    'feature': 'deepview',
-                    data: data
-                  }, {
-                    openApp: true
-                  }, function(err) {
-                    if(err) {
-                      console.log(err);
-                    } else {
-                      console.log('Successful deepview creation!');
-                    }
-                  });
-                }
+                data = data || {};
+                b.deepview({
+                  'channel': 'mobile_web',
+                  'feature': 'deepview',
+                  data: data
+                }, {
+                  openApp: true
+                }, function(err) {
+                  if(err) {
+                    console.log(err);
+                  } else {
+                    console.log('Successful deepview creation!');
+                    b.deepviewCta();
+                  }
+                });
               };
 
               showAlert('You can vote, comment and post your own content on our app', 'Interact in the app', showMe());
