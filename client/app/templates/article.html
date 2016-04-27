@@ -27,12 +27,19 @@
       is-card="true"> 
       <inMap map="map"></inMap>
       <div class="item dynamic-box"
-        ng-class="{'card' : Platform.getWidth() >= 768 || Platform.isLandscape()}"
+        ng-class="{'card' : Platform.getWidth() >= 768 || Platform.isLandscape(), 'no-margin-bottom': Platform.isBrowser()}" 
         style="border:0px;padding-top:0px;padding-bottom:0px">
          <inVotes style="border: transparent"
             votable="article">
          </inVotes>
          <inComments owner="article"></inComments>
+      </div>
+      <div class="item dynamic-box no-padding no-border no-margin-top"
+        style="font-size:smaller;background-color:transparent;"
+        ng-if="Platform.isBrowser()">
+        <a href="https://api.instanews.com/TermsOfService.html">Terms of Use</a> &bull; 
+        <a href="https://api.instanews.com/PrivacyPolicy.html">Privacy Policy</a> &bull; 
+        <a href="https://api.instanews.com/DMCAPolicy.html">DMCA</a>
       </div>
     </in-list>
     <div ng-show="Subarticles.areItemsAvaialable()" class="list-end">
