@@ -536,7 +536,7 @@ app.factory('Platform', [
                 });
               };
 
-              Dialog.alert('You can vote, comment and post your own content on our app', 'Interact in the app', showMe());
+              Dialog.confirm('You can vote, comment and post your own content on our app', 'Interact in the app', showMe);
             };
           } else { //Browser
             branch.viewInApp = function (data, cb) {
@@ -545,18 +545,16 @@ app.factory('Platform', [
                 'Interact in the app',
                 ['Text Me', 'Cancel'],
                 '(555)-555-5555',
-                function (res) {
-                  if(res.buttonIndex === 1) { //Text Me
-                    var num = res.input1;
-                    b.sendSMS(num, data, function(err) {
-                      if(err) {
-                        console.log('Failed to send text');
-                        console.log(err);
-                        Dialog.alert('There was an sending the text message', 'Please try again');
-                      }
-                    }); 
-                  }
-              });
+                function (num) {
+                  b.sendSMS(num, data, function(err) {
+                    if(err) {
+                      console.log('Failed to send text');
+                      console.log(err);
+                      Dialog.alert('There was an error sending the text message', 'Please try again');
+                    }
+                  }); 
+                }
+              );
             };
           }
         } else {
