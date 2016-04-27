@@ -112,6 +112,7 @@ app.factory('Platform', [
       $ionicActionSheet.show(sheet);
     };
 
+    //TODO Use angular material or ionic for alerts
     var showAlert = function (message, title, buttonName, cb) {
       if(!cb) {
         cb = buttonName;
@@ -157,6 +158,37 @@ app.factory('Platform', [
       }
 
       $cordovaDialogs.confirm(message, title, buttonNames)
+      .then(cb);
+    };
+
+    //TODO Use angular material or ionic for prompts 
+    var showPrompt = function (message, title, buttonNames, defaultText,  cb) {
+      if(!cb) {
+        cb = defaultText;
+        if(!cb) {
+          defaultText = 'Type here';
+          cb = buttonNames;
+          if(!cb) {
+            buttonNames = ['Ok', 'Cancel'];
+            cb = title;
+            if(!cb) {
+              title = 'Confirm';
+
+              cb = function () {
+                console.log('Dialog was confirmed');
+              };
+            } else if (typeof cb === 'function') {
+              title = 'Confirm';
+            }
+          } else if (typeof cb === 'function') {
+            buttonNames = ['Ok', 'Cancel'];
+          }
+        } else if (typeof cb === 'function') {
+          defaultText = 'Type here';
+        }
+      }
+
+      $cordovaDialogs.prompt(message, title, buttonNames, defaultText)
       .then(cb);
     };
 
@@ -455,47 +487,74 @@ app.factory('Platform', [
       }
     };
 
-    var branch = {
+    var branch = { 
       init: function() {
         if(!window.cordova) {
-          (function(b,r,a,n,c,h,_,s,d,k){
-            if(!b[n]||!b[n]._q){
-              for(;s<_.length;) {
-                c(h,_[s++]);
-              }
-              d=r.createElement(a);
-              d.async=1;
-              d.src='https://cdn.branch.io/branch-latest.min.js';
-              k=r.getElementsByTagName(a)[0];
-              k.parentNode.insertBefore(d,k);
-              b[n]=h;
-            }
-          })(window,document,'script','branch',
-          function(b,r){
-            b[r]=function(){
-              b._q.push([r,arguments]);
-            };
-          },{_q:[],_v:1},('addListener applyCode banner closeBanner creditHistory credits data ' + 
-            'deepview deepviewCta first getCode init link logout redeem referrals removeListener ' + 
-            'sendSMS setIdentity track validateCode').split(' '), 0
-          );
-          window.branch.init('key_live_lbo1wHTU65sACNHMqWdJndbdtBfIG34J');
-
           branch.branch = window.branch;
+          var b = branch.branch;
 
-          branch.branch.banner({
+          b.init('key_live_lbo1wHTU65sACNHMqWdJndbdtBfIG34J');
+          b.banner({
               icon: 'images/instanews.png',
               title: 'instanews',
               description: 'Crowdsourced Local News',
+              phonePreviewText: '(555)-555-5555',
               mobileSticky: true,
               downloadAppButtonText: 'Download'
           }, {});
+
+          // Create viewInApp() to create deepviews and navigate to the app
+          if((isIOS() || isAndroid())) { //Compatible mobile devices 
+            branch.viewInApp = function (data, cb) {
+              var showMe = function () {
+                if(!data) {
+                  b.deepviewCta();
+                } else {
+                  b.deepview({
+                    'channel': 'mobile_web',
+                    'feature': 'deepview',
+                    data: data
+                  }, {
+                    openApp: true
+                  }, function(err) {
+                    if(err) {
+                      console.log(err);
+                    } else {
+                      console.log('Successful deepview creation!');
+                    }
+                  });
+                }
+              };
+
+              showAlert('You can vote, comment and post your own content on our app', 'Interact in the app', showMe());
+            };
+          } else { //Browser
+            branch.viewInApp = function (data, cb) {
+              showPrompt(
+                'You can vote, comment and post your own content on our iOS & Android app',
+                'Interact in the app',
+                ['Text Me', 'Cancel'],
+                '(555)-555-5555',
+                function (res) {
+                  if(res.buttonIndex === 1) { //Text Me
+                    var num = res.input1;
+                    console.log(num);
+                    //TODO Text a deepview link for the app
+                  }
+              });
+            };
+          }
         } else {
           var onResume = function() {
             branch.branch.initSession();
           };
           document.addEventListener('resume', onResume, false);
           onResume();
+
+          // Call the callback when on a device
+          branch.viewInApp = function(data, cb) {
+            cb();
+          };
         }
       }
     };
@@ -803,6 +862,7 @@ app.factory('Platform', [
       permissions: permissions,
       support: support,
       analytics: analytics,
+      branch: branch,
       keyboard: keyboard,
       getAppNameLogo: getAppNameLogo,
       loading: loading,
@@ -812,6 +872,7 @@ app.factory('Platform', [
       showSheet: showSheet,
       showAlert: showAlert,
       showConfirm: showConfirm,
+      showPrompt: showPrompt,
       showToast: showToast,
       removeFile: removeFile,
       initBackButton: initBackButton,
