@@ -55,6 +55,13 @@ app.service('Navigate', [
       satisfyLoginSuccessCallback();
     };
 
+    var getBackView = function() {
+      var view = $ionicHistory.backView();
+      console.log('Getting backview');
+      console.log(view);
+      return view;
+    };
+
     // Checks if the login view is going back and if
     // it succeeded, then it wil call the success callback.
     // If not then it will just clear the callback
@@ -70,6 +77,11 @@ app.service('Navigate', [
           loginSuccess = null;
         }
       }
+    };
+
+    var goHome = function() {
+      disableNextBack();
+      go('app.feed');
     };
 
     var go =  function(state, params) {
@@ -281,9 +293,11 @@ app.service('Navigate', [
       openMenu: openMenu,
       closeMenu: closeMenu,
       focus: focus,
+      goHome: goHome,
       go: go,
       goBack: goBack,
       goOrGoBack: goOrGoBack,
+      getBackView: getBackView,
       ensureLogin: ensureLogin,
       disableNextBack: disableNextBack
     };
