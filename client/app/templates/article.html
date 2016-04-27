@@ -14,6 +14,14 @@
       </div>
     </div>
   </ion-nav-buttons>
+  <ion-nav-buttons side="left">
+    <div ng-cloak ng-if="homeButton">
+      <button ng-click="Navigate.goHome()"
+        class="button button-clear">
+        HOME
+      </button>
+    </div>
+  </ion-nav-buttons>
 
   <!--in-scroll-top scroll-handle="subarticle" 
   preScroll="preScrollToTop">
