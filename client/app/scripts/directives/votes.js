@@ -100,7 +100,7 @@ app.directive('invotes', [
               focusType: $scope.votable.modelName,
               focusId: $scope.votable.id,
             };
-            data.$deeplink_path = data.focusType + '/' + data.focusId;
+            //data.$deeplink_path = data.focusType + '/' + data.focusId;
             Platform.branch.viewInApp(data, cb);
           };
 
