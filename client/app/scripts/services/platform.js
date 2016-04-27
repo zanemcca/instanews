@@ -6,7 +6,7 @@ var app = angular.module('instanews.service.platform', ['ionic', 'ngCordova']);
 function DeepLinkHandler(data) {
   //TODO Handle deeplinks
   console.log('Deep link handler');
-  console.log(data);
+  console.log(JSON.stringify(data));
 }
 
 app.factory('Platform', [
@@ -509,8 +509,8 @@ app.factory('Platform', [
               var showMe = function () {
                 data = data || {};
                 b.deepview({
-                  'channel': 'mobile_web',
-                  'feature': 'deepview',
+                  channel: 'mobile_web',
+                  feature: 'deepview',
                   data: data
                 }, {
                   openApp: true
@@ -543,8 +543,17 @@ app.factory('Platform', [
             };
           }
         } else {
+          //jshint undef:false
+          branch.branch = Branch;
+          Branch.setDebug(true);
+
           var onResume = function() {
-            branch.branch.initSession();
+            branch.branch.initSession().then(function (res) {
+              console.log(res);
+            }).catch(function (err) {
+              console.log('Failed to initialize branch!');
+              console.log(err);
+            });
           };
           document.addEventListener('resume', onResume, false);
           onResume();
