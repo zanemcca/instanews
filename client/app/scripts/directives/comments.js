@@ -52,13 +52,16 @@ app.directive('incomments', [
         var Scroll = Navigate.scroll(scrollSpec);
 
         var viewInApp = function(cb) {
-          var data = null;
+          var data = {
+            focusType: $scope.owner.modelName,
+            focusId: $scope.owner.id
+          };
           Platform.branch.viewInApp(data, cb);
         };
 
         $scope.create = function () {
           viewInApp(function () {
-            Navigate.ensureLogin( function (noLoginNeeded) {
+            Navigate.ensureLogin( function () {
               var textInput = TextInput.get();
               textInput.maxLength = 2200;
               if($scope.owner.commentableId) {

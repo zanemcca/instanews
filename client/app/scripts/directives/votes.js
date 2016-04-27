@@ -96,7 +96,11 @@ app.directive('invotes', [
           }, 500, true);
 
           var viewInApp = function (cb) {
-            var data = null;
+            var data = {
+              focusType: $scope.votable.modelName,
+              focusId: $scope.votable.id,
+            };
+            data.$deeplink_path = data.focusType + '/' + data.focusId;
             Platform.branch.viewInApp(data, cb);
           };
 
