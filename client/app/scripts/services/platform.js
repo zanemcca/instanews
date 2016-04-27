@@ -536,8 +536,13 @@ app.factory('Platform', [
                 function (res) {
                   if(res.buttonIndex === 1) { //Text Me
                     var num = res.input1;
-                    console.log(num);
-                    //TODO Text a deepview link for the app
+                    b.sendSMS(num, data, function(err) {
+                      if(err) {
+                        console.log('Failed to send text');
+                        console.log(err);
+                        showAlert('There was an sending the text message', 'Please try again');
+                      }
+                    }); 
                   }
               });
             };
