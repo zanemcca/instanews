@@ -7,6 +7,7 @@ describe('Article controller: ', function(){
   beforeEach( function() {
     module('instanews.controller.article');
     module('mock.services.articles');
+    module('mock.services.device');
     module('mock.services.post');
     module('mock.services.preload');
     module('mock.services.platform');
@@ -35,6 +36,7 @@ describe('Article controller: ', function(){
     $stateParams,
     $ionicModal,
     Articles,
+    Device,
     Comments,
     Subarticles,
     Post,
@@ -50,6 +52,7 @@ describe('Article controller: ', function(){
     subarticles = Subarticles;
     Preload = preload;
     comments = Comments;
+    device = Device;
     articles = Articles;
     uploads = Uploads;
     ctrl = $controller;
@@ -63,6 +66,7 @@ describe('Article controller: ', function(){
       $ionicModal: ionicModal,
       Articles: articles,
       Comments: comments,
+      Device: device,
       Subarticles: subarticles,
       preload: Preload,
       Uploads: uploads,
