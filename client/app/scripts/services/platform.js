@@ -2,13 +2,15 @@
 'use strict';
 var app = angular.module('instanews.service.platform', ['ionic', 'ngCordova']);
 
-// jshint unused:false
+//jshint ignore:start 
 function DeepLinkHandler(data) {
   //TODO Handle deeplinks
   console.log('Deep link handler');
   console.log(JSON.stringify(data));
 }
+//jshint ignore:end 
 
+//jshint camelcase:false
 app.factory('Platform', [
   '$cordovaDevice',
   '$cordovaDialogs',
@@ -19,7 +21,6 @@ app.factory('Platform', [
   '$q',
   'Device',
   'Dialog',
-  'ENV',
   function(
     $cordovaDevice,
     $cordovaDialogs,
@@ -29,8 +30,7 @@ app.factory('Platform', [
     $ionicNavBarDelegate,
     $q,
     Device,
-    Dialog,
-    ENV
+    Dialog
   ) {
 
     var ready = $q.defer();
@@ -512,37 +512,53 @@ app.factory('Platform', [
               description: 'Crowdsourced Local News',
               phonePreviewText: '(555)-555-5555',
               mobileSticky: true,
+              sendLinkText: 'Get the App',
+              showBlackberry: false,
+              showWindowsPhone: false,
+              showKindle: false,
+              forgetHide: 7,
               downloadAppButtonText: 'Download'
           }, {});
 
+          branch.createDeepview = function(data ,cb) {
+            data = data || {};
+            var opts = {
+              make_new_link: true,
+              open_app: false 
+            };
+
+            b.deepview({
+              channel: 'mobile_web',
+              feature: 'deepview',
+              data: data
+            }, opts, function(err) {
+              if(err) {
+                console.log(err);
+                cb(err);
+              } else {
+                console.log('Successful deepview creation!');
+                cb();
+              }
+            });
+          };
+
           // Create viewInApp() to create deepviews and navigate to the app
           if((Device.isIOS() || Device.isAndroid())) { //Compatible mobile devices 
-            branch.viewInApp = function (data, cb) {
-              var showMe = function () {
-                data = data || {};
-                b.deepview({
-                  channel: 'mobile_web',
-                  feature: 'deepview',
-                  data: data
-                }, {
-                  openApp: true
-                }, function(err) {
-                  if(err) {
-                    console.log(err);
-                  } else {
-                    console.log('Successful deepview creation!');
-                    b.deepviewCta();
-                  }
-                });
-              };
-
-              Dialog.confirm('Get access to all of our features with the instanews app.', 'Open the App', showMe);
+            branch.viewInApp = function (data) {
+              branch.createDeepview(data, function(err) {
+                if(err) {
+                  console.log(err);
+                } else {
+                  //TODO Change this depending on the b.session.has_app flag 'view in app' vs 'download the app'
+                  Dialog.confirm('Get full access to instanews!', 'Want the App?', ['Download', 'Cancel'], b.deepviewCta.bind(b));
+                }
+              });
             };
           } else { //Browser
-            branch.viewInApp = function (data, cb) {
+            branch.viewInApp = function (data) {
               Dialog.prompt(
-                'Get access to all of our features with the instanews app. Available on iOS and Android.',
-                'Text the App',
+                'Enter your iOS or Android phone number and we\'ll text you a download link for the app.',
+                'Want full access to instanews?',
                 ['Text Me', 'Cancel'],
                 '(555)-555-5555',
                 function (num) {
