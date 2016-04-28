@@ -536,13 +536,13 @@ app.factory('Platform', [
                 });
               };
 
-              Dialog.confirm('You can vote, comment and post your own content on our app', 'Interact in the app', showMe);
+              Dialog.confirm('Get access to all of our features with the instanews app.', 'Open the App', showMe);
             };
           } else { //Browser
             branch.viewInApp = function (data, cb) {
               Dialog.prompt(
-                'You can vote, comment and post your own content on our iOS & Android app',
-                'Interact in the app',
+                'Get access to all of our features with the instanews app. Available on iOS and Android.',
+                'Text the App',
                 ['Text Me', 'Cancel'],
                 '(555)-555-5555',
                 function (num) {
