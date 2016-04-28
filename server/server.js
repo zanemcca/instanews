@@ -525,11 +525,7 @@ if(cluster.isMaster && numCPUs > 1 && process.env.NODE_ENV === 'production') {
   setupMiddleware();
 
   // istanbul ignore if
-  if( process.env.NODE_ENV && process .env.NODE_ENV === 'production') {
-    app.use(loopback.static(path.resolve(__dirname, '../common/')));
-  } else {
-    app.use(loopback.static(path.resolve(__dirname, '../client/www/')));
-  }
+  app.use(loopback.static(path.resolve(__dirname, '../client/www/')));
 
   // Create a healthcheck API
   app.use('/healthcheck', require('express-healthcheck')());
