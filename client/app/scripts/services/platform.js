@@ -515,28 +515,35 @@ app.factory('Platform', [
               downloadAppButtonText: 'Download'
           }, {});
 
+          branch.createDeepview = function(data ,cb) {
+            data = data || {};
+            b.deepview({
+              channel: 'mobile_web',
+              feature: 'deepview',
+              data: data
+            }, {
+              openApp: false 
+            }, function(err) {
+              if(err) {
+                console.log(err);
+                cb(err);
+              } else {
+                console.log('Successful deepview creation!');
+                cb();
+              }
+            });
+          };
+
           // Create viewInApp() to create deepviews and navigate to the app
           if((Device.isIOS() || Device.isAndroid())) { //Compatible mobile devices 
             branch.viewInApp = function (data, cb) {
-              var showMe = function () {
-                data = data || {};
-                b.deepview({
-                  channel: 'mobile_web',
-                  feature: 'deepview',
-                  data: data
-                }, {
-                  openApp: true
-                }, function(err) {
-                  if(err) {
-                    console.log(err);
-                  } else {
-                    console.log('Successful deepview creation!');
-                    b.deepviewCta();
-                  }
-                });
-              };
-
-              Dialog.confirm('Get access to all of our features with the instanews app.', 'Open the App', showMe);
+              branch.createDeepview(data, function(err) {
+                if(err) {
+                  console.log(err);
+                } else {
+                  Dialog.confirm('Get access to all of our features with the instanews app.', 'Open the App', b.deepviewCta.bind(b));
+                }
+              });
             };
           } else { //Browser
             branch.viewInApp = function (data, cb) {
