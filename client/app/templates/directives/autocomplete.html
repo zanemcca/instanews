@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 
 <form class="list dynamic-box dynamic-autocomplete"
+  autocomplete="off"
   ng-class="{'card' : Platform.getWidth() >= 768 || Platform.isLandscape() }"
   style="padding-bottom: 0;">
   <div class="bar bar-white item-input">
@@ -24,12 +25,21 @@
      </button>
   </div>
 </form>
-<div ng-if="!done" class="list dynamic-box" 
+<div ng-hide="done" class="list dynamic-box" 
   ng-class="{'card' : Platform.getWidth() >= 768 || Platform.isLandscape()}"
   style="height: 0; overflow:visible; z-index:100;max-width: 560px;">
   <div ng-repeat="prediction in place.predictions">
-    <div class="item" ng-click="set(prediction)">
-      {{prediction.description}}
+    <div ng-switch="Platform.isBrowser() && !(Platform.isIOS() || Platform.isAndroid())">
+      <div class="item" 
+        ng-switch-when="true"
+        ng-mousedown="set(prediction)">
+        {{prediction.description}}
+      </div>
+      <div class="item" 
+        ng-switch-when="false"
+        ng-click="set(prediction)">
+        {{prediction.description}}
+      </div>
     </div>
   </div>
 </div>

@@ -3,15 +3,30 @@
   style="background: #F0F0F0">
   <ion-nav-title>{{article.title}}</ion-nav-title>
   <ion-nav-buttons side="secondary">
-    <div ng-if="!Platform.isBrowser()" style="width:34px;">
-      <div ng-show="uploads.length > 0">
-        <button  ng-click="uploadModal.show();"
+    <div ng-switch="Platform.isBrowser()" style="width:34px;">
+      <div ng-switch-when="true">
+        <button ng-click="openApp()"
           class="button button-clear icon ion-plus">
         </button>
       </div>
-      <div ng-cloak ng-hide="uploads.length > 0">
-        <in-speed-dial style="width:34px;" position="'top-right'" uploads="Uploads"></in-speed-dial>
+      <div ng-switch-when="false">
+        <div ng-show="uploads.length > 0">
+          <button  ng-click="uploadModal.show();"
+            class="button button-clear icon ion-plus">
+          </button>
+        </div>
+        <div ng-cloak ng-hide="uploads.length > 0">
+          <in-speed-dial style="width:34px;" position="'top-right'" uploads="Uploads"></in-speed-dial>
+        </div>
       </div>
+    </div>
+  </ion-nav-buttons>
+  <ion-nav-buttons side="left">
+    <div ng-cloak ng-if="homeButton">
+      <button ng-click="Navigate.goHome()"
+        class="button button-clear">
+        HOME
+      </button>
     </div>
   </ion-nav-buttons>
 
@@ -26,8 +41,16 @@
       is-not-infinite="true" 
       is-card="true"> 
       <inMap map="map"></inMap>
+      <div class="item dynamic-box no-border no-margin-top"
+        style="padding-top:0;padding-bottom:0;font-size:smaller;"
+        ng-style="{'background-color': (Platform.getWidth() >= 768 || Platform.isLandscape()) ? 'transparent' : 'white'}"
+        ng-if="Platform.isBrowser()">
+        <a href="https://api.instanews.com/TermsOfService.html">Terms of Use</a> &bull; 
+        <a href="https://api.instanews.com/PrivacyPolicy.html">Privacy Policy</a> &bull; 
+        <a href="https://api.instanews.com/DMCAPolicy.html">DMCA</a>
+      </div>
       <div class="item dynamic-box"
-        ng-class="{'card' : Platform.getWidth() >= 768 || Platform.isLandscape()}"
+        ng-class="{'card' : Platform.getWidth() >= 768 || Platform.isLandscape()}" 
         style="border:0px;padding-top:0px;padding-bottom:0px">
          <inVotes style="border: transparent"
             votable="article">

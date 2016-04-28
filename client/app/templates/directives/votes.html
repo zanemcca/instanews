@@ -1,14 +1,12 @@
 <!DOCTYPE html>
 <button class="item button button-clear button-small ion-arrow-up-b"
   ng-class="votable.upVoted ? 'button-positive': 'button-stable'"
-  ng-disabled="Platform.isBrowser()"
   style="border:0;margin:0;"
   ng-style="{'font-weight': votable.upVoted ? 'bold' : 'normal'}"
    ng-click="upvote()">
       {{Platform.numToString(votable.upVoteCount)}}
  </button>
 <button class="item button button-clear button-small ion-arrow-down-b"
-  ng-disabled="Platform.isBrowser()"
   ng-class="votable.downVoted ? 'button-positive' : 'button-stable'"
   ng-style="{'font-weight': votable.downVoted ? 'bold' : 'normal'}"
   style="border:0;margin:0;"

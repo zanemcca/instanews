@@ -2,6 +2,13 @@
 'use strict';
 var app = angular.module('instanews.service.platform', ['ionic', 'ngCordova']);
 
+// jshint unused:false
+function DeepLinkHandler(data) {
+  //TODO Handle deeplinks
+  console.log('Deep link handler');
+  console.log(JSON.stringify(data));
+}
+
 app.factory('Platform', [
   '$cordovaDevice',
   '$cordovaDialogs',
@@ -10,6 +17,8 @@ app.factory('Platform', [
   '$ionicLoading',
   '$ionicNavBarDelegate',
   '$q',
+  'Device',
+  'Dialog',
   'ENV',
   function(
     $cordovaDevice,
@@ -19,11 +28,26 @@ app.factory('Platform', [
     $ionicLoading,
     $ionicNavBarDelegate,
     $q,
+    Device,
+    Dialog,
     ENV
   ) {
 
     var ready = $q.defer();
 
+    /*
+     * Sets or unsets the back button depending on if we are
+     * running on a device or in the browser respectivelly
+     */
+    var initBackButton = function () {
+      if(Device.isBrowser()) {
+        $ionicNavBarDelegate.showBackButton(false);
+      } else {
+        $ionicNavBarDelegate.showBackButton(true);
+      }
+    };
+
+/*
     var device = {
       type: '',
       token: ''
@@ -39,6 +63,11 @@ app.factory('Platform', [
 
     var setDeviceToken = function(token) {
       device.token = token;
+    };
+
+    var getAppNameLogo = function () {
+     //return '<img src="images/favicon.ico"/>stanews'; 
+     return 'InstaNews'; 
     };
 
     var getUUID = function() {
@@ -80,17 +109,6 @@ app.factory('Platform', [
       return (ip && (ip.isIOS() || ip.isAndroid() || ip.isWindowsPhone()));
     };
 
-    /*
-     * Sets or unsets the back button depending on if we are
-     * running on a device or in the browser respectivelly
-     */
-    var initBackButton = function () {
-      if(isBrowser()) {
-        $ionicNavBarDelegate.showBackButton(false);
-      } else {
-        $ionicNavBarDelegate.showBackButton(true);
-      }
-    };
 
     var showToast = function(message) {
       if(!isBrowser()) {
@@ -105,6 +123,7 @@ app.factory('Platform', [
       $ionicActionSheet.show(sheet);
     };
 
+    //TODO Use angular material or ionic for alerts
     var showAlert = function (message, title, buttonName, cb) {
       if(!cb) {
         cb = buttonName;
@@ -150,6 +169,37 @@ app.factory('Platform', [
       }
 
       $cordovaDialogs.confirm(message, title, buttonNames)
+      .then(cb);
+    };
+
+    //TODO Use angular material or ionic for prompts 
+    var showPrompt = function (message, title, buttonNames, defaultText,  cb) {
+      if(!cb) {
+        cb = defaultText;
+        if(!cb) {
+          defaultText = 'Type here';
+          cb = buttonNames;
+          if(!cb) {
+            buttonNames = ['Ok', 'Cancel'];
+            cb = title;
+            if(!cb) {
+              title = 'Confirm';
+
+              cb = function () {
+                console.log('Dialog was confirmed');
+              };
+            } else if (typeof cb === 'function') {
+              title = 'Confirm';
+            }
+          } else if (typeof cb === 'function') {
+            buttonNames = ['Ok', 'Cancel'];
+          }
+        } else if (typeof cb === 'function') {
+          defaultText = 'Type here';
+        }
+      }
+
+      $cordovaDialogs.prompt(message, title, buttonNames, defaultText)
       .then(cb);
     };
 
@@ -291,9 +341,10 @@ app.factory('Platform', [
     var isTablet = function () {
       return 'tablet' === getDeviceType();
     };
+    */
 
     /* Initialization */
-    if(isBrowser()) {
+    if(Device.isBrowser()) {
       console.log('App is running in the browser!');
       ready.resolve();
     }
@@ -301,7 +352,7 @@ app.factory('Platform', [
       ionic.Platform.ready( function( device ) {
         /* jshint undef:false */
         if(navigator.connection && navigator.connection.type === Connection.NONE) {
-          showAlert('Instanews is unavailable offline. Please try again later', 'Sorry', function () {
+          Dialog.alert('Instanews is unavailable offline. Please try again later', 'Sorry', function () {
             if(navigator.app) {
               navigator.app.exitApp();
             }
@@ -336,7 +387,7 @@ app.factory('Platform', [
 
     var loading = {
       show: function () {
-        if(isMobile()) {
+        if(Device.isMobile()) {
           if(!loading.loader ) {
              loading.loader = $ionicLoading.show({
               delay: 100,
@@ -347,7 +398,7 @@ app.factory('Platform', [
         }
       },
       hide: function () {
-        if(isMobile()) {
+        if(Device.isMobile()) {
           if(loading.loader) {
             $ionicLoading.hide();
             loading.loader = null;
@@ -359,9 +410,9 @@ app.factory('Platform', [
     var analytics = {
       init: function () {
         if(window.analytics) {
-          if(isAndroid()) {
+          if(Device.isAndroid()) {
             window.analytics.startTrackerWithId('UA-74478035-1');
-          } else if(isIOS()) {
+          } else if(Device.isIOS()) {
             //TODO Get iOS Google analytics key
             window.analytics.startTrackerWithId('UA-74478035-3');
           } else {
@@ -448,6 +499,88 @@ app.factory('Platform', [
       }
     };
 
+    var branch = { 
+      init: function() {
+        if(!window.cordova) {
+          branch.branch = window.branch;
+          var b = branch.branch;
+
+          b.init('key_live_lbo1wHTU65sACNHMqWdJndbdtBfIG34J');
+          b.banner({
+              icon: 'images/instanews.png',
+              title: 'instanews',
+              description: 'Crowdsourced Local News',
+              phonePreviewText: '(555)-555-5555',
+              mobileSticky: true,
+              downloadAppButtonText: 'Download'
+          }, {});
+
+          // Create viewInApp() to create deepviews and navigate to the app
+          if((Device.isIOS() || Device.isAndroid())) { //Compatible mobile devices 
+            branch.viewInApp = function (data, cb) {
+              var showMe = function () {
+                data = data || {};
+                b.deepview({
+                  channel: 'mobile_web',
+                  feature: 'deepview',
+                  data: data
+                }, {
+                  openApp: true
+                }, function(err) {
+                  if(err) {
+                    console.log(err);
+                  } else {
+                    console.log('Successful deepview creation!');
+                    b.deepviewCta();
+                  }
+                });
+              };
+
+              Dialog.confirm('Get access to all of our features with the instanews app.', 'Open the App', showMe);
+            };
+          } else { //Browser
+            branch.viewInApp = function (data, cb) {
+              Dialog.prompt(
+                'Get access to all of our features with the instanews app. Available on iOS and Android.',
+                'Text the App',
+                ['Text Me', 'Cancel'],
+                '(555)-555-5555',
+                function (num) {
+                  b.sendSMS(num, data, function(err) {
+                    if(err) {
+                      console.log('Failed to send text');
+                      console.log(err);
+                      Dialog.alert('There was an error sending the text message', 'Please try again');
+                    }
+                  }); 
+                }
+              );
+            };
+          }
+        } else {
+          //jshint undef:false
+          branch.branch = Branch;
+          Branch.setDebug(true);
+
+          var onResume = function() {
+            branch.branch.initSession().then(function (res) {
+              console.log(res);
+            }).catch(function (err) {
+              console.log('Failed to initialize branch!');
+              console.log(err);
+            });
+          };
+          document.addEventListener('resume', onResume, false);
+          onResume();
+
+          // Call the callback when on a device
+          branch.viewInApp = function(data, cb) {
+            cb();
+          };
+        }
+      }
+    };
+
     // Initialize the platform
     ready.promise
       .then(function() {
@@ -457,7 +590,7 @@ app.factory('Platform', [
       // for form inputs)
       if (window.cordova && window.cordova.plugins.Keyboard) {
         cordova.plugins.Keyboard.hideKeyboardAccessoryBar(true);
-        if(isIOS()) {
+        if(Device.isIOS()) {
           console.log('Disabling keyboard scroll!');
           cordova.plugins.Keyboard.disableScroll(true);
         }
@@ -473,11 +606,11 @@ app.factory('Platform', [
           domain: 'instanews.freshdesk.com'
         };
 
-        if(isIOS()) {
+        if(Device.isIOS()) {
           //TODO Get iOS credentials
           options.appKey = 'instanews-2-fca5122354a07cf1c41c7e08e38cd988';
           options.appSecret = '093fc47da209e872dba380fb4f2c9cf226cc5193';
-        } else if(isAndroid()) {
+        } else if(Device.isAndroid()) {
           options.appKey = 'instanews-1-66224bdfe44137a2d5272cc8976fbb73';
           options.appSecret = 'f5259266e2fb7076eaca67caecbcf2acf2259866';
         }
@@ -495,8 +628,8 @@ app.factory('Platform', [
       }
 
       analytics.init();
+      branch.init();
     });
-
 
     var support = {
       unreadCount: 0,
@@ -588,11 +721,6 @@ app.factory('Platform', [
       }
     };
 
-    var getAppNameLogo = function () {
-     //return '<img src="images/favicon.ico"/>stanews'; 
-     return 'InstaNews'; 
-    };
-
     var numToString = function(num) {
       num = num || this.number;
       if(!num || num < 0) {
@@ -609,7 +737,7 @@ app.factory('Platform', [
     //TODO Move to FileTransfer
     var removeFile = function (name, cb) {
       //TODO Add a directory option
-      $cordovaFile.removeFile(getDataDir(), name)
+      $cordovaFile.removeFile(Device.getDataDir(), name)
       .then(function () {
         cb();
       }, cb);
@@ -623,7 +751,7 @@ app.factory('Platform', [
         runtimes.push(runtime);
       }
 
-      if(isAndroid6() && !isBrowser()) {
+      if(Device.isAndroid6() && !Device.isBrowser()) {
         cordova.plugins.diagnostic.getPermissionsAuthorizationStatus( function(statuses) {
           var res = true;
           for(var runtime in statuses) {
@@ -646,7 +774,7 @@ app.factory('Platform', [
         runtimes.push(runtime);
       }
 
-      if(isAndroid6() && !isBrowser()) {
+      if(Device.isAndroid6() && !Device.isBrowser()) {
         isAuthorized(runtimes, function (authorized) {
           if(authorized) {
             succ(true);
@@ -660,7 +788,7 @@ app.factory('Platform', [
               }
 
               if(deniedAlways) {
-                showConfirm('We need your help changing your permissions', 'Go to Settings', function (idx) {
+                Dialog.confirm('We need your help changing your permissions', 'Go to Settings', function (idx) {
                   if(idx === 1) {
                     cordova.plugins.diagnostic.switchToSettings( function() {
                       isAuthorized(runtimes, succ, error);
@@ -684,7 +812,7 @@ app.factory('Platform', [
     var permissions = {
       location: {
         isAuthorized: function (succ, error) {
-          if(!isBrowser()) {
+          if(!Device.isBrowser()) {
             cordova.plugins.diagnostic.isLocationAuthorized(succ, error);
           } else {
             console.log('Cannot check permission from browser');
@@ -692,7 +820,7 @@ app.factory('Platform', [
           }
         },
         requestAuthorization: function (succ, error) {
-          if(!isBrowser()) {
+          if(!Device.isBrowser()) {
             permissions.location.isAuthorized(function (authorized) {
               if(authorized) {
                 succ(true);
@@ -701,7 +829,7 @@ app.factory('Platform', [
                   if(status === cordova.plugins.diagnostic.runtimePermissionStatus.GRANTED) {
                     succ(true);
                   } else if(status === cordova.plugins.diagnostic.runtimePermissionStatus.DENIED_ALWAYS) {
-                    showConfirm('We need your help changing your location permissions', 'Go to Settings', function (idx) {
+                    Dialog.confirm('We need your help changing your location permissions', 'Go to Settings', function (idx) {
                       if(idx === 1) {
                         cordova.plugins.diagnostic.switchToSettings( function() {
                           permissions.location.isAuthorized(succ, error);
@@ -724,7 +852,7 @@ app.factory('Platform', [
       }
     };
 
-    if(isAndroid6() && !isBrowser()) {
+    if(Device.isAndroid6() && !Device.isBrowser()) {
       permissions.storage = {
         isAuthorized: isAuthorized.bind(this, [
           cordova.plugins.diagnostic.runtimePermission.READ_EXTERNAL_STORAGE,
@@ -747,36 +875,39 @@ app.factory('Platform', [
     }
 
     return {
+      getAppNameLogo: Device.getAppNameLogo,
+      getUUID: Device.getUUID,
+      getDataDir: Device.getDataDir,
+      getCacheDir: Device.getCacheDir,
+      showSheet: Dialog.sheet,
+      showAlert: Dialog.alert,
+      showConfirm: Dialog.confirm,
+      showPrompt: Dialog.prompt,
+      showToast: Dialog.toast,
+      isIOS: Device.isIOS,
+      isAndroid: Device.isAndroid,
+      isAndroid6: Device.isAndroid6,
+      isBrowser: Device.isBrowser,
+      isMobile: Device.isMobile,
+      isCameraPresent: Device.isCameraPresent,
+      isVideoPresent: Device.isVideoPresent,
+      isTablet: Device.isTablet,
+      isLandscape: Device.isLandscape,
+      getWidth: Device.getWidth,
+      getMaxImageDimensions: Device.getMaxImageDimensions,
+      getDevice: Device.getDevice,
+      setDevice: Device.setDevice,
+      setDeviceToken: Device.setDeviceToken,
+      getSizeClassPrefix: Device.getSizeClassPrefix,
+      //All of the above should be deprecated out of platform
       permissions: permissions,
       support: support,
       analytics: analytics,
+      branch: branch,
       keyboard: keyboard,
-      getAppNameLogo: getAppNameLogo,
       loading: loading,
-      getUUID: getUUID,
-      getDataDir: getDataDir,
-      getCacheDir: getCacheDir,
-      showSheet: showSheet,
-      showAlert: showAlert,
-      showConfirm: showConfirm,
-      showToast: showToast,
       removeFile: removeFile,
       initBackButton: initBackButton,
-      isIOS: isIOS,
-      isAndroid: isAndroid,
-      isAndroid6: isAndroid6,
-      isBrowser: isBrowser,
-      isMobile: isMobile,
-      isCameraPresent: isCameraPresent,
-      isVideoPresent: isVideoPresent,
-      isTablet: isTablet,
-      isLandscape: isLandscape,
-      getWidth: getWidth,
-      getMaxImageDimensions: getMaxImageDimensions,
-      getDevice: getDevice,
-      setDevice: setDevice,
-      setDeviceToken: setDeviceToken,
-      getSizeClassPrefix: getSizeClassPrefix,
       numToString: numToString,
       ready: ready.promise
     };
