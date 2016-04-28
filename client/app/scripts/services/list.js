@@ -474,7 +474,7 @@ function ListFactory (observable, Platform, PreloadQueue, User) {
         },
         sync: function() {
           var items = getSegment(Math.max(10, lSpec.items.length));
-          console.log('Synchronizing: ' + items.length);
+          //console.log('Synchronizing: ' + items.length);
           lSpec.items = [];
 
           if(lSpec.preload) {

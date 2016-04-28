@@ -106,6 +106,7 @@ app.directive('inListItem', [
   '$state',
   '$timeout',
   'TextInput',
+  'Platform',
   'Position',
   'Navigate',
   'User',
@@ -114,6 +115,7 @@ app.directive('inListItem', [
     $state,
     $timeout,
     TextInput,
+    Platform,
     Position,
     Navigate,
     User,
@@ -154,6 +156,7 @@ app.directive('inListItem', [
         $scope,
         $state,
         $timeout,
+        Platform,
         TextInput,
         Maps,
         User
@@ -177,6 +180,8 @@ app.directive('inListItem', [
             return User.isAdmin();
           }
         };
+
+        $scope.Platform = Platform;
 
         var textInput;
         var newText = '';

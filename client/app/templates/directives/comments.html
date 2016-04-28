@@ -13,7 +13,6 @@
     <i ng-if="owner.modelName === 'comment'">Show older</i>
   </button>
   <button 
-    ng-disabled="Platform.isBrowser()"
     class="button button-icon dark"
     style="float: right;"
     ng-class="(owner.modelName !== 'comment') ? 'ion-edit': 'ion-forward'"

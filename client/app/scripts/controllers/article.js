@@ -9,6 +9,7 @@ app.controller('ArticleCtrl', [
   '$timeout',
   'Articles',
   'Comments',
+  'Device',
   'Maps',
   'Navigate',
   'Platform',
@@ -23,6 +24,7 @@ app.controller('ArticleCtrl', [
     $timeout,
     Articles,
     Comments,
+    Device,
     Maps,
     Navigate,
     Platform,
@@ -35,6 +37,19 @@ app.controller('ArticleCtrl', [
     Platform.initBackButton();
 
     $scope.Platform = Platform;
+    $scope.Device = Device;
+    $scope.Navigate = Navigate;
+
+    $scope.openApp = function () {
+      if(Device.isBrowser()) {
+        var data = {
+          focusId: $stateParams.id,
+          focusType: 'article'
+        };
+        Platform.branch.viewInApp(data, function() {});
+      }
+    };
+
     var Subs = Subarticles.findOrCreate($stateParams.id);
     $scope.Subarticles = Subs.getLoader({
       keepSync: true,
@@ -147,6 +162,15 @@ app.controller('ArticleCtrl', [
       refreshUploads();
 
       Platform.analytics.trackView('Article View');
+
+      var titles = angular.element(document.getElementsByClassName('title'));
+      if(!Navigate.getBackView()) {
+        titles.css('left', '60px');
+        $scope.homeButton = true;
+      } else {
+        $scope.homeButton = false;
+        //titles.css('left', '');
+      }
     });
 
     $scope.$on('$ionicView.beforeLeave', function() {

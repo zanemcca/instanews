@@ -51,40 +51,50 @@ app.directive('incomments', [
 
         var Scroll = Navigate.scroll(scrollSpec);
 
+        var viewInApp = function(cb) {
+          var data = {
+            focusType: $scope.owner.modelName,
+            focusId: $scope.owner.id
+          };
+          Platform.branch.viewInApp(data, cb);
+        };
+
         $scope.create = function () {
-          Navigate.ensureLogin( function () {
-            var textInput = TextInput.get();
-            textInput.maxLength = 2200;
-            if($scope.owner.commentableId) {
-              textInput.placeholder = 'Write a reply...';
-            }
-            textInput.text = newComment;
+          viewInApp(function () {
+            Navigate.ensureLogin( function () {
+              var textInput = TextInput.get();
+              textInput.maxLength = 2200;
+              if($scope.owner.commentableId) {
+                textInput.placeholder = 'Write a reply...';
+              }
+              textInput.text = newComment;
 
-            textInput.open(function (text) {
-              Comment.create({
-                content: text,
-                commentableId: $scope.owner.id,
-                commentableType: $scope.owner.modelName
-              }).$promise
-              .then(function(res,err) {
-                // istanbul ignore if 
-                if(err) {
-                  console.log(err);
-                }
-                else {
-                  $scope.owner.createCommentCount++;
-                  $scope.Comments.reload();
-                }
+              textInput.open(function (text) {
+                Comment.create({
+                  content: text,
+                  commentableId: $scope.owner.id,
+                  commentableType: $scope.owner.modelName
+                }).$promise
+                .then(function(res,err) {
+                  // istanbul ignore if 
+                  if(err) {
+                    console.log(err);
+                  }
+                  else {
+                    $scope.owner.createCommentCount++;
+                    $scope.Comments.reload();
+                  }
+                });
+              }, function (partialText) {
+                //Interruption function
+                newComment = partialText;
               });
-            }, function (partialText) {
-              //Interruption function
-              newComment = partialText;
-            });
 
-            // Wait a frame
-            $timeout(function () {
-              Scroll.anchorScroll($scope.owner.id);
-            }, 16);
+              // Wait a frame
+              $timeout(function () {
+                Scroll.anchorScroll($scope.owner.id);
+              }, 16);
+            });
           });
         };
       },

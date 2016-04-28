@@ -257,6 +257,12 @@ app.directive('inmap', [
           }, true);
         }
       },
+      controller: function(
+        $scope,
+        Platform
+      ) {
+        $scope.Platform = Platform;
+      },
       templateUrl: 'templates/directives/map.html'
     };
   }

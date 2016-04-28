@@ -14,7 +14,9 @@
     <div class="col col-90 no-padding">
       <b>{{item.username}}</b> &bull; <span am-time-ago="item.created"></span>
     </div>
-    <div style="text-align:right" class="buttons col col-10 col-top no-padding">
+    <div style="text-align:right" 
+      ng-if="!Platform.isBrowser()"
+      class="buttons col col-10 col-top no-padding">
       <button class="no-margin button button-small button-clear icon ion-chevron-down"
         style="color:#E0E0E0;"
         ng-click="item.showOptions()">

@@ -176,7 +176,7 @@ function PreloadFactory(Navigate, Platform, PreloadQueue) {
 
       // Ensure we always predict more will be needed if we are within 3 elements from the bottom
       if(needed < 5 && height <= maxScrollTop && maxScrollTop &&(maxScrollTop - height) < 3*avgHeight) {
-        console.log('Bottom Proximity! Height: ' + height + '\tmaxScrollTop: ' + maxScrollTop);
+        //console.log('Bottom Proximity! Height: ' + height + '\tmaxScrollTop: ' + maxScrollTop);
         needed = 5;
       }
 

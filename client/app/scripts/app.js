@@ -49,6 +49,8 @@ angular.module('instanews', [
   'instanews.service.articles',
   'instanews.service.camera',
   'instanews.service.comments',
+  'instanews.service.device',
+  'instanews.service.dialog',
   'instanews.service.fileTransfer',
   'instanews.service.imageCache',
   'instanews.service.list',
