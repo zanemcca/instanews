@@ -2,13 +2,46 @@
 'use strict';
 var app = angular.module('instanews.service.platform', ['ionic', 'ngCordova']);
 
+var handle = {};
 //jshint ignore:start 
 function DeepLinkHandler(data) {
-  //TODO Handle deeplinks
   console.log('Deep link handler');
   console.log(JSON.stringify(data));
+  if(handle.deeplink) {
+    handle.deeplink(data);
+  } else {
+    console.log('deeplink not set yet!');
+  }
 }
 //jshint ignore:end 
+
+app.run(function(
+  Comments,
+  Navigate,
+  Platform,
+  Subarticles
+) {
+  handle.deeplink = function(data) {
+    Platform.loading.show();
+    switch(data.focusType) {
+      case 'subarticle':
+        Subarticles.focusById(data.focusId);
+        break;
+      case 'comment':
+        Comments.focusById(data.focusId);
+        break;
+      case 'article':
+        Navigate.go('app.article', { id: data.focusId });
+        break;
+      default:
+        Platform.loading.hide();
+        console.log('Unknown focus type');
+        console.log('Possibly a legacy deeplink');
+        console.log(data);
+        break;
+    }
+  };
+});
 
 //jshint camelcase:false
 app.factory('Platform', [
