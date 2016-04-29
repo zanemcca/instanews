@@ -34,10 +34,14 @@ app.run(function(
         Navigate.go('app.article', { id: data.focusId });
         break;
       default:
-        Platform.loading.hide();
-        console.log('Unknown focus type');
-        console.log('Possibly a legacy deeplink');
-        console.log(data);
+        if(data.params) {
+          handle.deeplink(data.params);
+        } else {
+          Platform.loading.hide();
+          console.log('Unknown focus type');
+          console.log('Possibly a legacy deeplink');
+          console.log(data);
+        }
         break;
     }
   };
@@ -619,6 +623,7 @@ app.factory('Platform', [
               console.log(err);
             });
           };
+
           document.addEventListener('resume', onResume, false);
           onResume();
 
