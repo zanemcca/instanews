@@ -95,6 +95,10 @@ app.directive('invotes', [
            */
           }, 500, true);
 
+          $scope.share = function() {
+            Platform.branch.share($scope.votable);
+          };
+
           var viewInApp = function (cb) {
             var data = {
               focusType: $scope.votable.modelName,
