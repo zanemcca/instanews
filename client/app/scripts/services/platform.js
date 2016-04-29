@@ -58,6 +58,7 @@ app.factory('Platform', [
   '$q',
   'Device',
   'Dialog',
+  'ENV',
   function(
     $cordovaDevice,
     $cordovaDialogs,
@@ -67,7 +68,8 @@ app.factory('Platform', [
     $ionicNavBarDelegate,
     $q,
     Device,
-    Dialog
+    Dialog,
+    ENV
   ) {
 
     var ready = $q.defer();
@@ -630,6 +632,86 @@ app.factory('Platform', [
           // Call the callback when on a device
           branch.viewInApp = function(data, cb) {
             cb();
+          };
+
+          branch.share = function(item) {
+
+            var processSubarticle = function(sub) {
+              var opts = {};
+              if(sub.text) {
+                opts.contentDescription = sub.text;
+              } else if(sub._file) {
+                opts.contentDescription = sub._file.caption;
+                if(sub._file.type.indexOf('video') > -1) {
+                  opts.contentImageUrl = ENV.videoEndpoint + '/' + sub._file.poster;
+                } else {
+                  var order = ['thumbnail', 'XS', 'S', 'M', 'L', 'XL'];
+                  var prefix;
+                  var max = -1;
+                  for(var i in sub._file.sources) {
+                    var src = sub._file.sources[i];
+                    var idx = order.indexOf(src.prefix);
+                    if(idx > max) {
+                      max = idx;
+                      prefix = src.prefix;
+                    }
+                  }
+                  if(!prefix) {
+                    console.log('prefix is broken!');
+                    console.log(sub);
+                    return;
+                  }
+                  opts.contentImageUrl = ENV.photoEndpoint + '/' + prefix + '-' + sub._file.name;
+                }
+              } else {
+                console.log('Subarticle is broken!');
+                console.log(sub);
+                return;
+              }
+              return opts;
+            };
+
+            var opts;
+
+            switch(item.modelName) {
+              case 'article':
+                if(item.topSubarticle) {
+                  opts = processSubarticle(item.topSubarticle);
+                  if(!opts) {
+                    return;
+                  }
+                }
+                opts.title = item.title;
+                break;
+              case 'subarticle':
+                opts = processSubarticle(item);
+                if(!opts) {
+                  return;
+                }
+                //TODO Maybe we should include the article title
+                break;
+              default:
+                console.log('Cannot share ' + item.modelName + ' types');
+                return;
+            }
+
+            opts.contentIndexingMode = 'public';
+            opts.contentMetaData = {
+              focusId: item.id,
+              focusType: item.modelName
+            };
+
+            opts.canonicalIdentifier = item.modelName + '/' + item.id;
+
+            Branch.createBranchUniversalObject(opts).then(function(obj) {
+              obj.showShareSheet({
+                feature: 'share',
+                channel: 'share'
+              }, {}, 'Check this out!');
+            }, function(err) {
+              console.log('Failed to create BranchUniversalObject');
+              console.log(err);
+            });
           };
         }
       }
