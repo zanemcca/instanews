@@ -66,6 +66,8 @@ app.directive('inmap', [
           var mapOptions = {
             mapTypeId: google.maps.MapTypeId.HYBRID,
             center: Position.posToLatLng({ coords: { latitude: 54.708031, longitude: -95.871324}}),
+            zoomControl: (Platform.isBrowser && !Platform.isMobile()),
+            zoomControlOptions: 'BOTTOM_RIGHT',
             zoom: 3,
             minZoom: 3,
             disableDefaultUI: true, 

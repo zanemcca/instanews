@@ -2,13 +2,50 @@
 'use strict';
 var app = angular.module('instanews.service.platform', ['ionic', 'ngCordova']);
 
+var handle = {};
 //jshint ignore:start 
 function DeepLinkHandler(data) {
-  //TODO Handle deeplinks
   console.log('Deep link handler');
   console.log(JSON.stringify(data));
+  if(handle.deeplink) {
+    handle.deeplink(data);
+  } else {
+    console.log('deeplink not set yet!');
+  }
 }
 //jshint ignore:end 
+
+app.run(function(
+  Comments,
+  Navigate,
+  Platform,
+  Subarticles
+) {
+  handle.deeplink = function(data) {
+    Platform.loading.show();
+    switch(data.focusType) {
+      case 'subarticle':
+        Subarticles.focusById(data.focusId);
+        break;
+      case 'comment':
+        Comments.focusById(data.focusId);
+        break;
+      case 'article':
+        Navigate.go('app.article', { id: data.focusId });
+        break;
+      default:
+        if(data.params) {
+          handle.deeplink(data.params);
+        } else {
+          Platform.loading.hide();
+          console.log('Unknown focus type');
+          console.log('Possibly a legacy deeplink');
+          console.log(data);
+        }
+        break;
+    }
+  };
+});
 
 //jshint camelcase:false
 app.factory('Platform', [
@@ -413,7 +450,6 @@ app.factory('Platform', [
           if(Device.isAndroid()) {
             window.analytics.startTrackerWithId('UA-74478035-1');
           } else if(Device.isIOS()) {
-            //TODO Get iOS Google analytics key
             window.analytics.startTrackerWithId('UA-74478035-3');
           } else {
             return console.log('Error: Failed to start analytics!');
@@ -463,7 +499,7 @@ app.factory('Platform', [
             console.log(err.stack);
           });
         } else {
-          //TODO
+          window.ga('send', 'pageview', name);
         }
       },
       trackException: function(description, isFatal) {
@@ -472,7 +508,10 @@ app.factory('Platform', [
             console.log(err.stack);
           });
         } else {
-          //TODO
+          window.ga('send', 'exception', {
+            exDescription: description,
+            exFatal: isFatal
+          });
         }
       },
       trackTiming: function(category, interval, variable, label) {
@@ -483,7 +522,7 @@ app.factory('Platform', [
             console.log(err.stack);
           });
         } else {
-          //TODO
+          window.ga('send', 'timing', category, variable, interval, label);
         }
       },
       trackEvent: function(category, action, label, value) {
@@ -494,7 +533,7 @@ app.factory('Platform', [
             console.log(err.stack);
           });
         } else {
-          //TODO
+          window.ga('send', 'event', category, action, label, value);
         }
       }
     };
@@ -586,6 +625,7 @@ app.factory('Platform', [
               console.log(err);
             });
           };
+
           document.addEventListener('resume', onResume, false);
           onResume();
 
