@@ -200,9 +200,9 @@ app.service('Position', [
               Platform.showConfirm(
                 'To see news in your area, allow instanews to use your location.',
                 'instanews never shares your location!',
-                ['Allow', 'Later'],
+                ['Later', 'Allow'],
                 function (buttonIdx) {
-                  if(buttonIdx === 1) {
+                  if(buttonIdx === 2) { //Allow
                     var permission = {
                       hasPermission: true
                     };
@@ -210,7 +210,7 @@ app.service('Position', [
                     LocalStorage.secureWrite('geolocationPermission', permission);
                     setupGeolocation();
                     cb();
-                  } else {
+                  } else { //Later
                     rejected();
                   }
                 });
