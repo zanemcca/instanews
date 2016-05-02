@@ -23,7 +23,15 @@ function PreloadQueueFactory($q) {
       queueDelay: 0,
       loadDelay: 0,
       getLength: function () { return queueLength; },
-      totalProcessed: 0 
+      totalProcessed: 0, 
+      print: function() {
+        console.log(
+          'QueueDelay: ' + stats.queueDelay +
+          '\tLoadDelay: ' + stats.loadDelay +
+          '\tLength: ' + stats.getLength() +
+          '\tProcessed: ' + stats.totalProcessed
+        );
+      }
     };
 
     var flushing = 0;
