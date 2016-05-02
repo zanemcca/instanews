@@ -212,7 +212,8 @@ app.service('Navigate', [
           delegate = delegate.$getByHandle(spec.scrollHandle);
         }
         var view = delegate.getScrollView();
-        return view.options.getContentHeight() - view.__contentHeight;
+        //return view.options.getContentHeight() - view.__contentHeight;
+        return view.options.getContentHeight();
       };
 
       var resize = function () {
