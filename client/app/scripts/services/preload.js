@@ -181,7 +181,7 @@ function PreloadFactory(Navigate, Platform, PreloadQueue) {
       }
 
       if(needed > 0 && spec.list.areItemsAvailable()) {
-        if(needed + length > max) {
+        if(needed + length > max || PreloadQueue.stats.getLength() < needed) {
           var limit = Math.min(needed, 50);
           max = length + limit;
 
@@ -192,11 +192,6 @@ function PreloadFactory(Navigate, Platform, PreloadQueue) {
               console.log('Failed to get more!');
               console.log(err);
             }
-            /*
-            if(items) {
-              console.log('Loaded: ' + (items.length - length));
-            }
-            */
           });
         }
       }
