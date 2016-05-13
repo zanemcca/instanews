@@ -220,7 +220,8 @@ app.controller('LoginCtrl', [
           Platform.loading.hide();
           if(err) {
             console.log(err);
-            if(err.data && err.data.error && err.data.error.status === 401) {
+            if((err.status && err.status === 401) ||
+               (err.data && (err.data.status === 401 || (err.data.error && err.data.error.status === 401)))) {
               Platform.showAlert('Please try again!', 'Invalid credentials');
             } else {
               Platform.showAlert('There was an unknown error while logging in', 'Please try again');

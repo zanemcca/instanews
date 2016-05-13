@@ -452,7 +452,6 @@ app.factory('Platform', [
           if(Device.isAndroid()) {
             window.analytics.startTrackerWithId('UA-74478035-1');
           } else if(Device.isIOS()) {
-            //TODO Get iOS Google analytics key
             window.analytics.startTrackerWithId('UA-74478035-3');
           } else {
             return console.log('Error: Failed to start analytics!');
@@ -502,7 +501,7 @@ app.factory('Platform', [
             console.log(err.stack);
           });
         } else {
-          //TODO
+          window.ga('send', 'pageview', name);
         }
       },
       trackException: function(description, isFatal) {
@@ -511,7 +510,10 @@ app.factory('Platform', [
             console.log(err.stack);
           });
         } else {
-          //TODO
+          window.ga('send', 'exception', {
+            exDescription: description,
+            exFatal: isFatal
+          });
         }
       },
       trackTiming: function(category, interval, variable, label) {
@@ -522,7 +524,7 @@ app.factory('Platform', [
             console.log(err.stack);
           });
         } else {
-          //TODO
+          window.ga('send', 'timing', category, variable, interval, label);
         }
       },
       trackEvent: function(category, action, label, value) {
@@ -533,7 +535,7 @@ app.factory('Platform', [
             console.log(err.stack);
           });
         } else {
-          //TODO
+          window.ga('send', 'event', category, action, label, value);
         }
       }
     };

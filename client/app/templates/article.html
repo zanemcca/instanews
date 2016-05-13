@@ -58,11 +58,13 @@
          <inComments owner="article"></inComments>
       </div>
     </in-list>
-    <div ng-show="Subarticles.areItemsAvaialable()" class="list-end">
-      <ion-spinner></ion-spinner>
-    </div>
-    <div ng-hide="Subrticles.areItemsAvailable()" class="list-end">
-       No more items
+    <div ng-switch="isLoading()" class="list-end">
+      <div ng-switch-when="true">
+        <ion-spinner></ion-spinner>
+      </div>
+      <div ng-switch-when="false">
+         No more items
+      </div>
     </div>
   </ion-content>
   <in-text-footer></in-text-footer>
