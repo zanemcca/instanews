@@ -1,36 +1,39 @@
 <!DOCTYPE html>
-<button class="item button button-clear button-small ion-arrow-up-b"
-  ng-class="votable.upVoted ? 'button-positive': 'button-stable'"
-  style="border:0;margin:0;"
-  ng-style="{'font-weight': votable.upVoted ? 'bold' : 'normal'}"
-   ng-click="upvote()">
-      {{Platform.numToString(votable.upVoteCount)}}
- </button>
-<button class="item button button-clear button-small ion-arrow-down-b"
-  ng-class="votable.downVoted ? 'button-positive' : 'button-stable'"
-  ng-style="{'font-weight': votable.downVoted ? 'bold' : 'normal'}"
-  style="border:0;margin:0;"
-  ng-click="downvote()">
-     {{Platform.numToString(votable.downVoteCount)}}
-</button>
-<button ng-if="!Platform.isBrowser() && (votable.commentableType !== 'comment' && votable.modelName !== 'comment')"
-  style="float: right;border:0;margin:0;"
-  class="item button button-clear button-small ion-android-share"
-  ng-click="share()">
-  Share
-</button>
-<!--ng-class="Platform.isIOS() ? ' ion-ios-upload': 'ion-android-share'"-->
-<button ng-if="votable.commentableType !== 'comment'"
-  class="item button button-clear button-small"
-  ng-class="(votable.showComments || Comments.enableFocus) ? ' ion-arrow-down-b button-positive': 'ion-arrow-right-b button-stable'"
-  ng-style="{'font-weight': votable.showComments ? 'bold' : 'normal'}"
-  style="float: right;border:0;margin:0;"
-  id="{{votable.id}}"
-  ng-click="toggleComments()">
-  <span ng-if="votable.modelName !== 'comment'">
-      {{Platform.numToString(votable.createCommentCount)}} Comments
-  </span>
-  <span ng-if="votable.modelName === 'comment'">
-      {{Platform.numToString(votable.createCommentCount)}} Replies
-  </span>
-</button>
+<div class="item no-border no-padding no-margin" style="background-color:transparent;height: 30px;">
+  <div style="float: left;">
+    <button class="item button button-clear button-small ion-arrow-up-b"
+      ng-class="votable.upVoted ? 'button-positive': 'button-stable'"
+      style="border:0;margin:0;"
+      ng-style="{'font-weight': votable.upVoted ? 'bold' : 'normal'}"
+      ng-click="upvote()">
+         {{Platform.numToString(votable.upVoteCount)}}
+    </button>
+    <button class="item button button-clear button-small ion-arrow-down-b"
+      ng-class="votable.downVoted ? 'button-positive' : 'button-stable'"
+      ng-style="{'font-weight': votable.downVoted ? 'bold' : 'normal'}"
+      style="border:0;margin:0;"
+      ng-click="downvote()">
+         {{Platform.numToString(votable.downVoteCount)}}
+    </button>
+    <button ng-if="!Platform.isBrowser() && (votable.commentableType !== 'comment' && votable.modelName !== 'comment')"
+      style="float: right;border:0;margin:0;"
+      class="item button button-clear button-small ion-android-share"
+      ng-click="share()">
+      Share
+    </button>
+  </div>
+  <button ng-if="votable.commentableType !== 'comment'"
+    class="item button button-clear button-small"
+    ng-class="(votable.showComments || Comments.enableFocus) ? ' ion-arrow-down-b button-positive': 'ion-arrow-right-b button-stable'"
+    ng-style="{'font-weight': votable.showComments ? 'bold' : 'normal'}"
+    style="float:right;border:0;margin:0;"
+    id="{{votable.id}}"
+    ng-click="toggleComments()">
+    <span ng-if="votable.modelName !== 'comment'">
+        {{Platform.numToString(votable.createCommentCount)}} Comments
+    </span>
+    <span ng-if="votable.modelName === 'comment'">
+        {{Platform.numToString(votable.createCommentCount)}} Replies
+    </span>
+  </button>
+</div>
