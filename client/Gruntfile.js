@@ -49,7 +49,7 @@ module.exports = function (grunt) {
   //over the ip addressed that was looked up
   var ipAddress = grunt.option('host') || lookupIpAddress();
 
-  var url = 'http://' + ipAddress + ':3000/api';
+  var url = 'http://' + ipAddress + ':3000';
   console.log('Local server: ' + url);
 
   // Define the configuration for all the tasks
@@ -120,10 +120,11 @@ module.exports = function (grunt) {
         constants: {
           ENV: {
             name: 'development',
-            apiEndpoint: url,
-            storageEndpoint: url,
-            videoEndpoint: url + '/storages/instanews-videos/download',
-            photoEndpoint: url + '/storages/instanews-photos/download'
+            url: url,
+            apiEndpoint: url + '/api',
+            storageEndpoint: url + '/api',
+            videoEndpoint: url + '/api/storages/instanews-videos/download',
+            photoEndpoint: url + '/api/storages/instanews-photos/download'
           }
         }
       },
@@ -131,6 +132,7 @@ module.exports = function (grunt) {
         constants: {
           ENV: {
             name: 'staging',
+            url: 'https://turtle.instanews.com',
             apiEndpoint: 'https://turtle.instanews.com/api',
             storageEndpoint: 'https://turtle.instanews.com/api',
             videoEndpoint: 'https://turtlevideos.instanews.com',
@@ -142,6 +144,7 @@ module.exports = function (grunt) {
         constants: {
           ENV: {
             name: 'production',
+            url: 'https://www.instanews.com',
             apiEndpoint: 'https://api.instanews.com/api',
             storageEndpoint: 'https://storage.instanews.com/api',
             videoEndpoint: 'https://videos.instanews.com',
