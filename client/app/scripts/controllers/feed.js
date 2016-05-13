@@ -50,6 +50,14 @@ app.controller('FeedCtrl', [
       keepSync: true
     });
 
+    $scope.isLoading = function() {
+      if($scope.Articles.areItemsAvailable()) {
+        return true;
+      } else {
+        return false;
+      }
+    };
+
     $scope.toggleMenu = function () {
       if(Navigate.toggleMenu()) {
         Notifications.reload();

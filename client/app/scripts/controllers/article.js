@@ -50,6 +50,14 @@ app.controller('ArticleCtrl', [
       }
     };
 
+    $scope.isLoading = function() {
+      if($scope.Subarticles.areItemsAvailable()) {
+        return true;
+      } else {
+        return false;
+      }
+    };
+
     var Subs = Subarticles.findOrCreate($stateParams.id);
     $scope.Subarticles = Subs.getLoader({
       keepSync: true,
