@@ -674,6 +674,7 @@ app.factory('Platform', [
             };
 
             var opts;
+            var url = ENV.url; 
 
             switch(item.modelName) {
               case 'article':
@@ -684,12 +685,14 @@ app.factory('Platform', [
                   }
                 }
                 opts.title = item.title;
+                url += '/#/app/articles/' + item.id;
                 break;
               case 'subarticle':
                 opts = processSubarticle(item);
                 if(!opts) {
                   return;
                 }
+                url += '/#/app/articles/' + item.parentId;
                 //TODO Maybe we should include the article title
                 break;
               default:
@@ -698,7 +701,7 @@ app.factory('Platform', [
             }
 
             opts.contentIndexingMode = 'public';
-            opts.contentMetaData = {
+            opts.contentMetadata = {
               focusId: item.id,
               focusType: item.modelName
             };
@@ -709,7 +712,10 @@ app.factory('Platform', [
               obj.showShareSheet({
                 feature: 'share',
                 channel: 'share'
-              }, {}, 'Check this out!');
+              }, {
+                '$desktop_url': url,
+                '$fallback_url': url
+              }, 'Check this out!');
             }, function(err) {
               console.log('Failed to create BranchUniversalObject');
               console.log(err);
