@@ -777,6 +777,34 @@ app.factory('Platform', [
       }
     };
 
+
+    var url = {
+      getParam: function(art) {
+        var split = art.title.split(' ');
+        var words = [];
+        for(var i in split) {
+          var wrd = split[i];
+          if(!wrd.match(/[^\w\s]/gi)) { //Words must not contain special characters
+            if(wrd.match(/^[A-Z]/g)) { //Words must start with a capital letter
+              words.push(wrd);
+            }
+          }
+        }
+        words.push(art.id)
+        return words.join('-');
+      },
+      getId: function(param) {
+        if(param) {
+          var split = param.split('-');
+          if(split.length) {
+            return split[split.length -1];
+          }
+        }
+        console.log('Param is empty!');
+        return '';
+      }
+    };
+
     var numToString = function(num) {
       num = num || this.number;
       if(!num || num < 0) {
@@ -956,6 +984,7 @@ app.factory('Platform', [
       setDeviceToken: Device.setDeviceToken,
       getSizeClassPrefix: Device.getSizeClassPrefix,
       //All of the above should be deprecated out of platform
+      url: url,
       permissions: permissions,
       support: support,
       analytics: analytics,
