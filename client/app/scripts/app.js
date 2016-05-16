@@ -298,7 +298,7 @@ angular.module('instanews', [
   $stateProvider
 
   .state('app', {
-    url:'/app',
+    url:'/news',
     abstract: true,
     templateUrl: 'templates/menu.html',
     controller: 'AppCtrl'
@@ -380,6 +380,6 @@ angular.module('instanews', [
   });
 
   // if none of the above states are matched, use this as the fallback
-  $urlRouterProvider.otherwise('/app/feed');
+  $urlRouterProvider.otherwise('/news/feed');
 
 });
