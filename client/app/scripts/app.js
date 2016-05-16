@@ -65,6 +65,7 @@ angular.module('instanews', [
   'instanews.service.preloadQueue',
   'instanews.service.post',
   'instanews.service.subarticles',
+  'instanews.service.shares',
   'instanews.service.textInput',
   'instanews.service.uploads',
   'instanews.service.user',

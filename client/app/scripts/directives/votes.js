@@ -11,6 +11,9 @@ app.directive('invotes', [
   'Navigate',
   'Platform',
   'Position',
+  'Share',
+  'Shares',
+  'User',
   '_',
   function (
     $timeout,
@@ -21,6 +24,9 @@ app.directive('invotes', [
     Navigate,
     Platform,
     Position,
+    Share,
+    Shares,
+    User,
     _
   ) {
 
@@ -33,11 +39,19 @@ app.directive('invotes', [
 
           $scope.Platform = Platform;
           $scope.Comments = Comments.findOrCreate($scope.votable.modelName, $scope.votable.id) || {};
+          $scope.votable.shareCount = $scope.votable.shareCount || 0;
 
           var update = function () {
             $timeout(function () {
+              $scope.votable.shares = Shares.find($scope.votable);
               $scope.votable.upVotes = Votes.up.find($scope.votable);
               $scope.votable.downVotes = Votes.down.find($scope.votable);
+
+              if($scope.votable.shares.length) {
+                $scope.votable.shared = true;
+              } else {
+                $scope.votable.shared = false;
+              }
 
               if($scope.votable.upVotes.length) {
                 $scope.votable.upVoted = true;
@@ -53,6 +67,7 @@ app.directive('invotes', [
           };
 
           update();
+          Shares.registerObserver(update);
           Votes.up.registerObserver(update);
           Votes.down.registerObserver(update);
 
@@ -95,9 +110,57 @@ app.directive('invotes', [
            */
           }, 500, true);
 
-          $scope.share = function() {
-            Platform.branch.share($scope.votable);
-          };
+
+          $scope.share = _.debounce(function () {
+            //TODO Create a browser friendly share sheet and then enable for browser as well
+            viewInApp(function () {
+              Platform.branch.share($scope.votable, function(err, res) {
+                if(err) {
+                  console.log(err.stack);
+                  return;
+                }
+
+                var user = User.get();
+                if(user) {
+                  if(!$scope.votable.shared) {
+                    $scope.votable.shareCount++;
+                    $scope.votable.shared = true;
+                  }
+
+                  var position = Position.getPosition();
+                  var share = {
+                    url: res.url,
+                    clickableId: $scope.votable.id,
+                    clickableType: $scope.votable.modelName
+                  };
+
+                  // istanbul ignore else 
+                  if(position) {
+                    share.location = {
+                      type: 'Point',
+                      coordinates: [ position.coords.longitude, position.coords.latitude]
+                    };
+                  }
+
+                  Share.create(share)
+                  .$promise
+                  .then(
+                    function(res) {
+                      if(res) {
+                        Shares.add(res);
+                      }
+                      console.log('Successfully shared');
+                      Shares.reload();
+                    }, 
+                    // istanbul ignore  next 
+                    function(err) {
+                      console.log('Error: Failed to create an share');
+                      console.log(err);
+                    });
+                  }
+              });
+            });
+          }, 500, true);
 
           var viewInApp = function (cb) {
             var data = {
