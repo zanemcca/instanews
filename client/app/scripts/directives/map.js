@@ -179,7 +179,8 @@ app.directive('inmap', [
                 // istanbul ignore else
                 if ( $stateParams.id) {
                   scope.article = {};
-                  Articles.findById($stateParams.id, function(article) {
+                  var id = Platform.url.getId($stateParams.id);
+                  Articles.findById(id, function(article) {
                     scope.article = article;
                     if(article) {
                       mapOptions.center = new google.maps.LatLng(scope.article.loc.coordinates[1], scope.article.loc.coordinates[0]);
@@ -234,7 +235,7 @@ app.directive('inmap', [
                   }
                 }, 50));
 
-                Maps.setArticleMap(map, $stateParams.id);
+                Maps.setArticleMap(map, id);
 
                 break;
               }
