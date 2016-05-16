@@ -15,13 +15,15 @@
       ng-click="downvote()">
          {{Platform.numToString(votable.downVoteCount)}}
     </button>
+    <button ng-if="(votable.commentableType !== 'comment' && votable.modelName !== 'comment')"
+      style="float: right;border:0;margin:0;"
+      class="item button button-clear button-small ion-android-share"
+      ng-class="votable.shared ? 'button-positive' : 'button-stable'"
+      ng-style="{'font-weight': votable.shared ? 'bold' : 'normal'}"
+      ng-click="share()">
+         {{Platform.numToString(votable.shareCount)}}
+    </button>
   </div>
-  <button ng-if="!Platform.isBrowser() && (votable.commentableType !== 'comment' && votable.modelName !== 'comment')"
-    style="float: right;border:0;margin:0;"
-    class="item button button-clear button-small ion-android-share"
-    ng-click="share()">
-    Share
-  </button>
   <button ng-if="votable.commentableType !== 'comment'"
     class="item button button-clear button-small"
     ng-class="(votable.showComments || Comments.enableFocus) ? ' ion-arrow-down-b button-positive': 'ion-arrow-right-b button-stable'"
