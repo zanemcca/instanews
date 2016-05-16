@@ -119,10 +119,15 @@ exports.notify = function (Model, inst) {
       messageFrom: inst.username,
       username: inst.username
     }, report);
-  } else if(inst.modelName === 'upVote' || inst.modelName === 'downVote') {
+  } else if(inst.modelName === 'share' || inst.modelName === 'upVote' || inst.modelName === 'downVote') {
     getParentName = 'Click.clickable';
     getParent = inst.clickable;
+
     action = 'voted on';
+    if(inst.modelName === 'share') {
+      action = 'shared';
+    }
+
     if(inst.modelName === 'downVote') {
       someone = 'someone';
     }
