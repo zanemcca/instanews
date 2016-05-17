@@ -89,7 +89,6 @@ app.directive('inmap', [
                 map.mapTypes.set(instanewsMapTypeId, instanewsMapType);
                 map.setMapTypeId(instanewsMapTypeId);
 
-
                 //Listener on bounds changing on the map
                 google.maps.event.addListener(map, 'bounds_changed', _.debounce(function() {
                   if(Articles.inView) {
@@ -102,33 +101,6 @@ app.directive('inmap', [
                 //map.controls[google.maps.ControlPosition.TOP_CENTER].push(TEMPLATE);
 
                 Maps.setFeedMap(map);
-
-                var options = {
-                  cancel: false
-                };
-
-                var event = 'touch';
-                if(Platform.isBrowser() && !Platform.isMobile()) {
-                  event = 'mousedown';
-                }
-
-                var mapListener = function() {
-                  options.cancel = true;
-                  $ionicGesture.off(mapGesture, event, mapListener);
-                };
-                var mapGesture = $ionicGesture.on(event, mapListener, elem); 
-
-                var feed = angular.element(document.getElementById('feed'));
-                var scrollListener = function() {
-                  options.cancel = true;
-                  $ionicGesture.off(scrollGesture, 'scroll', scrollListener);
-                };
-                var scrollGesture = $ionicGesture.on('scroll', scrollListener, feed); 
-
-                Maps.localize(map, options, function(err) {
-                  console.log(err);
-                });
-
                 break;
               }
               case 'postMap': {
@@ -261,10 +233,49 @@ app.directive('inmap', [
         }
       },
       controller: function(
+        $element,
         $scope,
+        $stateParams,
+        Maps,
         Platform
       ) {
         $scope.Platform = Platform;
+
+        if($scope.map.id === 'feedMap' && !$stateParams.search) {
+          var options = {
+            cancel: false
+          };
+
+          var event = 'touch';
+          if(Platform.isBrowser() && !Platform.isMobile()) {
+            event = 'mousedown';
+          }
+
+          var mapListener = function() {
+            options.cancel = true;
+            $ionicGesture.off(mapGesture, event, mapListener);
+          };
+          var mapGesture = $ionicGesture.on(event, mapListener, $element); 
+
+          var feed = angular.element(document.getElementById('feed'));
+          var scrollListener = function() {
+            options.cancel = true;
+            $ionicGesture.off(scrollGesture, 'scroll', scrollListener);
+          };
+          var scrollGesture = $ionicGesture.on('scroll', scrollListener, feed); 
+
+          var localize = function () {
+            var map = Maps.getFeedMap();
+            if(map) {
+              observer.unregister();
+              Maps.localize(map, options, function(err) {
+                console.log(err);
+              });
+            }
+          };
+          var observer = Maps.registerObserver(localize);
+          localize();
+        }
       },
       templateUrl: 'templates/directives/map.html'
     };

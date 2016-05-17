@@ -305,7 +305,8 @@ angular.module('instanews', [
   })
 
   .state('app.feed', {
-    url:'/feed',
+    url:'/feed?search',
+    reloadOnSearch: false,
     views: {
       'menuContent' : {
         templateUrl: 'templates/feed.html',
@@ -315,7 +316,7 @@ angular.module('instanews', [
   })
 
   .state('app.article', {
-    url: '/articles/{id}',
+    url: '/article/{id}',
     views: {
       'menuContent' : {
         templateUrl: 'templates/article.html',
