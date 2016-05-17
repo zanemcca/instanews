@@ -780,12 +780,21 @@ app.factory('Platform', [
 
     var url = {
       getParam: function(art) {
-        var split = art.title.split(' ');
+        var removeBrackets = function(input) {
+          return input
+                .replace(/{+.*?}+/g, '')
+                .replace(/\[+.*?\]+/g, '')
+                .replace(/\(+.*?\)+/g, '')
+                .replace(/<.*?>/g, '');
+        }
+
+        var preprocess = removeBrackets(art.title);
+        var split = preprocess.split(' ');
         var words = [];
         for(var i in split) {
           var wrd = split[i];
           if(!wrd.match(/[^\w\s]/gi)) { //Words must not contain special characters
-            if(wrd.match(/^[A-Z]/g)) { //Words must start with a capital letter
+            if(wrd.match(/^[A-Z0-9]/g)) { //Words must start with a capital letter
               words.push(wrd);
             }
           }

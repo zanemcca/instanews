@@ -143,6 +143,7 @@ app.controller('FeedCtrl', [
       }
     });
 
+    // No Header on mobile browsers to save on space
     if(Platform.isBrowser() && Platform.isMobile() && !Platform.isTablet()) {
       $scope.$on('$ionicView.beforeEnter', function() {
         $ionicNavBarDelegate.showBar(false);
