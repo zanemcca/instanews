@@ -37,9 +37,10 @@ app.directive('inautocomplete', [
         place: '='
       },
       controller: function(
-        $scope
+        $scope,
+        $location,
+        $stateParams
       ) {
-
         // istanbul ignore next
         $scope.safeApply = function(fn) {
           var phase = this.$root.$$phase;
@@ -126,6 +127,10 @@ app.directive('inautocomplete', [
           $scope.done = true;
           console.log(prediction);
           $scope.place.value = prediction;
+
+          var place = prediction.description.replace(/\s+/gi, '_').replace(/,_/g, '__');
+          $location.search('search',place);
+
           $scope.input.value = '';
           $scope.input.placeholder = prediction.description;
           $scope.safeApply();
@@ -133,10 +138,11 @@ app.directive('inautocomplete', [
 
         $scope.done = true;
 
-        $scope.search = _.debounce(function () {
+        $scope.search = _.debounce(function (input) {
+          input = input || $scope.input.value;
           $scope.done = true;
-          if($scope.input.value && $scope.input.value.length > 0) {
-            Maps.autocomplete($scope.input.value, $scope.place, function (predictions) {
+          if(input && input.length > 0) {
+            Maps.autocomplete(input, $scope.place, function (predictions) {
               // istanbul ignore else 
               if(predictions && predictions.length) {
                 $scope.set(predictions[0]);
@@ -145,10 +151,14 @@ app.directive('inautocomplete', [
               }
             });
           }
-
           Platform.keyboard.hide();
         }, 100, true);
 
+        //TODO Run on entry
+        if($stateParams.search) {
+          var search = $stateParams.search.replace(/__/g, ',_').replace(/_/g, ' ');
+          $scope.search(search);
+        }
 
         Platform.ready
         .then( function() {
