@@ -786,7 +786,7 @@ app.factory('Platform', [
                 .replace(/\[+.*?\]+/g, '')
                 .replace(/\(+.*?\)+/g, '')
                 .replace(/<.*?>/g, '');
-        }
+        };
 
         var preprocess = removeBrackets(art.title);
         var split = preprocess.split(' ');
@@ -799,7 +799,7 @@ app.factory('Platform', [
             }
           }
         }
-        words.push(art.id)
+        words.push(art.id);
         return words.join('-');
       },
       getId: function(param) {

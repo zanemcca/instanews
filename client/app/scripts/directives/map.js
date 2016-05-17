@@ -149,9 +149,10 @@ app.directive('inmap', [
               }
               case 'articleMap': {
                 // istanbul ignore else
+                var id = '';
                 if ( $stateParams.id) {
                   scope.article = {};
-                  var id = Platform.url.getId($stateParams.id);
+                  id = Platform.url.getId($stateParams.id);
                   Articles.findById(id, function(article) {
                     scope.article = article;
                     if(article) {
