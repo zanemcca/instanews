@@ -38,7 +38,9 @@ app.directive('inautocomplete', [
       },
       controller: function(
         $scope,
-        $location
+        $timeout,
+        $location,
+        Maps
       ) {
         // istanbul ignore next
         $scope.safeApply = function(fn) {
@@ -122,6 +124,7 @@ app.directive('inautocomplete', [
           }
         };
 
+        var boundsListener;
         $scope.set = function (prediction, shouldReplace) {
           $scope.done = true;
           console.log(prediction);
@@ -131,9 +134,21 @@ app.directive('inautocomplete', [
           $scope.input.value = '';
           $scope.input.placeholder = prediction.description;
 
-          Platform.url.setQuery($location, {
-            search: prediction.description
-          }, shouldReplace);
+          if($scope.searchId.indexOf('feed') > -1) {
+            Platform.url.setQuery($location, {
+              search: prediction.description
+            }, shouldReplace);
+
+            $timeout(function () {
+              if(boundsListener) {
+                google.maps.event.removeListener(boundsListener);
+              }
+              boundsListener = google.maps.event.addListener(Maps.getFeedMap(), 'bounds_changed', function() {
+                Platform.url.setQuery($location,{ search: null });
+                google.maps.event.removeListener(boundsListener);
+              });
+            }, 5000);
+          }
 
           $scope.safeApply();
         };
@@ -173,6 +188,7 @@ app.directive('inautocomplete', [
         $scope.$on('$locationChangeSuccess', function () {
           checkQuery(true);
         });
+
 
         Platform.ready
         .then( function() {
