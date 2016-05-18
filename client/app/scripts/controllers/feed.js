@@ -155,6 +155,7 @@ app.controller('FeedCtrl', [
 
     //Refresh the map everytime we enter the view
     $scope.$on('$ionicView.afterEnter', function() {
+      $scope.$broadcast('afterEnter');
       Articles.inView = true;
       Preload.reset();
       var map = Maps.getFeedMap();

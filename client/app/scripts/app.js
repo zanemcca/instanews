@@ -281,7 +281,6 @@ angular.module('instanews', [
     }
   }); 
 
-  //No transitions for performance
   //$ionicConfigProvider.views.transition('none');
 
   //Setup back button to not have text
@@ -305,8 +304,9 @@ angular.module('instanews', [
   })
 
   .state('app.feed', {
-    url:'/feed?search',
-    reloadOnSearch: false,
+    url: '/feed',
+    //url:'/feed?search',
+    //reloadOnSearch: false,
     views: {
       'menuContent' : {
         templateUrl: 'templates/feed.html',
