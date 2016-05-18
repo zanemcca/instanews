@@ -817,7 +817,7 @@ app.factory('Platform', [
         var q = $location.search();
         for(var key in query) {
           var val = query[key];
-          if(val === '') {
+          if(val === '' || val === null) {
             val = null;
           } else if(key === 'search') {
             val = val.replace(/\s+/gi, '_').replace(/,_/g, '__');
