@@ -294,7 +294,7 @@ angular.module('instanews', [
   // Learn more here: https://github.com/angular-ui/ui-router
   // Set up the various states which the app can be in.
   // Each state's controller can be found in controllers.js
-  $stateProvider
+  var stateProvider = $stateProvider
 
   .state('app', {
     url:'/news',
@@ -323,62 +323,29 @@ angular.module('instanews', [
         controller: 'ArticleCtrl'
       }
     }
-  })
-
-  /*
-  .state('app.notif', {
-    cache: false,
-    url: '/notif/{id}',
-    views: {
-      'menuContent' : {
-        templateUrl: 'templates/notif.html',
-        controller: 'NotificationCtrl'
-      }
-    }
-  })
-
-  .state('app.profile', {
-    url:'/profile/{username}',
-    views: {
-      'menuContent' : {
-        templateUrl: 'templates/profile.html',
-        controller: 'ProfileCtrl'
-      }
-    }
-  })
-  */
-
-  .state('app.login', {
-    url: '/login',
-    views: {
-      'menuContent' : {
-        templateUrl: 'templates/login.html',
-        controller: 'LoginCtrl'
-      }
-    }
-  })
-
-  .state('app.articlePost', {
-    url: '/post/article',
-    views: {
-      'menuContent': {
-        templateUrl: 'templates/articlePost.html',
-        controller: 'PostCtrl'
-      }
-    }
-  })
-
-  //TODO Remove this dead code
-  .state('app.subarticlePost', {
-    cache: false,
-    url: '/post/article/{id}',
-    views: {
-      'menuContent': {
-        templateUrl: 'templates/subarticlePost.html',
-        controller: 'PostCtrl'
-      }
-    }
   });
+
+  if(window.cordova) {
+    stateProvider.state('app.login', {
+      url: '/login',
+      views: {
+        'menuContent' : {
+          templateUrl: 'templates/login.html',
+          controller: 'LoginCtrl'
+        }
+      }
+    })
+
+    .state('app.articlePost', {
+      url: '/post/article',
+      views: {
+        'menuContent': {
+          templateUrl: 'templates/articlePost.html',
+          controller: 'PostCtrl'
+        }
+      }
+    });
+  }
 
   // if none of the above states are matched, use this as the fallback
   $urlRouterProvider.otherwise('/news/feed');
