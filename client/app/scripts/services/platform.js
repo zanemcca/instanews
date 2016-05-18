@@ -781,21 +781,67 @@ app.factory('Platform', [
     var url = {
       getQuery: function($location) {
         var query = $location.search();
+        query = { //Clone the query
+          search: query.search,
+          loc: query.loc
+        };
+
         if(query.search) {
           query.search = query.search.replace(/__/g, ',_').replace(/_/g, ' ');
         }
+
+        if(query.loc) {
+          try {
+            var coords = query.loc.split(',');
+            var pos = {
+              lat: parseFloat(coords[0]),
+              lng: parseFloat(coords[1])
+            };
+            var zoom = coords[2].slice(0,-1);
+            zoom = parseFloat(zoom);
+
+            query.loc = {
+              pos: pos,
+              zoom: zoom
+            };
+          } catch(e) {
+            console.log(e);
+            console.log(loc);
+            query.loc = null;
+          }
+        }
         return query;
       },
-      setQuery: function($location, query) {
+      setQuery: function($location, query, replace) {
+        var modified = false;
+        var q = $location.search();
         for(var key in query) {
           var val = query[key];
           if(val === '') {
             val = null;
           } else if(key === 'search') {
             val = val.replace(/\s+/gi, '_').replace(/,_/g, '__');
+          } else if(key === 'loc') {
+            if(val.pos && val.pos.lat && val.pos.lng && val.zoom) {
+              var coord = (Math.round(1e7*val.pos.lat)/1e7).toString();
+              coord += ',' + (Math.round(1e7*val.pos.lng)/1e7).toString();
+              coord += ',' + val.zoom.toString() + 'z';
+              val = coord;
+            } else {
+              console.log('Invalid location given for the query!');
+              console.log(val);
+              continue;
+            }
           }
-          $location.search(key, val);
+          if(q[key] !== val) {
+            modified = true;
+            $location.search(key, val);
+            if(replace) {
+              $location.replace();
+            }
+          }
         }
+        return modified;
       },
       getParam: function(art) {
         var removeBrackets = function(input) {
