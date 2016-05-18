@@ -122,14 +122,16 @@ app.directive('inautocomplete', [
           }
         };
 
-        $scope.set = function (prediction) {
+        $scope.set = function (prediction, doNotUpdateQuery) {
           $scope.done = true;
           console.log(prediction);
           $scope.place.value = prediction;
 
-          Platform.url.setQuery($location, {
-            search: prediction.description
-          });
+          if(!doNotUpdateQuery) {
+            Platform.url.setQuery($location, {
+              search: prediction.description
+            });
+          }
 
           $scope.input.value = '';
           $scope.input.placeholder = prediction.description;
@@ -138,14 +140,14 @@ app.directive('inautocomplete', [
 
         $scope.done = true;
 
-        $scope.search = _.debounce(function (input) {
+        $scope.search = _.debounce(function (input, locationChanged) {
           input = input || $scope.input.value;
           $scope.done = true;
           if(input && input.length > 0) {
             Maps.autocomplete(input, $scope.place, function (predictions) {
               // istanbul ignore else 
               if(predictions && predictions.length) {
-                $scope.set(predictions[0]);
+                $scope.set(predictions[0], locationChanged);
               } else {
                 console.log('Invalid location. Please try again');
               }
@@ -155,12 +157,12 @@ app.directive('inautocomplete', [
         }, 100, true);
 
         var lastSearch;
-        var checkQuery = function() {
+        var checkQuery = function(locationChanged) {
           var query = Platform.url.getQuery($location);
           if(query && query.search && query.search !== lastSearch) {
             console.log('Searching: ' + query.search);
             lastSearch = query.search;
-            $scope.search(query.search);
+            $scope.search(query.search, locationChanged);
           }
         };
 
@@ -169,7 +171,7 @@ app.directive('inautocomplete', [
         });
 
         $scope.$on('$locationChangeSuccess', function () {
-          checkQuery();
+          checkQuery(true);
         });
 
         Platform.ready
