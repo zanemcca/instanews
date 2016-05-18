@@ -122,19 +122,19 @@ app.directive('inautocomplete', [
           }
         };
 
-        $scope.set = function (prediction, doNotUpdateQuery) {
+        $scope.set = function (prediction, shouldReplace) {
           $scope.done = true;
           console.log(prediction);
-          $scope.place.value = prediction;
 
-          if(!doNotUpdateQuery) {
-            Platform.url.setQuery($location, {
-              search: prediction.description
-            });
-          }
+          $scope.place.value = prediction;
 
           $scope.input.value = '';
           $scope.input.placeholder = prediction.description;
+
+          Platform.url.setQuery($location, {
+            search: prediction.description
+          }, shouldReplace);
+
           $scope.safeApply();
         };
 

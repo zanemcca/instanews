@@ -89,14 +89,6 @@ app.directive('inmap', [
                 map.mapTypes.set(instanewsMapTypeId, instanewsMapType);
                 map.setMapTypeId(instanewsMapTypeId);
 
-                //Listener on bounds changing on the map
-                google.maps.event.addListener(map, 'bounds_changed', _.debounce(function() {
-                  if(Articles.inView) {
-                    console.log('Updating bounds');
-                    Position.setBounds(map.getBounds());
-                  }
-                }, 100));
-
                 //TODO Use this to create the localization button on the map
                 //map.controls[google.maps.ControlPosition.TOP_CENTER].push(TEMPLATE);
 
@@ -235,14 +227,19 @@ app.directive('inmap', [
       },
       controller: function(
         $element,
+        $location,
         $scope,
         $stateParams,
+        $timeout,
+        Articles,
         Maps,
-        Platform
+        Position,
+        Platform,
+        _
       ) {
         $scope.Platform = Platform;
 
-        if($scope.map.id === 'feedMap' && !$stateParams.search) {
+        if($scope.map.id === 'feedMap') {
           var options = {
             cancel: false
           };
@@ -265,13 +262,74 @@ app.directive('inmap', [
           };
           var scrollGesture = $ionicGesture.on('scroll', scrollListener, feed); 
 
+          var last = {
+            pos: {
+              lat: null,
+              lng: null
+            },
+            zoom: null
+          }
+
+          var checkQuery = function(ignore) {
+            var map = Maps.getFeedMap();
+            if(map) {
+              var query = Platform.url.getQuery($location);
+              if(query && query.loc && query.loc.pos &&
+                 (query.loc.pos.lat !== last.pos.lat || query.loc.pos.lng !== last.pos.lng || query.loc.zoom !== last.zoom)
+                ) {
+                last = query.loc;
+
+                if(!ignore) {
+                  Maps.setCenter(map, query.loc.pos);
+                  map.setZoom(query.loc.zoom);
+                }
+              }
+            }
+          };
+
+          var ignoreNextURLChange = false;
+          $scope.$on('$locationChangeSuccess', function () {
+            checkQuery(ignoreNextURLChange);
+            if(ignoreNextURLChange) {
+              ignoreNextURLChange = false;
+            }
+          });
+
+          var query = Platform.url.getQuery($location);
+
           var localize = function () {
             var map = Maps.getFeedMap();
             if(map) {
               observer.unregister();
-              Maps.localize(map, options, function(err) {
-                console.log(err);
-              });
+
+              checkQuery();
+
+              //Listener on bounds changing on the map
+              google.maps.event.addListener(map, 'bounds_changed', _.debounce(function() {
+                if(Articles.inView) {
+                  Position.setBounds(map.getBounds());
+
+                  var loc = map.getCenter();
+                  var zoom = map.getZoom();
+                  $timeout(function () {
+                    ignoreNextURLChange = Platform.url.setQuery($location, {
+                      loc: {
+                        pos: {
+                          lat: loc.lat(),
+                          lng: loc.lng(),
+                        },
+                        zoom: zoom
+                      }
+                    }, true);
+                  });
+                }
+              }, 100));
+
+              if(!query.search && !query.loc){
+                Maps.localize(map, options, function(err) {
+                  console.log(err);
+                });
+              }
             }
           };
           var observer = Maps.registerObserver(localize);
