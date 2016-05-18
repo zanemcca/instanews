@@ -779,6 +779,24 @@ app.factory('Platform', [
 
 
     var url = {
+      getQuery: function($location) {
+        var query = $location.search();
+        if(query.search) {
+          query.search = query.search.replace(/__/g, ',_').replace(/_/g, ' ');
+        }
+        return query;
+      },
+      setQuery: function($location, query) {
+        for(var key in query) {
+          var val = query[key];
+          if(val === '') {
+            val = null;
+          } else if(key === 'search') {
+            val = val.replace(/\s+/gi, '_').replace(/,_/g, '__');
+          }
+          $location.search(key, val);
+        }
+      },
       getParam: function(art) {
         var removeBrackets = function(input) {
           return input

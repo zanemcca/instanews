@@ -38,8 +38,7 @@ app.directive('inautocomplete', [
       },
       controller: function(
         $scope,
-        $location,
-        $stateParams
+        $location
       ) {
         // istanbul ignore next
         $scope.safeApply = function(fn) {
@@ -128,8 +127,9 @@ app.directive('inautocomplete', [
           console.log(prediction);
           $scope.place.value = prediction;
 
-          var place = prediction.description.replace(/\s+/gi, '_').replace(/,_/g, '__');
-          $location.search('search',place);
+          Platform.url.setQuery($location, {
+            search: prediction.description
+          });
 
           $scope.input.value = '';
           $scope.input.placeholder = prediction.description;
@@ -154,11 +154,23 @@ app.directive('inautocomplete', [
           Platform.keyboard.hide();
         }, 100, true);
 
-        //TODO Run on entry
-        if($stateParams.search) {
-          var search = $stateParams.search.replace(/__/g, ',_').replace(/_/g, ' ');
-          $scope.search(search);
-        }
+        var lastSearch;
+        var checkQuery = function() {
+          var query = Platform.url.getQuery($location);
+          if(query && query.search && query.search !== lastSearch) {
+            console.log('Searching: ' + query.search);
+            lastSearch = query.search;
+            $scope.search(query.search);
+          }
+        };
+
+        $scope.$on('afterEnter', function () {
+          checkQuery();
+        });
+
+        $scope.$on('$locationChangeSuccess', function () {
+          checkQuery();
+        });
 
         Platform.ready
         .then( function() {
