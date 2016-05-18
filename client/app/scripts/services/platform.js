@@ -806,7 +806,7 @@ app.factory('Platform', [
             };
           } catch(e) {
             console.log(e);
-            console.log(loc);
+            console.log(query.loc);
             query.loc = null;
           }
         }

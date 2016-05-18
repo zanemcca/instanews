@@ -268,7 +268,7 @@ app.directive('inmap', [
               lng: null
             },
             zoom: null
-          }
+          };
 
           var checkQuery = function(ignore) {
             var map = Maps.getFeedMap();
