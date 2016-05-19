@@ -1,4 +1,5 @@
 
+var LIMIT = 300;
 /* jshint camelcase: false */
 
 module.exports = function(app) {
@@ -20,6 +21,16 @@ console.log('Made it');
 next();
 });
 */
+
+  Comment.observe('access', function(ctx, next) {
+    //Limit the queries to LIMIT per request
+    if( !ctx.query.limit || ctx.query.limit > LIMIT) {
+      ctx.query.limit = LIMIT;
+    }
+
+    debug('observe.access', ctx);
+    next();
+  });
 
   Comment.afterRemote('prototype.__get__comments', function(ctx, instance,next){
     ctx.options = {
