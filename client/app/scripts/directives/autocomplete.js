@@ -125,6 +125,7 @@ app.directive('inautocomplete', [
         };
 
         var boundsListener;
+        var timer;
         $scope.set = function (prediction, shouldReplace) {
           $scope.done = true;
           console.log(prediction);
@@ -135,14 +136,18 @@ app.directive('inautocomplete', [
           $scope.input.placeholder = prediction.description;
 
           if($scope.searchId.indexOf('feed') > -1) {
+            if(timer) {
+              $timeout.cancel(timer);
+            }
+            if(boundsListener) {
+              google.maps.event.removeListener(boundsListener);
+            }
+
             Platform.url.setQuery($location, {
               search: prediction.description
             }, shouldReplace);
 
-            $timeout(function () {
-              if(boundsListener) {
-                google.maps.event.removeListener(boundsListener);
-              }
+            timer = $timeout(function () {
               boundsListener = google.maps.event.addListener(Maps.getFeedMap(), 'bounds_changed', function() {
                 Platform.url.setQuery($location,{ search: null });
                 google.maps.event.removeListener(boundsListener);
