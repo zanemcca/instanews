@@ -234,6 +234,7 @@ if(cluster.isMaster && numCPUs > 1 && process.env.NODE_ENV === 'production') {
   var cred = require('./conf/credentials');
   var Redis = require('ioredis');
   var kue = require('kue');
+  var sm = require('sitemap');
 
   var setupModerator = function () {
     if(['staging', 'production'].indexOf(process.env.NODE_ENV) > -1) {
@@ -491,6 +492,102 @@ if(cluster.isMaster && numCPUs > 1 && process.env.NODE_ENV === 'production') {
     }
   };
 
+  var getSitemap = function(cb) {
+    var urls = [
+      { url: '/', changefreq: 'always', priority: 0.9 },
+      { url: '/TermsOfService.html', changefreq: 'monthly', priority: 0.1 },
+      { url: '/DMCAPolicy.html', changefreq: 'monthly', priority: 0.1 },
+      { url: '/PrivacyPolicy.html', changefreq: 'monthly', priority: 0.1 }
+    ];
+
+    var featuredGeographies = [
+      'Montreal__QC__Canada',
+      'Toronto__ON__Canada',
+      'Ottawa__ON__Canada',
+      'Vancouver__BC__Canada',
+      'Calgary__AB__Canada',
+      'Edmonton__AB__Canada',
+      'Winnipeg__MB__Canada',
+      'Halifax__NS__Canada',
+      'Hamilton__ON__Canada',
+      'St._John\'s__NL__Canada',
+      'Fredericton__NB__Canada',
+      'Moncton__NB__Canada',
+      'Saint_John__NB__Canada',
+      'Kitchener-Waterloo__Waterloo_Regional_Municipality__ON__Canada',
+      'Regina__SK__Canada',
+      'Saskatoon__SK__Canada',
+      'Kingston__ON__Canada',
+      'Niagara_Falls__ON__Canada',
+      'Victoria__BC__Canada',
+      'Guelph__ON_Canada',
+      'Charlottetown__PE__Canada',
+      'London__ON__Canada',
+      'Windsor__ON__Canada',
+      'Kelowna__BC__Canada',
+      'Nanaimo__BC__Canada',
+      'Kamloops__BC__Canada',
+      'Lethbridge__AB__Canada',
+      'Thunder_Bay__ON__Canada',
+      'Sudbury__ON__Canada',
+      'Red_Deer__AB__Canada',
+      'Belleville__ON__Canada',
+      'Chatham-Kent__ON__Canada'
+    ];
+
+    for(var i in featuredGeographies) {
+      urls.push({ url: '/#/news/feed?search=' + featuredGeographies[i], changefreq: 'always', priority: 0.9 });
+    }
+
+    var getArticleParam = function(art) {
+      var removeBrackets = function(input) {
+        return input
+              .replace(/{+.*?}+/g, '')
+              .replace(/\[+.*?\]+/g, '')
+              .replace(/\(+.*?\)+/g, '')
+              .replace(/<.*?>/g, '');
+      };
+
+      var preprocess = removeBrackets(art.title);
+      var split = preprocess.split(' ');
+      var words = [];
+      for(var i in split) {
+        var wrd = split[i];
+        if(!wrd.match(/[^\w\s]/gi)) { //Words must not contain special characters
+          if(wrd.match(/^[A-Z0-9]/g)) { //Words must start with a capital letter
+            words.push(wrd);
+          }
+        }
+      }
+      words.push(art.id);
+      return words.join('-');
+    };
+
+    app.models.Article.find({ sort: 'rating DESC' }, function(err, res) {
+      if(err) {
+        console.error(err.stack);
+        var e = new Error('Internal error with sitemap generation!');
+        e.status = 503;
+        return cb(e);
+      }
+
+      for(i in res) {
+        art = res[i];
+        var url = '/#/news/article/' + getArticleParam(art);
+        urls.push({ url: url, changefreq: 'hourly', priority: art.rating, lastmod: art.modified });
+      }
+
+      sitemap = sm.createSitemap({
+        hostname: 'https://instanews.com',
+        cacheTime: 10*60*1000, //10 min cachetime
+        urls: urls
+      });
+
+      cb(null, sitemap);
+    });
+  };
+
+
   app.start = function() {
     var server;
     var httpOnly = true;
@@ -532,6 +629,17 @@ if(cluster.isMaster && numCPUs > 1 && process.env.NODE_ENV === 'production') {
 
   // Expose the Terms of Service and Privacy Policy
   app.use(loopback.static(path.resolve(__dirname + '/public')));
+
+  // Sitemap.xml generation ondemand
+  app.get('/sitemap.xml', function(req, res, next) {
+    getSitemap(function(err, sitemap) {
+      if(err) {
+        return next(err);
+      }
+      res.header('Content-Type', 'application/xml');
+      res.send(sitemap.toString());
+    });
+  });
 
   // Bootstrap the application, config ure models, datasources and middleware.
   // Sub-apps like REST API are mounted via boot scripts.

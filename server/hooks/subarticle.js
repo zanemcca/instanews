@@ -1,4 +1,5 @@
 
+var LIMIT = 300;
 var async = require('async');
 /* jshint camelcase: false */
 
@@ -29,6 +30,16 @@ module.exports = function(app) {
         console.error(err.stack);
       }
     });
+    next();
+  });
+
+  Subarticle.observe('access', function(ctx, next) {
+    //Limit the queries to LIMIT per request
+    if( !ctx.query.limit || ctx.query.limit > LIMIT) {
+      ctx.query.limit = LIMIT;
+    }
+
+    debug('observe.access', ctx);
     next();
   });
 

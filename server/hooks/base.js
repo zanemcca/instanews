@@ -63,66 +63,17 @@ module.exports = function(app) {
       }
   };
 
+  /*
   Base.observe('access', function(ctx, next) {
     //Limit the queries to LIMIT per request
     if( !ctx.query.limit || ctx.query.limit > LIMIT) {
       ctx.query.limit = LIMIT;
     }
 
-    /*
-    ctx.query.where = ctx.query.where || {};
-    //Limit the requests to be within the last two weeks
-    ctx.query.where.id = ctx.query.where.id || { gt: app.utils.objectIdWithTimestamp(Date.now() - 2 * ONE_WEEK) };
-    */
-
-    /*
-    if(ctx.query.include) {
-      if(!Array.isArray(ctx.query.include)) {
-        ctx.query.include = [ctx.query.include];
-      }
-    }
-    else {
-      ctx.query.include = [];
-    } 
-
-    ctx.options = ctx.query.options;
-    if(!(ctx.options && ctx.options.rate)) {
-      //Include any upvotes or downvotes on the object
-      var context = loopback.getCurrentContext();
-      if(context) {
-        var token = context.get('accessToken');
-        var username;
-        // istanbul ignore else 
-        if(token) {
-          username =  token.userId;
-        }
-
-        // istanbul ignore else
-        if(username) {
-          ctx.query.include.push({
-            relation: 'upVotes',
-            scope: {
-              where: {
-                username: username 
-              }
-            }
-          });
-          ctx.query.include.push({
-            relation: 'downVotes',
-            scope: {
-              where: {
-                username: username 
-              }
-            }
-          });
-        }
-      }
-    }
-   */
-
     debug('observe.access', ctx);
     next();
   });
+ */
 
   Base.observe('before save', function(ctx, next) {
     var dd = app.DD('Base', 'beforeSave');

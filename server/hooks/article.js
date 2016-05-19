@@ -5,6 +5,8 @@ var ONE_MONTH = 30*ONE_DAY; // 1 Month in millisecs
 
 var PRELOAD_LIMIT = 1; //WARNING: Changing this could break the ranking algorithm
 
+var LIMIT = 300; //Load limit
+
 /* jshint camelcase: false */
 
 var loopback = require('loopback');
@@ -198,6 +200,10 @@ module.exports = function(app) {
           delete filter.where.location;
         }
       }
+    }
+
+    if( !filter.limit || filter.limit > LIMIT) {
+      filter.limit = LIMIT;
     }
 
     ctx.args.filter = JSON.stringify(filter);

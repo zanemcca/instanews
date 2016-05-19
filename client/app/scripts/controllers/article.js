@@ -34,6 +34,8 @@ app.controller('ArticleCtrl', [
     Uploads
   ) {
 
+    $scope.id = Platform.url.getId($stateParams.id);
+
     Platform.initBackButton();
 
     $scope.Platform = Platform;
@@ -43,7 +45,7 @@ app.controller('ArticleCtrl', [
     $scope.openApp = function () {
       if(Device.isBrowser()) {
         var data = {
-          focusId: $stateParams.id,
+          focusId: $scope.id,
           focusType: 'article'
         };
         Platform.branch.viewInApp(data, function() {});
@@ -58,7 +60,7 @@ app.controller('ArticleCtrl', [
       }
     };
 
-    var Subs = Subarticles.findOrCreate($stateParams.id);
+    var Subs = Subarticles.findOrCreate($scope.id);
     $scope.Subarticles = Subs.getLoader({
       keepSync: true,
       preload: true
@@ -78,7 +80,7 @@ app.controller('ArticleCtrl', [
 
     $scope.article = {
       modelName: 'article',
-      id: $stateParams.id
+      id: $scope.id
     };
 
     var setMarker = function (map, location) {
@@ -90,10 +92,10 @@ app.controller('ArticleCtrl', [
       }
     };
 
-    var articleComments = Comments.findOrCreate('article',$stateParams.id);
+    var articleComments = Comments.findOrCreate('article',$scope.id);
 
     var afterLoaded = function () {
-      var map = Maps.getArticleMap($stateParams.id);
+      var map = Maps.getArticleMap($scope.id);
       /* istanbul ignore else */
       if(map && $scope.article.loc) { 
         setMarker(map, $scope.article.loc);
@@ -105,7 +107,7 @@ app.controller('ArticleCtrl', [
     var mapObserver = Maps.registerObserver(afterLoaded);
 
     //Scope variables
-    Articles.findById($stateParams.id ,function (article) {
+    Articles.findById($scope.id ,function (article) {
       if(!article) {
         Platform.showToast('404: The article you were looking for is missing!');
       }
@@ -119,7 +121,7 @@ app.controller('ArticleCtrl', [
     var uploadObserver;
 
     var refreshUploads = function() {
-      $scope.Uploads = Uploads.findOrCreate($stateParams.id);
+      $scope.Uploads = Uploads.findOrCreate($scope.id);
       $scope.uploads = $scope.Uploads.get();
 
       if(uploadObserver) {
@@ -149,7 +151,7 @@ app.controller('ArticleCtrl', [
 
     $scope.$on('$ionicView.unloaded', function () {
       console.log('Destroying article view!');
-      Maps.deleteArticleMap($stateParams.id);
+      Maps.deleteArticleMap($scope.id);
       $scope.Subarticles.remove();
     });
 
@@ -162,7 +164,7 @@ app.controller('ArticleCtrl', [
       $scope.map.id = 'articleMap';
       Preload.start();
       afterLoaded();
-      var map = Maps.getArticleMap($stateParams.id);
+      var map = Maps.getArticleMap($scope.id);
       if(map) {
         google.maps.event.trigger(map, 'resize');
       }
@@ -224,7 +226,7 @@ app.controller('ArticleCtrl', [
       $scope.uploadModal = modal;
       $scope.post = function (){
         disableAdd = true;
-        Post.post($scope.Uploads, $stateParams.id, function (err) {
+        Post.post($scope.Uploads, $scope.id, function (err) {
           refreshUploads();
           if(!err) {
             modal.hide();
