@@ -630,15 +630,29 @@ if(cluster.isMaster && numCPUs > 1 && process.env.NODE_ENV === 'production') {
   // Expose the Terms of Service and Privacy Policy
   app.use(loopback.static(path.resolve(__dirname + '/public')));
 
-  // Sitemap.xml generation ondemand
-  app.get('/sitemap.xml', function(req, res, next) {
-    getSitemap(function(err, sitemap) {
-      if(err) {
-        return next(err);
-      }
-      res.header('Content-Type', 'application/xml');
-      res.send(sitemap.toString());
+  if(process.env.NODE_ENV === 'production') {
+    // Sitemap.xml generation ondemand
+    app.get('/sitemap.xml', function(req, res, next) {
+      getSitemap(function(err, sitemap) {
+        if(err) {
+          return next(err);
+        }
+        res.header('Content-Type', 'application/xml');
+        res.send(sitemap.toString());
+      });
     });
+  }
+
+  app.get('/robots.txt', function(req, res, next) {
+    var rbts = 'User-agent: *\n';
+    if(process.env.NODE_ENV === 'staging') {
+      rbts += 'Disallow: /';
+    } else if (process.env.NODE_ENV === 'production') {
+      rbts += 'Disallow: /healthcheck\n';
+      rbts += 'Disallow: /api/';
+    }
+    res.type('text/plain');
+    res.send(rbts);
   });
 
   // Bootstrap the application, config ure models, datasources and middleware.
