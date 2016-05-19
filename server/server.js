@@ -574,7 +574,7 @@ if(cluster.isMaster && numCPUs > 1 && process.env.NODE_ENV === 'production') {
       for(i in res) {
         art = res[i];
         var url = '/#/news/article/' + getArticleParam(art);
-        urls.push({ url: url, changefreq: 'hourly', priority: art.rating, lastmod: art.created });
+        urls.push({ url: url, changefreq: 'hourly', priority: art.rating, lastmod: art.modified });
       }
 
       sitemap = sm.createSitemap({
