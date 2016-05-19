@@ -493,7 +493,12 @@ if(cluster.isMaster && numCPUs > 1 && process.env.NODE_ENV === 'production') {
   };
 
   var getSitemap = function(cb) {
-    var urls = [{ url: '/', changefreq: 'always', priority: 0.9 }];
+    var urls = [
+      { url: '/', changefreq: 'always', priority: 0.9 },
+      { url: '/TermsOfService.html', changefreq: 'monthly', priority: 0.1 },
+      { url: '/DMCAPolicy.html', changefreq: 'monthly', priority: 0.1 },
+      { url: '/PrivacyPolicy.html', changefreq: 'monthly', priority: 0.1 }
+    ];
 
     var featuredGeographies = [
       'Montreal__QC__Canada',
@@ -569,7 +574,7 @@ if(cluster.isMaster && numCPUs > 1 && process.env.NODE_ENV === 'production') {
       for(i in res) {
         art = res[i];
         var url = '/#/news/article/' + getArticleParam(art);
-        urls.push({ url: url, changefreq: 'hourly', priority: art.rating });
+        urls.push({ url: url, changefreq: 'hourly', priority: art.rating, lastmod: art.created });
       }
 
       sitemap = sm.createSitemap({
