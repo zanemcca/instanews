@@ -143,6 +143,7 @@ app.controller('FeedCtrl', [
       }
     });
 
+    // No Header on mobile browsers to save on space
     if(Platform.isBrowser() && Platform.isMobile() && !Platform.isTablet()) {
       $scope.$on('$ionicView.beforeEnter', function() {
         $ionicNavBarDelegate.showBar(false);
@@ -154,6 +155,7 @@ app.controller('FeedCtrl', [
 
     //Refresh the map everytime we enter the view
     $scope.$on('$ionicView.afterEnter', function() {
+      $scope.$broadcast('afterEnter');
       Articles.inView = true;
       Preload.reset();
       var map = Maps.getFeedMap();

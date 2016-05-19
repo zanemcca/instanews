@@ -31,6 +31,11 @@ app.directive('incomments', [
           keepSync: true
         });
 
+        //Preload comments if there are any
+        if($scope.owner.createCommentCount > 0) {
+          $scope.Comments.reload();
+        }
+
         $scope.$on('$destroy', function() {
           $scope.Comments.remove();
         });
@@ -79,8 +84,7 @@ app.directive('incomments', [
                   // istanbul ignore if 
                   if(err) {
                     console.log(err);
-                  }
-                  else {
+                  } else {
                     $scope.owner.createCommentCount++;
                     $scope.Comments.reload();
                   }
