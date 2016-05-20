@@ -445,6 +445,7 @@ app.factory('Platform', [
     };
 
     var analytics = {
+      ready: $q.defer(),
       init: function () {
         if(window.analytics) {
           if(Device.isAndroid()) {
@@ -479,62 +480,73 @@ app.factory('Platform', [
           window.ga('create', 'UA-74478035-2', 'auto');
           analytics.ga = window.ga;
         }
+        analytics.ready.resolve();
       },
       setUser: function (userId) {
-        if(window.analytics) {
-          window.analytics.setUserId(userId, function () {
-            console.log('Successfully set the analytics user to: ' + userId);
-          }, function(err) {
-            console.log(err.stack);
-          });
-        } else {
-          analytics.ga('set', 'userId', userId);
-        }
+        analytics.ready.promise.then(function() {
+          if(window.analytics) {
+            window.analytics.setUserId(userId, function () {
+              console.log('Successfully set the analytics user to: ' + userId);
+            }, function(err) {
+              console.log(err.stack);
+            });
+          } else {
+            analytics.ga('set', 'userId', userId);
+          }
+        });
       },
       trackView: function(name) {
-        if(window.analytics) {
-          window.analytics.trackView(name, function () {
-            console.log('Tracking: ' + name);
-          }, function(err) {
-            console.log(err.stack);
-          });
-        } else {
-          window.ga('send', 'pageview', name);
-        }
+        analytics.ready.promise.then(function() {
+          if(window.analytics) {
+            window.analytics.trackView(name, function () {
+              console.log('Tracking: ' + name);
+            }, function(err) {
+              console.log(err.stack);
+            });
+          } else {
+            window.ga('send', 'pageview', name);
+          }
+        });
       },
       trackException: function(description, isFatal) {
-        if(window.analytics) {
-          window.analytics.trackException(description, isFatal, function () {}, function(err) {
-            console.log(err.stack);
-          });
-        } else {
-          window.ga('send', 'exception', {
-            exDescription: description,
-            exFatal: isFatal
-          });
-        }
+        analytics.ready.promise.then(function() {
+          if(window.analytics) {
+            window.analytics.trackException(description, isFatal, function () {}, function(err) {
+              console.log(err.stack);
+            });
+          } else {
+            window.ga('send', 'exception', {
+              exDescription: description,
+              exFatal: isFatal
+            });
+          }
+        });
       },
       trackTiming: function(category, interval, variable, label) {
-        if(window.analytics) {
-          window.analytics.trackTiming(category, interval, variable, label, function () {
-            console.log('Tracking: ' + category + '-' + interval);
-          }, function(err) {
-            console.log(err.stack);
-          });
-        } else {
-          window.ga('send', 'timing', category, variable, interval, label);
-        }
+        analytics.ready.promise.then(function() {
+          if(window.analytics) {
+            window.analytics.trackTiming(category, interval, variable, label, function () {
+              console.log('Tracking: ' + category + '-' + interval);
+            }, function(err) {
+              console.log(err.stack);
+            });
+          } else {
+            window.ga('send', 'timing', category, variable, interval, label);
+          }
+        });
       },
       trackEvent: function(category, action, label, value) {
-        if(window.analytics) {
-          window.analytics.trackEvent(category, action, label, value, function () {
-            console.log('Tracking: ' + category + '-' + action);
-          }, function(err) {
-            console.log(err.stack);
-          });
-        } else {
-          window.ga('send', 'event', category, action, label, value);
-        }
+        analytics.ready.promise.then(function() {
+          if(window.analytics) {
+            window.analytics.trackEvent(category, action, label, value, function () {
+              console.log('Tracking: ' + category + '-' + action);
+            }, function(err) {
+              console.log(err.stack);
+            });
+          } else {
+            window.ga('send', 'event', category, action, label, value);
+          }
+        });
       }
     };
 
