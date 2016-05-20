@@ -42,6 +42,7 @@
     "pem": "^1.7.2",
     "sendgrid": "^2.0.0",
     "serve-favicon": "^2.0.1",
+    "sitemap": "^1.6.0",
     "sns-validator": "^0.2.0",
     "sprintf-js": "^1.0.3",
     "webpurify": "^1.0.0"

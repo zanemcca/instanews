@@ -447,6 +447,7 @@ app.factory('Platform', [
     };
 
     var analytics = {
+      ready: $q.defer(),
       init: function () {
         if(window.analytics) {
           if(Device.isAndroid()) {
@@ -481,62 +482,73 @@ app.factory('Platform', [
           window.ga('create', 'UA-74478035-2', 'auto');
           analytics.ga = window.ga;
         }
+        analytics.ready.resolve();
       },
       setUser: function (userId) {
-        if(window.analytics) {
-          window.analytics.setUserId(userId, function () {
-            console.log('Successfully set the analytics user to: ' + userId);
-          }, function(err) {
-            console.log(err.stack);
-          });
-        } else {
-          analytics.ga('set', 'userId', userId);
-        }
+        analytics.ready.promise.then(function() {
+          if(window.analytics) {
+            window.analytics.setUserId(userId, function () {
+              console.log('Successfully set the analytics user to: ' + userId);
+            }, function(err) {
+              console.log(err.stack);
+            });
+          } else {
+            analytics.ga('set', 'userId', userId);
+          }
+        });
       },
       trackView: function(name) {
-        if(window.analytics) {
-          window.analytics.trackView(name, function () {
-            console.log('Tracking: ' + name);
-          }, function(err) {
-            console.log(err.stack);
-          });
-        } else {
-          window.ga('send', 'pageview', name);
-        }
+        analytics.ready.promise.then(function() {
+          if(window.analytics) {
+            window.analytics.trackView(name, function () {
+              console.log('Tracking: ' + name);
+            }, function(err) {
+              console.log(err.stack);
+            });
+          } else {
+            window.ga('send', 'pageview', name);
+          }
+        });
       },
       trackException: function(description, isFatal) {
-        if(window.analytics) {
-          window.analytics.trackException(description, isFatal, function () {}, function(err) {
-            console.log(err.stack);
-          });
-        } else {
-          window.ga('send', 'exception', {
-            exDescription: description,
-            exFatal: isFatal
-          });
-        }
+        analytics.ready.promise.then(function() {
+          if(window.analytics) {
+            window.analytics.trackException(description, isFatal, function () {}, function(err) {
+              console.log(err.stack);
+            });
+          } else {
+            window.ga('send', 'exception', {
+              exDescription: description,
+              exFatal: isFatal
+            });
+          }
+        });
       },
       trackTiming: function(category, interval, variable, label) {
-        if(window.analytics) {
-          window.analytics.trackTiming(category, interval, variable, label, function () {
-            console.log('Tracking: ' + category + '-' + interval);
-          }, function(err) {
-            console.log(err.stack);
-          });
-        } else {
-          window.ga('send', 'timing', category, variable, interval, label);
-        }
+        analytics.ready.promise.then(function() {
+          if(window.analytics) {
+            window.analytics.trackTiming(category, interval, variable, label, function () {
+              console.log('Tracking: ' + category + '-' + interval);
+            }, function(err) {
+              console.log(err.stack);
+            });
+          } else {
+            window.ga('send', 'timing', category, variable, interval, label);
+          }
+        });
       },
       trackEvent: function(category, action, label, value) {
-        if(window.analytics) {
-          window.analytics.trackEvent(category, action, label, value, function () {
-            console.log('Tracking: ' + category + '-' + action);
-          }, function(err) {
-            console.log(err.stack);
-          });
-        } else {
-          window.ga('send', 'event', category, action, label, value);
-        }
+        analytics.ready.promise.then(function() {
+          if(window.analytics) {
+            window.analytics.trackEvent(category, action, label, value, function () {
+              console.log('Tracking: ' + category + '-' + action);
+            }, function(err) {
+              console.log(err.stack);
+            });
+          } else {
+            window.ga('send', 'event', category, action, label, value);
+          }
+        });
       }
     };
 
@@ -892,6 +904,107 @@ app.factory('Platform', [
       }
     };
 
+
+    var url = {
+      getQuery: function($location) {
+        var query = $location.search();
+        query = { //Clone the query
+          search: query.search,
+          loc: query.loc
+        };
+
+        if(query.search) {
+          query.search = query.search.replace(/__/g, ',_').replace(/_/g, ' ');
+        }
+
+        if(query.loc) {
+          try {
+            var coords = query.loc.split(',');
+            var pos = {
+              lat: parseFloat(coords[0]),
+              lng: parseFloat(coords[1])
+            };
+            var zoom = coords[2].slice(0,-1);
+            zoom = parseFloat(zoom);
+
+            query.loc = {
+              pos: pos,
+              zoom: zoom
+            };
+          } catch(e) {
+            console.log(e);
+            console.log(query.loc);
+            query.loc = null;
+          }
+        }
+        return query;
+      },
+      setQuery: function($location, query, replace) {
+        var modified = false;
+        var q = $location.search();
+        for(var key in query) {
+          var val = query[key];
+          if(val === '' || val === null) {
+            val = null;
+          } else if(key === 'search') {
+            val = val.replace(/\s+/gi, '_').replace(/,_/g, '__');
+          } else if(key === 'loc') {
+            if(val.pos && val.pos.lat && val.pos.lng && val.zoom) {
+              var coord = (Math.round(1e7*val.pos.lat)/1e7).toString();
+              coord += ',' + (Math.round(1e7*val.pos.lng)/1e7).toString();
+              coord += ',' + val.zoom.toString() + 'z';
+              val = coord;
+            } else {
+              console.log('Invalid location given for the query!');
+              console.log(val);
+              continue;
+            }
+          }
+          if(q[key] !== val) {
+            modified = true;
+            $location.search(key, val);
+            if(replace) {
+              $location.replace();
+            }
+          }
+        }
+        return modified;
+      },
+      getParam: function(art) {
+        var removeBrackets = function(input) {
+          return input
+                .replace(/{+.*?}+/g, '')
+                .replace(/\[+.*?\]+/g, '')
+                .replace(/\(+.*?\)+/g, '')
+                .replace(/<.*?>/g, '');
+        };
+
+        var preprocess = removeBrackets(art.title);
+        var split = preprocess.split(' ');
+        var words = [];
+        for(var i in split) {
+          var wrd = split[i];
+          if(!wrd.match(/[^\w\s]/gi)) { //Words must not contain special characters
+            if(wrd.match(/^[A-Z0-9]/g)) { //Words must start with a capital letter
+              words.push(wrd);
+            }
+          }
+        }
+        words.push(art.id);
+        return words.join('-');
+      },
+      getId: function(param) {
+        if(param) {
+          var split = param.split('-');
+          if(split.length) {
+            return split[split.length -1];
+          }
+        }
+        console.log('Param is empty!');
+        return '';
+      }
+    };
+
     var numToString = function(num) {
       num = num || this.number;
       if(!num || num < 0) {
@@ -1071,6 +1184,7 @@ app.factory('Platform', [
       setDeviceToken: Device.setDeviceToken,
       getSizeClassPrefix: Device.getSizeClassPrefix,
       //All of the above should be deprecated out of platform
+      url: url,
       permissions: permissions,
       support: support,
       analytics: analytics,

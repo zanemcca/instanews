@@ -102,7 +102,17 @@ app.service('Navigate', [
             Platform.loading.hide();
           });
         }
-      } else if(current.stateName === state && (!params.id || params.id === current.stateParams.id)) {
+      } else if(current.stateName === state) {
+        if(params.id){ 
+          var id = Platform.url.getId(params.id);
+          var currId = Platform.url.getId(current.stateParams.id);
+
+          if(id !== currId) {
+            $state.go(state, params);
+            return;
+          }
+        }
+
         console.log('Not navigating to the same state!');
         Platform.loading.hide();
       } else {
