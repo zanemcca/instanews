@@ -2,7 +2,6 @@
 var app = angular.module('instanews.controller.post', ['ionic', 'ngResource', 'uuid']);
 
 app.controller('PostCtrl', [
-  '$stateParams',
   '$scope',
   '$timeout',
   '$ionicModal',
@@ -15,7 +14,6 @@ app.controller('PostCtrl', [
   'User',
   'Uploads',
   function(
-    $stateParams,
     $scope,
     $timeout,
     $ionicModal,

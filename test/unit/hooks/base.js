@@ -81,7 +81,8 @@ exports.run = function () {
           expect(next.calledOnce).to.be.true;
         });
 
-        describe('ctx.query.limit', function () {
+        //TODO Move this into subarticle and comments and on Article.find
+        describe.skip('ctx.query.limit', function () {
           it('should reduce the limit to the maximum', function () {
             ctx.query.limit = 5000;
             run();

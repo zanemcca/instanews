@@ -89,46 +89,10 @@ app.directive('inmap', [
                 map.mapTypes.set(instanewsMapTypeId, instanewsMapType);
                 map.setMapTypeId(instanewsMapTypeId);
 
-
-                //Listener on bounds changing on the map
-                google.maps.event.addListener(map, 'bounds_changed', _.debounce(function() {
-                  if(Articles.inView) {
-                    console.log('Updating bounds');
-                    Position.setBounds(map.getBounds());
-                  }
-                }, 100));
-
                 //TODO Use this to create the localization button on the map
                 //map.controls[google.maps.ControlPosition.TOP_CENTER].push(TEMPLATE);
 
                 Maps.setFeedMap(map);
-
-                var options = {
-                  cancel: false
-                };
-
-                var event = 'touch';
-                if(Platform.isBrowser() && !Platform.isMobile()) {
-                  event = 'mousedown';
-                }
-
-                var mapListener = function() {
-                  options.cancel = true;
-                  $ionicGesture.off(mapGesture, event, mapListener);
-                };
-                var mapGesture = $ionicGesture.on(event, mapListener, elem); 
-
-                var feed = angular.element(document.getElementById('feed'));
-                var scrollListener = function() {
-                  options.cancel = true;
-                  $ionicGesture.off(scrollGesture, 'scroll', scrollListener);
-                };
-                var scrollGesture = $ionicGesture.on('scroll', scrollListener, feed); 
-
-                Maps.localize(map, options, function(err) {
-                  console.log(err);
-                });
-
                 break;
               }
               case 'postMap': {
@@ -177,9 +141,11 @@ app.directive('inmap', [
               }
               case 'articleMap': {
                 // istanbul ignore else
+                var id = '';
                 if ( $stateParams.id) {
                   scope.article = {};
-                  Articles.findById($stateParams.id, function(article) {
+                  id = Platform.url.getId($stateParams.id);
+                  Articles.findById(id, function(article) {
                     scope.article = article;
                     if(article) {
                       mapOptions.center = new google.maps.LatLng(scope.article.loc.coordinates[1], scope.article.loc.coordinates[0]);
@@ -234,7 +200,7 @@ app.directive('inmap', [
                   }
                 }, 50));
 
-                Maps.setArticleMap(map, $stateParams.id);
+                Maps.setArticleMap(map, id);
 
                 break;
               }
@@ -260,10 +226,115 @@ app.directive('inmap', [
         }
       },
       controller: function(
+        $element,
+        $location,
         $scope,
-        Platform
+        $stateParams,
+        $timeout,
+        Articles,
+        Maps,
+        Position,
+        Platform,
+        _
       ) {
         $scope.Platform = Platform;
+
+        if($scope.map.id === 'feedMap') {
+          var options = {
+            cancel: false
+          };
+
+          var event = 'touch';
+          if(Platform.isBrowser() && !Platform.isMobile()) {
+            event = 'mousedown';
+          }
+
+          var mapListener = function() {
+            options.cancel = true;
+            $ionicGesture.off(mapGesture, event, mapListener);
+          };
+          var mapGesture = $ionicGesture.on(event, mapListener, $element); 
+
+          var feed = angular.element(document.getElementById('feed'));
+          var scrollListener = function() {
+            options.cancel = true;
+            $ionicGesture.off(scrollGesture, 'scroll', scrollListener);
+          };
+          var scrollGesture = $ionicGesture.on('scroll', scrollListener, feed); 
+
+          var last = {
+            pos: {
+              lat: null,
+              lng: null
+            },
+            zoom: null
+          };
+
+          var checkQuery = function(ignore) {
+            var map = Maps.getFeedMap();
+            if(map) {
+              var query = Platform.url.getQuery($location);
+              if(query && query.loc && query.loc.pos &&
+                 (query.loc.pos.lat !== last.pos.lat || query.loc.pos.lng !== last.pos.lng || query.loc.zoom !== last.zoom)
+                ) {
+                last = query.loc;
+
+                if(!ignore) {
+                  Maps.setCenter(map, query.loc.pos);
+                  map.setZoom(query.loc.zoom);
+                }
+              }
+            }
+          };
+
+          var ignoreNextURLChange = false;
+          $scope.$on('$locationChangeSuccess', function () {
+            checkQuery(ignoreNextURLChange);
+            if(ignoreNextURLChange) {
+              ignoreNextURLChange = false;
+            }
+          });
+
+          var query = Platform.url.getQuery($location);
+
+          var localize = function () {
+            var map = Maps.getFeedMap();
+            if(map) {
+              observer.unregister();
+
+              checkQuery();
+
+              //Listener on bounds changing on the map
+              google.maps.event.addListener(map, 'bounds_changed', _.debounce(function() {
+                if(Articles.inView) {
+                  Position.setBounds(map.getBounds());
+
+                  var loc = map.getCenter();
+                  var zoom = map.getZoom();
+                  $timeout(function () {
+                    ignoreNextURLChange = Platform.url.setQuery($location, {
+                      loc: {
+                        pos: {
+                          lat: loc.lat(),
+                          lng: loc.lng(),
+                        },
+                        zoom: zoom
+                      }
+                    }, true);
+                  });
+                }
+              }, 100));
+
+              if(!query.search && !query.loc){
+                Maps.localize(map, options, function(err) {
+                  console.log(err);
+                });
+              }
+            }
+          };
+          var observer = Maps.registerObserver(localize);
+          localize();
+        }
       },
       templateUrl: 'templates/directives/map.html'
     };

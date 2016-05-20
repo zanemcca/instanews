@@ -282,7 +282,6 @@ angular.module('instanews', [
     }
   }); 
 
-  //No transitions for performance
   //$ionicConfigProvider.views.transition('none');
 
   //Setup back button to not have text
@@ -296,17 +295,19 @@ angular.module('instanews', [
   // Learn more here: https://github.com/angular-ui/ui-router
   // Set up the various states which the app can be in.
   // Each state's controller can be found in controllers.js
-  $stateProvider
+  var stateProvider = $stateProvider
 
   .state('app', {
-    url:'/app',
+    url:'/news',
     abstract: true,
     templateUrl: 'templates/menu.html',
     controller: 'AppCtrl'
   })
 
   .state('app.feed', {
-    url:'/feed',
+    url: '/feed',
+    //url:'/feed?search',
+    //reloadOnSearch: false,
     views: {
       'menuContent' : {
         templateUrl: 'templates/feed.html',
@@ -316,71 +317,38 @@ angular.module('instanews', [
   })
 
   .state('app.article', {
-    url: '/articles/{id}',
+    url: '/article/{id}',
     views: {
       'menuContent' : {
         templateUrl: 'templates/article.html',
         controller: 'ArticleCtrl'
       }
     }
-  })
-
-  /*
-  .state('app.notif', {
-    cache: false,
-    url: '/notif/{id}',
-    views: {
-      'menuContent' : {
-        templateUrl: 'templates/notif.html',
-        controller: 'NotificationCtrl'
-      }
-    }
-  })
-
-  .state('app.profile', {
-    url:'/profile/{username}',
-    views: {
-      'menuContent' : {
-        templateUrl: 'templates/profile.html',
-        controller: 'ProfileCtrl'
-      }
-    }
-  })
-  */
-
-  .state('app.login', {
-    url: '/login',
-    views: {
-      'menuContent' : {
-        templateUrl: 'templates/login.html',
-        controller: 'LoginCtrl'
-      }
-    }
-  })
-
-  .state('app.articlePost', {
-    url: '/post/article',
-    views: {
-      'menuContent': {
-        templateUrl: 'templates/articlePost.html',
-        controller: 'PostCtrl'
-      }
-    }
-  })
-
-  //TODO Remove this dead code
-  .state('app.subarticlePost', {
-    cache: false,
-    url: '/post/article/{id}',
-    views: {
-      'menuContent': {
-        templateUrl: 'templates/subarticlePost.html',
-        controller: 'PostCtrl'
-      }
-    }
   });
 
+  if(window.cordova) {
+    stateProvider.state('app.login', {
+      url: '/login',
+      views: {
+        'menuContent' : {
+          templateUrl: 'templates/login.html',
+          controller: 'LoginCtrl'
+        }
+      }
+    })
+
+    .state('app.articlePost', {
+      url: '/post/article',
+      views: {
+        'menuContent': {
+          templateUrl: 'templates/articlePost.html',
+          controller: 'PostCtrl'
+        }
+      }
+    });
+  }
+
   // if none of the above states are matched, use this as the fallback
-  $urlRouterProvider.otherwise('/app/feed');
+  $urlRouterProvider.otherwise('/news/feed');
 
 });

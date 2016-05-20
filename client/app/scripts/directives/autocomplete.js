@@ -37,9 +37,11 @@ app.directive('inautocomplete', [
         place: '='
       },
       controller: function(
-        $scope
+        $scope,
+        $timeout,
+        $location,
+        Maps
       ) {
-
         // istanbul ignore next
         $scope.safeApply = function(fn) {
           var phase = this.$root.$$phase;
@@ -122,32 +124,75 @@ app.directive('inautocomplete', [
           }
         };
 
-        $scope.set = function (prediction) {
+        var boundsListener;
+        var timer;
+        $scope.set = function (prediction, shouldReplace) {
           $scope.done = true;
           console.log(prediction);
+
           $scope.place.value = prediction;
+
           $scope.input.value = '';
           $scope.input.placeholder = prediction.description;
+
+          if($scope.searchId.indexOf('feed') > -1) {
+            if(timer) {
+              $timeout.cancel(timer);
+            }
+            if(boundsListener) {
+              google.maps.event.removeListener(boundsListener);
+            }
+
+            Platform.url.setQuery($location, {
+              search: prediction.description
+            }, shouldReplace);
+
+            timer = $timeout(function () {
+              boundsListener = google.maps.event.addListener(Maps.getFeedMap(), 'bounds_changed', function() {
+                Platform.url.setQuery($location,{ search: null });
+                google.maps.event.removeListener(boundsListener);
+              });
+            }, 5000);
+          }
+
           $scope.safeApply();
         };
 
         $scope.done = true;
 
-        $scope.search = _.debounce(function () {
+        $scope.search = _.debounce(function (input, locationChanged) {
+          input = input || $scope.input.value;
           $scope.done = true;
-          if($scope.input.value && $scope.input.value.length > 0) {
-            Maps.autocomplete($scope.input.value, $scope.place, function (predictions) {
+          if(input && input.length > 0) {
+            Maps.autocomplete(input, $scope.place, function (predictions) {
               // istanbul ignore else 
               if(predictions && predictions.length) {
-                $scope.set(predictions[0]);
+                $scope.set(predictions[0], locationChanged);
               } else {
                 console.log('Invalid location. Please try again');
               }
             });
           }
-
           Platform.keyboard.hide();
         }, 100, true);
+
+        var lastSearch;
+        var checkQuery = function(locationChanged) {
+          var query = Platform.url.getQuery($location);
+          if(query && query.search && query.search !== lastSearch) {
+            console.log('Searching: ' + query.search);
+            lastSearch = query.search;
+            $scope.search(query.search, locationChanged);
+          }
+        };
+
+        $scope.$on('afterEnter', function () {
+          checkQuery();
+        });
+
+        $scope.$on('$locationChangeSuccess', function () {
+          checkQuery(true);
+        });
 
 
         Platform.ready

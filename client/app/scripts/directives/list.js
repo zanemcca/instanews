@@ -187,8 +187,9 @@ app.directive('inListItem', [
         var newText = '';
         if($scope.item.modelName === 'article') {
           $scope.openArticle = function () {
+            var id = Platform.url.getParam($scope.item);
             //TODO Change to use Navigate
-            $state.go('app.article', { id: $scope.item.id });
+            $state.go('app.article', { id: id });
           };
 
           var newTitle = '';
