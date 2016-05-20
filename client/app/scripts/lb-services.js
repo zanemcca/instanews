@@ -2368,6 +2368,41 @@ module.factory(
 
         /**
          * @ngdoc method
+         * @name lbServices.Share#prototype$__get__clickable
+         * @methodOf lbServices.Share
+         *
+         * @description
+         *
+         * Fetches belongsTo relation clickable.
+         *
+         * @param {Object=} parameters Request parameters.
+         *
+         *  - `id` – `{*}` - click id
+         *
+         *  - `refresh` – `{boolean=}` - 
+         *
+         * @param {function(Object,Object)=} successCb
+         *   Success callback with two arguments: `value`, `responseHeaders`.
+         *
+         * @param {function(Object)=} errorCb Error callback with one argument:
+         *   `httpResponse`.
+         *
+         * @returns {Object} An empty reference that will be
+         *   populated with the actual data once the response is returned
+         *   from the server.
+         *
+         * <em>
+         * (The remote method definition does not provide any description.
+         * This usually means the response is a `Share` object.)
+         * </em>
+         */
+        "prototype$__get__clickable": {
+          url: urlBase + "/shares/:id/clickable",
+          method: "GET"
+        },
+
+        /**
+         * @ngdoc method
          * @name lbServices.Share#create
          * @methodOf lbServices.Share
          *
