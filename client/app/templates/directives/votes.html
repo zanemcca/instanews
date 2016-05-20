@@ -17,8 +17,7 @@
     </button>
     <button ng-if="(votable.commentableType !== 'comment' && votable.modelName !== 'comment')"
       style="float: right;border:0;margin:0;"
-      class="item button button-clear button-small ion-android-share"
-      ng-class="votable.shared ? 'button-positive' : 'button-stable'"
+      class="item button button-clear button-positive button-small ion-android-share"
       ng-style="{'font-weight': votable.shared ? 'bold' : 'normal'}"
       ng-click="share()">
          {{Platform.numToString(votable.shareCount)}}

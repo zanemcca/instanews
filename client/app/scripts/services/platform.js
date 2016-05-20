@@ -684,9 +684,11 @@ app.factory('Platform', [
                     var err = new Error('invalid topsubarticle!');
                     cb(err);
                   }
+                } else {
+                  opts = {};
                 }
                 opts.title = item.title;
-                url += '/#/app/articles/' + item.id;
+                url += '/#/news/article/' + item.id;
                 break;
               case 'subarticle':
                 opts = processSubarticle(item);
@@ -694,7 +696,7 @@ app.factory('Platform', [
                   var er = new Error('invalid subarticle!');
                   cb(er);
                 }
-                url += '/#/app/articles/' + item.parentId;
+                url += '/#/news/article/' + item.parentId;
                 //TODO Maybe we should include the article title
                 break;
               default:
@@ -712,50 +714,34 @@ app.factory('Platform', [
 
             console.log(url);
             Branch.createBranchUniversalObject(opts).then(function(obj) {
-              //obj.generateShortUrl({
+              var responded = false;
+
+              obj.onShareSheetDismissed(function () {
+                if(!responded) {
+                  var e = new Error('Cancelled share');
+                  cb(e);
+                }
+              });
+
+              obj.onLinkShareResponse(function (res) {
+                responded = true;
+                if(res.sharedLink) {
+                  res.targetUrl = url;
+                  cb(null, res);
+                } else {
+                  var e = new Error('Failed share');
+                  cb(e);
+                }
+              });
+
               obj.showShareSheet({
                 feature: 'share',
-                channel: 'share'
+                //channel: 'share'
               }, {
                 '$desktop_url': url,
                 '$fallback_url': url
               }, 'Check this out');
-              //TODO Get callbacks working
 
-              /*
-              }).then(function(res) {
-                console.log(res.url);
-
-                var options = {
-                  url: res.url,
-                  message: opts.contentDescription,
-                  subject: opts.title,
-                  chooserTitle: 'Pick an app'
-                }
-                if(opts.contentImageUrl) {
-                  options.files = [opts.contentImageUrl];
-                }
-
-                //TODO Use this once we get v5.1.0 for cordova-plugin-x-socialsharing
-                window.plugins.socialsharing.shareWithOptions(options, function(res) {
-                  console.log(res);
-                  if(res.completed || res.app.length > 0) {
-                    cb(null, options);
-                  } else {
-                    var e = new Error('Cancelled share');
-                    cb(e);
-                  }
-                }, function(err) {
-                  console.log('Failed to share');
-                  console.log(err);
-                  cb(err);
-                });
-              }, function(err) {
-                console.log('Failed to generateShortUrl');
-                console.log(err);
-                cb(err);
-              });
-             */
             }, function(err) {
               console.log('Failed to create BranchUniversalObject');
               console.log(err);
