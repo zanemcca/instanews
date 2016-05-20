@@ -43,15 +43,8 @@ app.directive('invotes', [
 
           var update = function () {
             $timeout(function () {
-              $scope.votable.shares = Shares.find($scope.votable);
               $scope.votable.upVotes = Votes.up.find($scope.votable);
               $scope.votable.downVotes = Votes.down.find($scope.votable);
-
-              if($scope.votable.shares.length) {
-                $scope.votable.shared = true;
-              } else {
-                $scope.votable.shared = false;
-              }
 
               if($scope.votable.upVotes.length) {
                 $scope.votable.upVoted = true;
@@ -67,7 +60,6 @@ app.directive('invotes', [
           };
 
           update();
-          Shares.registerObserver(update);
           Votes.up.registerObserver(update);
           Votes.down.registerObserver(update);
 
@@ -122,14 +114,12 @@ app.directive('invotes', [
 
                 var user = User.get();
                 if(user) {
-                  if(!$scope.votable.shared) {
-                    $scope.votable.shareCount++;
-                    $scope.votable.shared = true;
-                  }
 
                   var position = Position.getPosition();
                   var share = {
-                    url: res.url,
+                    sharedUrl: res.sharedLink,
+                    targetUrl: res.targetUrl, 
+                    channel: res.sharedChannel,
                     clickableId: $scope.votable.id,
                     clickableType: $scope.votable.modelName
                   };
@@ -147,10 +137,9 @@ app.directive('invotes', [
                   .then(
                     function(res) {
                       if(res) {
-                        Shares.add(res);
+                        $scope.votable.shareCount++;
                       }
                       console.log('Successfully shared');
-                      Shares.reload();
                     }, 
                     // istanbul ignore  next 
                     function(err) {
@@ -176,17 +165,18 @@ app.directive('invotes', [
             viewInApp(function () {
               Navigate.ensureLogin( function (noLoginNeeded) {
                 if(noLoginNeeded) {
+                  //TODO Move this into the callback to get rid of negative vote count issue
                   var destroying = false;
-                    if($scope.votable.upVoted) {
-                      //UpVote.create will toggle the vote if it already exists
-                      Votes.up.remove($scope.votable);
-                      $scope.votable.upVoteCount--;
-                      $scope.votable.upVoted = false;
-                      destroying = true;
-                    } else {
-                      $scope.votable.upVoteCount++;
-                      $scope.votable.upVoted = true;
-                    }
+                  if($scope.votable.upVoted) {
+                    //UpVote.create will toggle the vote if it already exists
+                    Votes.up.remove($scope.votable);
+                    $scope.votable.upVoteCount--;
+                    $scope.votable.upVoted = false;
+                    destroying = true;
+                  } else {
+                    $scope.votable.upVoteCount++;
+                    $scope.votable.upVoted = true;
+                  }
 
                   if($scope.votable.downVoted) {
                     Votes.down.remove($scope.votable);
