@@ -205,7 +205,8 @@ app.controller('LoginCtrl', [
             }, user);
           }, function (err) {
             Platform.loading.hide();
-            Platform.analytics.trackEvent('Login', 'error', 'status', err.status);
+            Platform.analytics.trackEvent('Login', 'error');
+            Platform.analytics.trackException(err.message || (err.data && err.data.message), false);
             Platform.showAlert('There was an unknown error while logging in', 'Please try again');
             console.log(err);
           });
@@ -216,7 +217,9 @@ app.controller('LoginCtrl', [
           $scope.invalidLogin = true;
           $scope.cred.password = '';
 
-          Platform.analytics.trackEvent('Login', 'error', 'status', err.status);
+          //Platform.analytics.trackEvent('Login', 'error', 'status', err.status);
+          Platform.analytics.trackEvent('Login', 'error');
+          Platform.analytics.trackException(err.message || (err.data && err.data.message), false);
           Platform.loading.hide();
           if(err) {
             console.log(err);
@@ -267,7 +270,9 @@ app.controller('LoginCtrl', [
         }, function (err) {
           console.log(err);
           Platform.loading.hide();
-          Platform.analytics.trackEvent('Login', 'error', 'status', err.status);
+          Platform.analytics.trackEvent('Login', 'error');
+          Platform.analytics.trackException(err.message || (err.data && err.data.message), false);
+          //Platform.analytics.trackEvent('Login', 'error', 'status', err.status);
           Platform.showAlert('There is no user with the given username or email' , 'Invalid Username');
         });
       }; 
@@ -286,7 +291,9 @@ app.controller('LoginCtrl', [
           console.log(err);
           $scope.invalid.token = true;
           Platform.loading.hide();
-          Platform.analytics.trackEvent('Verify', 'error', 'status', err.status);
+          Platform.analytics.trackEvent('Verify', 'error');
+          Platform.analytics.trackException(err.message || (err.data && err.data.message), false);
+          //Platform.analytics.trackEvent('Verify', 'error', 'status', err.status);
           Platform.showAlert('The token you entered is invalid. Please try again', 'Invalid Token');
         });
       };
@@ -356,7 +363,9 @@ app.controller('LoginCtrl', [
         }, function (err) {
           console.log(err);
           Platform.loading.hide();
-          Platform.analytics.trackEvent('ResetPassword', 'error', 'status', err.status);
+          Platform.analytics.trackEvent('ResetPassword', 'error');
+          Platform.analytics.trackException(err.message || (err.data && err.data.message), false);
+          //Platform.analytics.trackEvent('ResetPassword', 'error', 'status', err.status);
           Platform.showAlert('Failed to send the reset code. Please try again');
         });
       };
@@ -406,7 +415,9 @@ app.controller('LoginCtrl', [
           }, function (err) {
             console.log(err);
             Platform.loading.hide();
-            Platform.analytics.trackEvent('ResetPassword', 'error', 'status', err.status);
+            Platform.analytics.trackEvent('ResetPassword', 'error');
+            Platform.analytics.trackException(err.message || (err.data && err.data.message), false);
+            //Platform.analytics.trackEvent('ResetPassword', 'error', 'status', err.status);
             Platform.showAlert('There was an error resetting your password. Please try again');
           });
         }
@@ -497,7 +508,9 @@ app.controller('LoginCtrl', [
                       function(err) {
                         console.log(err);
                         Platform.loading.hide();
-                        Platform.analytics.trackEvent('Signup', 'error', 'status', err.status);
+                        Platform.analytics.trackEvent('Signup', 'error');
+                        Platform.analytics.trackException(err.message || (err.data && err.data.message), false);
+                        //Platform.analytics.trackEvent('Signup', 'error', 'status', err.status);
                         if([403, 422].indexOf(err.status) > -1) {
                           Platform.showAlert((err.data && err.data.message) || 'There was an error with your credentials', 'Please try again');
                         } else {
@@ -509,7 +522,9 @@ app.controller('LoginCtrl', [
                   /* istanbul ignore next */
                   function(err) {
                     Platform.loading.hide();
-                    Platform.analytics.trackEvent('Signup', 'error', 'status', err.status);
+                    Platform.analytics.trackEvent('Signup', 'error');
+                    Platform.analytics.trackException(err.message || (err.data && err.data.message), false);
+                    //Platform.analytics.trackEvent('Signup', 'error', 'status', err.status);
                     Platform.showAlert('There was an unknown error while signing up', 'Please try again');
                     console.log(err);
                   });
@@ -518,7 +533,9 @@ app.controller('LoginCtrl', [
               /* istanbul ignore next */
               function(err) {
                 Platform.loading.hide();
-                Platform.analytics.trackEvent('Signup', 'error', 'status', err.status);
+                Platform.analytics.trackEvent('Signup', 'error');
+                Platform.analytics.trackException(err.message || (err.data && err.data.message), false);
+                //Platform.analytics.trackEvent('Signup', 'error', 'status', err.status);
                 Platform.showAlert('There was an unknown error while signing up', 'Please try again');
                 console.log(err);
               });
