@@ -58,6 +58,7 @@ app.factory('Platform', [
   '$q',
   'Device',
   'Dialog',
+  'ENV',
   function(
     $cordovaDevice,
     $cordovaDialogs,
@@ -67,7 +68,8 @@ app.factory('Platform', [
     $ionicNavBarDelegate,
     $q,
     Device,
-    Dialog
+    Dialog,
+    ENV
   ) {
 
     var ready = $q.defer();
@@ -644,6 +646,119 @@ app.factory('Platform', [
           // Call the callback when on a device
           branch.viewInApp = function(data, cb) {
             cb();
+          };
+
+          branch.share = function(item, cb) {
+
+            var processSubarticle = function(sub) {
+              var opts = {};
+              if(sub.text) {
+                opts.contentDescription = sub.text;
+              } else if(sub._file) {
+                opts.contentDescription = sub._file.caption;
+                if(sub._file.type.indexOf('video') > -1) {
+                  opts.contentImageUrl = ENV.videoEndpoint + '/' + sub._file.poster;
+                } else {
+                  var order = ['thumbnail', 'XS', 'S', 'M', 'L', 'XL'];
+                  var prefix;
+                  var max = -1;
+                  for(var i in sub._file.sources) {
+                    var src = sub._file.sources[i];
+                    var idx = order.indexOf(src.prefix);
+                    if(idx > max) {
+                      max = idx;
+                      prefix = src.prefix;
+                    }
+                  }
+                  if(!prefix) {
+                    console.log('prefix is broken!');
+                    console.log(sub);
+                    return;
+                  }
+                  opts.contentImageUrl = ENV.photoEndpoint + '/' + prefix + '-' + sub._file.name;
+                }
+              } else {
+                console.log('Subarticle is broken!');
+                console.log(sub);
+                return;
+              }
+              return opts;
+            };
+
+            var opts;
+            var url = ENV.url; 
+
+            switch(item.modelName) {
+              case 'article':
+                if(item.topSubarticle) {
+                  opts = processSubarticle(item.topSubarticle);
+                  if(!opts) {
+                    var err = new Error('invalid topsubarticle!');
+                    cb(err);
+                  }
+                } else {
+                  opts = {};
+                }
+                opts.title = item.title;
+                url += '/news/article/' + item.id;
+                break;
+              case 'subarticle':
+                opts = processSubarticle(item);
+                if(!opts) {
+                  var er = new Error('invalid subarticle!');
+                  cb(er);
+                }
+                url += '/news/article/' + item.parentId;
+                //TODO Maybe we should include the article title
+                break;
+              default:
+                var e = new Error('Cannot share ' + item.modelName + ' types');
+                cb(e);
+            }
+
+            opts.contentIndexingMode = 'public';
+            opts.contentMetadata = {
+              focusId: item.id,
+              focusType: item.modelName
+            };
+
+            opts.canonicalIdentifier = item.modelName + '/' + item.id;
+
+            Branch.createBranchUniversalObject(opts).then(function(obj) {
+              var responded = false;
+
+              obj.onShareSheetDismissed(function () {
+                if(!responded) {
+                  var e = new Error('Cancelled share');
+                  e.status = 200;
+                  cb(e);
+                }
+              });
+
+              obj.onLinkShareResponse(function (res) {
+                responded = true;
+                if(res.sharedLink) {
+                  res.targetUrl = url;
+                  cb(null, res);
+                } else {
+                  var e = new Error('Failed share');
+                  cb(e);
+                }
+              });
+
+              obj.showShareSheet({
+                feature: 'share',
+                //channel: 'share'
+              }, {
+                '$desktop_url': url,
+                '$fallback_url': url
+              }, 'Check this out');
+
+            }, function(err) {
+              console.log('Failed to create BranchUniversalObject');
+              console.log(err);
+              cb(err);
+            });
           };
         }
       }

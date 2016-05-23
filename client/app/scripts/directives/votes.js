@@ -11,6 +11,9 @@ app.directive('invotes', [
   'Navigate',
   'Platform',
   'Position',
+  'Share',
+  'Shares',
+  'User',
   '_',
   function (
     $timeout,
@@ -21,6 +24,9 @@ app.directive('invotes', [
     Navigate,
     Platform,
     Position,
+    Share,
+    Shares,
+    User,
     _
   ) {
 
@@ -33,6 +39,7 @@ app.directive('invotes', [
 
           $scope.Platform = Platform;
           $scope.Comments = Comments.findOrCreate($scope.votable.modelName, $scope.votable.id) || {};
+          $scope.votable.shareCount = $scope.votable.shareCount || 0;
 
           var update = function () {
             $timeout(function () {
@@ -95,6 +102,67 @@ app.directive('invotes', [
            */
           }, 500, true);
 
+
+          $scope.share = _.debounce(function () {
+            //TODO Create a browser friendly share sheet and then enable for browser as well
+            viewInApp(function () {
+              Platform.analytics.trackEvent('Share', 'start');
+              Platform.branch.share($scope.votable, function(err, res) {
+                if(err) {
+                  if(err.status === 200) {
+                    Platform.analytics.trackEvent('Share', 'cancelled');
+                  } else {
+                    Platform.analytics.trackEvent('Share', 'error');
+                    Platform.analytics.trackException(err.message, false);
+                  }
+                  console.log(err.stack);
+                  return;
+                }
+
+                var user = User.get();
+                if(user) {
+
+                  var position = Position.getPosition();
+                  var share = {
+                    sharedUrl: res.sharedLink,
+                    targetUrl: res.targetUrl, 
+                    channel: res.sharedChannel,
+                    clickableId: $scope.votable.id,
+                    clickableType: $scope.votable.modelName
+                  };
+
+                  // istanbul ignore else 
+                  if(position) {
+                    share.location = {
+                      type: 'Point',
+                      coordinates: [ position.coords.longitude, position.coords.latitude]
+                    };
+                  }
+
+                  Share.create(share)
+                  .$promise
+                  .then(
+                    function(res) {
+                      Platform.analytics.trackEvent('Share', 'success');
+                      if(res) {
+                        $scope.votable.shareCount++;
+                      }
+                      console.log('Successfully shared');
+                    }, 
+                    // istanbul ignore  next 
+                    function(err) {
+                      Platform.analytics.trackEvent('Share', 'error');
+                      Platform.analytics.trackException((err.message || (err.data && err.data.error)), false);
+                      console.log('Error: Failed to create an share');
+                      console.log(err);
+                    });
+                  } else {
+                    Platform.analytics.trackEvent('Share', 'success');
+                  }
+              });
+            });
+          }, 500, true);
+
           var viewInApp = function (cb) {
             var data = {
               focusType: $scope.votable.modelName,
@@ -109,17 +177,18 @@ app.directive('invotes', [
             viewInApp(function () {
               Navigate.ensureLogin( function (noLoginNeeded) {
                 if(noLoginNeeded) {
+                  //TODO Move this into the callback to get rid of negative vote count issue
                   var destroying = false;
-                    if($scope.votable.upVoted) {
-                      //UpVote.create will toggle the vote if it already exists
-                      Votes.up.remove($scope.votable);
-                      $scope.votable.upVoteCount--;
-                      $scope.votable.upVoted = false;
-                      destroying = true;
-                    } else {
-                      $scope.votable.upVoteCount++;
-                      $scope.votable.upVoted = true;
-                    }
+                  if($scope.votable.upVoted) {
+                    //UpVote.create will toggle the vote if it already exists
+                    Votes.up.remove($scope.votable);
+                    $scope.votable.upVoteCount--;
+                    $scope.votable.upVoted = false;
+                    destroying = true;
+                  } else {
+                    $scope.votable.upVoteCount++;
+                    $scope.votable.upVoted = true;
+                  }
 
                   if($scope.votable.downVoted) {
                     Votes.down.remove($scope.votable);

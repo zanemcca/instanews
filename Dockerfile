@@ -35,7 +35,7 @@ RUN cd client && bower install --allow-root
 COPY . /usr/src/app
 
 # Compress the frontend for production 
-RUN cd client && grunt compress
+RUN cd client && grunt compress:browser
 
 # Run the application
 CMD npm start 

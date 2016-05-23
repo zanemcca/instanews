@@ -7,28 +7,13 @@ describe('Login: ', function(){
   beforeEach( function() {
 
     module('instanews.controller.login');
+    module('mock.services.platform');
 
     module(function($provide) {
       $provide.service('Navigate', function() {
         return {
           goOrGoBack: function () {},
           disableNextBack: function() {}
-        };
-      });
-
-      $provide.service('Platform', function() {
-        return {
-          loading: {
-            show: function () {},
-            hide: function () {}
-          },
-          analytics: {
-            trackView: function () {},
-            trackEvent: function () {},
-          },
-          showToast: function() {},
-          showAlert: function() {},
-          getDevice: function() {}
         };
       });
 
