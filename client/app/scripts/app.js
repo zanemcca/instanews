@@ -14,13 +14,13 @@ document.onclick = function(e) {
 
   if(element.tagName ==='A') {
     console.log('Opening ' + element.href + ' in in-app-browser');
-    window.open(element.href, '_blank', 'location=no');
+    window.open(element.href, '_blank', 'location=no,scrollbars=yes');
     return false;
   } else if(element.tagName === 'IMG' && element.src.indexOf('maps') > -1) {
     var grandparent = element.parentElement.parentElement;
     if(grandparent.tagName === 'A') {
       console.log('Opening ' + grandparent.href + ' in in-app-browser');
-      window.open(grandparent.href, '_blank', 'location=no');
+      window.open(grandparent.href, '_blank', 'location=no,scrollbars=yes');
       return false;
     }
   }
