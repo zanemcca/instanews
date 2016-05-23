@@ -259,7 +259,9 @@ angular.module('instanews', [
   $ionicConfigProvider,
   $mdGestureProvider
 ) {
-  $locationProvider.html5Mode(true);
+  if(!window.cordova) {
+    $locationProvider.html5Mode(true);
+  }
 
   $ionicConfigProvider.views.forwardCache(true);
 
