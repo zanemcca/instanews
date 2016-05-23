@@ -730,6 +730,7 @@ app.factory('Platform', [
               obj.onShareSheetDismissed(function () {
                 if(!responded) {
                   var e = new Error('Cancelled share');
+                  e.status = 200;
                   cb(e);
                 }
               });
