@@ -536,7 +536,7 @@ if(cluster.isMaster && numCPUs > 1 && process.env.NODE_ENV === 'production') {
     ];
 
     for(var i in featuredGeographies) {
-      urls.push({ url: '/#/news/feed?search=' + featuredGeographies[i], changefreq: 'always', priority: 0.9 });
+      urls.push({ url: '/news/feed?search=' + featuredGeographies[i], changefreq: 'always', priority: 0.9 });
     }
 
     var getArticleParam = function(art) {
@@ -573,7 +573,7 @@ if(cluster.isMaster && numCPUs > 1 && process.env.NODE_ENV === 'production') {
 
       for(i in res) {
         art = res[i];
-        var url = '/#/news/article/' + getArticleParam(art);
+        var url = '/news/article/' + getArticleParam(art);
         urls.push({ url: url, changefreq: 'hourly', priority: art.rating, lastmod: art.modified });
       }
 
@@ -658,6 +658,12 @@ if(cluster.isMaster && numCPUs > 1 && process.env.NODE_ENV === 'production') {
   // Bootstrap the application, config ure models, datasources and middleware.
   // Sub-apps like REST API are mounted via boot scripts.
   boot(app, __dirname);
+
+  // This enables html5Mode by forwarding any unfound file to the angular frontend
+  app.all('/*', function(req, res) {
+    console.log('Forwarding request to frontend!');
+    res.sendFile(path.resolve(__dirname, '../client/www/index.html'));
+  });
 
   //Setup the push server
   setupPush(app);
