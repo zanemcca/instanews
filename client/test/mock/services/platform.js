@@ -9,12 +9,14 @@ angular.module('mock.services.platform', []).service('Platform', function() {
     analytics: {
       trackView: function () {},
       trackEvent: function () {},
+      trackException: function () {}
     },
     url: {
       getId: function (item) {
         return item;
       }
     },
+    showAlert: function () {},
     initBackButton: function() {},
     isBrowser: function() {},
     isAndroid6: function () {

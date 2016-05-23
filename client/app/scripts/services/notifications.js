@@ -17,6 +17,7 @@ app.service('Notifications', [
   'Navigate',
   'Notif',
   'Platform',
+  'Share',
   'Subarticles',
   'User',
   'UpVote',
@@ -33,6 +34,7 @@ app.service('Notifications', [
     Navigate,
     Notif,
     Platform,
+    Share,
     Subarticles,
     User,
     UpVote
@@ -198,6 +200,16 @@ app.service('Notifications', [
           }, function (err) {
             console.log(err);
             Platform.showToast('Sorry but that vote was removed');
+          });
+          break;
+        case 'share':
+          Share.prototype$__get__clickable({ id: data.notifiableId })
+          .$promise
+          .then(function (res) {
+            handleVotable(res);
+          }, function (err) {
+            console.log(err);
+            Platform.showToast('Sorry but that share was removed');
           });
           break;
         case 'comment':

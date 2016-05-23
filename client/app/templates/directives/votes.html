@@ -5,15 +5,22 @@
       ng-class="votable.upVoted ? 'button-positive': 'button-stable'"
       style="border:0;margin:0;"
       ng-style="{'font-weight': votable.upVoted ? 'bold' : 'normal'}"
-       ng-click="upvote()">
-          {{Platform.numToString(votable.upVoteCount)}}
-     </button>
+      ng-click="upvote()">
+         {{Platform.numToString(votable.upVoteCount)}}
+    </button>
     <button class="item button button-clear button-small ion-arrow-down-b"
       ng-class="votable.downVoted ? 'button-positive' : 'button-stable'"
       ng-style="{'font-weight': votable.downVoted ? 'bold' : 'normal'}"
       style="border:0;margin:0;"
       ng-click="downvote()">
          {{Platform.numToString(votable.downVoteCount)}}
+    </button>
+    <button ng-if="(votable.commentableType !== 'comment' && votable.modelName !== 'comment')"
+      style="float: right;border:0;margin:0;"
+      class="item button button-clear button-positive button-small ion-android-share"
+      ng-style="{'font-weight': votable.shared ? 'bold' : 'normal'}"
+      ng-click="share()">
+         {{Platform.numToString(votable.shareCount)}}
     </button>
   </div>
   <button ng-if="votable.commentableType !== 'comment'"

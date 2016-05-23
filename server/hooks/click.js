@@ -353,7 +353,7 @@ module.exports = function(app) {
     if(inst) {
       var modelName = inst.clickableType.charAt(0).toUpperCase() + inst.clickableType.slice(1);
 
-      var updateImmediately = ['upVote', 'downVote', 'createComment'];
+      var updateImmediately = ['upVote', 'downVote', 'share', 'createComment'];
       if(updateImmediately.indexOf(ctx.Model.modelName) > -1 || updateImmediately.indexOf(inst.type) > -1) {
         var dat = {
           updateRating : true,

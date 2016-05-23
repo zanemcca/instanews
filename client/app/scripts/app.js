@@ -14,13 +14,13 @@ document.onclick = function(e) {
 
   if(element.tagName ==='A') {
     console.log('Opening ' + element.href + ' in in-app-browser');
-    window.open(element.href, '_blank', 'location=no');
+    window.open(element.href, '_blank', 'location=no,scrollbars=yes');
     return false;
   } else if(element.tagName === 'IMG' && element.src.indexOf('maps') > -1) {
     var grandparent = element.parentElement.parentElement;
     if(grandparent.tagName === 'A') {
       console.log('Opening ' + grandparent.href + ' in in-app-browser');
-      window.open(grandparent.href, '_blank', 'location=no');
+      window.open(grandparent.href, '_blank', 'location=no,scrollbars=yes');
       return false;
     }
   }
@@ -65,6 +65,7 @@ angular.module('instanews', [
   'instanews.service.preloadQueue',
   'instanews.service.post',
   'instanews.service.subarticles',
+  'instanews.service.shares',
   'instanews.service.textInput',
   'instanews.service.uploads',
   'instanews.service.user',
@@ -253,10 +254,15 @@ angular.module('instanews', [
 
 .config(function(
   $stateProvider,
+  $locationProvider,
   $urlRouterProvider,
   $ionicConfigProvider,
   $mdGestureProvider
 ) {
+  if(!window.cordova) {
+    $locationProvider.html5Mode(true);
+  }
+
   $ionicConfigProvider.views.forwardCache(true);
 
   // Fix ionic ng-click from firing twice when using ngMaterial

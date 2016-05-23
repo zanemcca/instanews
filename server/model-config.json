@@ -67,6 +67,10 @@
     "dataSource": "Articles",
     "public": false
   },
+  "share": {
+    "dataSource": "Interactions",
+    "public": true
+  },
   "upVote": {
     "dataSource": "Interactions",
     "public": true

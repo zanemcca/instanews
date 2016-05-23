@@ -104,7 +104,7 @@ module.exports = function(Base) {
 
       // createSubarticleCount and createCommentCount are taken care of with a DB read
       var incrementers = ['viewCount', 'getSubarticlesCount', 'getCommentsCount', 'clickCount']; 
-      var shouldNotBeDeferred = ['upVoteCount', 'createCommentCount', 'downVoteCount'];
+      var shouldNotBeDeferred = ['upVoteCount', 'shareCount', 'createCommentCount', 'downVoteCount'];
 
       var notSubarticleRating = -1, notCommentRating = -1;
       var commentCount, subarticleCount;
@@ -184,6 +184,8 @@ module.exports = function(Base) {
               //console.log('Recalculating subarticle contribution!');
               addSubarticle = true;
             }
+           } else {
+             console.warn('Unknown data type! Cannot processUpdate');
            }
         } catch(e) {
           console.error(e.stack);
