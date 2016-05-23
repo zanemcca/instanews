@@ -106,8 +106,15 @@ app.directive('invotes', [
           $scope.share = _.debounce(function () {
             //TODO Create a browser friendly share sheet and then enable for browser as well
             viewInApp(function () {
+              Platform.analytics.trackEvent('Share', 'start');
               Platform.branch.share($scope.votable, function(err, res) {
                 if(err) {
+                  if(err.status === 200) {
+                    Platform.analytics.trackEvent('Share', 'cancelled');
+                  } else {
+                    Platform.analytics.trackEvent('Share', 'error');
+                    Platform.analytics.trackException(err.message, false);
+                  }
                   console.log(err.stack);
                   return;
                 }
@@ -136,6 +143,7 @@ app.directive('invotes', [
                   .$promise
                   .then(
                     function(res) {
+                      Platform.analytics.trackEvent('Share', 'success');
                       if(res) {
                         $scope.votable.shareCount++;
                       }
@@ -143,9 +151,13 @@ app.directive('invotes', [
                     }, 
                     // istanbul ignore  next 
                     function(err) {
+                      Platform.analytics.trackEvent('Share', 'error');
+                      Platform.analytics.trackException((err.message || (err.data && err.data.error)), false);
                       console.log('Error: Failed to create an share');
                       console.log(err);
                     });
+                  } else {
+                    Platform.analytics.trackEvent('Share', 'success');
                   }
               });
             });
