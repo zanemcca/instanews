@@ -164,6 +164,16 @@ module.exports = function (grunt) {
         files: {
           '<%= yeoman.dist %>/index.html' : '<%= yeoman.dist %>/index.html'
         }
+      },
+      browserDev: {
+        files: {
+          '<%= yeoman.dist %>/index.html' : '<%= yeoman.dist %>/index.html'
+        }
+      }, 
+      browserProd: {
+        files: {
+          '<%= yeoman.dist %>/index.html' : '<%= yeoman.dist %>/index.html'
+        }
       }
     },
 
@@ -705,7 +715,7 @@ module.exports = function (grunt) {
     }
 
     grunt.config('concurrent.ionic.tasks', ['ionic:serve', 'watch']);
-    grunt.task.run(['wiredep', 'init', 'concurrent:ionic']);
+    grunt.task.run(['wiredep', 'init:browser', 'concurrent:ionic']);
   });
   grunt.registerTask('emulate', function() {
     grunt.config('concurrent.ionic.tasks', ['ionic:emulate:' + this.args.join(':'), 'watch']);
@@ -732,17 +742,59 @@ module.exports = function (grunt) {
     return grunt.task.run(['init', 'ionic:resources', 'ionic:build:' + this.args.join(':')]);
   });
 
-  grunt.registerTask('init', [
-    'clean',
-    'ngconstant:development',
-    'wiredep',
-    'concurrent:server',
-    'postcss',
-    'newer:copy:app',
-    'newer:copy:tmp',
-    'targethtml:dev'
-  ]);
+  grunt.registerTask('init', function() {
+    var jobs = [];
 
+    if(this.args.indexOf('production') > -1) {
+      jobs = [
+        'clean',
+        'ngconstant:production',
+        'wiredep',
+        'concurrent:dist',
+        'postcss',
+        'newer:copy:app',
+        'newer:copy:tmp'
+      ];
+    } else if(this.args.indexOf('staging') > -1) {
+      jobs = [
+        'clean',
+        'ngconstant:staging',
+        'wiredep',
+        'concurrent:dist',
+        'postcss',
+        'newer:copy:app',
+        'newer:copy:tmp'
+      ];
+    } else {
+      jobs = [
+        'clean',
+        'ngconstant:development',
+        'wiredep',
+        'concurrent:server',
+        'postcss',
+        'newer:copy:app',
+        'newer:copy:tmp'
+      ];
+    }
+
+    if(this.args.indexOf('browser') > -1) {
+      if(this.args.indexOf('production') > -1 || this.args.indexOf('staging') > -1) {
+        jobs.push('targethtml:browserProd');
+      } else {
+        jobs.push('targethtml:browserDev');
+      }
+    } else {
+      if(this.args.indexOf('production') > -1 || this.args.indexOf('staging') > -1) {
+        jobs.push('targethtml:prod');
+      } else {
+        jobs.push('targethtml:dev');
+      }
+    }
+
+    return grunt.task.run(jobs);
+  });
+
+  /*
   grunt.registerTask('init:production', [
     'clean',
     'ngconstant:production',
@@ -764,22 +816,32 @@ module.exports = function (grunt) {
     'newer:copy:tmp',
     'targethtml:prod'
   ]);
+ */
 
-  grunt.registerTask('compress', [
-    'ngconstant:production',
-    'wiredep',
-    'useminPrepare',
-    'concurrent:dist',
-    'postcss',
-    'concat',
-    'ngAnnotate',
-    'copy:dist',
-    'cssmin',
-    'uglify',
-    'usemin',
-    'targethtml:prod',
-    'htmlmin'
-  ]);
+  grunt.registerTask('compress', function() {
+    var jobs = [
+      'ngconstant:production',
+      'wiredep',
+      'useminPrepare',
+      'concurrent:dist',
+      'postcss',
+      'concat',
+      'ngAnnotate',
+      'copy:dist',
+      'cssmin',
+      'uglify',
+      'usemin'
+    ];
+
+    if(this.args.indexOf('browser') > -1) {
+        jobs.push('targethtml:browserProd');
+    } else {
+        jobs.push('targethtml:prod');
+    }
+
+    jobs.push('htmlmin');
+    return grunt.task.run(jobs);
+  });
 
   grunt.registerTask('coverage', 
     ['karma:continuous',
