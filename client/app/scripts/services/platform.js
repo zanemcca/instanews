@@ -700,7 +700,7 @@ app.factory('Platform', [
                   opts = {};
                 }
                 opts.title = item.title;
-                url += '/#/news/article/' + item.id;
+                url += '/news/article/' + item.id;
                 break;
               case 'subarticle':
                 opts = processSubarticle(item);
@@ -708,7 +708,7 @@ app.factory('Platform', [
                   var er = new Error('invalid subarticle!');
                   cb(er);
                 }
-                url += '/#/news/article/' + item.parentId;
+                url += '/news/article/' + item.parentId;
                 //TODO Maybe we should include the article title
                 break;
               default:
@@ -724,7 +724,6 @@ app.factory('Platform', [
 
             opts.canonicalIdentifier = item.modelName + '/' + item.id;
 
-            console.log(url);
             Branch.createBranchUniversalObject(opts).then(function(obj) {
               var responded = false;
 
