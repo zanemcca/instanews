@@ -30,7 +30,9 @@ describe('Feed: ', function(){
       $provide.service('Maps', function() {
         return {
           getFeedMap: function() {
-            return {};
+            return {
+              getBounds: function () {}
+            };
           },
           getNewPlace: function() {
             return {};
@@ -50,6 +52,8 @@ describe('Feed: ', function(){
               new google.maps.LatLng(33.671068, -116.25128),
               new google.maps.LatLng(33.685282, -116.233942)
             );
+          },
+          setBounds: function() {
           },
           boundsReady: {
             then: function (cb) {
