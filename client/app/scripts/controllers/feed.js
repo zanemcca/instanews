@@ -162,8 +162,8 @@ app.controller('FeedCtrl', [
       /* istanbul ignore else */
       if(map) {
         google.maps.event.trigger(map, 'resize');
+        Position.setBounds(map.getBounds());
       }
-      Articles.reorganize();  //Reorganize the cached list to remove any out of view articles
 
       Platform.analytics.trackView('Feed View');
 
