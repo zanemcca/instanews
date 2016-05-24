@@ -648,7 +648,7 @@ app.factory('Platform', [
             cb();
           };
 
-          branch.share = function(item, cb) {
+          branch.share = function(item, cb, parent) {
 
             var processSubarticle = function(sub) {
               var opts = {};
@@ -686,7 +686,7 @@ app.factory('Platform', [
             };
 
             var opts;
-            var url = ENV.url; 
+            var URL = ENV.url; 
 
             switch(item.modelName) {
               case 'article':
@@ -700,7 +700,7 @@ app.factory('Platform', [
                   opts = {};
                 }
                 opts.title = item.title;
-                url += '/news/article/' + item.id;
+                URL += '/news/article/' + url.getParam(item);
                 break;
               case 'subarticle':
                 opts = processSubarticle(item);
@@ -708,8 +708,12 @@ app.factory('Platform', [
                   var er = new Error('invalid subarticle!');
                   cb(er);
                 }
-                url += '/news/article/' + item.parentId;
-                //TODO Maybe we should include the article title
+                if(parent) {
+                  opts.title = parent.title;
+                  URL += '/news/article/' + url.getParam(parent);
+                } else {
+                  URL += '/news/article/' + item.parentId;
+                }
                 break;
               default:
                 var e = new Error('Cannot share ' + item.modelName + ' types');
@@ -738,7 +742,7 @@ app.factory('Platform', [
               obj.onLinkShareResponse(function (res) {
                 responded = true;
                 if(res.sharedLink) {
-                  res.targetUrl = url;
+                  res.targetUrl = URL;
                   cb(null, res);
                 } else {
                   var e = new Error('Failed share');
@@ -750,8 +754,11 @@ app.factory('Platform', [
                 feature: 'share',
                 //channel: 'share'
               }, {
-                '$desktop_url': url,
-                '$fallback_url': url
+                '$desktop_url': URL,
+                '$fire_url': URL,
+                '$blackberry_url': URL,
+                '$windows_phone_url': URL,
+        //        '$fallback_url': URL 
               }, 'Check this out');
 
             }, function(err) {
