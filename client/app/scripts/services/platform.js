@@ -79,7 +79,7 @@ app.factory('Platform', [
      * running on a device or in the browser respectivelly
      */
     var initBackButton = function () {
-      if(Device.isBrowser()) {
+      if(Device.isBrowser() && !Device.isMobile()) {
         $ionicNavBarDelegate.showBackButton(false);
       } else {
         $ionicNavBarDelegate.showBackButton(true);
@@ -558,9 +558,17 @@ app.factory('Platform', [
           branch.branch = window.branch;
           var b = branch.branch;
 
-          b.init('key_live_lbo1wHTU65sACNHMqWdJndbdtBfIG34J');
+          branch.hasApp = false;
+          b.init('key_live_lbo1wHTU65sACNHMqWdJndbdtBfIG34J', function(err, data) {
+            if(err) {
+              console.log(err);
+            } else {
+              branch.hasApp = data.has_app;
+            }
+          });
+
           b.banner({
-              icon: 'images/instanews.png',
+              icon: 'https://photos.instanews.com/instanews.png',
               title: 'instanews',
               description: 'Crowdsourced Local News',
               phonePreviewText: '(555)-555-5555',
@@ -570,6 +578,7 @@ app.factory('Platform', [
               showWindowsPhone: false,
               showKindle: false,
               forgetHide: 7,
+              openAppButtonText: 'Open',
               downloadAppButtonText: 'Download'
           }, {});
 
@@ -602,8 +611,11 @@ app.factory('Platform', [
                 if(err) {
                   console.log(err);
                 } else {
-                  //TODO Change this depending on the b.session.has_app flag 'view in app' vs 'download the app'
-                  Dialog.confirm('Get full access to instanews!', 'Want the App?', ['Download', 'Cancel'], b.deepviewCta.bind(b));
+                  if(branch.hasApp) {
+                    Dialog.confirm('Interact in the app', 'View in the App', ['Open', 'Cancel'], b.deepviewCta.bind(b));
+                  } else {
+                    Dialog.confirm('Get full access to instanews with our mobile app!', 'Want to Interact?', ['Get the App', 'Cancel'], b.deepviewCta.bind(b));
+                  }
                 }
               });
             };
@@ -615,7 +627,12 @@ app.factory('Platform', [
                 ['Text Me', 'Cancel'],
                 '(555)-555-5555',
                 function (num) {
-                  b.sendSMS(num, data, function(err) {
+                  data = {
+                    channel: 'Text',
+                    feature: 'deepview',
+                    data: data
+                  };
+                  b.sendSMS(num, data, { make_new_link: true }, function(err) {
                     if(err) {
                       console.log('Failed to send text');
                       console.log(err);
@@ -629,7 +646,7 @@ app.factory('Platform', [
         } else {
           //jshint undef:false
           branch.branch = Branch;
-          Branch.setDebug(true);
+          //Branch.setDebug(true);
 
           var onResume = function() {
             branch.branch.initSession().then(function (res) {
@@ -648,7 +665,7 @@ app.factory('Platform', [
             cb();
           };
 
-          branch.share = function(item, cb) {
+          branch.share = function(item, cb, parent) {
 
             var processSubarticle = function(sub) {
               var opts = {};
@@ -686,7 +703,7 @@ app.factory('Platform', [
             };
 
             var opts;
-            var url = ENV.url; 
+            var URL = ENV.url; 
 
             switch(item.modelName) {
               case 'article':
@@ -700,7 +717,7 @@ app.factory('Platform', [
                   opts = {};
                 }
                 opts.title = item.title;
-                url += '/news/article/' + item.id;
+                URL += '/news/article/' + url.getParam(item);
                 break;
               case 'subarticle':
                 opts = processSubarticle(item);
@@ -708,8 +725,12 @@ app.factory('Platform', [
                   var er = new Error('invalid subarticle!');
                   cb(er);
                 }
-                url += '/news/article/' + item.parentId;
-                //TODO Maybe we should include the article title
+                if(parent) {
+                  opts.title = parent.title;
+                  URL += '/news/article/' + url.getParam(parent);
+                } else {
+                  URL += '/news/article/' + item.parentId;
+                }
                 break;
               default:
                 var e = new Error('Cannot share ' + item.modelName + ' types');
@@ -738,7 +759,7 @@ app.factory('Platform', [
               obj.onLinkShareResponse(function (res) {
                 responded = true;
                 if(res.sharedLink) {
-                  res.targetUrl = url;
+                  res.targetUrl = URL;
                   cb(null, res);
                 } else {
                   var e = new Error('Failed share');
@@ -750,8 +771,13 @@ app.factory('Platform', [
                 feature: 'share',
                 //channel: 'share'
               }, {
-                '$desktop_url': url,
-                '$fallback_url': url
+                '$desktop_url': URL,
+                '$fire_url': URL,
+                '$blackberry_url': URL,
+                '$windows_phone_url': URL,
+                '$ios_url': URL,
+                '$android_url': URL
+        //        '$fallback_url': URL 
               }, 'Check this out');
 
             }, function(err) {
