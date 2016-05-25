@@ -558,7 +558,15 @@ app.factory('Platform', [
           branch.branch = window.branch;
           var b = branch.branch;
 
-          b.init('key_live_lbo1wHTU65sACNHMqWdJndbdtBfIG34J');
+          branch.hasApp = false;
+          b.init('key_live_lbo1wHTU65sACNHMqWdJndbdtBfIG34J', function(err, data) {
+            if(err) {
+              console.log(err);
+            } else {
+              branch.hasApp = data.has_app;
+            }
+          });
+
           b.banner({
               icon: 'images/instanews.png',
               title: 'instanews',
@@ -570,6 +578,7 @@ app.factory('Platform', [
               showWindowsPhone: false,
               showKindle: false,
               forgetHide: 7,
+              openAppButtonText: 'Open',
               downloadAppButtonText: 'Download'
           }, {});
 
@@ -602,8 +611,11 @@ app.factory('Platform', [
                 if(err) {
                   console.log(err);
                 } else {
-                  //TODO Change this depending on the b.session.has_app flag 'view in app' vs 'download the app'
-                  Dialog.confirm('Get full access to instanews!', 'Want the App?', ['Download', 'Cancel'], b.deepviewCta.bind(b));
+                  if(branch.hasApp) {
+                    Dialog.confirm('Interact in the app', 'View in the App', ['Open', 'Cancel'], b.deepviewCta.bind(b));
+                  } else {
+                    Dialog.confirm('Get full access to instanews with our mobile app!', 'Want to Interact?', ['Get the App', 'Cancel'], b.deepviewCta.bind(b));
+                  }
                 }
               });
             };
@@ -615,7 +627,12 @@ app.factory('Platform', [
                 ['Text Me', 'Cancel'],
                 '(555)-555-5555',
                 function (num) {
-                  b.sendSMS(num, data, function(err) {
+                  data = {
+                    channel: 'Text',
+                    feature: 'deepview',
+                    data: data
+                  }
+                  b.sendSMS(num, data, { make_new_link: true }, function(err) {
                     if(err) {
                       console.log('Failed to send text');
                       console.log(err);
@@ -629,7 +646,7 @@ app.factory('Platform', [
         } else {
           //jshint undef:false
           branch.branch = Branch;
-          Branch.setDebug(true);
+          //Branch.setDebug(true);
 
           var onResume = function() {
             branch.branch.initSession().then(function (res) {
