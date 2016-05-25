@@ -79,7 +79,7 @@ app.factory('Platform', [
      * running on a device or in the browser respectivelly
      */
     var initBackButton = function () {
-      if(Device.isBrowser()) {
+      if(Device.isBrowser() && !Device.isMobile()) {
         $ionicNavBarDelegate.showBackButton(false);
       } else {
         $ionicNavBarDelegate.showBackButton(true);
@@ -631,7 +631,7 @@ app.factory('Platform', [
                     channel: 'Text',
                     feature: 'deepview',
                     data: data
-                  }
+                  };
                   b.sendSMS(num, data, { make_new_link: true }, function(err) {
                     if(err) {
                       console.log('Failed to send text');
@@ -775,6 +775,8 @@ app.factory('Platform', [
                 '$fire_url': URL,
                 '$blackberry_url': URL,
                 '$windows_phone_url': URL,
+                '$ios_url': URL,
+                '$android_url': URL
         //        '$fallback_url': URL 
               }, 'Check this out');
 
