@@ -568,7 +568,7 @@ app.factory('Platform', [
           });
 
           b.banner({
-              icon: 'images/instanews.png',
+              icon: 'https://photos.instanews.com/instanews.png',
               title: 'instanews',
               description: 'Crowdsourced Local News',
               phonePreviewText: '(555)-555-5555',
