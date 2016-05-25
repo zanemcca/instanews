@@ -648,8 +648,8 @@ if(cluster.isMaster && numCPUs > 1 && process.env.NODE_ENV === 'production') {
     if(process.env.NODE_ENV === 'staging') {
       rbts += 'Disallow: /';
     } else if (process.env.NODE_ENV === 'production') {
-      rbts += 'Disallow: /healthcheck\n';
-      rbts += 'Disallow: /api/';
+      //rbts += 'Disallow: /api/\n';
+      rbts += 'Disallow: /healthcheck';
     }
     res.type('text/plain');
     res.send(rbts);
