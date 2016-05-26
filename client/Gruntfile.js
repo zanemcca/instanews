@@ -167,12 +167,12 @@ module.exports = function (grunt) {
       },
       browserDev: {
         files: {
-          '<%= yeoman.dist %>/index.html' : '<%= yeoman.dist %>/index.html'
+          '<%= yeoman.dist %>/index.ejs' : '<%= yeoman.dist %>/index.html'
         }
       }, 
       browserProd: {
         files: {
-          '<%= yeoman.dist %>/index.html' : '<%= yeoman.dist %>/index.html'
+          '<%= yeoman.dist %>/index.ejs' : '<%= yeoman.dist %>/index.html'
         }
       }
     },

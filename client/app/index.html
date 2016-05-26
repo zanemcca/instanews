@@ -2,13 +2,24 @@
 <html>
   <head>
     <meta charset="utf-8"/>
-
-    <!--(if target browserProd || browserDev)><!-->
-    <base href="/">
-    <!--<!(endif)-->
-
     <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no, width=device-width"/>
 
+    <!-- Browser only markup -->
+    <!--(if target browserProd || browserDev)><!-->
+    <base href="/">
+    <% if (country) { %>
+    <script type="text/javascript">
+      geo = {
+        country: '<%= country %>',
+        city: '<%= city %>',
+        region: '<%= region %>',
+        ll: [<%= ll %>]
+      };
+    </script>
+    <% } %>
+
+    <!-- TODO Inject meta tags at request time -->
+    <!-- TODO Inject retrieved data into index.html as a global to reduce user percieved latency -->
     <title>instanews - Crowdsourced Local News!</title>
     <meta property="og:title" content="instanews - Crowdsourced Local News!"/>
     <meta name="twitter:title" content="instanews - Crowdsourced Local News!"/>
@@ -32,6 +43,12 @@
 
     <meta name="robots" content="index,follow"/>
 
+    <!-- Change chrome android color -->
+    <meta name="theme-color" content="#023E4F">
+    <!--<!(endif)-->
+
+
+
     <meta http-equiv="Content-Security-Policy" content="style-src 'self' 'unsafe-inline' https://*.instanews.com https://*.googleapis.com"/>
     <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-eval' 'unsafe-inline' https://*.instanews.com https://*.branch.io https://bnc.lt https://ine.ws https://app.link https://*.googleapis.com http://www.google-analytics.com https://www.google-analytics.com"/>
     <meta http-equiv="Content-Security-Policy" content="media-src 'self' https://videos.instanews.com https://turtlevideos.instanews.com"/>
@@ -39,10 +56,6 @@
     <meta http-equiv="Content-Security-Policy" content="font-src 'self' https://fonts.googleapis.com https://fonts.gstatic.com"/>
 
     <link rel="shortcut icon" href="images/favicon.png">
-
-    <!-- Change chrome android color -->
-    <meta name="theme-color" content="#023E4F">
-    <!--meta name="theme-color" content="#048AB0"-->
 
     <!-- build:css styles/vendor.css -->
     <!-- bower:css -->
