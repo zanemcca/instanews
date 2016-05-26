@@ -63,12 +63,28 @@ app.directive('inmap', [
           var instanewsMapTypeId = 'instanews_style';
 
           //Defaults to a view of Canada
+          var coords = {
+            latitude: 54.708031,
+            longitude: -95.871324
+          };
+
+          var zoom =  3;
+
+          if(window.geo) { //Override location with the users appx location
+            //TODO Use the city or country and look up the place
+            if(window.geo.ll && window.geo.ll.length === 2) {
+              coords.latitude = window.geo.ll[0];
+              coords.longitude = window.geo.ll[1];
+              zoom = 6;
+            }
+          }
+
           var mapOptions = {
             mapTypeId: google.maps.MapTypeId.HYBRID,
-            center: Position.posToLatLng({ coords: { latitude: 54.708031, longitude: -95.871324}}),
+            center: Position.posToLatLng({ coords: coords}),
             zoomControl: (Platform.isBrowser && !Platform.isMobile()),
             zoomControlOptions: 'BOTTOM_RIGHT',
-            zoom: 3,
+            zoom: zoom,
             minZoom: 3,
             disableDefaultUI: true, 
           };
