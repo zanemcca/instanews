@@ -475,6 +475,7 @@ if(cluster.isMaster && numCPUs > 1 && process.env.NODE_ENV === 'production') {
     setupBrute();
     setupLogging();
     setupModerator();
+    setupEmail();
 
     //context for use in hooks
     app.use(loopback.context());
@@ -627,9 +628,8 @@ if(cluster.isMaster && numCPUs > 1 && process.env.NODE_ENV === 'production') {
   app.set('views', path.resolve(__dirname, '../client/www/'));
   app.set('view engine', 'ejs');
 
-  function renderIndex(req, res, next) {
+  var renderIndex = function(req, res, next) {
     var ip = req.clientIp;
-    ip = '107.179.247.220';
     var geo = geoip.lookup(ip);
     var arg = {};
     if(geo) {
@@ -639,7 +639,7 @@ if(cluster.isMaster && numCPUs > 1 && process.env.NODE_ENV === 'production') {
         city: geo.city || null,
         region: geo.region || null,
         ll: geo.ll || null
-      }
+      };
     } else {
       console.warn('Invalid Ip address: ' + ip);
       arg = {
@@ -648,7 +648,7 @@ if(cluster.isMaster && numCPUs > 1 && process.env.NODE_ENV === 'production') {
         city: null,
         region: null,
         ll: null
-      }
+      };
     }
 
     res.render('index', arg, function(err, html) {
@@ -656,7 +656,6 @@ if(cluster.isMaster && numCPUs > 1 && process.env.NODE_ENV === 'production') {
         console.error(err.stack);
         next(err);
       } else {
-        console.log(html);
         res.send(html);
       }
     });

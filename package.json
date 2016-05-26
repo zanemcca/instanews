@@ -44,6 +44,7 @@
     "pem": "^1.7.2",
     "request-ip": "^1.2.2",
     "sendgrid": "^2.0.0",
+    "sendgrid-contacts": "0.0.2",
     "serve-favicon": "^2.0.1",
     "sitemap": "^1.6.0",
     "sns-validator": "^0.2.0",
