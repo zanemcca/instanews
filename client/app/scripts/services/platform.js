@@ -59,6 +59,7 @@ app.factory('Platform', [
   'Device',
   'Dialog',
   'ENV',
+  'Journalist',
   function(
     $cordovaDevice,
     $cordovaDialogs,
@@ -69,7 +70,8 @@ app.factory('Platform', [
     $q,
     Device,
     Dialog,
-    ENV
+    ENV,
+    Journalist
   ) {
 
     var ready = $q.defer();
@@ -605,7 +607,36 @@ app.factory('Platform', [
           };
 
           // Create viewInApp() to create deepviews and navigate to the app
-          if((Device.isIOS() || Device.isAndroid())) { //Compatible mobile devices 
+          if(['CA'].indexOf(window.geo.country) === -1) { //Client is outside of valid countries
+            branch.viewInApp = function (data) {
+              Dialog.prompt(
+                'Join the crowd and help instanews determine where to launch next',
+                'Want crowdsourced news in your country?',
+                ['Submit', 'Later'],
+                'email@example.com',
+                function (email) {
+                  console.log(email);
+                  Journalist.registerEmail({
+                    data: {
+                      email: email,
+                      country: window.geo.country,
+                      city: window.geo.city,
+                      region: window.geo.region
+                    }
+                  }, function (res) {
+                    console.log('Registered email successfully');
+                    Dialog.alert('Thanks! We will email you as soon as instanews is availble in your country', 'Success');
+                  }, function (err) {
+                    if(err.status === 400) {
+                      Dialog.alert('There was an error with your email', 'Please try again');
+                    } else {
+                      Dialog.alert('There was an error registering your email', 'Please try again');
+                    }
+                  });
+                }
+              );
+            };
+          } else if((Device.isIOS() || Device.isAndroid())) { //Compatible mobile devices 
             branch.viewInApp = function (data) {
               branch.createDeepview(data, function(err) {
                 if(err) {
@@ -624,7 +655,7 @@ app.factory('Platform', [
               Dialog.prompt(
                 'Enter your iOS or Android phone number and we\'ll text you a download link for the app.',
                 'Want full access to instanews?',
-                ['Text Me', 'Cancel'],
+                ['Text Me', 'Later'],
                 '(555)-555-5555',
                 function (num) {
                   data = {

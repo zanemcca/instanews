@@ -7,7 +7,6 @@
     <!-- Browser only markup -->
     <!--(if target browserProd || browserDev)><!-->
     <base href="/">
-    <% if (country) { %>
     <script type="text/javascript">
       geo = {
         country: '<%= country %>',
@@ -16,7 +15,6 @@
         ll: [<%= ll %>]
       };
     </script>
-    <% } %>
 
     <!-- TODO Inject meta tags at request time -->
     <!-- TODO Inject retrieved data into index.html as a global to reduce user percieved latency -->
