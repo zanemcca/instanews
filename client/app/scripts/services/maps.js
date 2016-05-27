@@ -291,11 +291,11 @@ return gradient;
       }
       options.zoom = options.zoom || 10;
 
-      var finish = function () {
+      var finish = function (position) {
         if(options.cancel) {
           cb('Cancelled localization!');
         } else {
-          var position = Position.getPosition(); 
+          position = position || Position.getPosition(); 
           if (setCenter(map, position)) {
             map.setZoom(options.zoom);
             if(options.zoom >= 18) {
@@ -322,18 +322,41 @@ return gradient;
       Position.getPermission( function() {
         Position.ready.then(function () {
           finish();
+        }, function(err) {
+          console.log(err);
+          if(Platform.isBrowser() && window.geo.ll && window.geo.ll.length === 2) {
+            var pos = {
+              coords: {
+                latitude: window.geo.ll[0],
+                longitude: window.geo.ll[1]
+              }
+            };
+            finish(pos);
+          } else {
+            var message = 'Failed to read location!';
+            if(cb) {
+              cb(message);
+            } else {
+              console.log(message);
+            }
+          }
         });
       }, function () {
-        /*
-        position = feedMap.getCenter();
-        zoom = feedMap.getZoom();
-        finish();
-       */
-        var message = 'Permission denied!';
-        if(cb) {
-          cb(message);
+        if(Platform.isBrowser() && window.geo.ll && window.geo.ll.length === 2) {
+          var pos = {
+            coords: {
+              latitude: window.geo.ll[0],
+              longitude: window.geo.ll[1]
+            }
+          };
+          finish(pos);
         } else {
-          console.log(message);
+          var message = 'Permission denied!';
+          if(cb) {
+            cb(message);
+          } else {
+            console.log(message);
+          }
         }
       }); 
     };
