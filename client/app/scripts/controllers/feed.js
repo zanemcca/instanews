@@ -8,6 +8,7 @@ app.controller('FeedCtrl', [
   '$timeout',
   '$ionicNavBarDelegate',
   'Article',
+  'Dialog',
   'Maps',
   'Position',
   'Platform',
@@ -22,6 +23,7 @@ app.controller('FeedCtrl', [
     $timeout,
     $ionicNavBarDelegate,
     Article,
+    Dialog,
     Maps,
     Position,
     Platform,
@@ -31,6 +33,12 @@ app.controller('FeedCtrl', [
     Notifications,
     User
   ) {
+
+    if(Platform.isBrowser() && ['CA'].indexOf(window.geo.country) === -1) { 
+      Dialog.alert(
+        'You can still access all of our great crowdsourced news in Canada',
+        'instanews is not yet availble in your country');
+    }
 
     $scope.Articles = Articles.getLoader({
       preload: true,
@@ -162,7 +170,9 @@ app.controller('FeedCtrl', [
       /* istanbul ignore else */
       if(map) {
         google.maps.event.trigger(map, 'resize');
-        Position.setBounds(map.getBounds());
+        if(!Position.getBounds()) {
+          Position.setBounds(map.getBounds());
+        }
       }
 
       Platform.analytics.trackView('Feed View');
