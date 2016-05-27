@@ -109,6 +109,30 @@ app.directive('inmap', [
                 //map.controls[google.maps.ControlPosition.TOP_CENTER].push(TEMPLATE);
 
                 Maps.setFeedMap(map);
+
+                var layer = new google.maps.FusionTablesLayer({
+                  suppressInfoWindows: true,
+                  query: {
+                    select: 'json_4326',
+                    where: 'name NOT EQUAL TO \'Canada\'',
+                    // All data is from here https://www.google.com/fusiontables/DataSource?dsrcid=394713#rows:id=1
+                    // Which is a copy of the Natural Earth public dataset
+                    from: '1uKyspg-HkChMIntZ0N376lMpRzduIjr85UYPpQ' //Mid Def 1:50m 
+                    //from: '1foc3xO9DyfSIF6ofvN0kp2bxSfSeKog5FbdWdQ' //Low Def 1:110m
+                    //from: '16CTzhDWVwwqa0e5xe4dRxQ9yoyE1hVt_3ekDFQ' //Hi Def 1:10m (missing india and brazil)
+                  },
+                  styles:[{
+                    polygonOptions: {
+                      strokeColor: '#FF0000',
+                      strokeOpacity: 0.1,
+                      strokeWeight: 0,
+                      fillColor: '#FF0000',
+                      fillOpacity: 0.1
+                    }
+                  }]
+                });
+                layer.setMap(map);
+
                 break;
               }
               case 'postMap': {
