@@ -1,11 +1,36 @@
 
 var common = require('./common');
 
+var salt = '61490800bb56d8fg4'; 
+var password = 'TripTopFlipFlapDoDadDiddlyooo';
+
 module.exports = function(Journalist) {
 
   var loopback = require('loopback');
   var path = require('path');
   var crypto = require('crypto');
+
+  function encrypt(password, text) {
+    var key = crypto.pbkdf2Sync(password,salt, 100000, 48, 'sha512');
+
+    var cipher = crypto.createCipheriv('aes-256-cbc', key.slice(0,32), key.slice(32));
+
+    encrypted = cipher.update(text, 'utf8', 'hex');
+    encrypted += cipher.final('hex');
+
+    return encrypted;
+  }
+
+  function decrypt(password, encrypted) {
+    var key = crypto.pbkdf2Sync(password,salt, 100000, 48, 'sha512');
+
+    var decipher = crypto.createDecipheriv('aes-256-cbc', key.slice(0,32), key.slice(32));
+
+    var decrypted = decipher.update(encrypted, 'hex', 'utf8');
+    decrypted += decipher.final('utf8');
+
+    return decrypted;
+  }
 
   function randomToken(len) {
     if(!len) {
@@ -288,6 +313,33 @@ module.exports = function(Journalist) {
     });
   }; 
 
+  var validEmail = function(email) { 
+    var re = /^([\w-]+(?:\.[\w-]+)*)@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$/i;
+    var valid = re.test(email);
+    return valid;
+  };
+
+  Journalist.registerEmail = function (data, next) {
+    var dd = Journalist.app.DD('Journalist', 'registerEmail');
+    console.log(data);
+    if(data && data.email && validEmail(data.email)) {
+      data.urlkey = encrypt(password, data.email);
+      Journalist.app.email.register(data, function(err, res) {
+        if(err) {
+          console.error(err.stack);
+          next(err);
+        } else {
+          next();
+        }
+      });
+    } else {
+      var e = new Error('Invalid email: ' + data.email);
+      e.status = 400;
+      console.error(e);
+      next(e);
+    }
+  }; 
+
   Journalist.on('resetPasswordRequest', function (info) {
     var dd = Journalist.app.DD('Journalist', 'onRequestPasswordReset');
     //TODO randomToken does not set the accesstoken at all
@@ -448,6 +500,13 @@ module.exports = function(Journalist) {
     'passwordReset',
     {
       accepts: { arg: 'user', type: 'object', required: true}
+    }
+   );
+
+  Journalist.remoteMethod(
+    'registerEmail',
+    {
+      accepts: { arg: 'data', type: 'object', required: true}
     }
    );
 

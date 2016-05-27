@@ -235,6 +235,8 @@ if(cluster.isMaster && numCPUs > 1 && process.env.NODE_ENV === 'production') {
   var Redis = require('ioredis');
   var kue = require('kue');
   var sm = require('sitemap');
+  var requestIp = require('request-ip');
+  var geoip = require('geoip-lite');
 
   var setupModerator = function () {
     if(['staging', 'production'].indexOf(process.env.NODE_ENV) > -1) {
@@ -473,6 +475,7 @@ if(cluster.isMaster && numCPUs > 1 && process.env.NODE_ENV === 'production') {
     setupBrute();
     setupLogging();
     setupModerator();
+    setupEmail();
 
     //context for use in hooks
     app.use(loopback.context());
@@ -621,6 +624,49 @@ if(cluster.isMaster && numCPUs > 1 && process.env.NODE_ENV === 'production') {
 
   setupMiddleware();
 
+  app.use(requestIp.mw());
+  app.set('views', path.resolve(__dirname, '../client/www/'));
+  app.set('view engine', 'ejs');
+
+  var renderIndex = function(req, res, next) {
+    var ip = req.clientIp;
+    //ip = '205.179.247.220'; //Southern States
+    //ip = '107.179.247.220'; //Mtl
+    var geo = geoip.lookup(ip);
+    var arg = {};
+    if(geo) {
+      arg = {
+        cache: false,
+        ip: ip,
+        country: geo.country || null,
+        city: geo.city || null,
+        region: geo.region || null,
+        ll: geo.ll || null
+      };
+    } else {
+      console.warn('Invalid Ip address: ' + ip);
+      arg = {
+        cache: false,
+        ip: null,
+        country: null,
+        city: null,
+        region: null,
+        ll: null
+      };
+    }
+
+    res.render('index', arg, function(err, html) {
+      if(err) {
+        console.error(err.stack);
+        next(err);
+      } else {
+        res.send(html);
+      }
+    });
+  };
+
+  app.get('/', renderIndex);
+
   // istanbul ignore if
   app.use(loopback.static(path.resolve(__dirname, '../client/www/')));
 
@@ -660,10 +706,7 @@ if(cluster.isMaster && numCPUs > 1 && process.env.NODE_ENV === 'production') {
   boot(app, __dirname);
 
   // This enables html5Mode by forwarding any unfound file to the angular frontend
-  app.all('/*', function(req, res) {
-    console.log('Forwarding request to frontend!');
-    res.sendFile(path.resolve(__dirname, '../client/www/index.html'));
-  });
+  app.all('/*', renderIndex) ;
 
   //Setup the push server
   setupPush(app);

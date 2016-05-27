@@ -36,14 +36,13 @@ app.factory('Dialog', [
       $ionicActionSheet.show(sheet);
     };
 
-    //TODO Use angular material or ionic for alerts
     var showAlert = function (message, title, buttonName, cb) {
-      if(!cb) {
+      if (!cb) {
         cb = buttonName;
-        if(!cb) {
+        if (!cb) {
           buttonName = 'Ok';
           cb = title;
-          if(!cb) {
+          if (!cb) {
             title = 'Alert';
 
             cb = function () {
@@ -51,9 +50,13 @@ app.factory('Dialog', [
             };
           } else if (typeof cb === 'function') {
             title = 'Alert';
+          } else {
+            cb = function () {};
           }
         } else if (typeof cb === 'function') {
           buttonName = 'Ok';
+        } else {
+          cb = function () {};
         }
       }
 
