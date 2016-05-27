@@ -630,10 +630,13 @@ if(cluster.isMaster && numCPUs > 1 && process.env.NODE_ENV === 'production') {
 
   var renderIndex = function(req, res, next) {
     var ip = req.clientIp;
+    //ip = '205.179.247.220'; //Southern States
+    //ip = '107.179.247.220'; //Mtl
     var geo = geoip.lookup(ip);
     var arg = {};
     if(geo) {
       arg = {
+        cache: false,
         ip: ip,
         country: geo.country || null,
         city: geo.city || null,
@@ -643,6 +646,7 @@ if(cluster.isMaster && numCPUs > 1 && process.env.NODE_ENV === 'production') {
     } else {
       console.warn('Invalid Ip address: ' + ip);
       arg = {
+        cache: false,
         ip: null,
         country: null,
         city: null,
