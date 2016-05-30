@@ -8,6 +8,7 @@ var app = angular.module('instanews.directive.map', [
 app.directive('inmap', [
   '$stateParams',
   '$ionicGesture',
+  'Dialog',
   'Position',
   'Maps',
   'Platform',
@@ -16,6 +17,7 @@ app.directive('inmap', [
   function (
     $stateParams,
     $ionicGesture,
+    Dialog,
     Position,
     Maps,
     Platform,
@@ -82,7 +84,8 @@ app.directive('inmap', [
           var mapOptions = {
             mapTypeId: google.maps.MapTypeId.HYBRID,
             center: Position.posToLatLng({ coords: coords}),
-            zoomControl: (Platform.isBrowser && !Platform.isMobile()),
+            //zoomControl: (Platform.isBrowser && !Platform.isMobile()),
+            zoomControl: true,
             zoomControlOptions: 'BOTTOM_RIGHT',
             zoom: zoom,
             minZoom: 3,
@@ -177,6 +180,37 @@ app.directive('inmap', [
                 //map.setTilt(45);
                 Maps.setPostMap(map);
                 Maps.setMarker(map, mapOptions.center);
+
+                var lay = new google.maps.FusionTablesLayer({
+                  suppressInfoWindows: true,
+                  query: {
+                    select: 'json_4326',
+                    where: 'name NOT EQUAL TO \'Canada\'',
+                    // All data is from here https://www.google.com/fusiontables/DataSource?dsrcid=394713#rows:id=1
+                    // Which is a copy of the Natural Earth public dataset
+                    from: '1uKyspg-HkChMIntZ0N376lMpRzduIjr85UYPpQ' //Mid Def 1:50m 
+                    //from: '1foc3xO9DyfSIF6ofvN0kp2bxSfSeKog5FbdWdQ' //Low Def 1:110m
+                    //from: '16CTzhDWVwwqa0e5xe4dRxQ9yoyE1hVt_3ekDFQ' //Hi Def 1:10m (missing india and brazil)
+                  },
+                  styles:[{
+                    polygonOptions: {
+                      strokeColor: '#FF0000',
+                      strokeOpacity: 0.1,
+                      strokeWeight: 0,
+                      fillColor: '#FF0000',
+                      fillOpacity: 0.1
+                    }
+                  }]
+                });
+                lay.setMap(map);
+
+                google.maps.event.addListener(lay, 'click', function(event) {
+                  Dialog.confirm('Would you like to continue anyway?', 'Sorry but instanews is currently only available in Canada', function(idx) {
+                    if(idx === 1) {
+                      Maps.setMarker(Maps.getPostMap(), event.latLng);
+                    }
+                  });
+                });
                 break;
               }
               case 'articleMap': {

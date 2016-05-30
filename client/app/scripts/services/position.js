@@ -150,6 +150,9 @@ app.service('Position', [
             function(err) {
               console.log('Error on position watch');
               console.log(err);
+              if(!Platform.isIOS() || Platform.isBrowser()) {
+                ready.reject(err);
+              }
             },
             {
               //maximumAge: 5000,
