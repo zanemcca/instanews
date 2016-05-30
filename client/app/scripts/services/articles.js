@@ -289,6 +289,38 @@ app.service('Articles', [
       return spec;
     };
 
+    articles.findNearest = function(position, limit, cb) {
+      if(!cb) {
+        cb = limit;
+        limit = 1;
+      }
+
+      var query = {
+        filter: {
+          where: {
+            pending: {
+              exists: false
+            },
+            loc: {
+              near: {
+                lat: position.coords.latitude,
+                lng:position.coords.longitude
+              }
+            }
+          },
+          limit: limit 
+        }
+      };
+
+      Article.find(query).$promise.then(function(res) {
+        console.log(res);
+        cb(null, res);
+      }, function(err) {
+        console.log(err);
+        cb(err);
+      });
+    };
+
     return articles;
   }
 ]);

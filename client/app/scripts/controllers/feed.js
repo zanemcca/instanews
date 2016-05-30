@@ -58,6 +58,46 @@ app.controller('FeedCtrl', [
       keepSync: true
     });
 
+    $scope.findNews = function() {
+      var map = Maps.getFeedMap();
+      if(map) {
+        var center = map.getCenter();
+        Articles.findNearest({
+          coords: {
+            latitude: center.lat(),
+            longitude: center.lng()
+          }
+        }, function(err, res) {
+          if(err) {
+            Dialog.alert(
+              'There was an error trying to find more news. Please try to use the map instead.',
+              'Sorry!');
+            console.log(err);
+          } else {
+            if(res.length) {
+              var idx = 0;
+              for(var i in res) {
+                if(res[i].rating > res[idx].rating) {
+                  idx = i;
+                }
+              }
+              map.setZoom(10);
+              Maps.setCenter(map, Position.posToLatLng(res[idx].loc));
+            } else {
+              Dialog.alert(
+                'We could not find any modern news. Do you have something news worthy? Put it on the map',
+                'No News');
+            }
+          }
+        });
+      } else {
+        console.log('map not setup yet');
+        Dialog.alert(
+          'Please try again',
+          'The map is not ready yet');
+      }
+    };
+
     $scope.isLoading = function() {
       if($scope.Articles.areItemsAvailable()) {
         return true;
