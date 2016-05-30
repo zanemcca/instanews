@@ -8,6 +8,7 @@ app.factory('Post', [
   '$q',
   'Article',
   'Camera',
+  'Dialog',
   'Maps',
   'observable',
   'Platform',
@@ -17,6 +18,7 @@ app.factory('Post', [
     $q,
     Article,
     Camera,
+    Dialog,
     Maps,
     observable,
     Platform,
@@ -169,10 +171,25 @@ app.factory('Post', [
               'country'
             ];
 
+            var country;
             for(var i in place.address_components) {
               if(whitelist.indexOf(place.address_components[i].types[0]) > -1) {
                 article.place.push(place.address_components[i]);
               }
+              if(place.address_components[i].types[0] === 'country') {
+                country = place.address_components[i];
+              }
+            }
+            
+            //TODO Creata a function for determing valid countries
+            if(country.short_name !== 'CA') {
+              Platform.loading.hide();
+              Dialog.alert('Sorry but instanews is not currently available in ' + country.long_name, 'Not yet available'); 
+              var err = {
+                message: 'Unavailable in your country',
+                noAlert: true
+              };
+              return cb(err);
             }
 
             Article.create(article)
