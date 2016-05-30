@@ -182,7 +182,7 @@ app.factory('Post', [
             }
             
             //TODO Creata a function for determing valid countries
-            if(country.short_name !== 'CA') {
+            if(country && country.short_name !== 'CA') {
               Platform.loading.hide();
               Dialog.alert('Sorry but instanews is not currently available in ' + country.long_name, 'Not yet available'); 
               var err = {
