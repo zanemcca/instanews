@@ -7,6 +7,7 @@ describe('Feed: ', function(){
   beforeEach( function() {
 
     module('instanews.controller.feed');
+    module('mock.services.dialog');
 
     module(function($provide) {
       $provide.service('Navigate', function() {
@@ -158,6 +159,7 @@ describe('Feed: ', function(){
     $controller, 
     $rootScope,
     Article,
+    Dialog,
     Maps,
     Position,
     Platform,
@@ -167,6 +169,7 @@ describe('Feed: ', function(){
   ){
     scope = $rootScope.$new(); 
     article = Article;
+    dialog = Dialog;
     maps = Maps;
     position = Position;
     platform = Platform;
@@ -182,6 +185,7 @@ describe('Feed: ', function(){
     var controller = ctrl('FeedCtrl', {
       $scope: scope,
       Article: article,
+      Dialog: dialog,
       Maps: maps,
       Position: position,
       Platform: platform,

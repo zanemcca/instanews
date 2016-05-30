@@ -181,7 +181,7 @@ app.directive('inmap', [
                 Maps.setPostMap(map);
                 Maps.setMarker(map, mapOptions.center);
 
-                var layer = new google.maps.FusionTablesLayer({
+                var lay = new google.maps.FusionTablesLayer({
                   suppressInfoWindows: true,
                   query: {
                     select: 'json_4326',
@@ -202,9 +202,9 @@ app.directive('inmap', [
                     }
                   }]
                 });
-                layer.setMap(map);
+                lay.setMap(map);
 
-                google.maps.event.addListener(layer, 'click', function(event) {
+                google.maps.event.addListener(lay, 'click', function(event) {
                   Dialog.confirm('Would you like to continue anyway?', 'Sorry but instanews is currently only available in Canada', function(idx) {
                     if(idx === 1) {
                       Maps.setMarker(Maps.getPostMap(), event.latLng);
