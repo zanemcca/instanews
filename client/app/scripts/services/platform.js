@@ -608,7 +608,7 @@ app.factory('Platform', [
 
           // Create viewInApp() to create deepviews and navigate to the app
           if(['CA'].indexOf(window.geo.country) === -1) { //Client is outside of valid countries
-            branch.viewInApp = function (data) {
+            branch.viewInApp = function () {
               Dialog.prompt(
                 'Join the crowd and help instanews determine where to launch next',
                 'Want crowdsourced news in your country?',
@@ -623,7 +623,7 @@ app.factory('Platform', [
                       city: window.geo.city,
                       region: window.geo.region
                     }
-                  }, function (res) {
+                  }, function () {
                     console.log('Registered email successfully');
                     Dialog.alert('Thanks! We will email you as soon as instanews is availble in your country', 'Success');
                   }, function (err) {

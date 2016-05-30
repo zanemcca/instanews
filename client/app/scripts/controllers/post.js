@@ -181,7 +181,9 @@ app.controller('PostCtrl', [
               exit();
             } else {
               $scope.alreadyPosting = false;
-              Platform.showAlert('Something went wrong while posting your content. Please try again');
+              if(!err.noAlert) {
+                Platform.showAlert('Something went wrong while posting your content. Please try again');
+              }
             }
           });
         }

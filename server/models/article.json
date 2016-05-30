@@ -4,17 +4,21 @@
   "strict": false,
   "idInjection": false,
   "indexes": {
-    "location_1_rating_-1": {
+    "_id_-1_loc_2dsphere_rating_-1": {
       "keys": {
-        "location": 1,
+        "_id": -1,
+        "loc": "2dsphere",
         "rating": -1
       },
       "options": {
-        "background": true
+         "background": true
       }
     }
   },
   "properties": {
+    "loc": {
+      "type": "geoPoint"
+    },
     "isPrivate": {
       "type": "boolean",
       "required": true

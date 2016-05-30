@@ -49,14 +49,22 @@
       </div>
       <div ng-switch-when="false">
         <div ng-if="Articles.get().length">
-          No more stories
+          <div>
+            No more stories
+          </div>
+          <div>
+            Use the map to find more news
+          </div>
         </div>
         <div ng-if="!Articles.get().length">
           <i class="icon ion-alert-circled"></i>
           No stories found here
+          <button ng-click="findNews()"
+              style="max-width:600px;margin-left:50%;transform: translateX(-50%);"
+              class="button button-block button-positive">
+              Find Some News
+          </button>
         </div>
-        <div>
-          Use the map to find more news
       </div>
     </div>
   </ion-content>

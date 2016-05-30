@@ -73,21 +73,10 @@ module.exports = function(app) {
       inst = ctx.data;
     }
 
-    if(inst && ctx.isNewInstance) {
-      inst.pending = true;
-      //TODO Remove this once all v0.5.0 devices are gone
-      if(inst.location && !inst.loc) {
-        // Convert legacy location to geoJSON
-        inst.loc = {
-          type: 'Point',
-          coordinates: [ inst.location.lng, inst.location.lat ]
-        };
-      } else if(inst.loc && !inst.location) {
-        // We need to maintain the legacy location until v0.5.0 frontend is expired
-        inst.location = {
-          lat: inst.loc.coordinates[1],
-          lng: inst.loc.coordinates[0]
-        };
+    if(inst) {
+      //Workaround for yet another shitty bug by the ever useless loopback https://github.com/strongloop/loopback-connector-mongodb/issues/248
+      if(inst.$set && inst.$set.loc) {
+        delete inst.$set.loc;
       }
     }
 
@@ -211,38 +200,64 @@ module.exports = function(app) {
     next();
   });
 
-  /*
-  Article.observe('access', function(ctx, next) {
-    debug('observe access', ctx);
+  Article.beforeRemote('create', function(ctx, unused, next){
+    debug('beforeRemote.create', ctx, next);
 
-    /*
-    if(ctx.options.rate) {
-      var context = loopback.getCurrentContext();
-      if(context) {
-        var stat = context.get('currentStat');
-        if(stat) {
-          if(ctx.query.include) {
-            if(!Array.isArray(ctx.query.include)) {
-              ctx.query.include = [ctx.query.include];
-            }
-          }
-          else {
-            ctx.query.include = [];
-          }
+    var inst = ctx.args.data;
+    if(inst) {
+      inst.pending = true;
 
-          ctx.query.include.push({      
-            relation: 'subarticles',
-            scope: {
-              limit: stat.subarticle.views.mean,
-              order: 'rating DESC'
-            } 
-          });
+      // Loopback added support for geoJSON 2dsphere indices
+      // So we need to convert any incoming articles from geoJSON to geoPoint
+      if(inst.loc) {
+        if(inst.loc.coordinates) {
+          inst.loc = {
+            lng: inst.loc.coordinates[0],
+            lat: inst.loc.coordinates[1]
+          };
+        }
+
+        //TODO Remove this once all v0.5.0 devices are gone
+        // location is stored in 2d index and also the lat and lng are mixed up even though they are labeled correctly
+        // so it is totally unreliable and only maintained for legacy reasons
+        if(!inst.location) {
+          // We need to maintain the legacy location until v0.5.0 frontend is expired
+          inst.location = {
+            lat: inst.loc.lat,
+            lng: inst.loc.lng
+          };
+        }
+      } else { //TODO Remove this once all v0.5.0 devices are gone
+        if(inst.location) {
+          inst.loc = {
+            lng: inst.location.lng,
+            lat: inst.location.lat
+          };
         }
       }
     }
+
     next();
   });
-   */
+
+  Article.observe('access', function(ctx, next) {
+    debug('observe access', ctx);
+
+    var inst = ctx.instance;
+    if(!inst) {
+      inst = ctx.data;
+    }
+
+    //Loopback hijacked $near query but they also added support for 2DSphere indices
+    //This workaround keeps the data consitently in geoJSON format on the frontend
+    if(inst) {
+      inst.loc = {
+        type: 'Point',
+        coordinates: [ inst.loc.lng, inst.loc.lat ]
+      };
+    }
+    next();
+  });
 
   /*
    * Unused due to deferred updates
