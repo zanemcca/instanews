@@ -46,6 +46,7 @@ module.exports = {
     name: 'Installations',
     connector: 'mongodb',
     mongos: mongos,
+    enableGeoIndexing: true,
     debug: false 
   },
   Interactions: {
@@ -54,6 +55,7 @@ module.exports = {
     name: 'Interactions',
     connector: 'mongodb',
     mongos: mongos,
+    enableGeoIndexing: true,
     debug: false
   },
   /*
@@ -62,6 +64,7 @@ module.exports = {
     database: 'notifications',
     name: 'Notifications',
     connector: 'mongodb',
+    enableGeoIndexing: true,
     debug: false
   },
  */
@@ -71,6 +74,7 @@ module.exports = {
     name: 'Articles',
     connector: 'mongodb',
     mongos: mongos,
+    enableGeoIndexing: true,
     debug: false
   },
   Admins: {
@@ -79,6 +83,7 @@ module.exports = {
     name: 'Admins',
     connector: 'mongodb',
     mongos: mongos,
+    enableGeoIndexing: true,
     debug: false
   },
   Users: {
@@ -87,6 +92,7 @@ module.exports = {
     name: 'Users',
     connector: 'mongodb',
     mongos: mongos,
+    enableGeoIndexing: true,
     debug: false
   },
   push: {

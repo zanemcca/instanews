@@ -9,6 +9,7 @@
     "database": "installations",
     "name": "Installations",
     "connector": "mongodb",
+    "enableGeoIndexing": true,
     "debug": true
   },
   "Interactions": {
@@ -17,6 +18,7 @@
     "database": "interactions",
     "name": "Interactions",
     "connector": "mongodb",
+    "enableGeoIndexing": true,
     "debug": true
   },
   "Articles": {
@@ -26,6 +28,7 @@
     "name": "Articles",
     "connector": "mongodb",
     "allowExtendedOperators": true,
+    "enableGeoIndexing": true,
     "debug": true
   },
   "Users": {
@@ -34,6 +37,7 @@
     "database": "users",
     "name": "Users",
     "allowExtendedOperators": true,
+    "enableGeoIndexing": true,
     "connector": "mongodb"
   },
   "Admins": {
@@ -42,6 +46,7 @@
     "database": "admins",
     "name": "Admins",
     "connector": "mongodb",
+    "enableGeoIndexing": true,
     "debug": true
   },
   "push": {
