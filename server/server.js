@@ -581,7 +581,7 @@ if(cluster.isMaster && numCPUs > 1 && process.env.NODE_ENV === 'production') {
       }
 
       sitemap = sm.createSitemap({
-        hostname: 'https://instanews.com',
+        hostname: 'https://www.instanews.com',
         cacheTime: 10*60*1000, //10 min cachetime
         urls: urls
       });
