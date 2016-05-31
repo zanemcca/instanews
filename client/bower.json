@@ -29,7 +29,7 @@
     "angular-material": "^1.0.7",
     "angular-elastic": "~2.5.1",
     "async": "^1.5.2",
-    "branch-sdk": "^2.2.0"
+    "branch-sdk": "^2.2.1"
   },
   "resolutions": {
     "angular": "~1.4.8",

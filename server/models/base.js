@@ -184,9 +184,9 @@ module.exports = function(Base) {
               //console.log('Recalculating subarticle contribution!');
               addSubarticle = true;
             }
-           } else {
-             console.warn('Unknown data type! Cannot processUpdate');
-           }
+          } else if(data[i] !== 'updateRating') {
+             console.warn('Unknown data type! Cannot processUpdate: ' + data[i]);
+          }
         } catch(e) {
           console.error(e.stack);
         }
