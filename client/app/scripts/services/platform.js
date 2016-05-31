@@ -569,21 +569,6 @@ app.factory('Platform', [
             }
           });
 
-          b.banner({
-              icon: 'https://photos.instanews.com/instanews.png',
-              title: 'instanews',
-              description: 'Crowdsourced Local News',
-              phonePreviewText: '(555)-555-5555',
-              mobileSticky: true,
-              sendLinkText: 'Get the App',
-              showBlackberry: false,
-              showWindowsPhone: false,
-              showKindle: false,
-              forgetHide: 7,
-              openAppButtonText: 'Open',
-              downloadAppButtonText: 'Download'
-          }, {});
-
           branch.createDeepview = function(data ,cb) {
             data = data || {};
             var opts = {
@@ -636,43 +621,60 @@ app.factory('Platform', [
                 }
               );
             };
-          } else if((Device.isIOS() || Device.isAndroid())) { //Compatible mobile devices 
-            branch.viewInApp = function (data) {
-              branch.createDeepview(data, function(err) {
-                if(err) {
-                  console.log(err);
-                } else {
-                  if(branch.hasApp) {
-                    Dialog.confirm('Interact in the app', 'View in the App', ['Open', 'Cancel'], b.deepviewCta.bind(b));
+          } else {
+            b.banner({
+                icon: 'https://photos.instanews.com/instanews.png',
+                title: 'instanews',
+                description: 'Crowdsourced Local News',
+                phonePreviewText: '(555)-555-5555',
+                mobileSticky: true,
+                sendLinkText: 'Get the App',
+                showBlackberry: false,
+                showWindowsPhone: false,
+                showKindle: false,
+                forgetHide: 7,
+                openAppButtonText: 'Open',
+                downloadAppButtonText: 'Download'
+            }, {});
+
+            if((Device.isIOS() || Device.isAndroid())) { //Compatible mobile devices 
+              branch.viewInApp = function (data) {
+                branch.createDeepview(data, function(err) {
+                  if(err) {
+                    console.log(err);
                   } else {
-                    Dialog.confirm('Get full access to instanews with our mobile app!', 'Want to Interact?', ['Get the App', 'Cancel'], b.deepviewCta.bind(b));
-                  }
-                }
-              });
-            };
-          } else { //Browser
-            branch.viewInApp = function (data) {
-              Dialog.prompt(
-                'Enter your iOS or Android phone number and we\'ll text you a download link for the app.',
-                'Want full access to instanews?',
-                ['Text Me', 'Later'],
-                '(555)-555-5555',
-                function (num) {
-                  data = {
-                    channel: 'Text',
-                    feature: 'deepview',
-                    data: data
-                  };
-                  b.sendSMS(num, data, { make_new_link: true }, function(err) {
-                    if(err) {
-                      console.log('Failed to send text');
-                      console.log(err);
-                      Dialog.alert('There was an error sending the text message', 'Please try again');
+                    if(branch.hasApp) {
+                      Dialog.confirm('Interact in the app', 'View in the App', ['Open', 'Cancel'], b.deepviewCta.bind(b));
+                    } else {
+                      Dialog.confirm('Get full access to instanews with our mobile app!', 'Want to Interact?', ['Get the App', 'Cancel'], b.deepviewCta.bind(b));
                     }
-                  }); 
-                }
-              );
-            };
+                  }
+                });
+              };
+            } else { //Browser
+              branch.viewInApp = function (data) {
+                Dialog.prompt(
+                  'Enter your iOS or Android phone number and we\'ll text you a download link for the app.',
+                  'Want full access to instanews?',
+                  ['Text Me', 'Later'],
+                  '(555)-555-5555',
+                  function (num) {
+                    data = {
+                      channel: 'Text',
+                      feature: 'deepview',
+                      data: data
+                    };
+                    b.sendSMS(num, data, { make_new_link: true }, function(err) {
+                      if(err) {
+                        console.log('Failed to send text');
+                        console.log(err);
+                        Dialog.alert('There was an error sending the text message', 'Please try again');
+                      }
+                    }); 
+                  }
+                );
+              };
+            }
           }
         } else {
           //jshint undef:false
