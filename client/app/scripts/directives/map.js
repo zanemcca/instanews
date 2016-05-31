@@ -222,7 +222,8 @@ app.directive('inmap', [
                   Articles.findById(id, function(article) {
                     scope.article = article;
                     if(article) {
-                      mapOptions.center = new google.maps.LatLng(scope.article.loc.coordinates[1], scope.article.loc.coordinates[0]);
+                       mapOptions.center = Position.posToLatLng(scope.article.loc);
+
                       mapOptions.zoom = 18;
                       //mapOptions.minZoom = 9;
                       mapOptions.tilt = 45;
