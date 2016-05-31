@@ -251,20 +251,22 @@ module.exports = function(app) {
     if(inst) {
       if(Array.isArray(ctx.result)) {
         for(var i in inst) {
-          //Unfortunately loopback does some dumb ass validation on the loc so it cannot be replaced
-          //but we can add parameters to it.
-          inst[i].loc.type = 'Point';
-          inst[i].loc.coordinates = [ inst[i].loc.lng, inst[i].loc.lat ];
+          if(inst[i].loc) {
+            //Unfortunately loopback does some dumb ass validation on the loc so it cannot be replaced
+            //but we can add parameters to it.
+            inst[i].loc.type = 'Point';
+            inst[i].loc.coordinates = [ inst[i].loc.lng, inst[i].loc.lat ];
+          } else {
+            console.warn('Article found without a location: ' + inst[i].id);
+          }
         }
       } else {
-        inst.loc.type = 'Point';
-        inst.loc.coordinates = [ inst.loc.lng, inst.loc.lat ];
-        /*
-        inst.loc = {
-          type: 'Point',
-          coordinates: [ inst.loc.lng, inst.loc.lat ]
-        };
-       */
+        if(inst.loc) {
+          inst.loc.type = 'Point';
+          inst.loc.coordinates = [ inst.loc.lng, inst.loc.lat ];
+        } else {
+          console.warn('Article found without a location: ' + inst.id);
+        }
       }
     }
     next();
