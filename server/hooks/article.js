@@ -12,12 +12,12 @@ var LIMIT = 300; //Load limit
 var loopback = require('loopback');
 module.exports = function(app) {
 
-   var Article = app.models.Article;
-   var Base = app.models.base;
-   var View = app.models.view;
-   var Subarticle = app.models.Subarticle;
-   var Storage = app.models.Storage;
-   var Stat = app.models.Stat;
+  var Article = app.models.Article;
+  var Base = app.models.base;
+  var View = app.models.view;
+  var Subarticle = app.models.Subarticle;
+  var Storage = app.models.Storage;
+  var Stat = app.models.Stat;
 
   var debug = app.debug('hooks:article');
 
@@ -240,21 +240,32 @@ module.exports = function(app) {
     next();
   });
 
-  Article.observe('access', function(ctx, next) {
-    debug('observe access', ctx);
 
-    var inst = ctx.instance;
-    if(!inst) {
-      inst = ctx.data;
-    }
+  //TODO Configure the client to not care about geoJSON vs geoPoint and then deprecate this
+  Article.observe('loaded', function(ctx, next){
+    debug('observe.loaded', ctx, next);
+    var inst = ctx.result || ctx.instance || ctx.data;
 
     //Loopback hijacked $near query but they also added support for 2DSphere indices
     //This workaround keeps the data consitently in geoJSON format on the frontend
     if(inst) {
-      inst.loc = {
-        type: 'Point',
-        coordinates: [ inst.loc.lng, inst.loc.lat ]
-      };
+      if(Array.isArray(ctx.result)) {
+        for(var i in inst) {
+          //Unfortunately loopback does some dumb ass validation on the loc so it cannot be replaced
+          //but we can add parameters to it.
+          inst[i].loc.type = 'Point';
+          inst[i].loc.coordinates = [ inst[i].loc.lng, inst[i].loc.lat ];
+        }
+      } else {
+        inst.loc.type = 'Point';
+        inst.loc.coordinates = [ inst.loc.lng, inst.loc.lat ];
+        /*
+        inst.loc = {
+          type: 'Point',
+          coordinates: [ inst.loc.lng, inst.loc.lat ]
+        };
+       */
+      }
     }
     next();
   });
