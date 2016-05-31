@@ -339,3 +339,12 @@
     list-style-type: lower-alpha;
   }
 }
+
+// Workaround for app-banner not working on ipad in landscape
+// Ionic added position:fixed to repair some bug in iOS 7 but we do not care
+// about that niche usecase
+@media (orientation:landscape) {
+  .platform-ios.platform-browser.platform-ipad {
+      position: relative !important;
+  }
+}
