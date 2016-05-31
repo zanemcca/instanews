@@ -590,7 +590,6 @@ if(cluster.isMaster && numCPUs > 1 && process.env.NODE_ENV === 'production') {
     });
   };
 
-
   app.start = function() {
     var server;
     var httpOnly = true;
@@ -621,6 +620,16 @@ if(cluster.isMaster && numCPUs > 1 && process.env.NODE_ENV === 'production') {
       app.emit('started');
     });
   };
+
+  // Redirect all instanews.com requests to www.instanews.com
+  app.get('/*', function(req, res, next) {
+    if (req.headers.host.match(/^instanews.com/) !== null ) {
+      var newUrl = 'https://www.' + req.headers.host + req.url;
+      res.redirect(301, newUrl);
+    } else {
+      next();
+    }
+  });
 
   setupMiddleware();
 
