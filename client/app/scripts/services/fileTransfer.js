@@ -5,10 +5,12 @@ var app = angular.module('instanews.service.fileTransfer', ['ionic', 'ngResource
 
 app.factory('FileTransfer', [
   '$cordovaFileTransfer',
+  'Dialog',
   'Platform',
   'rfc4122',
   function(
     $cordovaFileTransfer,
+    Dialog,
     Platform,
     rfc4122
   ) {
@@ -50,11 +52,13 @@ app.factory('FileTransfer', [
                 }, function(err) {
                   console.log(err);
                   console.log('Error: Failed to move the file');
+                  Dialog.alert('Failed to upload the file.', 'Please try again');
                 });
               });
             } else {
               var e = new Error('Cannot upload content type ' + baseType);
               console.log(e);
+              Dialog.alert('Invalid filetype: ' + baseType , 'Please try again');
             }
           });
         });
