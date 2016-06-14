@@ -160,6 +160,7 @@ exports.run = function () {
 
           it('should call updateAttributes on the result from subarticle.findOne with the proper arguments and it should also propogate errors', function (done) {
             err = 'error';
+            sub._file.type = 'image/jpeg';
 
             update = function(attr, cb) {
               expect(attr).to.deep.equal({

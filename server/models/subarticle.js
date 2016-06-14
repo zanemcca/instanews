@@ -35,10 +35,18 @@ module.exports = function(Subarticle) {
           }
         };
 
-        if(message.sources) {
-          query.$set = {
-            '_file.sources': message.sources 
-          };
+        if(res._file && res._file.type.indexOf('image') > -1) {
+          if(message.sources) {
+            query.$set = {
+              '_file.sources': message.sources 
+            };
+          } else {
+            var e = new Error('Invalid message! Cannot clear pending flag for ' + res.id + ' subarticle');
+            e.status = 400;
+            console.error(e);
+            console.dir(message);
+            return next(e);
+          }
         }
 
         var parentId = res.parentId;
