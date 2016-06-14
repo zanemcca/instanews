@@ -435,7 +435,7 @@ module.exports = function(Storage) {
                 CopySource: container + '/' + key,
                 MetadataDirective: 'REPLACE',
                 Metadata: meta,
-                CacheControl: 'no-transform,public,max-age=86400',
+                CacheControl: 'no-transform,public,max-age=31536000', //1 year cache
                 Key: key 
               }, function(err) {
                 dd.elapsed('S3.copyObject');
