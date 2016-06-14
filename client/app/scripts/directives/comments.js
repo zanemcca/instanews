@@ -65,6 +65,7 @@ app.directive('incomments', [
         };
 
         $scope.create = function () {
+          Platform.analytics.trackEvent('addComment', 'start');
           viewInApp(function () {
             Navigate.ensureLogin( function () {
               var textInput = TextInput.get();
@@ -80,18 +81,18 @@ app.directive('incomments', [
                   commentableId: $scope.owner.id,
                   commentableType: $scope.owner.modelName
                 }).$promise
-                .then(function(res,err) {
-                  // istanbul ignore if 
-                  if(err) {
-                    console.log(err);
-                  } else {
-                    $scope.owner.createCommentCount++;
-                    $scope.Comments.reload();
-                  }
+                .then(function() {
+                  Platform.analytics.trackEvent('addComment', 'success');
+                  $scope.owner.createCommentCount++;
+                  $scope.Comments.reload();
+                }, function(err) {
+                  console.log(err);
+                  Platform.analytics.trackEvent('addComment', 'error');
                 });
               }, function (partialText) {
                 //Interruption function
                 newComment = partialText;
+                Platform.analytics.trackEvent('addComment', 'partial');
               });
 
               // Wait a frame
