@@ -9,6 +9,7 @@ describe('instanews.service.fileTransfer', function() {
   beforeEach(function() {
 
     module('instanews.service.fileTransfer');
+    module('mock.services.dialog');
 
     module(function($provide) {
       $provide.service('$cordovaFileTransfer', function() {
