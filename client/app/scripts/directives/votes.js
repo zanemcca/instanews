@@ -104,12 +104,10 @@ app.directive('invotes', [
            */
           }, 500, true);
 
-
           $scope.share = _.debounce(function () {
+            Platform.analytics.trackEvent('Share', 'start');
             //TODO Create a browser friendly share sheet and then enable for browser as well
             viewInApp(function () {
-              Platform.analytics.trackEvent('Share', 'start');
-
               var share = function(parent) {
                 Platform.branch.share($scope.votable, function(err, res) {
                   if(err) {
@@ -184,6 +182,7 @@ app.directive('invotes', [
           };
 
           $scope.upvote = _.debounce(function () {
+            Platform.analytics.trackEvent('UpVote', 'start');
             //TODO Move this into the Votes service
             viewInApp(function () {
               Navigate.ensureLogin( function (noLoginNeeded) {
@@ -231,11 +230,13 @@ app.directive('invotes', [
                       console.log('Successfully upvoted');
                       Votes.up.reload();
                       Votes.down.reload();
+                      Platform.analytics.trackEvent('UpVote', 'success');
                     }, 
                     // istanbul ignore  next 
                     function(err) {
                       console.log('Error: Failed to create an upvote');
                       console.log(err);
+                      Platform.analytics.trackEvent('UpVote', 'error');
                     });
                 }
               });
@@ -243,6 +244,7 @@ app.directive('invotes', [
           }, 500, true);
 
           $scope.downvote = _.debounce(function () {
+            Platform.analytics.trackEvent('DownVote', 'start');
             viewInApp(function () {
               Navigate.ensureLogin( function (noLoginNeeded) {
                 if(noLoginNeeded) {
@@ -288,11 +290,13 @@ app.directive('invotes', [
                       Votes.up.reload();
                       Votes.down.reload();
                       console.log('Successfully downVoted');
+                      Platform.analytics.trackEvent('DownVote', 'success');
                     },
                     // istanbul ignore next 
                     function(err) {
                       console.log('Error: Failed to create an downVote');
                       console.log(err);
+                      Platform.analytics.trackEvent('DownVote', 'error');
                     });
                 }
               });

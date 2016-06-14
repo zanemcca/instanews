@@ -594,6 +594,7 @@ app.factory('Platform', [
           // Create viewInApp() to create deepviews and navigate to the app
           if(['CA'].indexOf(window.geo.country) === -1) { //Client is outside of valid countries
             branch.viewInApp = function () {
+              analytics.trackEvent('ViewInApp', 'start', 'OutOfCountry');
               Dialog.prompt(
                 'Join the crowd and help instanews determine where to launch next',
                 'Want crowdsourced news in your country?',
@@ -611,21 +612,28 @@ app.factory('Platform', [
                   }, function () {
                     console.log('Registered email successfully');
                     Dialog.alert('Thanks! We will email you as soon as instanews is availble in your country', 'Success');
+                    analytics.trackEvent('ViewInApp', 'success', 'OutOfCountry');
                   }, function (err) {
                     if(err.status === 400) {
                       Dialog.alert('There was an error with your email', 'Please try again');
                     } else {
                       Dialog.alert('There was an error registering your email', 'Please try again');
                     }
+                    analytics.trackEvent('ViewInApp', 'error', 'OutOfCountry');
                   });
                 }
               );
             };
           } else {
+            b.addListener('didShowBanner', function() {
+              analytics.trackEvent('ViewInApp', 'start', 'Banner');
+            });
+
             b.banner({
                 icon: 'https://photos.instanews.com/instanews.png',
-                title: 'instanews',
-                description: 'Crowdsourced Local News',
+                title: 'instanews - Crowdsourced Local News',
+                description: 'Share your story',
+                //buttonBackgroundColor: '#048AB0', //Broken right now see issue #314 for Branch smart banner repo
                 phonePreviewText: '(555)-555-5555',
                 mobileSticky: true,
                 sendLinkText: 'Get the App',
@@ -633,29 +641,47 @@ app.factory('Platform', [
                 showWindowsPhone: false,
                 showKindle: false,
                 forgetHide: 7,
+                position: 'bottom',
                 openAppButtonText: 'Open',
-                downloadAppButtonText: 'Download'
+                downloadAppButtonText: 'Get the App'
             }, {});
 
             if((Device.isIOS() || Device.isAndroid())) { //Compatible mobile devices 
+              b.addListener('didDeepviewCTA', function() {
+                analytics.trackEvent('ViewInApp', 'success', 'Mobile');
+              });
+
               branch.viewInApp = function (data) {
+                analytics.trackEvent('ViewInApp', 'start', 'Mobile');
                 branch.createDeepview(data, function(err) {
                   if(err) {
                     console.log(err);
+                    analytics.trackEvent('ViewInApp', 'error', 'Mobile');
                   } else {
                     if(branch.hasApp) {
-                      Dialog.confirm('Interact in the app', 'View in the App', ['Open', 'Cancel'], b.deepviewCta.bind(b));
+                      analytics.trackEvent('ViewInApp', 'hasApp', 'Mobile');
+                      Dialog.confirm('View in the App', 'Want to Add to the Story?', ['Open', 'Cancel'], b.deepviewCta.bind(b));
                     } else {
-                      Dialog.confirm('Get full access to instanews with our mobile app!', 'Want to Interact?', ['Get the App', 'Cancel'], b.deepviewCta.bind(b));
+                      analytics.trackEvent('ViewInApp', 'doesNotHaveApp', 'Mobile');
+                      Dialog.confirm('Get full access to instanews with our mobile app!',
+                                     'Want to Add to the Story?',
+                                     ['Get the App', 'Cancel'],
+                                     b.deepviewCta.bind(b)
+                                    );
                     }
                   }
                 });
               };
             } else { //Browser
+              b.addListener('didSendBannerSMS', function() {
+                analytics.trackEvent('ViewInApp', 'success', 'Browser');
+              });
+
               branch.viewInApp = function (data) {
+                analytics.trackEvent('ViewInApp', 'start', 'Browser');
                 Dialog.prompt(
-                  'Enter your iOS or Android phone number and we\'ll text you a download link for the app.',
-                  'Want full access to instanews?',
+                  'Enter your iOS or Android phone number and we\'ll text you a download link for the official instanews app.',
+                  'Want to Add to the Story?',
                   ['Text Me', 'Later'],
                   '(555)-555-5555',
                   function (num) {
@@ -669,6 +695,9 @@ app.factory('Platform', [
                         console.log('Failed to send text');
                         console.log(err);
                         Dialog.alert('There was an error sending the text message', 'Please try again');
+                        analytics.trackEvent('ViewInApp', 'error', 'Browser');
+                      } else {
+                        analytics.trackEvent('ViewInApp', 'success', 'Browser');
                       }
                     }); 
                   }
@@ -962,7 +991,6 @@ app.factory('Platform', [
         support.clearUser();
       }
     };
-
 
     var url = {
       getQuery: function($location) {
