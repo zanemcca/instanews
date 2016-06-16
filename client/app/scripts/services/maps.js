@@ -426,7 +426,7 @@ return gradient;
       //Setup the search query
       var query = {
         input: input,
-        componentRestrictions: {country: 'ca'}
+        //componentRestrictions: {country: 'ca'}
       };
 
       if(options.types) {
