@@ -18,21 +18,21 @@
     <div ng-if="!Platform.isIOS()">
       <vg-media vg-src="sources"
         vg-preload="preload">
-    </vg-media>
+      </vg-media>
 
-    <vg-controls>
-      <vg-play-pause-button></vg-play-pause-button>
-      <vg-time-display>{{ currentTime | date:'mm:ss':'+0000' }}</vg-time-display>
-      <vg-scrub-bar>
-        <vg-scrub-bar-current-time></vg-scrub-bar-current-time>
-      </vg-scrub-bar>
-      <vg-time-display>{{ totalTime | date:'mm:ss':'+0000' }}</vg-time-display>
-      <vg-fullscreen-button></vg-fullscreen-button>
-    </vg-controls>
+      <vg-controls>
+        <vg-play-pause-button></vg-play-pause-button>
+        <vg-time-display>{{ currentTime | date:'mm:ss':'+0000' }}</vg-time-display>
+        <vg-scrub-bar>
+          <vg-scrub-bar-current-time></vg-scrub-bar-current-time>
+        </vg-scrub-bar>
+        <vg-time-display>{{ totalTime | date:'mm:ss':'+0000' }}</vg-time-display>
+        <vg-fullscreen-button></vg-fullscreen-button>
+      </vg-controls>
 
-    <vg-overlay-play></vg-overlay-play>
-    <vg-buffering></vg-buffering>
-    <vg-poster ng-if="poster && Platform.isAndroid()" vg-url='poster'></vg-poster>
+      <vg-overlay-play></vg-overlay-play>
+      <vg-buffering></vg-buffering>
+      <vg-poster ng-if="poster" vg-url='poster'></vg-poster>
     </div>
   </videogular>
 </div>
@@ -48,6 +48,7 @@
   ng-class="{'focused' : enableFocus }"
   ng-if="media.caption">
   <p class="no-margin">{{media.caption}} <button class="no-margin button button-small button-clear icon ion-edit"
+      style="color:#B2B2B2;"
       ng-if="isMine()"
       ng-click="editCaption()">
     </button>
