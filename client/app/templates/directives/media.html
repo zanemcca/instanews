@@ -3,7 +3,10 @@
   class="no-padding image-container"
   ng-style="containerStyle()"
   ng-controller="imageCtrl">
-  <img ng-style="imgStyle()" ng-src="{{source}}">
+  <div ng-style="subContainerStyle()"
+    rotate="rotate">
+    <inImage img="img" url="source" degrees="degrees"></inImage>
+  </div>
 </div>
 
 <div ng-if="media.type && media.type.indexOf('video') > -1" 

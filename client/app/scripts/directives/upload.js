@@ -70,6 +70,14 @@ app.directive(
                 });
               }
             };
+
+            $scope.degrees = 0;
+
+            $scope.rotate = function() {
+              $scope.degrees += 90;
+              $scope.degrees %= 360;
+              $scope.upload.subarticle._file.rotate = $scope.degrees;
+            };
           }
           $scope.is = {
             mine: function () {
@@ -81,3 +89,4 @@ app.directive(
       };
     }]
 );
+
