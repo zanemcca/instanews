@@ -4,7 +4,8 @@
   ng-style="containerStyle()"
   class="item no-padding image-container">
   <!--img ng-style="imgStyle()" alt="Oops! There was a problem loading this image" ng-src="{{source}}"-->
-  <img ng-style="imgStyle()" ng-src="{{source}}">
+  <!--img ng-style="imgStyle()" ng-src="{{source}}"-->
+  <inImage img="img" url="source"></inImage>
   <div class="icon ion-ios-play icon-center" ng-if="isVideo()"></div>
 </div>
 
@@ -12,6 +13,7 @@
   style="border-top: 0px;"
   ng-if="media.caption">
   <p class="no-margin">{{media.caption}} <button class="no-margin button button-small button-clear icon ion-edit"
+      style="color:#B2B2B2;"
       ng-if="isMine()"
       ng-click="edit()">
     </button>

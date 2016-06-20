@@ -89,7 +89,7 @@ app.controller(
         return isVideo;
       };
 
-      var img = {
+      $scope.img = {
         height: 0,
         width: 0
       };
@@ -130,8 +130,8 @@ app.controller(
 
         for(var i in $scope.media.sources) {
           if($scope.media.sources[i].prefix === prefix) {
-            img.height = $scope.media.sources[i].height;
-            img.width = $scope.media.sources[i].width;
+            $scope.img.height = $scope.media.sources[i].height;
+            $scope.img.width = $scope.media.sources[i].width;
             break;
           }
         }
@@ -153,24 +153,33 @@ app.controller(
         // istanbul ignore else 
         if(src) {
           $scope.source = getUrl($scope.container, src);
-          if(img.height && img.width) {
+          if($scope.img.height && $scope.img.width) {
+            var height = $scope.img.height;
+            var width = $scope.img.width;
+            if($scope.degrees % 180) {
+              height = $scope.img.width;
+              width = $scope.img.height;
+            }
+
             rendered = Platform.getMaxImageDimensions();
 
-            if(rendered.width > img.width) {
-              if(rendered.height > img.height) {
-                rendered.width = img.width;
-                rendered.height = img.height;
+            if(rendered.width > width) {
+              if(rendered.height > height) {
+                rendered.width = width;
+                rendered.height = height;
               } else {
-                rendered.width = Math.round(rendered.height/img.height*img.width);
+                rendered.width = Math.round(rendered.height/height*width);
               }
             } else {
-              var maxH = Math.round(rendered.width/img.width*img.height);
+              var maxH = Math.round(rendered.width/width*height);
               if(rendered.height > maxH) {
                 rendered.height = maxH;
               } else {
-                rendered.width = Math.round(rendered.height/img.height*img.width);
+                rendered.width = Math.round(rendered.height/height*width);
               }
             }
+
+            $scope.rotate = $scope.degrees;
           }
         } else {
           //TODO Create some kind of image that lets users know the photo is broken
@@ -180,7 +189,6 @@ app.controller(
       };
 
       findSource();
-
 
       $scope.imgStyle = function () {
         if(rendered.height && rendered.width) {
@@ -207,13 +215,98 @@ app.controller(
         }
       };
 
+      $scope.subContainerStyle = function() {
+        if(rendered.height && rendered.width) {
+          var res = {
+            'height': rendered.height + 'px',
+            'width': rendered.width + 'px'
+          };
+          if($scope.degrees % 180) {
+            res.height = rendered.width + 'px';
+            res.width = rendered.height + 'px';
+            res.maxWidth = res.width;
+            res.maxHeight = res.height;
+            res.position = 'relative';
+            res.top = (Math.abs(rendered.height - rendered.width)/2) + 'px';
+            res.left = '-' + res.top;
+          }
+
+          return res;
+        }
+      };
+
       $scope.$watch('media', function(oldMedia, newMedia) {
         if(oldMedia.name !== newMedia.name) {
           findSource();
         }
       });
+
+      $scope.$watch('degrees', function(oldDegrees, degrees) {
+        if(oldDegrees % 180 !== degrees % 180) {
+          findSource();
+        }
+      });
     }]
 );
+
+app.directive(
+  'inimage', [
+    function(
+    ) {
+      return {
+        restrict: 'E',
+        link: function(scope, element, attrs) {
+          var img, url, degrees = 0;
+
+          var resetImage = function() {
+            if(img) {
+              img.remove();
+            }
+
+            var style = {};
+
+            if(scope.img.height && scope.img.width) {
+              style.height = '100%';
+              style.width= '100%';
+            } else {
+              style.height = 'auto';
+              style.width= 'auto';
+            }
+
+            var image = new Image();
+            image.onload = function() {
+              scope.$apply(function() {
+                scope.img.height = image.naturalHeight;
+                scope.img.width = image.naturalWidth;
+              });
+            };
+
+            image.src = url;
+
+            img = angular.element(image);
+            img.css(style);
+            element.append(img);
+          };
+
+          scope.$watch(attrs.url, function(URL) {
+            if(typeof(URL) === 'string') {
+              url = URL;
+              resetImage();
+            }
+          }); 
+
+          scope.$watch(attrs.degrees, function(degs) {
+            if(typeof(degs) === 'number') {
+              degrees = degs;
+              resetImage();
+            }
+          });
+        }
+      };
+    }
+  ]
+);
+
 
 //This directive will display subarticle media in a consumable format
 // istanbul ignore next
@@ -227,6 +320,7 @@ app.directive(
           isMine: '=',
           enableFocus: '=',
           editCaption: '=',
+          degrees: '=',
           media: '='
         },
         templateUrl: 'templates/directives/media.html'
@@ -252,3 +346,24 @@ app.directive(
       };
     }]
 );
+
+app.directive(
+  'rotate',
+  function() {
+    return {
+      link: function(scope, element, attrs) {
+          scope.$watch(attrs.rotate, function(degrees) {
+            if(typeof(degrees) === 'number') {
+              degrees %= 360;
+              element.css({
+                  '-webkit-transform': 'rotate(' + degrees + 'deg)',
+                  '-ms-transform': 'rotate(' + degrees + 'deg)',
+                  '-moz-transform': 'rotate(' + degrees + 'deg)',
+                  '-o-transform': 'rotate(' + degrees + 'deg)',
+                  'transform': 'rotate(' + degrees + 'deg)'
+              });
+            }
+          });
+      }
+    };
+});

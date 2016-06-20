@@ -592,7 +592,7 @@ app.factory('Platform', [
           };
 
           // Create viewInApp() to create deepviews and navigate to the app
-          if(['CA'].indexOf(window.geo.country) === -1) { //Client is outside of valid countries
+          if(!isValidCountry(window.geo.country)) { //Client is outside of valid countries
             branch.viewInApp = function () {
               analytics.trackEvent('ViewInApp', 'start', 'OutOfCountry');
               Dialog.prompt(
@@ -1245,6 +1245,16 @@ app.factory('Platform', [
       };
     }
 
+    var validCountries = ['CA', 'IN'];
+
+    var getValidCountries = function() {
+      return validCountries;
+    };
+
+    var isValidCountry = function(country) {
+      return (validCountries.indexOf(country) > -1);
+    };
+
     return {
       getAppNameLogo: Device.getAppNameLogo,
       getUUID: Device.getUUID,
@@ -1271,6 +1281,8 @@ app.factory('Platform', [
       setDeviceToken: Device.setDeviceToken,
       getSizeClassPrefix: Device.getSizeClassPrefix,
       //All of the above should be deprecated out of platform
+      getValidCountries: getValidCountries,
+      isValidCountry: isValidCountry,
       url: url,
       permissions: permissions,
       support: support,

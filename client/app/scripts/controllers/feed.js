@@ -34,9 +34,9 @@ app.controller('FeedCtrl', [
     User
   ) {
 
-    if(Platform.isBrowser() && ['CA'].indexOf(window.geo.country) === -1) { 
+    if(Platform.isBrowser() && !Platform.isValidCountry(window.geo.country)) { 
       Dialog.alert(
-        'You can still access all of our great crowdsourced news in Canada',
+        'You can still access all of our great crowdsourced news abroad',
         'instanews is not yet available in your country');
     }
 
