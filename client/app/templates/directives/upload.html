@@ -3,6 +3,10 @@
   ng-if="upload.subarticle._file">
   <div class="item item-divider no-padding">
     <div class="buttons">
+      <button class="button button-small button-clear button-dark icon ion-refresh"
+        ng-if="!upload.isPosting && (upload.subarticle._file.type.indexOf('image') > -1)"
+        ng-click="rotate()">
+      </button>
       <button class="button button-small button-clear button-dark icon ion-close-round"
         style="position:absolute;right:0;"
         ng-if="!upload.isPosting"
@@ -20,7 +24,7 @@
       md-mode="query">
     </md-progress-linear>
   </div>
-  <inMedia edit-caption="caption.edit" is-mine="is.mine" media="upload.subarticle._file"></inMedia>
+  <inMedia edit-caption="caption.edit" is-mine="is.mine" media="upload.subarticle._file" degrees="degrees"></inMedia>
 </div>
 <div class="card" ng-if="upload.subarticle.text">
   <div class="item item-divider no-padding">

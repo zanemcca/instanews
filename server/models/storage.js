@@ -183,7 +183,7 @@ module.exports = function(Storage) {
     }
   };
 
-  var getTranscoderParams = function (containerName, filename) {
+  var getTranscoderParams = function (containerName, filename, options) {
     var cntr = getContainer(containerName);
     var name = filename.slice(0, filename.lastIndexOf('.'));
 
@@ -206,10 +206,15 @@ module.exports = function(Storage) {
         }
         return cntr.Params;
       } else if(cntr.Type === 'photo') {
-        cntr.Params.Payload = JSON.stringify({
+        var payload = {
           name: filename,
           container: containerName
-        });
+        };
+        if(options && options.rotate) {
+          payload.rotate = options.rotate % 360;
+        }
+
+        cntr.Params.Payload = JSON.stringify(payload);
         return cntr.Params;
       } else {
         console.warn('Unknown container type!');
@@ -232,7 +237,7 @@ module.exports = function(Storage) {
     }
   };
 
-  Storage.triggerTranscoding = function (containerName, file, cb) {
+  Storage.triggerTranscoding = function (containerName, file, options, cb) {
     var debug = Storage.app.debug('models:storage');
     var dd = Storage.app.DD('Storage','triggerTranscoding');
 
@@ -240,7 +245,7 @@ module.exports = function(Storage) {
       containerName = containerName.slice(0, containerName.lastIndexOf('-in')) + '-test-in';
     }
 
-    var params = getTranscoderParams(containerName, file);
+    var params = getTranscoderParams(containerName, file, options);
     var type = getContainerType(containerName);
 
     if(params) {
