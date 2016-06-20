@@ -60,6 +60,7 @@ exports.run = function () {
       describe('triggerTranscoding', function () {
         var container,
         name,
+        opts,
         cb,
         triggerCb,
         err,
@@ -69,8 +70,9 @@ exports.run = function () {
           container = 'videos.container';
           name = 'video.mp4';
           res = 'results';
+          opts = {};
 
-          triggerCb = function (cntr, name, cb) {
+          triggerCb = function (cntr, name, opts, cb) {
             cb(err, res);
           };
 
@@ -81,8 +83,8 @@ exports.run = function () {
             id: 'id'
           };
 
-          sandbox.stub(app.models.storage, 'triggerTranscoding', function(cntr, nme, cb) {
-            triggerCb(cntr, nme, cb);
+          sandbox.stub(app.models.storage, 'triggerTranscoding', function(cntr, nme, opts, cb) {
+            triggerCb(cntr, nme, opts, cb);
           });
         });
 
