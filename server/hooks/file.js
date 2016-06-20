@@ -7,8 +7,12 @@ module.exports = function(app) {
   File.beforeSave = function (inst, next) {
     var dd = app.DD('File', 'beforeSave');
     debug('before save', inst, next);
+    var options = {};
+    if(inst.rotate) {
+      options.rotate = inst.rotate;
+    }
     //TODO Check if video is available on S3
-    Storage.triggerTranscoding( inst.container, inst.name, function (err, res) {
+    Storage.triggerTranscoding( inst.container, inst.name, options, function (err, res) {
       dd.lap('Storage.triggerTranscoding');
       if(err) {
         return next(err);

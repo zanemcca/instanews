@@ -148,16 +148,18 @@ exports.run = function () {
         var run,
         containerName,
         filename,
+        opts,
         cb;
 
         beforeEach(function () {
           containerName = 'instanews-videos-in';
           filename = 'video.mp4';
+          opts = {};
           cb = function () {};
 
           run = function () {
             start();
-            Storage.triggerTranscoding(containerName, filename, cb);
+            Storage.triggerTranscoding(containerName, filename, opts, cb);
           };
         });
 
@@ -243,7 +245,7 @@ exports.run = function () {
             };
 
             run();
-            Storage.triggerTranscoding(containerName, 'secondVideo.mp4', cb);
+            Storage.triggerTranscoding(containerName, 'secondVideo.mp4', null, cb);
           }); 
 
           it('should not cause a problem if there are not params', function (done) {
