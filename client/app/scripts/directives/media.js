@@ -275,13 +275,9 @@ app.directive(
 
             var image = new Image();
             image.onload = function() {
-              EXIF.getData(image, function() {
-                console.log(EXIF.pretty(this));
-              });
               scope.$apply(function() {
                 scope.img.height = image.naturalHeight;
                 scope.img.width = image.naturalWidth;
-                console.log('Image height: ' + image.naturalHeight + '\tWidth: ' + image.naturalWidth);
               });
             };
 
