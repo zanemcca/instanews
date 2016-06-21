@@ -14,14 +14,14 @@
       <inAutocomplete search-id="post-search" place="place"></inAutocomplete>
       <inMap map="map"></inMap>
 
-      <div class="list dynamic-box">
-        <label class="item item-input"
+      <div class="list">
+        <label class="item item-input dynamic-box"
           ng-class="{'card' : Platform.getWidth() >= 768, 'box-invalid' : newArticle.title === undefined}">
            <input type="text" placeholder="What's the title?" ng-maxLength="100" on-return="Platform.keyboard.hide();" ng-model="newArticle.title" required>
          </label>
 
          <div ng-repeat="upload in Uploads.get()">
-           <inUpload upload="upload"></inUpload>
+           <inUpload upload="upload" dynamic="true"></inUpload>
          </div>
       </div>
   </ion-content>

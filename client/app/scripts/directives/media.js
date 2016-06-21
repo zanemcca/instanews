@@ -67,10 +67,12 @@ app.controller(
 app.controller(
   'imageCtrl', [
     '$scope',
+    '$element',
     'ENV',
     'Platform',
     function (
       $scope,
+      $element,
       ENV,
       Platform
     ) {
@@ -161,7 +163,18 @@ app.controller(
               width = $scope.img.height;
             }
 
-            rendered = Platform.getMaxImageDimensions();
+            var elem = $element[0];
+            while(elem.tagName !== 'ION-CONTENT') {
+              if(elem.parentElement) {
+                elem = elem.parentElement;
+              } else {
+                elem = null;
+                break;
+              }
+            }
+
+            rendered = Platform.getMaxImageDimensions(elem);
+
 
             if(rendered.width > width) {
               if(rendered.height > height) {
@@ -228,7 +241,11 @@ app.controller(
             res.maxHeight = res.height;
             res.position = 'relative';
             res.top = (Math.abs(rendered.height - rendered.width)/2) + 'px';
-            res.left = '-' + res.top;
+            if(Platform.isIOS()) {
+              res.top = '-' + res.top;
+            } else {
+              res.left = '-' + res.top;
+            }
           }
 
           return res;
