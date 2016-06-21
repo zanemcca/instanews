@@ -115,17 +115,21 @@ app.factory('Device', [
       return scrollBarWidth;
     };
 
-    var getWidth = function () {
-      return window.innerWidth;
+    var getWidth = function (element) {
+      if(element) {
+        return element.clientWidth;
+      } else {
+        return window.innerWidth;
+      }
     }; 
 
-    var getMaxImageDimensions = function () {
+    var getMaxImageDimensions = function (parentElement) {
       var res = {
         height: 0,
         width: 0
       };
 
-      var width = getWidth() - getScrollBarWidth();
+      var width = getWidth(parentElement) - getScrollBarWidth();
       if(width >= 768) {
         res.width = 600;
       } else if(isTablet()) {
@@ -135,6 +139,10 @@ app.factory('Device', [
       }
 
       var max = Math.max(window.innerWidth, window.innerHeight);
+      if(parentElement) {
+        max = Math.max(parentElement.clientWidth, parentElement.clientHeight);
+      }
+
       if(max < 500) {
         res.height = 300;
       } else if(max < 600) {
