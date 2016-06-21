@@ -154,9 +154,13 @@ module.exports = function(Base) {
           notSubarticleRating = 1;
           subarticleCount = res.length;
           if(res.length) {
-            topSubarticle = res[0].toObject();
             for(var i in res) {
-              notSubarticleRating *= (1 - res[i].rating);
+              if(!res[i].pending) { //Only include non-pending subarticles
+                if(!topSubarticle) {  //Set the topSubarticle to the highest rated non pending subarticle
+                  topSubarticle = res[i].toObject();
+                }
+                notSubarticleRating *= (1 - res[i].rating);
+              }
             }
           }
 
