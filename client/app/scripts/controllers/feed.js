@@ -34,7 +34,7 @@ app.controller('FeedCtrl', [
     User
   ) {
 
-    if(Platform.isBrowser() && !Platform.isValidCountry(window.geo.country)) { 
+    if(Platform.isBrowser() && window.geo.country && !Platform.isValidCountry(window.geo.country)) { 
       Dialog.alert(
         'You can still access all of our great crowdsourced news abroad',
         'instanews is not yet available in your country');
