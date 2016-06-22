@@ -1246,7 +1246,7 @@ app.factory('Platform', [
       };
     }
 
-    var validCountries = ['CA', 'IN'];
+    var validCountries = ['CA', 'IN', 'US', 'PH'];
 
     var getValidCountries = function() {
       return validCountries;
