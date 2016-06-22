@@ -241,7 +241,7 @@ app.controller(
             res.maxHeight = res.height;
             res.position = 'relative';
             res.top = (Math.abs(rendered.height - rendered.width)/2) + 'px';
-            if(Platform.isIOS()) {
+            if($scope.img.height > $scope.img.width) {
               res.top = '-' + res.top;
             } else {
               res.left = '-' + res.top;
