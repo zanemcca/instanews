@@ -223,7 +223,9 @@ app.controller(
             'margin': 'auto',
             'background-color': '#EFEFFF',
             'height': rendered.height + 'px',
-            'width': rendered.width + 'px'
+            'width': rendered.width + 'px',
+            'max-width': rendered.width + 'px',
+            'max-height': rendered.height + 'px'
           };
         }
       };
