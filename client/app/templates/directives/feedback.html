@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<div class="ng-cloak item card dynamic-box md-positive border-positive"
+  style="margin-bottom:0;"
+  ng-if="isShown()">
+  <section layout="column" layout-wrap layout-align="space-around space-between">
+    <section layout="row" flex="100"
+      layout-align="center center"
+      class="item-text-wrap"
+      style="color:white;padding-top:20px;padding-left:20px;padding-right:20px;">
+      <b>{{text.question}}</b>
+    </section>
+    <section layout="row" layout-align="space-between center"
+      style="padding-top:20px;padding-bottom:20px;">
+      <div flex="45">
+        <md-button class="button tocapitalize button-block button-outline button-white-positive"
+          aria-label="Disagree"
+          ng-click="disagree()">
+            {{text.disagree}} 
+        </md-button>
+      </div>
+      <div flex="45">
+        <md-button class="button tocapitalize button-block button-white-positive"
+          aria-label="Agree"
+          ng-click="agree()">
+            {{text.agree}}
+        </md-button>
+      </div>
+    </section>
+  </section>
+</div>

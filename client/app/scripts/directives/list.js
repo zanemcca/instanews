@@ -105,6 +105,7 @@ app.directive('inList', [
 app.directive('inListItem', [
   '$state',
   '$timeout',
+  'Activity',
   'TextInput',
   'Platform',
   'Position',
@@ -114,6 +115,7 @@ app.directive('inListItem', [
   function (
     $state,
     $timeout,
+    Activity,
     TextInput,
     Platform,
     Position,
@@ -190,6 +192,7 @@ app.directive('inListItem', [
             var id = Platform.url.getParam($scope.item);
             //TODO Change to use Navigate
             $state.go('app.article', { id: id });
+            Activity.registerArticleOpen();
           };
 
           var newTitle = '';
@@ -349,6 +352,7 @@ app.directive('inListItem', [
                 console.log(err);
               });
           }
+          Activity.registerView();
         };
 
         //console.log($scope.item);
