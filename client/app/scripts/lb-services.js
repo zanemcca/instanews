@@ -3212,6 +3212,85 @@ module.factory(
     return R;
   }]);
 
+/**
+ * @ngdoc object
+ * @name lbServices.Feedback
+ * @header lbServices.Feedback
+ * @object
+ *
+ * @description
+ *
+ * A $resource object for interacting with the `Feedback` model.
+ *
+ * ## Example
+ *
+ * See
+ * {@link http://docs.angularjs.org/api/ngResource.$resource#example $resource}
+ * for an example of using this object.
+ *
+ */
+module.factory(
+  "Feedback",
+  ['LoopBackResource', 'LoopBackAuth', '$injector', function(Resource, LoopBackAuth, $injector) {
+    var R = Resource(
+      urlBase + "/feedbacks/:id",
+      { 'id': '@id' },
+      {
+
+        /**
+         * @ngdoc method
+         * @name lbServices.Feedback#submit
+         * @methodOf lbServices.Feedback
+         *
+         * @description
+         *
+         * Submits feedback to helpdesk
+         *
+         * @param {Object=} parameters Request parameters.
+         *
+         *   This method does not accept any parameters.
+         *   Supply an empty object or omit this argument altogether.
+         *
+         * @param {Object} postData Request data.
+         *
+         *  - `content` – `{string}` - 
+         *
+         * @param {function(Object,Object)=} successCb
+         *   Success callback with two arguments: `value`, `responseHeaders`.
+         *
+         * @param {function(Object)=} errorCb Error callback with one argument:
+         *   `httpResponse`.
+         *
+         * @returns {Object} An empty reference that will be
+         *   populated with the actual data once the response is returned
+         *   from the server.
+         *
+         * This method returns no data.
+         */
+        "submit": {
+          url: urlBase + "/feedbacks",
+          method: "PUT"
+        },
+      }
+    );
+
+
+
+
+    /**
+    * @ngdoc property
+    * @name lbServices.Feedback#modelName
+    * @propertyOf lbServices.Feedback
+    * @description
+    * The name of the model represented by this $resource,
+    * i.e. `Feedback`.
+    */
+    R.modelName = "Feedback";
+
+
+    return R;
+  }]);
+
 
 module
   .factory('LoopBackAuth', function() {

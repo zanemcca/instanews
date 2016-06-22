@@ -62,6 +62,7 @@ describe('Post service', function() {
 
     module('instanews.service.post');
     module('mock.services.dialog');
+    module('mock.services.activity');
 
     module(function($provide) {
       $provide.service('Article', function() {
@@ -246,6 +247,7 @@ describe('Post service', function() {
   var post;
   var article;
   var platform;
+  var activity;
 
   var localStorage;
   var fileTransfer;
@@ -257,6 +259,7 @@ describe('Post service', function() {
 
   beforeEach(inject(function(
     Post,
+    Activity,
     Article,
     Camera,
     Dialog,
@@ -270,6 +273,7 @@ describe('Post service', function() {
   ) {
     post = Post;
     article = Article;
+    activity = Activity;
     camera = Camera;
     dialog = Dialog;
     subarticles = Subarticles;

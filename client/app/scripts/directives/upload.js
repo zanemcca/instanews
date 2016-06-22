@@ -34,7 +34,8 @@ app.directive(
       return {
         restrict: 'E',
         scope: {
-          upload: '='
+          upload: '=',
+          dynamic: '@'
         },
         controller: function ($scope, TextInput) {
           var newText;

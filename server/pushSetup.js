@@ -95,7 +95,8 @@ module.exports = function (app) {
       };
 
       Push.on('error', function (err) {
-        console.error('Push Notification error: ', err.stack);
+        console.error('Push Notification error: ');
+        console.error(err);
       });
 
       App.observe('before save', function(ctx, next) {

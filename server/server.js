@@ -640,6 +640,7 @@ if(cluster.isMaster && numCPUs > 1 && process.env.NODE_ENV === 'production') {
   var renderIndex = function(req, res, next) {
     var ip = req.clientIp;
     //ip = '205.179.247.220'; //Southern States
+    //ip = '1.37.0.0'; //Phillipines
     //ip = '107.179.247.220'; //Mtl
     var geo = geoip.lookup(ip);
     var arg = {};

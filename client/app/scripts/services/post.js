@@ -6,6 +6,7 @@ var app = angular.module('instanews.service.post', ['ionic', 'ngResource']);
 
 app.factory('Post', [
   '$q',
+  'Activity',
   'Article',
   'Camera',
   'Dialog',
@@ -16,6 +17,7 @@ app.factory('Post', [
   'Uploads',
   function(
     $q,
+    Activity,
     Article,
     Camera,
     Dialog,
@@ -109,6 +111,7 @@ app.factory('Post', [
             if(hasMediaItems) {
               Platform.showToast('Your content has finished uploading and should be available soon');
             }
+            Activity.activateFeedback();
           }
         }
       };

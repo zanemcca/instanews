@@ -135,6 +135,10 @@
   background-color: $positive !important;
 }
 
+.border-positive {
+  border-color: $positive !important;
+}
+
 .positive {
   color: $positive !important;
 }
@@ -348,3 +352,11 @@
       position: relative !important;
   }
 }
+
+.tolowercase {
+  text-transform: lowercase;
+}
+.tocapitalize {
+  text-transform: capitalize;
+}
+

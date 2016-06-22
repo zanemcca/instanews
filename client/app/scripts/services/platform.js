@@ -561,6 +561,7 @@ app.factory('Platform', [
           var b = branch.branch;
 
           branch.hasApp = false;
+
           b.init('key_live_lbo1wHTU65sACNHMqWdJndbdtBfIG34J', function(err, data) {
             if(err) {
               console.log(err);
@@ -592,7 +593,7 @@ app.factory('Platform', [
           };
 
           // Create viewInApp() to create deepviews and navigate to the app
-          if(!isValidCountry(window.geo.country)) { //Client is outside of valid countries
+          if(window.geo.country && !isValidCountry(window.geo.country)) { //Client is outside of valid countries
             branch.viewInApp = function () {
               analytics.trackEvent('ViewInApp', 'start', 'OutOfCountry');
               Dialog.prompt(
@@ -1245,7 +1246,7 @@ app.factory('Platform', [
       };
     }
 
-    var validCountries = ['CA', 'IN'];
+    var validCountries = ['CA', 'IN', 'US', 'PH'];
 
     var getValidCountries = function() {
       return validCountries;
