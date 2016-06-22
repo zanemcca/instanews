@@ -4,12 +4,8 @@ var app = angular.module('instanews.service.device', ['ionic', 'ngCordova']);
 
 app.factory('Device', [
   '$cordovaDevice',
-  '$cordovaFile',
-  'ENV',
   function(
-    $cordovaDevice,
-    $cordovaFile,
-    ENV
+    $cordovaDevice
   ) {
 
     var device = {
@@ -51,7 +47,7 @@ app.factory('Device', [
 
     var isBrowser = function() {
       var ip = ionic.Platform;
-      if((ip && window.cordova) || ENV.name === 'development') {
+      if((ip && window.cordova)) {
         if(ip.isIOS() || ip.isAndroid() || ip.isWindowsPhone()) {
           return false;
         } else {

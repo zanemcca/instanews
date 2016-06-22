@@ -106,5 +106,9 @@
   "term": {
     "dataSource": null,
     "public": true
+  },
+  "feedback": {
+    "dataSource": null,
+    "public": true
   }
 }

@@ -4,6 +4,7 @@ var app = angular.module('instanews.directive.votes', ['ionic', 'ngResource']);
 
 app.directive('invotes', [
   '$timeout',
+  'Activity',
   'Articles',
   'Comments',
   'UpVote',
@@ -18,6 +19,7 @@ app.directive('invotes', [
   '_',
   function (
     $timeout,
+    Activity,
     Articles,
     Comments,
     UpVote,
@@ -121,6 +123,7 @@ app.directive('invotes', [
                     return;
                   }
 
+                  Activity.activateFeedback();
                   var user = User.get();
                   if(user) {
 
@@ -230,6 +233,8 @@ app.directive('invotes', [
                       console.log('Successfully upvoted');
                       Votes.up.reload();
                       Votes.down.reload();
+
+                      Activity.activateFeedback();
                       Platform.analytics.trackEvent('UpVote', 'success');
                     }, 
                     // istanbul ignore  next 
