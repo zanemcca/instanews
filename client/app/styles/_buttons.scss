@@ -45,3 +45,26 @@
   bottom: 4px;
 }
 
+.button-white-positive {
+  border-color: transparent;
+  background-color: #ffffff;
+  color: $positive;
+}
+
+.button-white-positive.button-outline {
+  border-color: #ffffff;
+  color: #ffffff;
+  background-color: $positive;
+}
+
+.button-white-positive:hover {
+  border-color: transparent;
+  background-color: #ffffff !important;
+  color: $positive;
+}
+
+.button-white-positive.button-outline:hover {
+  border-color: #ffffff;
+  color: #ffffff;
+  background-color: $positive !important;
+}
