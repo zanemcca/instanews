@@ -175,7 +175,6 @@ app.controller(
 
             rendered = Platform.getMaxImageDimensions(elem);
 
-
             if(rendered.width > width) {
               if(rendered.height > height) {
                 rendered.width = width;
