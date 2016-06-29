@@ -38,6 +38,7 @@ angular.module('instanews', [
   'instanews.directive.autocomplete',
   'instanews.directive.comments',
   'instanews.directive.feedback',
+  'instanews.directive.heightCorrector',
   'instanews.directive.list',
   'instanews.directive.map',
   'instanews.directive.media',

@@ -119,6 +119,14 @@ app.factory('Device', [
       }
     }; 
 
+    var getHeight = function (element) {
+      if(element) {
+        return element.clientHeight;
+      } else {
+        return window.innerHeight;
+      }
+    }; 
+
     var keyboardHeight = 0;
 
     window.addEventListener('native.keyboardshow', function(e) {
@@ -263,6 +271,7 @@ app.factory('Device', [
       isTablet: isTablet,
       isLandscape: isLandscape,
       getWidth: getWidth,
+      getHeight: getHeight,
       getMaxImageDimensions: getMaxImageDimensions,
       getDevice: getDevice,
       setDevice: setDevice,
