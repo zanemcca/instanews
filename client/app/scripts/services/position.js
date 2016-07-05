@@ -137,7 +137,7 @@ app.service('Position', [
         Platform.ready
         .then( function() {
           // istanbul ignore if
-          if( !geolocation ) {
+          if( !geolocation || (Platform.isIOS() && !Platform.isBrowser())) {
             console.log('HTML5 geolocation not availble. Using cordova plugin instead.');
             geolocation = navigator.geolocation;
           }

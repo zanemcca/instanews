@@ -119,6 +119,28 @@ app.factory('Device', [
       }
     }; 
 
+    var getHeight = function (element) {
+      if(element) {
+        return element.clientHeight;
+      } else {
+        return window.innerHeight;
+      }
+    }; 
+
+    var keyboardHeight = 0;
+
+    window.addEventListener('native.keyboardshow', function(e) {
+      keyboardHeight = e.keyboardHeight;
+    });
+
+    window.addEventListener('native.keyboardhide', function() {
+      keyboardHeight = 0;
+    });
+
+    var getKeyboardHeight = function() {
+      return keyboardHeight;
+    };
+
     var getMaxImageDimensions = function (parentElement) {
       var res = {
         height: 0,
@@ -135,8 +157,16 @@ app.factory('Device', [
       }
 
       var max = Math.max(window.innerWidth, window.innerHeight);
+      if(window.screen && window.screen.height) {
+        max = window.screen.height;
+      }
+
       if(parentElement) {
-        max = Math.max(parentElement.clientWidth, parentElement.clientHeight);
+        if(keyboardHeight && !isLandscape()) {
+          max = Math.min(parentElement.clientHeight + keyboardHeight, max);
+        } else {
+          max = Math.max(parentElement.clientWidth, parentElement.clientHeight);
+        }
       }
 
       if(max < 500) {
@@ -154,14 +184,24 @@ app.factory('Device', [
     };
 
     var isLandscape = function () {
-      var isLandscape = false;
+      if(window.screen && window.screen.orientation) {
+        if(typeof(window.screen.orientation) === 'string') {
+          return (window.screen.orientation.indexOf('landscape') > -1);
+        } else { 
+          //This section is for android which has screen.orientation as an object for some reason
+          if(window.screen.orientation.type && typeof(window.screen.orientation.type) === 'string') {
+            return (window.screen.orientation.type.indexOf('landscape') > -1);
+          }
+        }
+      }
+      
       if(typeof(window.orientation) === 'number') {
-        isLandscape = (window.orientation % 180);
+        return (window.orientation % 180);
       } else {
-        isLandscape = (window.innerHeight < window.innerWidth);
+        return (window.innerHeight < window.innerWidth);
       }
 
-      return isLandscape;
+      return false;
     };
 
     var getDeviceType = function () {
@@ -220,6 +260,7 @@ app.factory('Device', [
       getUUID: getUUID,
       getDataDir: getDataDir,
       getCacheDir: getCacheDir,
+      getKeyboardHeight: getKeyboardHeight,
       isIOS: isIOS,
       isAndroid: isAndroid,
       isAndroid6: isAndroid6,
@@ -230,6 +271,7 @@ app.factory('Device', [
       isTablet: isTablet,
       isLandscape: isLandscape,
       getWidth: getWidth,
+      getHeight: getHeight,
       getMaxImageDimensions: getMaxImageDimensions,
       getDevice: getDevice,
       setDevice: setDevice,
