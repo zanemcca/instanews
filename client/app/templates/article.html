@@ -34,7 +34,7 @@
   preScroll="preScrollToTop">
   </in-scroll-top-->
 
-  <ion-content id="subarticle" delegate-handle="subarticle" on-swipe-down="onSwipeDown()" overflow-scroll="true" class="gpu">
+  <ion-content in-height-corrector id="subarticle" delegate-handle="subarticle" on-swipe-down="onSwipeDown()" overflow-scroll="true" class="gpu">
     <ion-refresher pulling-text="Fresh Stuff" on-refresh="onRefresh()">
     </ion-refresher>
     <in-list list="Subarticles"
