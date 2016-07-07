@@ -48,7 +48,7 @@ module.exports = function(app) {
   DownVote.observe('access', function(ctx, next) {
     //console.log(objectIdWithTimestamp(Date.now() - 2*ONE_WEEK));
     ctx.query.where = ctx.query.where || {};
-    ctx.query.where.id = ctx.query.where.id || { gt: app.utils.objectIdWithTimestamp(Date.now() - 2 * ONE_WEEK) };
+//    ctx.query.where.id = ctx.query.where.id || { gt: app.utils.objectIdWithTimestamp(Date.now() - 2 * ONE_WEEK) };
 
     debug('observe.access', ctx);
     next();
