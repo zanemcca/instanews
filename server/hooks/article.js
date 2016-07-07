@@ -165,7 +165,7 @@ module.exports = function(app) {
     }
 
     filter.where = filter.where || {};
-    filter.where.id = filter.where.id || { gt: app.utils.objectIdWithTimestamp(Date.now() - 2 * ONE_WEEK) };
+    //filter.where.id = filter.where.id || { gt: app.utils.objectIdWithTimestamp(Date.now() - 2 * ONE_WEEK) };
 
     var loc = filter.where.loc || filter.where.location;
     if(loc) {
