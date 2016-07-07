@@ -162,9 +162,11 @@ module.exports = function(Article) {
         },
         pending: {
           exists: false
+          /*
         },
         id: {
           gt: Article.app.utils.objectIdWithTimestamp(Date.now() - 2 * ONE_WEEK)
+         */
         }
       },
       order: 'rating DESC'
@@ -183,8 +185,7 @@ module.exports = function(Article) {
     });
   };
 
-  Article.remoteMethod(
-    'heatMap',
+  Article.remoteMethod('heatMap',
     {
       accepts: { arg: 'box', type: 'array', required: true},
       http: {
@@ -215,9 +216,11 @@ module.exports = function(Article) {
         },
         pending: {
           exists: false
+          /*
         },
         id: {
           gt: Article.app.utils.objectIdWithTimestamp(Date.now() - 2 * ONE_WEEK)
+         */
         }
       },
       order: 'rating DESC'
@@ -236,8 +239,7 @@ module.exports = function(Article) {
     });
   };
 
-  Article.remoteMethod(
-    'getHeatMap',
+  Article.remoteMethod('getHeatMap',
     {
       accepts: { arg: 'box', type: 'array'},
       description: 'DEPRECATED',
