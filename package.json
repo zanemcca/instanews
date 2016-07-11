@@ -76,6 +76,7 @@
     "it-each": "^0.3.1",
     "jshint": "^2.9.1-rc1",
     "mocha": "^2.1.0",
+    "monk": "^3.0.4",
     "node-static": "^0.7.7",
     "sinon": "^1.16.1",
     "supertest": "^1.1.0"
