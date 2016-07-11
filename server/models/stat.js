@@ -3,7 +3,7 @@ module.exports = function(Stat) {
 
   Stat.averageId = 'averageJoe';
 
-  var TIME_DECAY_RATE = process.env.TIME_DECAY_RATE || 0.99;
+  var TIME_DECAY_RATE = process.env.TIME_DECAY_RATE || 0.951297;
 
   // Critical values from the t table for 
   // 50% Confidence Interval
