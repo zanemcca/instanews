@@ -12,7 +12,39 @@ var Stat = {
 
 require('./server/models/stat.js')(Stat);
 
-const db = require('monk')('localhost/articles');
+var cred = require('./server/conf/credentials');
+
+var mongo = cred.get('mongo');
+var mongoCA = cred.get('mongoCA');
+
+var mongodb = '';
+if( mongo.username && mongo.password) {
+  mongodb += mongo.username +
+  ':' + mongo.password;
+}
+
+mongodb  += mongo.url;
+
+var options = {
+  connectTimeoutMS: 30000
+};
+
+if(mongo.replicaSet) {
+  options.replicaSet = mongo.replicaSet;
+}
+
+if(mongo.ssl && mongoCA) {
+  options = {
+    ssl: true,
+    sslValidate: true,
+    sslCA: [mongoCA],
+  };
+}
+
+console.log(mongodb);
+console.log(options);
+
+const db = require('monk')(mongodb + 'articles', options);
 const articles = db.get('article');
 const comments = db.get('comment');
 const subarticles = db.get('subarticle');
