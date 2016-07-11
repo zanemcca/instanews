@@ -282,7 +282,6 @@ viewCount: 270
         '\tPnotSub: ' + rateable.notSubarticleRating
     );
 
-
     var Pup = upVoteCount/viewCount;
 
     var PupBonus = upVoteCount + Stat.bonus.upVoteCount;
@@ -306,6 +305,7 @@ viewCount: 270
     }
     
     var timeDecay =  Math.pow(TIME_DECAY_RATE, daysOld);
+    //console.log('days old: ' + daysOld + '  Decay: ' + timeDecay + '  Original: ' + rating + '  New: ' + (rating*timeDecay));
     rating *= timeDecay;
 
     /*
@@ -330,15 +330,15 @@ viewCount: 270
 
     if(rating > 1 || rating < 0 || isNaN(rating)) {
       dd.increment('Stat.brokenRating');
-      console.warn('The returned probability is not unitary!: ' + rating);
+      console.warn('The probability (' + rating + ') returned for ' +  rateable.modelName + ': ' + rateable.id + ' is not unitary!');
       return rateable.rating;
     }
 
     if(rating === 1) {
-      rating = 0.9999; 
+      rating = 0.99999999; 
     }
     if(rating === 0) {
-      rating = 0.0001;
+      rating = 0.00000001;
     }
 
     dd.histogram('Stat.rating', rating, ['instanceId:' + rateable.id, 'instanceType:' + rateable.modelName]);
