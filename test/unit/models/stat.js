@@ -129,7 +129,7 @@ exports.run = function () {
         created: new Date(Date.now() - 5*25*60*60*1000), // 5 days ago
         message: 'should use all available data',
         // (1 - P(down))*P( up U comments U subarticles ) - P((comments U subarticles) & downvotes)
-        result: 0.35634667331897085 
+        result: 0.291929088732647 
       },
       {
         notCommentRating: 0.25,

@@ -38,7 +38,7 @@ exports.run = function () {
 
     if(process.env.NODE_ENV === 'development') {
       tests = [{
-        key: 'mongoEast',
+        key: 'mongo',
         value : {
           url: 'localhost:27017/'
         }
