@@ -144,18 +144,22 @@ function process(model, cb) {
       });
       break;
     case 'comment':
-      var finish = function() {
+      var finish = function(isReply) {
         var rating = Stat.getRating(model);
-        comments.update({ _id: model._id }, {
+        var updates = {
           $set: {
-            notCommentRating: model.notCommentRating,
             rating: rating,
             ratingModified: new Date(),
           },
           $inc: {
             ratingVersion: 1
           }
-        }).then(function() {
+        };
+
+        if(!isReply) {
+          updates.$set.notCommentRating = model.notCommentRating;
+        }
+        comments.update({ _id: model._id }, updates).then(function() {
           //console.log('Model: ' + model.modelName + '\tRating: ' + rating);
           cb(rating);
         });
@@ -172,10 +176,10 @@ function process(model, cb) {
           }
 
           model.notCommentRating = notComRating;
-          finish();
+          finish(false);
         });
       } else {
-        finish();
+        finish(true);
       }
       break;
     default:
