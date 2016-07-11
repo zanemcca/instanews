@@ -12,9 +12,12 @@ module.exports = function(Subarticle) {
   Subarticle.notify = common.notify.bind(this, Subarticle);
 
   Subarticle.clearPending = function(message, next) {
+    var debug = Subarticle.app.debug('models:subarticle');
     var dd = Subarticle.app.DD('Subarticle','clearPending');
     var Article = Subarticle.app.models.Article;
     var Storage = Subarticle.app.models.Storage;
+
+    debug('clearPending', message);
 
     Subarticle.findOne({
       where: {
@@ -28,30 +31,50 @@ module.exports = function(Subarticle) {
       }
 
       if(res) {
-
         var query = {
           $unset: {
             pending: ''
           }
         };
 
-        if(res._file && res._file.type.indexOf('image') > -1) {
-          if(message.sources) {
-            query.$set = {
-              '_file.sources': message.sources 
-            };
-          } else {
-            var e = new Error('Invalid message! Cannot clear pending flag for ' + res.id + ' subarticle');
-            e.status = 400;
-            console.error(e);
-            console.dir(message);
-            return next(e);
+        if(res._file) {
+          if(res._file.type.indexOf('video') > -1) {
+            var sources = [];
+            for(var i in message.outputs) {
+              var src = message.outputs[i];
+              sources.push({
+                name: src.Key,
+                duration: src.DurationMillis,
+                width: src.Width,
+                height: src.Height,
+                size: src.FileSize
+              });
+            }
+
+            if(sources.length) {
+              query.$set = {
+                '_file.sourceMetadata': sources
+              };
+            }
+          } else if(res._file.type.indexOf('image') > -1) {
+            if(message.sources) {
+              query.$set = {
+                '_file.sources': message.sources 
+              };
+            } else {
+              var e = new Error('Invalid message! Cannot clear pending flag for ' + res.id + ' subarticle');
+              e.status = 400;
+              console.error(e);
+              console.dir(message);
+              return next(e);
+            }
           }
         }
 
         var parentId = res.parentId;
         Subarticle.notify(res);
 
+        debug('updateAttributes', query);
         res.updateAttributes(query, function (err, result) {
           dd.lap('Subarticle.updateAttributes');
           if(err) {
