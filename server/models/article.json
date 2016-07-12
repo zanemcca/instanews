@@ -13,6 +13,14 @@
       "options": {
         "background": true
       }
+    },
+    "loc_2dsphere": {
+      "keys": {
+        "loc": "2dsphere"
+      },
+      "options": {
+        "background": true
+      }
     }
   },
   "properties": {
