@@ -147,6 +147,11 @@ module.exports = function(grunt) {
     },
     //Shell commands
     shell: {
+      search: {
+        command: function (pattern) { 
+          return 'ag ' + pattern + ' ./';
+        }
+      },
       debug: {
         command: function (file) { 
           return 'node-debug -p 8081 --hidden node_modules/ ' + file;
@@ -256,6 +261,11 @@ module.exports = function(grunt) {
     }
 
     grunt.task.run(command + file);
+  }); 
+
+  //Search task
+  grunt.registerTask('search', function(pattern) {
+    grunt.task.run('shell:search:' + pattern);
   });
 
   // Start and open the web server
