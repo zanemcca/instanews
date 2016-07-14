@@ -725,11 +725,15 @@ if(cluster.isMaster && numCPUs > 1 && process.env.NODE_ENV === 'production') {
   // Call autoupdate on the databases
   autoUpdateDB();
 
+  // The race condition between the middleware and app start could result in
+  // the server never getting started properly if there
+  // were many requests coming in before the server was fully started
+  //TODO Delay starting the server until all middleware has completed its setup
+  //
   // start the server if `$ node server.js`
   if (require.main === module) {
     app.start();
   }
-
 
   //Setup error handler last
   var errorHandler = require('./middleware/errorHandler.js')();
