@@ -83,9 +83,11 @@ exports.run = function () {
                 geoWithin: {
                   $box: box
                 }
+                /*
               },
               id: {
                 gt: "id"
+               */
               },
               pending: {
                 exists: false

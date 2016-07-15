@@ -24,6 +24,9 @@ function start() {
           decrement: function () {}
         };
       },
+      debug: function() {
+        return function () {};
+      },
       models: {
         Article: {
           clearPending: function (id, next) {

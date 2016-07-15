@@ -228,7 +228,7 @@ module.exports = function(app) {
     next();
   });
 
-  var checkLoadedUser = function (instance, next) {
+  var checkLoadedUser = function (ctx, instance, next) {
     var dd = app.DD('Journalist','checkLoadedUser');
     var userId;
     var includeSecrets = false;
@@ -289,16 +289,10 @@ module.exports = function(app) {
       });
     };
 
-    var context = loopback.getCurrentContext();
+    userId = ctx.req.accessToken && ctx.req.accessToken.userId;
 
-    if(context) {
-      var token = context.get('accessToken');
-      if(token) {
-        userId = token.userId;
-        if(userId) {
-          return check();
-        }
-      }
+    if(userId) {
+      return check();
     }
 
     if (!instance.findById) {
@@ -317,7 +311,7 @@ module.exports = function(app) {
 
     if(instance) {
       instance.findById = true;
-      checkLoadedUser(instance, function(err) {
+      checkLoadedUser(ctx, instance, function(err) {
         dd.lap('Journalist.checkLoadedUser');
         next(err);
       });
@@ -331,7 +325,7 @@ module.exports = function(app) {
     debug('afterRemote findOne', instance, next);
 
     if(instance) {
-      checkLoadedUser(instance, function(err) {
+      checkLoadedUser(ctx, instance, function(err) {
         dd.lap('Journalist.checkLoadedUser');
         next(err);
       });
@@ -349,7 +343,7 @@ module.exports = function(app) {
       var funcs = [];
       instances.forEach( function (instance) {
         funcs.push(function(cb) {
-          checkLoadedUser(instance, function(err) {
+          checkLoadedUser(ctx, instance, function(err) {
             dd.elapsed('Journalist.checkLoadedUser');
             cb(err);
           });
