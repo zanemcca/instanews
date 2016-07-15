@@ -43,11 +43,11 @@ module.exports = function(Subarticle) {
             for(var i in message.outputs) {
               var src = message.outputs[i];
               sources.push({
-                name: src.Key,
-                duration: src.DurationMillis,
-                width: src.Width,
-                height: src.Height,
-                size: src.FileSize
+                name: src.key,
+                duration: src.duration,
+                width: src.width,
+                height: src.height,
+                size: src.filesize
               });
             }
 
