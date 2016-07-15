@@ -34,7 +34,7 @@
     "loopback-component-push": "^1.4.4",
     "loopback-component-storage": "^1.3.0",
     "loopback-connector-mongodb": "^1.15.2",
-    "loopback-connector-sendgrid": "^2.0.3",
+    "loopback-connector-sendgrid": "^1.2.3",
     "loopback-datasource-juggler": "^2.46.0",
     "mongodb": "^2.1.6",
     "morgan": "^1.6.1",
