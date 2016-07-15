@@ -20,6 +20,7 @@ RUN gem update --system && gem install sass compass
 
 # Install backend dependencies
 COPY package.json /usr/src/app/
+COPY npm-shrinkwrap.json /usr/src/app/
 RUN npm install --production
 
 # Install frontend depencencies

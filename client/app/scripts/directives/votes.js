@@ -47,19 +47,37 @@ app.directive('invotes', [
 
           var update = function () {
             $timeout(function () {
-              $scope.votable.upVotes = Votes.up.find($scope.votable);
-              $scope.votable.downVotes = Votes.down.find($scope.votable);
+              Votes.up.find($scope.votable, function(err, votes) {
+                if(err) {
+                  console.log(err);
+                  $scope.votable.upVotes = [];
+                }
+                if(votes) {
+                  $scope.votable.upVotes = votes;
+                }
+                Votes.down.find($scope.votable, function(err, votes) {
+                  if(err) {
+                    console.log(err);
+                    $scope.votable.downVotes = [];
+                  }
 
-              if($scope.votable.upVotes.length) {
-                $scope.votable.upVoted = true;
-                $scope.votable.downVoted = false;
-              } else if($scope.votable.downVotes.length) {
-                $scope.votable.downVoted = true;
-                $scope.votable.upVoted = false;
-              } else {
-                $scope.votable.downVoted = false;
-                $scope.votable.upVoted = false;
-              }
+                  if(votes) {
+                    $scope.votable.downVotes = votes;
+                  }
+
+                  if($scope.votable.upVotes.length) {
+                    $scope.votable.upVoted = true;
+                    $scope.votable.downVoted = false;
+                  } else if($scope.votable.downVotes.length) {
+                    $scope.votable.downVoted = true;
+                    $scope.votable.upVoted = false;
+                  } else {
+                    $scope.votable.downVoted = false;
+                    $scope.votable.upVoted = false;
+                  }
+                });
+              });
+
             });
           };
 

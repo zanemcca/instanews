@@ -33,17 +33,23 @@ app.service('LocalStorage', [
         });
       };
 
-      $cordovaFile.checkDir(Platform.getDataDir(), dir)
-      .then( write(), function(err) {
-        if(err.code === 1) {
-          $cordovaFile.createDir(Platform.getDataDir(),dir,true)
-          .then( write(), function(err) {
-            console.log('Error: Failed to create directory ' + Platform.getDataDir() + dir + ': ' + JSON.stringify(err));
+      Platform.permissions.storage.requestAuthorization( function (succ) {
+        if(succ) {
+          $cordovaFile.checkDir(Platform.getDataDir(), dir)
+          .then( write, function(err) {
+            if(err.code === 1) {
+              $cordovaFile.createDir(Platform.getDataDir(),dir,true)
+              .then( write, function(err) {
+                console.log('Error: Failed to create directory ' + Platform.getDataDir() + dir + ': ' + JSON.stringify(err));
+              });
+            }
+            else {
+              console.log('Error: There was an error checking the directory ' + Platform.getDataDir() + dir + ': ' + JSON.stringify(err));
+            }
           });
         }
-        else {
-          console.log('Error: There was an error checking the directory ' + Platform.getDataDir() + dir + ': ' + JSON.stringify(err));
-        }
+      }, function(err) {
+        console.log(err);
       });
     }
   };
@@ -107,27 +113,40 @@ app.service('LocalStorage', [
       if(dir.length > 0) {
         path += dir + '/';
       }
-      $cordovaFile.readAsText(path, filename)
-      .then( function(text) {
-        var types = filename.split('.');
-        var type = types[types.length - 1];
 
-        var res;
-        if( type === 'json' ) {
-          try { 
-            res = JSON.parse(text);
-          } catch(e) {
-            return cb(e);
-          }
+      Platform.permissions.storage.requestAuthorization( function (succ) {
+        if(succ) {
+          $cordovaFile.readAsText(path, filename)
+          .then( function(text) {
+            var types = filename.split('.');
+            var type = types[types.length - 1];
+
+            var res;
+            if( type === 'json' ) {
+              try { 
+                res = JSON.parse(text);
+              } catch(e) {
+                return cb(e);
+              }
+            } else {
+              res = text;
+            }
+
+            cb(null,res);
+
+          }, function(err) {
+            console.log('Error: Failed to read file ' + filename + ': ' + JSON.stringify(err));
+            cb(err.message);
+          });
         } else {
-          res = text;
+          var err = new Error('Permission denied');
+          err.status = 401;
+          console.log(err);
+          cb(err);
         }
-
-        cb(null,res);
-
       }, function(err) {
-        console.log('Error: Failed to read file ' + filename + ': ' + JSON.stringify(err));
-        cb(err.message);
+        console.log(err);
+        cb(err);
       });
     }
   };

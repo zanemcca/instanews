@@ -28,30 +28,24 @@ module.exports = function(app) {
            ctx.req.remotingContext.instance &&
              ctx.req.remotingContext.instance.id
       ){
-        var context = loopback.getCurrentContext();
-        if(context) {
-          var token = context.get('accessToken');
-          if(token) {
-            var click = {
-              username: token.userId,
-              type: ctx.options.clickType,
-              clickableType: ctx.req.remotingContext.instance.modelName,
-              clickableId: ctx.req.remotingContext.instance.id
-            };
-            Click.create(click, function(err, res) {
-              dd.lap('Click.create');
-              if(err) {
-                console.error(err.stack);
-              }
-              next(err);
-            });
-          }
-          else {
-            next();
-          }
+        var userId = ctx.req.accessToken && ctx.req.accessToken.userId;
+
+        if(userId) {
+          var click = {
+            username: userId,
+            type: ctx.options.clickType,
+            clickableType: ctx.req.remotingContext.instance.modelName,
+            clickableId: ctx.req.remotingContext.instance.id
+          };
+          Click.create(click, function(err, res) {
+            dd.lap('Click.create');
+            if(err) {
+              console.error(err.stack);
+            }
+            next(err);
+          });
         }
         else {
-          console.warn('Warning: No context object was found!');
           next();
         }
       }

@@ -3,6 +3,51 @@ module.exports = function(Stat) {
 
   Stat.averageId = 'averageJoe';
 
+  var TIME_DECAY_RATE = process.env.TIME_DECAY_RATE || 0.951297;
+
+  // Critical values from the t table for 
+  // 50% Confidence Interval
+  var tTable = [
+    1,
+    0.816,
+    0.765,
+    0.741,
+    0.727,
+    0.718,
+    0.711,
+    0.706,
+    0.703,
+    0.700,
+    0.697,
+    0.695,
+    0.694,
+    0.692,
+    0.691,
+    0.690,
+    0.689,
+    0.688,
+    0.688,
+    0.687,
+    0.687,
+    0.686,
+    0.686,
+    0.685,
+    0.685,
+    0.684,
+    0.684,
+    0.684,
+    0.683,
+    0.683,
+    0.683,
+    0.681,
+    0.679,
+    0.679,
+    0.678,
+    0.677
+  ];
+  var CRITICAL_VALUE_INF = 0.674;
+
+
   var debug = require('../helpers/logging').debug('models:stat');
 
   //TODO Create a probability and statistics library for javascript
@@ -108,49 +153,6 @@ viewCount: 270
     comments: 0.7
   };
 
-  // Critical values from the t table for 
-  // 50% Confidence Interval
-  var tTable = [
-    1,
-    0.816,
-    0.765,
-    0.741,
-    0.727,
-    0.718,
-    0.711,
-    0.706,
-    0.703,
-    0.700,
-    0.697,
-    0.695,
-    0.694,
-    0.692,
-    0.691,
-    0.690,
-    0.689,
-    0.688,
-    0.688,
-    0.687,
-    0.687,
-    0.686,
-    0.686,
-    0.685,
-    0.685,
-    0.684,
-    0.684,
-    0.684,
-    0.683,
-    0.683,
-    0.683,
-    0.681,
-    0.679,
-    0.679,
-    0.678,
-    0.677
-  ];
-
-  var criticalValueInfinity = 0.674;
-
   Stat.getRating  = function(rateable) {
     var dd = Stat.app.DD('Stat', 'getRating');
     var upVoteCount = rateable.upVoteCount || 0;
@@ -205,7 +207,7 @@ viewCount: 270
     } else if(degreesOfFreedom < tTable.length) {
       criticalValue = tTable[degreesOfFreedom - 1];
     } else {
-      criticalValue = criticalValueInfinity;
+      criticalValue = CRITICAL_VALUE_INF;
     }
 
     var clickCount =
@@ -280,7 +282,6 @@ viewCount: 270
         '\tPnotSub: ' + rateable.notSubarticleRating
     );
 
-
     var Pup = upVoteCount/viewCount;
 
     var PupBonus = upVoteCount + Stat.bonus.upVoteCount;
@@ -296,6 +297,16 @@ viewCount: 270
 
     // The rating is the probability of not downvoting and then positively interacting
     var rating = (1 - Pdown)*(Pup + (1 - Pdown - Pup)*Pclick);
+
+    var daysOld = 1000;
+    if(rateable.created) {
+      daysOld = Date.now() - rateable.created.getTime(); 
+      daysOld = Math.floor(daysOld/86400000); // 1000 ms/s * 60 s/m * 60 m/h * 24 h/day = day
+    }
+    
+    var timeDecay =  Math.pow(TIME_DECAY_RATE, daysOld);
+    //console.log('days old: ' + daysOld + '  Decay: ' + timeDecay + '  Original: ' + rating + '  New: ' + (rating*timeDecay));
+    rating *= timeDecay;
 
     /*
     // Click Thru
@@ -317,18 +328,17 @@ viewCount: 270
         '\tPsub: ' + Psub
     );
 
-
     if(rating > 1 || rating < 0 || isNaN(rating)) {
       dd.increment('Stat.brokenRating');
-      console.warn('The returned probability is not unitary!: ' + rating);
+      console.warn('The probability (' + rating + ') returned for ' +  rateable.modelName + ': ' + rateable.id + ' is not unitary!');
       return rateable.rating;
     }
 
     if(rating === 1) {
-      rating = 0.9999; 
+      rating = 0.99999999; 
     }
     if(rating === 0) {
-      rating = 0.0001;
+      rating = 0.00000001;
     }
 
     dd.histogram('Stat.rating', rating, ['instanceId:' + rateable.id, 'instanceType:' + rateable.modelName]);

@@ -88,6 +88,7 @@ exports.run = function () {
 
       beforeEach(function () {
         rateable = {
+          created: new Date(),
           upVoteCount: 24,
           downVoteCount: 20,
           viewCount: 118,
@@ -114,12 +115,21 @@ exports.run = function () {
       });
 
       //Without clickthru
-      var tests = [{
+      var tests = [
+      {
         notSubarticleRating: 0.75,
         notCommentRating: 0.25,
         message: 'should use all available data',
         // (1 - P(down))*P( up U comments U subarticles ) - P((comments U subarticles) & downvotes)
         result: 0.3747112531371301
+      },
+      {
+        notSubarticleRating: 0.75,
+        notCommentRating: 0.25,
+        created: new Date(Date.now() - 5*25*60*60*1000), // 5 days ago
+        message: 'should use all available data',
+        // (1 - P(down))*P( up U comments U subarticles ) - P((comments U subarticles) & downvotes)
+        result: 0.291929088732647 
       },
       {
         notCommentRating: 0.25,
@@ -159,6 +169,7 @@ exports.run = function () {
       tests.forEach(function(test) {
         it(test.message, function () {
           rateable = {
+            created: new Date(),
             upVoteCount: 0,
             downVoteCount: 0,
             viewCount: 0,
@@ -174,6 +185,9 @@ exports.run = function () {
             rateable.getCommentsCount = 0;
             rateable.notCommentRating = test.notCommentRating;
           }
+          if(test.created) {
+            rateable.created = test.created;
+          }
 
           Stat.bonus = bonus;
           Stat.weight = weight;
@@ -184,6 +198,7 @@ exports.run = function () {
 
       it('should use the given input data from the rateable item', function () {
         rateable = {
+          created: new Date(),
           upVoteCount: 150,
           downVoteCount: 5,
           viewCount: 200,

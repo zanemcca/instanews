@@ -5,39 +5,32 @@ module.exports = function(app) {
   var loopback = require('loopback');
 
   Role.registerResolver('admin', function(role, ctx, cb) {
-    function reject() {
+    function done(err, isInRole) {
       process.nextTick(function() {
-        cb(null, false);
+        cb(err, isInRole);
       });
     }
 
-    var userId;
-    var context = loopback.getCurrentContext();
-    if(context) {
-      var token = context.get('accessToken');
-      if(token) {
-        userId = token.userId;
-        if(!userId) {
-          return reject();
-        }
-      }
-    }
+    var users = ctx.principals.map(function(principal) {
+      return principal.id;
+    });
 
     // Check if the user is an admin 
-    Admin.findOne({ 
+    Admin.find({ 
       where: {
-        username: userId
+        username: {
+         inq: users
+        } 
       }
-    }, function(err, user) {
+    }, function(err, usrs) {
       if (err) {
         console.log(err);
-        return cb(null, false);
+        done(null, false);
+      } else if(usrs.length !== users.length) {
+        done(null, false);
+      } else {
+        done (null, true); // true = is a team member
       }
-
-      if(!user) {
-        return cb(null, false);
-      }
-      cb(null, true); // true = is a team member
     });
   });
 };
