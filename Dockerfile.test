@@ -16,6 +16,7 @@ WORKDIR /usr/src/app
 #ENV ENCRYPT_PASSWORD couchesareabit2fly4me
 
 COPY package.json /usr/src/app/
+COPY npm-shrinkwrap.json /usr/src/app/
 RUN npm install && npm install -g grunt-cli
 COPY . /usr/src/app
 
