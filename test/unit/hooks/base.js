@@ -487,7 +487,7 @@ exports.run = function () {
     });
 
     describe('createClickAfterRemote', function() {
-      var run, click, clickCb, stat, context;
+      var run, click, clickCb, stat;
       beforeEach(function () {
         ctx.req = {
           remotingContext: {
@@ -495,6 +495,9 @@ exports.run = function () {
               id: 'someid',
               modelName: 'aModel'
             }
+          },
+          accessToken: {
+            userId: 'user6'
           }
         };
 
@@ -510,20 +513,6 @@ exports.run = function () {
           clickCb(click, cb);
         });
 
-        token = {
-          userId: 'user6'
-        };
-
-        context = {
-          get: function(name) {
-            expect(name).to.equal('accessToken');
-            return token;
-          }
-        };
-
-        sandbox.stub(loopback, 'getCurrentContext', function () {
-          return context;
-        });
       });
 
       it('should create a click' , function (done) {
@@ -534,7 +523,7 @@ exports.run = function () {
       });
 
       it('should not create a click' , function (done) {
-        context = null;
+        ctx.req.accessToken = null;
         run(function(err) {
           expect(click.called).to.be.false;
           done();
@@ -542,7 +531,7 @@ exports.run = function () {
       });
 
       it('should also not create a click' , function (done) {
-        token = null;
+        ctx.req.accessToken.userId = null;
         run(function(err) {
           expect(click.called).to.be.false;
           done();
