@@ -88,9 +88,9 @@ var debug = function(debugString) {
 // istanbul ignore next 
 function colorConsole() {
   [
+    //[ 'log',   'green', 'italic' ],
     [ 'warn',  'yellow', 'yellow' ],
-    [ 'error', 'red', 'bold'],
-    [ 'log',   'green', 'italic' ]
+    [ 'error', 'red', 'bold']
   ].forEach(function(pair) {
     var method = pair[0], color = pair[1], color2 = pair[2];
     var oldCall = console[method];
