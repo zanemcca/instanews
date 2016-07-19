@@ -311,9 +311,9 @@ app.directive('inListItem', [
       },
       templateUrl: 'templates/directives/listItem.html',
       //link: function($scope,element, attributes) {
-      link: function($scope) {
+      link: function(scope) {
 
-        $scope.getItemTemplate = getItemTemplate;
+        scope.getItemTemplate = getItemTemplate;
 
         // TODO Use the new subarticle retrieval to trigger views instead of using an api
         // But we have to be careful because we are caching things so the
@@ -321,12 +321,12 @@ app.directive('inListItem', [
         //    Because of above assertion we need to wait to replace this till we have
         //    proper refreshing reinstated in the lists. 
         var createView = function () {
-          if(User.get() && $scope.item.modelName !== 'notif') {
+          if(User.get() && scope.item.modelName !== 'notif') {
             var position = Position.getPosition();
 
             var view = {
-              viewableId: $scope.item.id,
-              viewableType: $scope.item.modelName
+              viewableId: scope.item.id,
+              viewableType: scope.item.modelName
             };
 
             // istanbul ignore else
@@ -355,21 +355,21 @@ app.directive('inListItem', [
           Activity.registerView();
         };
 
-        //console.log($scope.item);
-        if($scope.preLoad instanceof Function) {
-          $scope.preLoad($scope.item, createView);
+        //console.log(scope.item);
+        if(scope.preLoad instanceof Function) {
+          scope.preLoad(scope.item, createView);
         } else {
           createView();
         }
 
         /*
            var onRelease = function() {
-           $scope.position = $ionicScrollDelegate.getScrollPosition().top;
-           console.log('Position: ' + $scope.position);
+           scope.position = $ionicScrollDelegate.getScrollPosition().top;
+           console.log('Position: ' + scope.position);
            };
 
            $timeout(function() {
-           console.log('Height: ' + element[0].offsetHeight);
+           console.log('Height: ' + element.$$element[0].offsetHeight);
            }, false);
 
            $ionicGesture.on('on-release', onRelease, element, options);
