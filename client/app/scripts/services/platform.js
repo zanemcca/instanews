@@ -466,6 +466,11 @@ app.factory('Platform', [
             console.log(err.stack);
           });
 
+          window.analytics.setAllowIDFACollection(true, function () {
+            console.log('Successfully set up analytics IDFA');
+          }, function (err) {
+            console.log(err.stack);
+          });
         } else {
           //Browser version
           (function(i,s,o,g,r,a,m){
