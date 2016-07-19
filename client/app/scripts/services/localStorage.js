@@ -12,8 +12,8 @@ app.service('LocalStorage', [
     $cordovaFile
   ){
 
-  var writeFile = function(dir ,filename, data) {
-    if(Platform.isBrowser()) {
+  var writeFile = function(isLocal, dir ,filename, data) {
+    if(Platform.isBrowser() || isLocal) {
       if(typeof(data) === 'string') {
         window.localStorage[dir + '-' + filename] = data;
       } else {
@@ -47,6 +47,8 @@ app.service('LocalStorage', [
               console.log('Error: There was an error checking the directory ' + Platform.getDataDir() + dir + ': ' + JSON.stringify(err));
             }
           });
+        } else {
+          console.log('Storage Write Permission denied!');
         }
       }, function(err) {
         console.log(err);
@@ -54,7 +56,7 @@ app.service('LocalStorage', [
     }
   };
 
-  var readFiles = function(dir, cb) {
+  var readFiles = function(isLocal, dir, cb) {
     if(Platform.isBrowser()) {
       console.log('Cannot read files in the browser');
     } else {
@@ -83,7 +85,7 @@ app.service('LocalStorage', [
           total = res.length;
           for( var i = 0; i < res.length; i++) {
             var name = res[i].fullPath.split('/');
-            readFile(dir, String(name[name.length -1]), handle);
+            readFile(isLocal, dir, String(name[name.length -1]), handle);
           }
         }, function(err) {
           console.log('Error: Failed to read the directory! ' + JSON.stringify(err));
@@ -93,8 +95,8 @@ app.service('LocalStorage', [
     }
   };
 
-  var readFile = function(dir, filename, cb) {
-    if(Platform.isBrowser()) {
+  var readFile = function(isLocal, dir, filename, cb) {
+    if(Platform.isBrowser() || isLocal) {
       var res =  window.localStorage[dir + '-' + filename];
       if(res) {
         console.log('Read this:');
@@ -151,12 +153,26 @@ app.service('LocalStorage', [
     }
   };
 
+   var deleteFile = function(isLocal, dir, file) {
+    if(isLocal || Platform.isBrowser()) {
+      delete window.localStorage[dir + '-' + file];
+      console.log('Cannot delete files in the browser');
+    } else {
+      $cordovaFile.removeFile(Platform.getDataDir() + dir, file)
+      .then( function (success) {
+         console.log('Successfully deleted file!'+ JSON.stringify(success.fileRemoved.name));
+      }, function (err) {
+         console.log('Error deleting file: '+ JSON.stringify(err));
+      });
+    }
+   };
+
    var getFileName = function(partial) {
       return '.' + partial + '.txt';
    };
 
    //TODO Use native encryption on Android and keychain on iOS
-   var secureWrite = function(key, value) {
+   var secureWrite = function(isLocal, key, value) {
      var val = JSON.stringify(value);
      var encrypted = CryptoJS.AES.encrypt(val, key).toString();
 
@@ -164,14 +180,14 @@ app.service('LocalStorage', [
 //     console.log('Trying to write \"'+ val + '\" to ' + file);
 //     console.log('Encrypted to: ' + encrypted);
 
-     writeFile('', file, encrypted);
+     writeFile(isLocal, '', file, encrypted);
    };
 
-   var secureRead = function(key, cb) {
+   var secureRead = function(isLocal, key, cb) {
      var file = getFileName(CryptoJS.SHA256(key));
 //     console.log('Trying to read ' + file);
 
-    readFile('', file, function(err, encrypted) {
+    readFile(isLocal, '', file, function(err, encrypted) {
       if(!err) {
        try {
          //console.log('Successfully read ' + JSON.stringify(decrypted, 'utf8', '  ') +
@@ -194,39 +210,26 @@ app.service('LocalStorage', [
    };
 
    //TODO Ensure the data gets overwritten at the deletion address
-   var secureDelete = function(key) {
+   var secureDelete = function(isLocal, key) {
       var file = getFileName(CryptoJS.SHA256(key));
       //console.log('Trying to delete ' + file);
-
-      $cordovaFile.removeFile(Platform.getDataDir(), file)
-      .then( function (success) {
-         console.log('Successfully deleted file!'+ JSON.stringify(success.fileRemoved.name));
-      }, function (err) {
-         console.log('Error deleting file: '+ err.message);
-      });
-   };
-
-   var deleteFile = function(dir, file) {
-    if(Platform.isBrowser()) {
-      delete window.localStorage[dir + '-' + file];
-      console.log('Cannot delete files in the browser');
-    } else {
-      $cordovaFile.removeFile(Platform.getDataDir() + dir, file)
-      .then( function (success) {
-         console.log('Successfully deleted file!'+ JSON.stringify(success.fileRemoved.name));
-      }, function (err) {
-         console.log('Error deleting file: '+ JSON.stringify(err));
-      });
-    }
+      deleteFile(isLocal, '', file);
    };
 
   return {
-    writeFile: writeFile,
-    readFile: readFile,
-    readFiles: readFiles,
-    deleteFile: deleteFile,
-    secureWrite: secureWrite,
-    secureDelete: secureDelete,
-    secureRead: secureRead
+    writeFile: writeFile.bind(this, false),
+    readFile: readFile.bind(this, false),
+    readFiles: readFiles.bind(this, false),
+    deleteFile: deleteFile.bind(this, false),
+    secureWrite: secureWrite.bind(this, false),
+    secureDelete: secureDelete.bind(this, false),
+    secureRead: secureRead.bind(this, false),
+    writeFileLocal: writeFile.bind(this, true),
+    readFileLocal: readFile.bind(this, true),
+    readFilesLocal: readFiles.bind(this, true),
+    deleteFileLocal: deleteFile.bind(this, true),
+    secureWriteLocal: secureWrite.bind(this, true),
+    secureDeleteLocal: secureDelete.bind(this, true),
+    secureReadLocal: secureRead.bind(this, true)
   };
 }]);
