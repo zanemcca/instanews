@@ -4,6 +4,16 @@ module.exports = function(Subarticle) {
 
   common.initBase(Subarticle);
 
+  // HLS PresetId's for AWS Elastic Transcoder
+  var HLS_PRESETS = [
+    '1351620000001-200010',
+    '1351620000001-200015',
+    '1351620000001-200020',
+    '1351620000001-200025',
+    '1351620000001-200030',
+    '1351620000001-200035'
+  ];
+
   //TODO Use bind instead of this crud
   Subarticle.readModifyWrite = function(query, modify, cb, options) {
     common.readModifyWrite(Subarticle, query, modify, cb, options);
@@ -40,14 +50,17 @@ module.exports = function(Subarticle) {
         if(res._file) {
           if(res._file.type.indexOf('video') > -1) {
             var sources = [];
+
             for(var i in message.outputs) {
               var src = message.outputs[i];
+              if(src.key.indexOf('.m3u8') === -1 && HLS_PRESETS.indexOf(src.presetId) > -1) {
+                src.key += '.m3u8';
+              }
               sources.push({
                 name: src.key,
                 duration: src.duration,
                 width: src.width,
-                height: src.height,
-                size: src.filesize
+                height: src.height
               });
             }
 
