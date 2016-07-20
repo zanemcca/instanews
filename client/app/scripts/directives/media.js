@@ -73,8 +73,6 @@ function containerStyle(rendered) {
       'max-width': rendered.width + 'px',
       'max-height': rendered.height + 'px'
     };
-  } else {
-    console.log('No Rendered height!');
   }
 }
 
@@ -175,10 +173,7 @@ function videoSetup(scope, attrs, $element, $sce, ENV, Platform) {
   findSources();
 
   scope.containerStyle = function () {
-    var res = containerStyle(rendered);
-    res['max-width'] = '100%';
-    res.width = '100%';
-    return res;
+    return containerStyle(rendered);
   };
 
   scope.$watch(attrs.media, function(oldMedia, newMedia) {
