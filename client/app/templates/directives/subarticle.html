@@ -23,13 +23,14 @@
       </button>
     </div>
   </div>
-  <div ng-if="item.text">
+  <div ng-if="item.text" ng-click="item.expanded = !item.expanded" ng-class="{ 'text-preview': !item.expanded}">
     <p class="no-margin">{{item.text}} <button class="no-margin button button-small button-clear icon ion-edit"
         style="color:#B2B2B2;"
         ng-if="is.mine()"
         ng-click="edit()">
       </button>
     </p>
+    <div ng-class="{'text-preview-shadow': !item.expanded}"></div>
   </div>
 </div>
 

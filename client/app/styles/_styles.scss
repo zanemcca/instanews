@@ -39,6 +39,22 @@
   display: inline-block;
 }
 
+.text-preview {
+  position:relative;
+  max-height: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.text-preview-shadow {
+  height: 100%;
+  width:100%;
+  position:absolute;
+  top: 0;
+  left: 0;
+  background:linear-gradient(transparent 150px, white);
+}
+
 .margin-10 {
   margin-left: 10% !important;
   margin-right: 10% !important;
