@@ -1,8 +1,7 @@
 <!DOCTYPE html>
 <div ng-if="media.type && media.type.indexOf('image') > -1"
   class="no-padding image-container"
-  ng-style="containerStyle()"
-  ng-controller="imageCtrl">
+  ng-style="containerStyle()">
   <div ng-style="subContainerStyle()"
     rotate="rotate">
     <inImage img="img" url="source" degrees="degrees"></inImage>
@@ -10,19 +9,15 @@
 </div>
 
 <div ng-if="media.type && media.type.indexOf('video') > -1" 
-  ng-controller="videoCtrl"
-  class="video-container">
+  class="video-container"
+  ng-style="containerStyle()">
   <videogular>
-    <vg-media ng-if="Platform.isIOS()"
-      vg-native-controls="true"
-      vg-src="sources">
+    <vg-media
+      vg-src="config.sources"
+      vg-preload="config.preload"
+      vg-native-controls="config.nativeControls">
     </vg-media>
-
     <div ng-if="!Platform.isIOS()">
-      <vg-media vg-src="sources"
-        vg-preload="preload">
-      </vg-media>
-
       <vg-controls>
         <vg-play-pause-button></vg-play-pause-button>
         <vg-time-display>{{ currentTime | date:'mm:ss':'+0000' }}</vg-time-display>
@@ -35,7 +30,7 @@
 
       <vg-overlay-play></vg-overlay-play>
       <vg-buffering></vg-buffering>
-      <vg-poster ng-if="poster" vg-url='poster'></vg-poster>
+      <vg-poster ng-if="config.poster" vg-url='config.poster'></vg-poster>
     </div>
   </videogular>
 </div>

@@ -21,7 +21,7 @@ app.factory('Activity', [
     var date = (new Date()).toDateString();
 
     Platform.ready.then(function() {
-      LocalStorage.secureRead('activity', function(err, results) {
+      LocalStorage.secureReadLocal('activity', function(err, results) {
         if(err) {
           console.log(err);
         }
@@ -38,7 +38,7 @@ app.factory('Activity', [
         }
         activity.accesses++;
 
-        LocalStorage.secureWrite('activity', activity);
+        LocalStorage.secureWriteLocal('activity', activity);
       });
     });
 
@@ -52,7 +52,7 @@ app.factory('Activity', [
 
     var hideFeedback = function() {
       activity.feedbackHidden = date;
-      LocalStorage.secureWrite('activity', activity);
+      LocalStorage.secureWriteLocal('activity', activity);
     };
 
     var isFeedbackActive = function() {

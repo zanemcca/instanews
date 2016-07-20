@@ -401,6 +401,7 @@ app.directive('inmap', [
               }
             }
           };
+
           var observer = Maps.registerObserver(localize);
           localize();
         }
