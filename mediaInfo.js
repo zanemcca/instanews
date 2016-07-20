@@ -45,7 +45,10 @@ function convertDuration(duration) {
         case 'h':
           value *= 3600;
           break;
-        case 'm':
+        case 'hr':
+          value *= 3600;
+          break;
+        case 'mn':
           value *= 60;
           break;
         case 's':
@@ -54,7 +57,7 @@ function convertDuration(duration) {
           value = 0;
           break;
         default:
-          throw 'Unknown time value ' + time[1];
+          throw 'Unknown time value ' + unit[0];
           break;
       }
 
@@ -69,7 +72,7 @@ function convertDuration(duration) {
 }
 
 function convertDimension(dimension) {
-  var value = dimension.match(/^[0-9]*/)[0];
+  var value = dimension.replace(/\s+/g, '').match(/^[0-9]*/)[0];
   try {
     return Number(value);
   } catch(e) {
@@ -142,17 +145,15 @@ function processItem(model, cb) {
       }
 
       if(metadata.video) {
-        var dur = convertDuration(metadata.video.duration);
         var width = convertDimension(metadata.video.width);
         var height = convertDimension(metadata.video.height);
 
-        if(isNaN(dur) || isNaN(width) || isNaN(height)) {
+        if(isNaN(width) || isNaN(height)) {
           return cb(new Error('Failed to convert data for ' + src));
         }
 
         sourceMetadata.push({
           name: src,
-          duration: dur,
           width: width,
           height: height
         });
@@ -172,7 +173,6 @@ function processItem(model, cb) {
       return cb(err);
     }
 
-    //console.log(sourceMetadata);
     subarticles.update({ _id: model._id },{ 
       $set: {
         '_file.sourceMetadata': sourceMetadata
@@ -196,13 +196,13 @@ function processItem(model, cb) {
 
 function test(cb) {
   console.log('Testing...');
-  var res = convertDuration('3h 4m 5s 657ms');
+  var res = convertDuration('3hr 4mn 5s 657ms');
   if(res !== 11045) {
     console.log(res);
     return cb(new Error('convertDuration bug!'));
   }
-  res = convertDimension('367 pixels');
-  if(res !== 367) {
+  res = convertDimension('1 024 pixels');
+  if(res !== 1024) {
     console.log(res);
     return cb(new Error('convertDimension bug!'));
   }
