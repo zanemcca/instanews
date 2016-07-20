@@ -152,7 +152,7 @@ function videoSetup(scope, attrs, $element, $sce, ENV, Platform) {
         if(meta.name.indexOf('.m3u8') > -1 && Platform.isIOS()) {
           scope.naturalSize.height = meta.height;
           scope.naturalSize.width = meta.width;
-        } else if(!Platform.isIOS()){
+        } else if(meta.name.indexOf('.mp4') > -1 && !Platform.isIOS()) {
           scope.naturalSize.height = meta.height;
           scope.naturalSize.width = meta.width;
         }
@@ -175,7 +175,10 @@ function videoSetup(scope, attrs, $element, $sce, ENV, Platform) {
   findSources();
 
   scope.containerStyle = function () {
-    return containerStyle(rendered);
+    var res = containerStyle(rendered);
+    res['max-width'] = '100%';
+    res.width = '100%';
+    return res;
   };
 
   scope.$watch(attrs.media, function(oldMedia, newMedia) {
