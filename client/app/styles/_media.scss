@@ -108,20 +108,28 @@ videogular .iconButton:focus, [videogular] .iconButton:focus {
 //Replace fullscreen icon
 videogular .enter:before, [videogular] .enter:before {
   content: $ionicon-var-arrow-expand !important;
+  font-size: 30px;
 }
 
 //Replace shrink icon
 videogular .exit:before, [videogular] .exit:before {
   content: $ionicon-var-arrow-shrink !important;
+  font-size: 30px;
 }
 
 //Replace play icon
 videogular .play:before, [videogular] .play:before {
   content: $ionicon-var-ios-play !important;
+  font-size: 30px;
 }
 
 videogular .pause:before, [videogular] .pause:before {
   content: $ionicon-var-ios-pause !important;
+  font-size: 30px;
+}
+
+videogular vg-overlay-play .overlayPlayContainer .play:before, [videogular] vg-overlay-play .overlayPlayContainer .play:before {
+  font-size: 100px;
 }
 
 videogular vg-overlay-play .overlayPlayContainer, [videogular] vg-overlay-play .overlayPlayContainer {
