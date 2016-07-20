@@ -180,12 +180,14 @@ function processItem(model, cb) {
     }).then(function() {
       //console.log('Model: ' + model.modelName + '\tRating: ' + rating);
       articles.findOne({ _id: model.parentId }).then((article) => {
-        if(article.topSubarticle && article.topSubarticle._id === model._id) {
+        if(article.topSubarticle && article.topSubarticle.id.toHexString() === model._id.toHexString()) {
           articles.update({ _id: model.parentId },{ 
             $set: {
               'topSubarticle._file.sourceMetadata': sourceMetadata
             }
-          }).then(cb);
+          }).then(function() {
+            cb();
+          });
         } else { 
           cb(err);
         }
