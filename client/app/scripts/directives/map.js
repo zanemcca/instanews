@@ -199,7 +199,7 @@ app.directive('inmap', [
                 layer.setMap(map);
 
                 google.maps.event.addListener(layer, 'click', function(event) {
-                  Dialog.confirm('Would you like to continue anyway?', 'Sorry but instanews is currently only available in Canada', function(idx) {
+                  Dialog.confirm('Would you like to continue anyway?', 'Sorry but instanews is currently not available in that region', function(idx) {
                     if(idx === 1) {
                       Maps.setMarker(Maps.getPostMap(), event.latLng);
                     }
