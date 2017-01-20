@@ -15,7 +15,8 @@ ENV NODE_ENV production
 
 # Install universal tools
 RUN npm install -g bower grunt
-RUN apt-get update && apt-get install -y ruby-full rubygems
+#RUN apt-get update && apt-get -y upgrade libssl1.0.0 openssl && apt-get install -y ruby-full rubygems 
+RUN apt-get update && apt-get install -y ruby-full rubygems libssl-dev 
 RUN gem update --system && gem install sass compass
 
 # Install backend dependencies
