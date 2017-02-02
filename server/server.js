@@ -239,6 +239,7 @@ if(cluster.isMaster && numCPUs > 1 && process.env.NODE_ENV === 'production') {
   var geoip = require('geoip-lite');
 
   var setupModerator = function () {
+    /*
     if(['staging', 'production'].indexOf(process.env.NODE_ENV) > -1) {
       var WebPurify = require('webpurify');
       var creds = cred.get('webpurify');
@@ -247,6 +248,7 @@ if(cluster.isMaster && numCPUs > 1 && process.env.NODE_ENV === 'production') {
       });
       app.moderator = wp;
     } else {
+   */
       app.moderator = {
         check: function() {
           return {
@@ -256,7 +258,7 @@ if(cluster.isMaster && numCPUs > 1 && process.env.NODE_ENV === 'production') {
           };
         }
       };
-    }
+    //}
   };
 
   var setupRedis = function () {
@@ -388,7 +390,7 @@ if(cluster.isMaster && numCPUs > 1 && process.env.NODE_ENV === 'production') {
           }
         }
 
-        //console.log('Connecting to ' + mongodb);
+        console.log('Connecting to ' + mongodb);
 
         MongoClient.connect(mongodb, options, function(err, db) {
           // istanbul ignore if

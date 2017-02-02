@@ -3,6 +3,7 @@ function validate(options) {
   return options && options.to && options.subject && options.text;
 }
 
+/*
 if(process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'staging') {
   var cred = require('../conf/credentials').get('sendgrid');
 
@@ -41,6 +42,7 @@ if(process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'staging') 
   };
 } else {
 
+ */
   exports.email = {
     send: function(opts, cb) {
       if(validate(options)) {
@@ -59,4 +61,4 @@ if(process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'staging') 
       cb();
     }
   };
-}
+//}
