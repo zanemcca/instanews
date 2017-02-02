@@ -583,7 +583,7 @@ if(cluster.isMaster && numCPUs > 1 && process.env.NODE_ENV === 'production') {
       }
 
       sitemap = sm.createSitemap({
-        hostname: 'https://www.instanews.com',
+        hostname: 'https://www.instanews.zanemccaig.com',
         cacheTime: 10*60*1000, //10 min cachetime
         urls: urls
       });
@@ -623,9 +623,9 @@ if(cluster.isMaster && numCPUs > 1 && process.env.NODE_ENV === 'production') {
     });
   };
 
-  // Redirect all instanews.com requests to www.instanews.com
+  // Redirect all instanews.zanemccaig.com requests to www.instanews.zanemccaig.com
   app.get('/*', function(req, res, next) {
-    if (req.headers.host.match(/^instanews.com/) !== null ) {
+    if (req.headers.host.match(/^instanews.zanemccaig.com/) !== null ) {
       var newUrl = 'https://www.' + req.headers.host + req.url;
       res.redirect(301, newUrl);
     } else {
