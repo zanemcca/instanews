@@ -132,11 +132,11 @@ module.exports = function (grunt) {
         constants: {
           ENV: {
             name: 'staging',
-            url: 'https://turtle.instanews.com',
-            apiEndpoint: 'https://turtle.instanews.com/api',
-            storageEndpoint: 'https://turtle.instanews.com/api',
-            videoEndpoint: 'https://turtlevideos.instanews.com',
-            photoEndpoint: 'https://turtlephotos.instanews.com'
+            url: 'https://turtle.instanews.zanemccaig.com',
+            apiEndpoint: 'https://turtle.instanews.zanemccaig.com/api',
+            storageEndpoint: 'https://turtle.instanews.zanemccaig.com/api',
+            videoEndpoint: 'https://turtlevideos.instanews.zanemccaig.com',
+            photoEndpoint: 'https://turtlephotos.instanews.zanemccaig.com'
           }
         }
       },
@@ -144,11 +144,11 @@ module.exports = function (grunt) {
         constants: {
           ENV: {
             name: 'production',
-            url: 'https://www.instanews.com',
-            apiEndpoint: 'https://api.instanews.com/api',
-            storageEndpoint: 'https://storage.instanews.com/api',
-            videoEndpoint: 'https://videos.instanews.com',
-            photoEndpoint: 'https://photos.instanews.com'
+            url: 'https://www.instanews.zanemccaig.com',
+            apiEndpoint: 'https://www.instanews.zanemccaig.com/api',
+            storageEndpoint: 'https://www.instanews.zanemccaig.com/api',
+            videoEndpoint: 'https://videos.instanews.zanemccaig.com',
+            photoEndpoint: 'https://photos.instanews.zanemccaig.com'
           }
         }
       }
