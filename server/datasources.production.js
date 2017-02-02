@@ -1,7 +1,7 @@
 
 var cred = require('./conf/credentials');
 
-var sendgrid = cred.get('sendgrid');
+//var sendgrid = cred.get('sendgrid');
 var mongo = cred.get('mongo');
 var mongoCA = cred.get('mongoCA');
 var aws = cred.get('aws');
@@ -102,11 +102,13 @@ module.exports = {
     notification: 'notification',
     application: 'app'
   },
+  /*
   sendgrid: {
     connector: 'loopback-connector-sendgrid',
     api_user: sendgrid.user,
     api_key: sendgrid.key 
   },
+ */
   Storage: {
     name: 'Storage',
     connector: 'loopback-component-storage',

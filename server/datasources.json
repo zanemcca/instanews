@@ -62,11 +62,5 @@
     "provider": "filesystem",
     "maxFileSize": 1073741824,
     "root": "./test/.storage"
-  },
-  "sendgrid": {
-    "name": "sendgrid",
-    "connector": "loopback-connector-sendgrid",
-    "api_user": "instanews-dev",
-    "api_key": "couchesareabit2fly4me"
   }
 }
