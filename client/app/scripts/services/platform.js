@@ -636,7 +636,7 @@ app.factory('Platform', [
             });
 
             b.banner({
-                icon: 'https://photos.instanews.zanemccaig.com/instanews.png',
+                icon: 'https://iphotos.zanemccaig.com/instanews.png',
                 title: 'instanews - Crowdsourced Local News',
                 description: 'Share your story',
                 //buttonBackgroundColor: '#048AB0', //Broken right now see issue #314 for Branch smart banner repo
