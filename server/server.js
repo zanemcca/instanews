@@ -189,7 +189,12 @@ if(cluster.isMaster && numCPUs > 1 && process.env.NODE_ENV === 'production') {
   var workers = createWorkers();
 
   // Start instance per cpu
-  for(var i = 0; i < numCPUs; i++) {
+  var threads = numCPUs;
+  if( threads > process.env.THREADS) {
+    threads = process.env.THREADS;
+  }
+
+  for(var i = 0; i < threads; i++) {
     workers.add(cluster.fork());
   }
 
