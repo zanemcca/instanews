@@ -38,26 +38,26 @@ module.exports = function(Storage) {
   if(credentials) {
     s3 = new aws.S3({
       apiVersion: '2006-03-01',
-      region: 'us-east-1',
+      region: 'us-west-2',
       accessKeyId: credentials.keyId,
       secretAccessKey: credentials.key
     });
 
     transcoder = new aws.ElasticTranscoder({
-      region: 'us-east-1',
+      region: 'us-west-2',
       accessKeyId: credentials.keyId,
       secretAccessKey: credentials.key
     });
 
     lambda = new aws.Lambda({
       apiVersion: '2015-03-31',
-      region: 'us-east-1',
+      region: 'us-west-2',
       accessKeyId: credentials.keyId,
       secretAccessKey: credentials.key
     });
 
     sns = new aws.SNS({
-      region: 'us-east-1',
+      region: 'us-west-2',
       accessKeyId: credentials.keyId,
       secretAccessKey: credentials.key
     });
@@ -69,7 +69,7 @@ module.exports = function(Storage) {
       Type: 'video',
       Output: 'instanews-videos',
       Params: { 
-        PipelineId: '1444324496785-65xn4p',
+        PipelineId: '1486607980817-a5uel0',
         Input: { 
           Key: null,
           AspectRatio: 'auto', 
@@ -99,9 +99,7 @@ module.exports = function(Storage) {
             Rotate: 'auto',
             ThumbnailPattern: '-SD-{count}',
             //iPhone1-3 (640x480 Mp4 baseline AAC)
-            //PresetId: '1445198308687-fnaxk5' 
-            //PresetId: '1452644707524-dm853y' 
-            PresetId: '1452650735370-1grufa' 
+            PresetId: '1486612511217-04ktxv' 
           }] 
           //TODO webM
       }
@@ -143,9 +141,7 @@ module.exports = function(Storage) {
             Rotate: 'auto',
             ThumbnailPattern: '-SD-{count}',
             //iPhone1-3 (640x480 Mp4 baseline AAC)
-            PresetId: '1452650735370-1grufa' 
-            //PresetId: '1452644707524-dm853y' 
-            //PresetId: '1445198308687-fnaxk5' 
+            PresetId: '1486612511217-04ktxv' 
           }] 
           //TODO webM
       }
