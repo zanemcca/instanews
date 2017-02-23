@@ -5,6 +5,7 @@ var cred = require('./conf/credentials');
 var mongo = cred.get('mongo');
 var mongoCA = cred.get('mongoCA');
 var aws = cred.get('aws');
+var mailgun = cred.get('mailgun');
 
 if( !mongo ) {
   return process.exit(1);
@@ -101,6 +102,11 @@ module.exports = {
     installation: 'installation',
     notification: 'notification',
     application: 'app'
+  },
+  mailgun: {
+    connector: 'loopback-connector-mailgun',
+    apikey: mailgun.apikey,
+    domain: mailgun.domain
   },
   /*
   sendgrid: {

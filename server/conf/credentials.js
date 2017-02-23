@@ -91,6 +91,10 @@ if( process.env.NODE_ENV === 'production' ||
     else {
       keys = decryptFile('.keys.staging');
     }
+    if(!keys) {
+      console.error('Error: Failure decrypting file');
+      process.exit(1);
+    }
   }
 }
 else {
