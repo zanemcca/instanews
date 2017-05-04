@@ -630,8 +630,13 @@ if(cluster.isMaster && numCPUs > 1 && process.env.NODE_ENV === 'production') {
 
   // Redirect all zanemccaig.com requests to www.zanemccaig.com
   app.get('/*', function(req, res, next) {
+    var newUrl = 'https://www.' + req.headers.host + req.url;
     if (req.headers.host.match(/^zanemccaig.com/) !== null ) {
-      var newUrl = 'https://www.' + req.headers.host + req.url;
+      console.log('Redirecting to ' + newUrl);
+      res.redirect(301, newUrl);
+    } else if (req.connection.encrypted == null && req.headers.host.match(/zanemccaig.com/) !== null) {
+      newUrl = 'https://' + req.headers.host + req.url;
+      console.log('Redirecting to ' + newUrl);
       res.redirect(301, newUrl);
     } else {
       next();
