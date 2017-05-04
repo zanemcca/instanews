@@ -632,11 +632,11 @@ if(cluster.isMaster && numCPUs > 1 && process.env.NODE_ENV === 'production') {
   app.get('/*', function(req, res, next) {
     var newUrl = 'https://www.' + req.headers.host + req.url;
     if (req.headers.host.match(/^zanemccaig.com/) !== null ) {
-      console.log('Redirecting to ' + newUrl);
+      console.log('Redirecting http request to ' + newUrl);
       res.redirect(301, newUrl);
-    } else if (req.connection.encrypted == null && req.headers.host.match(/zanemccaig.com/) !== null) {
+    } else if (!req.secure && req.headers.host.match(/zanemccaig.com/) !== null) {
       newUrl = 'https://' + req.headers.host + req.url;
-      console.log('Redirecting to ' + newUrl);
+      console.log('Redirecting http request to ' + newUrl);
       res.redirect(301, newUrl);
     } else {
       next();
